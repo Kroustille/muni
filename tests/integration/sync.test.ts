@@ -10,6 +10,7 @@ import { InMemoryItemRepository } from "../helpers/in-memory-item-repository";
 import { InMemoryRemoteStore } from "../helpers/in-memory-remote-store";
 
 const T0 = Date.parse("2026-01-01T10:00:00.000Z");
+let nextItemId = 0;
 
 type Device = {
   repository: InMemoryItemRepository;
@@ -26,11 +27,10 @@ function createDevice(
 ): Device {
   const repository = new InMemoryItemRepository();
   let clock = T0;
-  let idCounter = 0;
   const useCases = createItemUseCases({
     repository,
     idGenerator: {
-      newId: () => `00000000-0000-4000-8000-${String(++idCounter).padStart(12, "0")}`,
+      newId: () => `00000000-0000-4000-8000-${String(++nextItemId).padStart(12, "0")}`,
     },
     now: () => clock,
   });
@@ -100,8 +100,8 @@ describe("sync engine integration", () => {
     await syncAll(a, b);
     const afterAb = await itemSnapshot(b);
     expect(afterBa).toBe(afterAb);
-    expect(await a.useCases.getItem(onlyOnA.id)?.title).toBe("Alien");
-    expect(await b.useCases.getItem(onlyOnB.id)?.title).toBe("Crêpes");
+    expect((await a.useCases.getItem(onlyOnA.id))?.title).toBe("Alien");
+    expect((await b.useCases.getItem(onlyOnB.id))?.title).toBe("Crêpes");
   });
 
   it("resolves edit vs delete so the latest field change wins", async () => {
@@ -168,7 +168,7 @@ describe("sync engine integration", () => {
 
     await client.engine.run();
     expect(await client.repository.outbox()).toEqual([]);
-    expect(await client.useCases.getItem(item.id)?.title).toBe("Retry me");
+    expect((await client.useCases.getItem(item.id))?.title).toBe("Retry me");
     vi.useRealTimers();
   });
 
@@ -200,8 +200,8 @@ describe("sync engine integration", () => {
       expect.objectContaining({ id: bad.id, message: expect.stringMatching(/rating/i) }),
     ]);
     expect(await client.repository.outbox()).toEqual([]);
-    expect(await client.useCases.getItem(good.id)?.title).toBe("Valid");
-    expect(await client.useCases.getItem(bad.id)?.rating).toBe(9);
+    expect((await client.useCases.getItem(good.id))?.title).toBe("Valid");
+    expect((await client.useCases.getItem(bad.id))?.rating).toBe(9);
     expect(remote.snapshot().some((row) => row.id === good.id)).toBe(true);
     expect(remote.snapshot().some((row) => row.id === bad.id)).toBe(false);
   });
