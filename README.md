@@ -1,23 +1,59 @@
 # Muni
 
-Muni is a life companion: a mobile-first, offline-capable PWA that works as a second brain. The name comes from Muninn, Odin's raven of memory. It keeps typed lists for shopping, books, movies and recipes, synced across phone and desktop.
+**Muni** is an offline-first life companion PWA — a mobile-first second brain for typed lists that sync across phone and desktop. The name comes from **Muninn**, Odin's raven of memory.
 
-## Status
+Capture books, films, recipes, and shopping in a few taps; browse and update them offline; changes sync when you're back online. The UI is **French** (i18n message catalog); this README is in English.
 
-Specification phase. Nothing is implemented yet. The product was defined through an interview and captured with [GitHub Spec Kit](https://github.com/github/spec-kit).
+## Features
 
-- Constitution: `.specify/memory/constitution.md`
-- v1 spec: `specs/001-typed-lists-companion/spec.md`
+**Core (v1)** — four typed lists with quick-add, search, ratings, and per-field sync:
 
-## Next steps with Spec Kit
+| List | Highlights |
+|------|------------|
+| **Shopping** | Check off items, fast capture |
+| **Books** | Reading status, 1–5 star rating when finished |
+| **Movies** | Watch status, personal rating |
+| **Recipes** | Ingredients, steps, notes |
 
-Run these in the agent, in order:
+**Catalog extensions** (spec-driven; see [`specs/`](specs/)):
 
-1. `/speckit-clarify` to resolve remaining ambiguity (optional).
-2. `/speckit-plan` to produce the technical plan (Next.js, TypeScript, Tailwind, IndexedDB, self-hosted PostgreSQL).
-3. `/speckit-tasks` to produce the task list.
-4. `/speckit-implement` to build it.
+- **Books** — mobile ISBN barcode scan + Open Library lookup via the server ([`002-book-barcode-scan`](specs/002-book-barcode-scan/spec.md))
+- **Movies** — title search against a keyless catalog (Wikidata / IMDb id), planned ([`003-movie-imdb-search`](specs/003-movie-imdb-search/spec.md))
+- **Music** — artists and tracks lists with optional MusicBrainz search + Spotify/SoundCloud links, planned ([`004-music-artists-tracks`](specs/004-music-artists-tracks/spec.md))
 
-## Commit convention
+Sign-in: Google or email magic link (SMTP). First use needs a network connection; after that the app works fully offline and an expired session never blocks local data.
 
-All commits follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/), e.g. `feat: add quick add bar` or `docs: update spec`. See the constitution for details.
+## Stack
+
+Single **Next.js 15** app (App Router): React UI + API route handlers in one deployable.
+
+- **Architecture** — domain-driven design, **hexagonal** (ports & adapters): pure `domain`, `application` use cases, adapters for IndexedDB, PostgreSQL (Kysely), SMTP, OIDC, and browser APIs
+- **Client** — IndexedDB is the UI source of truth; background sync to self-hosted PostgreSQL; **Serwist** PWA
+- **Server** — Node route handlers, sessions in PostgreSQL, no third-party BaaS or analytics
+
+Details: [`specs/001-typed-lists-companion/plan.md`](specs/001-typed-lists-companion/plan.md) and [`.specify/memory/constitution.md`](.specify/memory/constitution.md).
+
+## Local development
+
+**Requirements:** Node.js 22+, [Corepack](https://nodejs.org/api/corepack.html) (`corepack enable`), Docker Compose.
+
+```bash
+corepack enable
+yarn install
+cp .env.example .env.local   # database, APP_URL, SMTP (Mailpit), optional Google OAuth
+docker compose up -d         # PostgreSQL + Mailpit
+yarn migrate:up
+yarn dev                     # http://localhost:3000
+```
+
+Magic links appear in Mailpit at http://localhost:8025. After schema changes: `yarn db:codegen`.
+
+**Checks:** `yarn typecheck`, `yarn test`, `yarn test:coverage`, `yarn test:e2e`. Manual validation scenarios: [`specs/001-typed-lists-companion/quickstart.md`](specs/001-typed-lists-companion/quickstart.md).
+
+## Specifications
+
+Features are specified under [`specs/`](specs/) using [GitHub Spec Kit](https://github.com/github/spec-kit) (constitution, spec, plan, tasks). Start with [`specs/001-typed-lists-companion/spec.md`](specs/001-typed-lists-companion/spec.md).
+
+## Commits
+
+[Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/) — e.g. `feat: add quick add bar`, `docs: update readme`. See the constitution for project conventions.

@@ -1,6 +1,7 @@
 {
   "name": "muni",
   "version": "0.1.0",
+  "description": "Offline-first life companion PWA — typed lists (shopping, books, movies, recipes) with hexagonal Next.js architecture",
   "private": true,
   "packageManager": "yarn@1.22.22",
   "scripts": {
