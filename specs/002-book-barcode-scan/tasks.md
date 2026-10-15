@@ -18,7 +18,7 @@
 
 ## Phase 1: Setup (Feature 002)
 
-- [ ] T201 Add Open Library and barcode WASM dependencies and document versions in `package.json` per research.md
+- [x] T201 Add Open Library and barcode WASM dependencies and document versions in `package.json` per research.md
 - [ ] T202 [P] Add i18n keys for scan, preview, lookup errors, genres editor in `src/i18n/fr.json`
 
 ---
