@@ -116,7 +116,12 @@ export function createMusicBrainzCatalogSearch(
         const payload = await fetchJson<MbArtistSearchResponse>(fetchFn, url);
         const hits = mapArtistResponse(payload);
         if (deps.cache) {
-          await deps.cache.set("musicbrainz", cacheKey, hits, now);
+          await deps.cache.upsert({
+            provider: "musicbrainz",
+            cacheKey,
+            payload: hits,
+            fetchedAt: now,
+          });
         }
         return hits;
       } catch (error) {
@@ -146,7 +151,12 @@ export function createMusicBrainzCatalogSearch(
         const payload = await fetchJson<MbRecordingSearchResponse>(fetchFn, url);
         const hits = mapRecordingResponse(payload).filter((hit) => hit.artist.trim() !== "");
         if (deps.cache) {
-          await deps.cache.set("musicbrainz", cacheKey, hits, now);
+          await deps.cache.upsert({
+            provider: "musicbrainz",
+            cacheKey,
+            payload: hits,
+            fetchedAt: now,
+          });
         }
         return hits;
       } catch (error) {
