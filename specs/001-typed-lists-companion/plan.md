@@ -178,7 +178,7 @@ Sign-in comes first because every other story assumes a signed-in user.
 ## Auth Approach (Google OIDC, in-house magic link)
 
 - **Magic link**: in-house use cases (`requestMagicLink`, `verifyMagicLink`) over `MagicLinkTokenRepository`, `Mailer` and `TokenGenerator`; no library.
-- **Google**: the `OAuthProvider` port (`begin() -> { redirectUrl, flowState }`, `complete(callbackParams, flowState) -> verified identity | rejection`) implemented by an adapter over `openid-client`, which does discovery, PKCE, state and nonce checks and id-token verification (issuer, audience, expiry, nonce, signature) and requires a verified email. `flowState` (state, nonce, code verifier) is kept in a short-lived HttpOnly cookie by the route handler.
+- **Google**: the `OAuthProvider` port (`begin() -> { redirectUrl, flowState }`, `complete(callbackParams, flowState) -> verified identity | rejection`) implemented by an adapter over `openid-client`, which does discovery, PKCE, state and nonce checks and id-token checks (issuer, audience, expiry, nonce) and requires a verified email. `openid-client` v6 does not verify the signature of an id token obtained directly from the token endpoint, so the adapter verifies the signature itself against the provider JWKS with `jose` (explicit dependency). `flowState` (state, nonce, code verifier) is kept in a short-lived HttpOnly cookie by the route handler.
 - **Why**: `openid-client` works with plain Web `Request`/`Response` and has no Express or session coupling, so no bridge is needed. Previous Passport and `arctic` options were dropped by the user.
 - **Risk**: id-token and PKCE handling is delegated to one library, covered by adapter tests against mocked HTTP and JWKS plus a manual Google check in the quickstart.
 
