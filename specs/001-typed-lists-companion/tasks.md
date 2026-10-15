@@ -25,7 +25,7 @@
 ## Phase 1: Setup (Shared Infrastructure)
 
 - [X] T001 Initialize Next.js 15 App Router project with TypeScript strict, React 19 and Tailwind CSS 4 at repo root (`package.json`, `tsconfig.json`, `next.config.ts`, `postcss.config.mjs`, `src/app/layout.tsx`, `src/app/globals.css`)
-- [ ] T002 Install runtime dependencies `idb`, `zod`, `@serwist/next`, `kysely`, `pg`, `openid-client`, `nodemailer` and dev dependencies `vitest`, `@vitest/coverage-v8`, `fake-indexeddb`, `@playwright/test`, `kysely-codegen`, `@types/pg`, `@types/nodemailer` in `package.json` (no Passport, no Express, no `tsx`)
+- [X] T002 Install runtime dependencies `idb`, `zod`, `@serwist/next`, `kysely`, `pg`, `openid-client`, `nodemailer` and dev dependencies `vitest`, `@vitest/coverage-v8`, `fake-indexeddb`, `@playwright/test`, `kysely-codegen`, `@types/pg`, `@types/nodemailer` in `package.json` (no Passport, no Express, no `tsx`)
 - [ ] T003 [P] Configure Vitest (`vitest.config.ts`, setup file loading `fake-indexeddb/auto`) and Playwright (`playwright.config.ts`) with `npm test` and `npm run test:e2e` scripts in `package.json`
 - [ ] T004 [P] Configure ESLint and Prettier (`eslint.config.mjs`, `.prettierrc`) and a `typecheck` script in `package.json`
 - [ ] T005 [P] Create the hexagonal source folder skeleton from plan.md (`src/domain/`, `src/application/ports/`, `src/application/sync/`, `src/application/server/`, `src/application/auth/`, `src/adapters/indexeddb/`, `src/adapters/http/`, `src/adapters/browser/`, `src/adapters/postgres/`, `src/adapters/mail/`, `src/adapters/google/`, `src/adapters/node/`, `src/composition/`, `src/components/`, `src/i18n/`, `db/migrations/`, `tests/unit/`, `tests/integration/`, `tests/e2e/`, `tests/helpers/`, `tests/vectors/`)
