@@ -18,6 +18,14 @@ import { createUpsertBookFromCatalog } from "./books/upsert-from-catalog";
 import type { UpsertBookFromCatalogInput } from "./books/upsert-from-catalog";
 import { createUpsertMovieFromCatalog } from "./movies/upsert-from-catalog";
 import type { UpsertMovieFromCatalogInput } from "./movies/upsert-from-catalog";
+import {
+  createUpsertMusicArtistFromCatalog,
+  createUpsertMusicTrackFromCatalog,
+} from "./music/upsert-from-catalog";
+import type {
+  UpsertMusicArtistFromCatalogInput,
+  UpsertMusicTrackFromCatalogInput,
+} from "./music/upsert-from-catalog";
 import type { IdGenerator } from "./ports/id-generator";
 import type { ItemRepository, Unsubscribe } from "./ports/item-repository";
 
@@ -43,6 +51,9 @@ export type ItemUseCases = {
   applyRemote(rows: ItemWire[]): Promise<void>;
   upsertBookFromCatalog(input: UpsertBookFromCatalogInput): Promise<Item>;
   upsertMovieFromCatalog(input: UpsertMovieFromCatalogInput): Promise<Item>;
+  upsertMusicArtistFromCatalog(input: UpsertMusicArtistFromCatalogInput): Promise<Item>;
+  upsertMusicTrackFromCatalog(input: UpsertMusicTrackFromCatalogInput): Promise<Item>;
+  musicArtistSuggestions(prefix: string): Promise<string[]>;
 };
 
 const byNewest = (a: Item, b: Item): number =>
@@ -95,6 +106,18 @@ export function createItemUseCases({
   });
 
   const upsertMovieFromCatalog = createUpsertMovieFromCatalog({
+    repository,
+    idGenerator,
+    now,
+  });
+
+  const upsertMusicArtistFromCatalog = createUpsertMusicArtistFromCatalog({
+    repository,
+    idGenerator,
+    now,
+  });
+
+  const upsertMusicTrackFromCatalog = createUpsertMusicTrackFromCatalog({
     repository,
     idGenerator,
     now,
@@ -181,6 +204,23 @@ export function createItemUseCases({
     upsertBookFromCatalog: (input) => serialized(() => upsertBookFromCatalog(input)),
 
     upsertMovieFromCatalog: (input) => serialized(() => upsertMovieFromCatalog(input)),
+
+    upsertMusicArtistFromCatalog: (input) =>
+      serialized(() => upsertMusicArtistFromCatalog(input)),
+
+    upsertMusicTrackFromCatalog: (input) => serialized(() => upsertMusicTrackFromCatalog(input)),
+
+    musicArtistSuggestions: async (prefix) => {
+      const wanted = normalizeText(prefix);
+      const seen = new Map<string, string>();
+      for (const item of await repository.query({ type: "music_artist" })) {
+        if (item.deletedAt !== null) continue;
+        const title = item.title;
+        if (!normalizeText(title).startsWith(wanted)) continue;
+        if (!seen.has(title)) seen.set(title, title);
+      }
+      return [...seen.values()].sort((a, b) => a.localeCompare(b, "fr"));
+    },
 
     applyRemote: (rows) =>
       serialized(async () => {
