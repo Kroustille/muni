@@ -148,7 +148,7 @@
 **Independent Test**: Create items in each list, change statuses, check off shopping items, edit and delete, confirm changes persist after reload.
 
 - [X] T069 [US3] Write the e2e scenarios first (must fail): check off, status change plus rating hide/restore, status filter, edit persists after reload including recipe ingredients and steps, delete then Undo in `tests/e2e/lists.spec.ts` (depends on T068)
-- [ ] T070 [P] [US3] Add shopping check-off toggle and quantity display to the list row in `src/components/rows/ShoppingRow.tsx` (depends on T069)
+- [X] T070 [P] [US3] Add shopping check-off toggle and quantity display to the list row in `src/components/rows/ShoppingRow.tsx` (depends on T069)
 - [ ] T071 [P] [US3] Add status selector and 1 to 5 star rating (rating visible and editable only when status is `read`/`watched`, stored value kept but hidden otherwise) in `src/components/rows/BookMovieRow.tsx` and `src/components/StarRating.tsx` (depends on T069)
 - [ ] T072 [P] [US3] Add status filter (books: to read, reading, read; movies: to watch, watched) to the list view in `src/components/StatusFilter.tsx`, wired through `listItems(type, {status})` in `src/app/(app)/lists/[type]/page.tsx` (depends on T069)
 - [X] T073 [US3] Build the item detail and edit route with type-specific fields, recipe ingredients (quantity and name) and ordered steps editing in `src/app/(app)/items/[id]/page.tsx` (depends on T065, T069)

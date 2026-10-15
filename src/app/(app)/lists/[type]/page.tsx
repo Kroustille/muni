@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getItemUseCases } from "@/composition/client";
+import { ShoppingRow } from "@/components/rows/ShoppingRow";
 import type { Item, ItemType } from "@/domain/item";
 import { t, type MessageKey } from "@/i18n";
 
@@ -83,6 +84,19 @@ export default function ListPage() {
       ) : (
         <ul className="flex flex-col gap-2">
           {items.map((item) => {
+            if (item.type === "shopping") {
+              return (
+                <ShoppingRow
+                  key={item.id}
+                  item={item}
+                  onCheckedChange={(checked) => {
+                    void getItemUseCases().then((useCases) =>
+                      useCases.updateItem(item.id, { checked }),
+                    );
+                  }}
+                />
+              );
+            }
             const secondary = rowSecondaryText(item);
             return (
               <li key={item.id} className="rounded-lg border border-border px-3 py-2">
