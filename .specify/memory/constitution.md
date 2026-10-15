@@ -1,4 +1,4 @@
-# Life Companion Constitution
+# Muni Constitution
 
 ## Core Principles
 

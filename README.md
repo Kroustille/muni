@@ -1,6 +1,6 @@
-# Life Companion
+# Muni
 
-A mobile-first, offline-capable PWA that works as a second brain. It keeps typed lists for shopping, books, movies and recipes, synced across phone and desktop.
+Muni is a life companion: a mobile-first, offline-capable PWA that works as a second brain. The name comes from Muninn, Odin's raven of memory. It keeps typed lists for shopping, books, movies and recipes, synced across phone and desktop.
 
 ## Status
 

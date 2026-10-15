@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Life Companion v1
+# Specification Quality Checklist: Muni v1
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning
 **Created**: 2026-10-15

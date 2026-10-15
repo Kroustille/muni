@@ -1,4 +1,4 @@
-# Feature Specification: Life Companion v1 (Typed Lists Second Brain)
+# Feature Specification: Muni v1 (Typed Lists Second Brain)
 
 **Feature Branch**: `001-typed-lists-companion`
 
