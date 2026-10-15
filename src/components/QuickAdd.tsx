@@ -8,6 +8,7 @@ import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
 import { BookIsbnLookup } from "@/components/quick-add/book-isbn-lookup";
 import { BookScanEntry } from "@/components/quick-add/book-scan-entry";
+import { MovieCatalogFlow } from "@/components/movies/movie-catalog-flow";
 import {
   BookFields,
   bookFieldValuesToExtra,
@@ -176,11 +177,14 @@ export function QuickAdd() {
         );
       case "movie":
         return (
-          <MovieFields
-            values={values as MovieFieldValues}
-            onChange={updateValues}
-            titleError={titleError}
-          />
+          <>
+            <MovieCatalogFlow onSaved={close} />
+            <MovieFields
+              values={values as MovieFieldValues}
+              onChange={updateValues}
+              titleError={titleError}
+            />
+          </>
         );
       case "recipe":
         return (

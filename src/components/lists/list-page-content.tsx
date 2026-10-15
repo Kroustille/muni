@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getItemUseCases, subscribeSyncStatus } from "@/composition/client";
 import { BookCatalogFlow } from "@/components/books/book-catalog-flow";
+import { MovieCatalogFlow } from "@/components/movies/movie-catalog-flow";
 import { BookMovieRow } from "@/components/rows/BookMovieRow";
 import { ShoppingRow } from "@/components/rows/ShoppingRow";
 import { StatusFilter, type StatusFilterValue } from "@/components/StatusFilter";
@@ -147,6 +148,7 @@ export function ListPageContent({ route }: ListPageContentProps) {
         {route === "books" && isMobile ? (
           <BookCatalogFlow onSaved={refreshList} showDefaultTrigger />
         ) : null}
+        {route === "movies" ? <MovieCatalogFlow onSaved={refreshList} /> : null}
       </div>
       {showStatusFilter ? (
         <StatusFilter
