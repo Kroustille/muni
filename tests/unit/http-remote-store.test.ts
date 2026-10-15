@@ -19,6 +19,12 @@ const sampleItem: ItemWire = {
   steps: null,
   deleted_at: null,
   fields_updated_at: {},
+  isbn: null,
+  synopsis: null,
+  genres: null,
+  publication_year: null,
+  publisher: null,
+  page_count: null,
   server_updated_at: null,
 };
 

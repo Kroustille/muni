@@ -36,12 +36,12 @@ function createFakeDocument(initial: DocumentVisibilityState = "visible"): FakeD
   const listeners = new Map<string, Set<EventListener>>();
   return {
     visibilityState,
-    addEventListener(type, listener) {
+    addEventListener(type: string, listener: EventListener) {
       const set = listeners.get(type) ?? new Set<EventListener>();
       set.add(listener);
       listeners.set(type, set);
     },
-    removeEventListener(type, listener) {
+    removeEventListener(type: string, listener: EventListener) {
       listeners.get(type)?.delete(listener);
     },
     setVisibility(state) {

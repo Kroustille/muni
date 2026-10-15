@@ -1,15 +1,20 @@
 import type { Kysely, Selectable } from "kysely";
 
-import { isCatalogCacheFresh } from "../../application/catalog-cache/ttl";
+import { isCatalogCacheFresh } from "../../application/ports/catalog-cache-ttl";
 import type {
+  CatalogCacheProvider,
   CatalogCacheRecord,
   CatalogCacheRepository,
 } from "../../application/ports/catalog-cache-repository";
-import type { CatalogCache, DB } from "./db-types";
+import type { CatalogCache, DB, Json } from "./db-types";
+
+function rowPayload(row: Selectable<CatalogCache>): unknown {
+  return row.payload;
+}
 
 export function createPostgresCatalogCacheRepository(db: Kysely<DB>): CatalogCacheRepository {
   return {
-    async get(provider, cacheKey, now) {
+    async get(provider: CatalogCacheProvider, cacheKey: string, now: Date) {
       const row = await db
         .selectFrom("catalog_cache")
         .selectAll()
@@ -21,7 +26,7 @@ export function createPostgresCatalogCacheRepository(db: Kysely<DB>): CatalogCac
       if (!isCatalogCacheFresh(fetchedAt, now)) {
         return null;
       }
-      return row.payload;
+      return rowPayload(row);
     },
 
     async upsert(record: CatalogCacheRecord) {
@@ -30,12 +35,12 @@ export function createPostgresCatalogCacheRepository(db: Kysely<DB>): CatalogCac
         .values({
           provider: record.provider,
           cache_key: record.cacheKey,
-          payload: record.payload as Selectable<CatalogCache>["payload"],
+          payload: record.payload as Json,
           fetched_at: record.fetchedAt,
         })
         .onConflict((oc) =>
           oc.columns(["provider", "cache_key"]).doUpdateSet({
-            payload: record.payload as Selectable<CatalogCache>["payload"],
+            payload: record.payload as Json,
             fetched_at: record.fetchedAt,
           }),
         )

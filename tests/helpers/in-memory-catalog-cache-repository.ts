@@ -1,4 +1,4 @@
-import { isCatalogCacheFresh } from "@/application/catalog-cache/ttl";
+import { isCatalogCacheFresh } from "@/application/ports/catalog-cache-ttl";
 import type {
   CatalogCacheProvider,
   CatalogCacheRecord,

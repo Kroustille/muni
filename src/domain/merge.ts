@@ -13,6 +13,12 @@ const MERGED_FIELDS = [
   "ingredients",
   "steps",
   "deleted_at",
+  "isbn",
+  "synopsis",
+  "genres",
+  "publication_year",
+  "publisher",
+  "page_count",
 ] as const satisfies readonly (keyof ItemWire)[];
 
 function compareValues(a: unknown, b: unknown): number {

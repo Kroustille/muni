@@ -55,6 +55,12 @@ function validBookWire(overrides: Partial<ItemWire> = {}): ItemWire {
     steps: null,
     deleted_at: null,
     fields_updated_at: { title: "1000-0-dev-a" },
+    isbn: null,
+    synopsis: null,
+    genres: null,
+    publication_year: null,
+    publisher: null,
+    page_count: null,
     server_updated_at: null,
     ...overrides,
   };

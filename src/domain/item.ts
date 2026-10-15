@@ -140,7 +140,7 @@ function checkCrossType(value: Item, ctx: z.RefinementCtx, path: (f: string) => 
       message: `invalid status for type ${value.type}`,
     });
   }
-  if (value.type === "book" && value.isbn !== null && !isValidIsbn(value.isbn)) {
+  if (value.type === "book" && value.isbn != null && !isValidIsbn(value.isbn)) {
     ctx.addIssue({
       code: "custom",
       path: [path("isbn")],
@@ -189,21 +189,18 @@ export const itemWireSchema = z
     steps: itemShape.steps,
     deleted_at: itemShape.deletedAt,
     fields_updated_at: itemShape.fieldsUpdatedAt,
-    isbn: itemShape.isbn,
-    synopsis: itemShape.synopsis,
-    genres: itemShape.genres,
-    publication_year: itemShape.publicationYear,
-    publisher: itemShape.publisher,
-    page_count: itemShape.pageCount,
+    isbn: itemShape.isbn.optional(),
+    synopsis: itemShape.synopsis.optional(),
+    genres: itemShape.genres.optional(),
+    publication_year: itemShape.publicationYear.optional(),
+    publisher: itemShape.publisher.optional(),
+    page_count: itemShape.pageCount.optional(),
     server_updated_at: timestamp.nullable(),
   })
   .superRefine((wire, ctx) =>
     checkCrossType(
       {
-        ...mapKeys(
-          wire as Record<string, unknown>,
-          camelOf,
-        ),
+        ...coalesceCatalogWireFields(wire),
         createdAt: wire.created_at,
         recommendedBy: wire.recommended_by,
         deletedAt: wire.deleted_at,
@@ -295,11 +292,32 @@ export function itemToWire(item: Item, serverUpdatedAt: string | null = null): I
   };
 }
 
+function coalesceCatalogWireFields(
+  wire: Omit<ItemWire, "fields_updated_at" | "server_updated_at">,
+): Record<string, unknown> {
+  return {
+    ...mapKeys(restWithoutCatalog(wire), camelOf),
+    isbn: wire.isbn ?? null,
+    synopsis: wire.synopsis ?? null,
+    genres: wire.genres ?? null,
+    publicationYear: wire.publication_year ?? null,
+    publisher: wire.publisher ?? null,
+    pageCount: wire.page_count ?? null,
+  };
+}
+
+function restWithoutCatalog(
+  wire: Omit<ItemWire, "fields_updated_at" | "server_updated_at">,
+): Record<string, unknown> {
+  const { isbn, synopsis, genres, publication_year, publisher, page_count, ...rest } = wire;
+  return rest as Record<string, unknown>;
+}
+
 export function wireToItem(wire: ItemWire): Item {
   const { fields_updated_at, ...rest } = wire;
   delete (rest as Partial<ItemWire>).server_updated_at;
   return itemSchema.parse({
-    ...mapKeys(rest, camelOf),
+    ...coalesceCatalogWireFields(rest),
     fieldsUpdatedAt: mapKeys(fields_updated_at, camelOf),
   }) as Item;
 }

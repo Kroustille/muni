@@ -4,10 +4,12 @@ import { createBrowserConnectivity } from "@/adapters/browser/connectivity";
 
 describe("browser Connectivity adapter", () => {
   const listeners = new Map<string, Set<EventListener>>();
+  const navigatorState = { onLine: true };
 
   beforeEach(() => {
     listeners.clear();
-    vi.stubGlobal("navigator", { onLine: true });
+    navigatorState.onLine = true;
+    vi.stubGlobal("navigator", navigatorState);
     vi.stubGlobal("window", {
       addEventListener(type: string, listener: EventListener) {
         const set = listeners.get(type) ?? new Set<EventListener>();
@@ -43,7 +45,7 @@ describe("browser Connectivity adapter", () => {
   it("reports navigator.onLine", () => {
     const connectivity = createBrowserConnectivity();
     expect(connectivity.isOnline()).toBe(true);
-    navigator.onLine = false;
+    navigatorState.onLine = false;
     expect(connectivity.isOnline()).toBe(false);
   });
 
@@ -51,7 +53,7 @@ describe("browser Connectivity adapter", () => {
     const connectivity = createBrowserConnectivity();
     const states: boolean[] = [];
     connectivity.onChange((online) => states.push(online));
-    navigator.onLine = true;
+    navigatorState.onLine = true;
     dispatch("online");
     expect(states).toEqual([true]);
   });
@@ -60,7 +62,7 @@ describe("browser Connectivity adapter", () => {
     const connectivity = createBrowserConnectivity();
     const states: boolean[] = [];
     connectivity.onChange((online) => states.push(online));
-    navigator.onLine = false;
+    navigatorState.onLine = false;
     dispatch("offline");
     expect(states).toEqual([false]);
   });
@@ -69,9 +71,9 @@ describe("browser Connectivity adapter", () => {
     const connectivity = createBrowserConnectivity();
     const states: boolean[] = [];
     connectivity.onChange((online) => states.push(online));
-    navigator.onLine = true;
+    navigatorState.onLine = true;
     dispatch("visibilitychange");
-    navigator.onLine = false;
+    navigatorState.onLine = false;
     dispatch("visibilitychange");
     expect(states).toEqual([true, false]);
   });

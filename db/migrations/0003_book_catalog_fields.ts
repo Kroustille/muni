@@ -6,8 +6,6 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
     OR (rating >= 1 AND rating <= 5)
   )
   AND char_length(btrim(title)) > 0
-  AND (publication_year IS NULL OR (publication_year >= 1000 AND publication_year <= 2100))
-  AND (page_count IS NULL OR page_count >= 1)
   AND (
     CASE type::text
       WHEN 'shopping' THEN
@@ -30,6 +28,8 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND steps IS NULL
         AND checked = false
         AND (status IS NULL OR status IN ('to_read', 'reading', 'read'))
+        AND (publication_year IS NULL OR (publication_year >= 1000 AND publication_year <= 2100))
+        AND (page_count IS NULL OR page_count >= 1)
       WHEN 'movie' THEN
         author IS NULL
         AND quantity IS NULL
@@ -67,7 +67,7 @@ export async function up(db: Kysely<unknown>): Promise<void> {
     .addColumn("isbn", "text")
     .addColumn("synopsis", "text")
     .addColumn("genres", "jsonb")
-    .addColumn("publication_year", "integer")
+    .addColumn("publication_year", "smallint")
     .addColumn("publisher", "text")
     .addColumn("page_count", "integer")
     .execute();
@@ -80,7 +80,18 @@ export async function up(db: Kysely<unknown>): Promise<void> {
 }
 
 export async function down(db: Kysely<unknown>): Promise<void> {
-  const priorCheck = sql`
+  await db.schema.alterTable("items").dropConstraint("items_type_fields").execute();
+  await db.schema
+    .alterTable("items")
+    .dropColumn("page_count")
+    .dropColumn("publisher")
+    .dropColumn("publication_year")
+    .dropColumn("genres")
+    .dropColumn("synopsis")
+    .dropColumn("isbn")
+    .execute();
+
+  const LEGACY_CHECK = sql`
     (
       rating IS NULL
       OR (rating >= 1 AND rating <= 5)
@@ -120,17 +131,8 @@ export async function down(db: Kysely<unknown>): Promise<void> {
       END
     )
   `;
-
-  await db.schema.alterTable("items").dropConstraint("items_type_fields").execute();
-  await db.schema.alterTable("items").addCheckConstraint("items_type_fields", priorCheck).execute();
-
   await db.schema
     .alterTable("items")
-    .dropColumn("isbn")
-    .dropColumn("synopsis")
-    .dropColumn("genres")
-    .dropColumn("publication_year")
-    .dropColumn("publisher")
-    .dropColumn("page_count")
+    .addCheckConstraint("items_type_fields", LEGACY_CHECK)
     .execute();
 }

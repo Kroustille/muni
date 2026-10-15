@@ -27,6 +27,12 @@ function toWire(row: Selectable<Items>): ItemWire {
     steps: row.steps as ItemWire["steps"],
     deleted_at: row.deleted_at === null ? null : toIso(row.deleted_at),
     fields_updated_at: row.fields_updated_at as ItemWire["fields_updated_at"],
+    isbn: row.isbn,
+    synopsis: row.synopsis,
+    genres: row.genres as ItemWire["genres"],
+    publication_year: row.publication_year,
+    publisher: row.publisher,
+    page_count: row.page_count,
     server_updated_at: toIso(row.server_updated_at),
   };
 }
@@ -52,6 +58,12 @@ function toRow(userId: string, wire: ItemWire): Insertable<Items> {
     steps: wire.steps,
     deleted_at: wire.deleted_at,
     fields_updated_at: wire.fields_updated_at,
+    isbn: wire.isbn ?? null,
+    synopsis: wire.synopsis ?? null,
+    genres: wire.genres ?? null,
+    publication_year: wire.publication_year ?? null,
+    publisher: wire.publisher ?? null,
+    page_count: wire.page_count ?? null,
     server_updated_at: wire.server_updated_at,
   };
 }
@@ -107,6 +119,12 @@ function createRepo(db: DbOrTrx, inTransaction: boolean): ServerItemRepository {
               steps: values.steps,
               deleted_at: values.deleted_at,
               fields_updated_at: values.fields_updated_at,
+              isbn: values.isbn,
+              synopsis: values.synopsis,
+              genres: values.genres,
+              publication_year: values.publication_year,
+              publisher: values.publisher,
+              page_count: values.page_count,
               server_updated_at: values.server_updated_at,
             }),
           )

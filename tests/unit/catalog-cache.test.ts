@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   CATALOG_CACHE_TTL_MS,
   isCatalogCacheFresh,
-} from "@/application/catalog-cache/ttl";
+} from "@/application/ports/catalog-cache-ttl";
 
 import { InMemoryCatalogCacheRepository } from "../helpers/in-memory-catalog-cache-repository";
 

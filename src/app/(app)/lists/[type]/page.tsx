@@ -152,10 +152,11 @@ export default function ListPage() {
         <ul className="flex flex-col gap-2">
           {items.map((item) => {
             if (item.type === "shopping") {
+              const shoppingItem = item as typeof item & { type: "shopping" };
               return (
                 <ShoppingRow
                   key={item.id}
-                  item={item}
+                  item={shoppingItem}
                   onCheckedChange={(checked) => {
                     void getItemUseCases().then((useCases) =>
                       useCases.updateItem(item.id, { checked }),
@@ -165,10 +166,11 @@ export default function ListPage() {
               );
             }
             if (item.type === "book" || item.type === "movie") {
+              const mediaItem = item as typeof item & { type: "book" | "movie" };
               return (
                 <BookMovieRow
                   key={item.id}
-                  item={item}
+                  item={mediaItem}
                   onStatusChange={(status) => {
                     updateBookMovieItem(item.id, { status });
                   }}
