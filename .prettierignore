@@ -1,0 +1,9 @@
+.next
+node_modules
+coverage
+dist
+package-lock.json
+.cursor
+.specify
+specs
+*.md
