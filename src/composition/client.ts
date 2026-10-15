@@ -1,4 +1,7 @@
+import { createPlatformBrowserBarcodeScanner } from "../adapters/browser/barcode-scanner";
+import { createCameraBarcodeFrameSource } from "../adapters/browser/camera-barcode-frame-source";
 import { createBrowserConnectivity } from "../adapters/browser/connectivity";
+import type { BarcodeScanner } from "../application/ports/barcode-scanner";
 import { createHttpAuthGateway } from "../adapters/http/auth-gateway";
 import { createHttpRemoteStore } from "../adapters/http/remote-store";
 import { createUuidIdGenerator } from "../adapters/browser/id-generator";
@@ -199,6 +202,17 @@ export function startClientSync(): Promise<void> {
     const online = typeof navigator !== "undefined" ? navigator.onLine : true;
     if (!online) publishSyncStatus("offline");
   });
+}
+
+export function createBookBarcodeScanner(video: HTMLVideoElement): {
+  scanner: BarcodeScanner;
+  stopTracks(): void;
+} {
+  const frameSource = createCameraBarcodeFrameSource({ video });
+  return {
+    scanner: createPlatformBrowserBarcodeScanner({ frameSource }),
+    stopTracks: () => frameSource.stopTracks(),
+  };
 }
 
 export function stopClientSync(): void {
