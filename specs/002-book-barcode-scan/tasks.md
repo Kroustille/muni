@@ -33,7 +33,7 @@
 - [x] T206 Create unit tests for book catalog field validation on `Item` in `tests/unit/domain-item-book-catalog.test.ts` (depends on T205)
 - [x] T207 Write Kysely migration `db/migrations/0002_book_catalog_fields.ts` adding nullable columns to `items` for book catalog fields
 - [x] T208 Write Kysely migration `db/migrations/0003_catalog_cache.ts` for `catalog_cache` table per data-model.md
-- [ ] T209 Regenerate and commit `src/adapters/postgres/db-types.ts` via `yarn run db:codegen` after T207–T208
+- [x] T209 Regenerate and commit `src/adapters/postgres/db-types.ts` via `yarn run db:codegen` after T207–T208
 - [ ] T210 Define `BookCatalogLookup` port in `src/application/ports/book-catalog-lookup.ts` per contracts/book-catalog-api.md
 - [ ] T211 Define `BarcodeScanner` port (`scanContinuous(callback)`, `stop()`) in `src/application/ports/barcode-scanner.ts`
 - [ ] T212 [P] Create unit tests for `CatalogCacheRepository` TTL logic in `tests/unit/catalog-cache.test.ts`

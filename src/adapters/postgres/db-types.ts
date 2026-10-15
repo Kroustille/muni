@@ -26,21 +26,34 @@ export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
+export interface CatalogCache {
+  cache_key: string;
+  fetched_at: Timestamp;
+  payload: Json;
+  provider: string;
+}
+
 export interface Items {
   author: string | null;
   checked: Generated<boolean>;
   created_at: Timestamp;
   deleted_at: Timestamp | null;
   fields_updated_at: Json;
+  genres: Json | null;
   id: string;
   ingredients: Json | null;
+  isbn: string | null;
   notes: string | null;
+  page_count: number | null;
+  publication_year: number | null;
+  publisher: string | null;
   quantity: string | null;
   rating: number | null;
   recommended_by: string | null;
   server_updated_at: Timestamp;
   status: string | null;
   steps: Json | null;
+  synopsis: string | null;
   title: string;
   type: ItemType;
   user_id: string;
@@ -71,6 +84,7 @@ export interface Users {
 }
 
 export interface DB {
+  catalog_cache: CatalogCache;
   items: Items;
   magic_link_tokens: MagicLinkTokens;
   sessions: Sessions;
