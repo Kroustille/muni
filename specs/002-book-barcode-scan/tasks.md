@@ -28,7 +28,7 @@
 **Purpose**: Schema, domain, ports, cache, ISBN utilities — required before user stories.
 
 - [x] T203 Create unit tests for ISBN normalize/validate (ISBN-10/13, checksum, reject invalid) in `tests/unit/isbn.test.ts`
-- [ ] T204 Implement ISBN helpers in `src/domain/isbn.ts` (depends on T203)
+- [x] T204 Implement ISBN helpers in `src/domain/isbn.ts` (depends on T203)
 - [ ] T205 Extend domain `Item` / book zod schema with `isbn`, `synopsis`, `genres`, `publicationYear`, `publisher`, `pageCount` per data-model.md in `src/domain/item.ts` with cross-type null rules
 - [ ] T206 Create unit tests for book catalog field validation on `Item` in `tests/unit/domain-item-book-catalog.test.ts` (depends on T205)
 - [ ] T207 Write Kysely migration `db/migrations/0002_book_catalog_fields.ts` adding nullable columns to `items` for book catalog fields
