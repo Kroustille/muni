@@ -6,6 +6,7 @@ import { getItemUseCases } from "@/composition/client";
 import { t } from "@/i18n";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
+import { BookIsbnLookup } from "@/components/quick-add/book-isbn-lookup";
 import { BookScanEntry } from "@/components/quick-add/book-scan-entry";
 import {
   BookFields,
@@ -165,6 +166,7 @@ export function QuickAdd() {
         return (
           <>
             <BookScanEntry onSaved={close} />
+            <BookIsbnLookup onSaved={close} />
             <BookFields
               values={values as BookFieldValues}
               onChange={updateValues}
