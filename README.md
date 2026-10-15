@@ -4,6 +4,12 @@
 
 Capture books, films, recipes, and shopping in a few taps; browse and update them offline; changes sync when you're back online. The UI is **French** (i18n message catalog); this README is in English.
 
+## Getting started
+
+- [docs/GETTING-STARTED.md](docs/GETTING-STARTED.md) — run locally
+- [specs/001-typed-lists-companion/quickstart.md](specs/001-typed-lists-companion/quickstart.md) — smoke scenarios
+- [Spec Kit workflow](.github/CONTRIBUTING.md) — new features
+
 ## Features
 
 **Core (v1)** — four typed lists with quick-add, search, ratings, and per-field sync:
@@ -35,20 +41,9 @@ Details: [`specs/001-typed-lists-companion/plan.md`](specs/001-typed-lists-compa
 
 ## Local development
 
-**Requirements:** Node.js 22+, [Corepack](https://nodejs.org/api/corepack.html) (`corepack enable`), Docker Compose.
+Clone, prerequisites, `.env.local`, Docker, migrations, and Mailpit sign-in: **[docs/GETTING-STARTED.md](docs/GETTING-STARTED.md)**.
 
-```bash
-corepack enable
-yarn install
-cp .env.example .env.local   # database, APP_URL, SMTP (Mailpit), optional Google OAuth
-docker compose up -d         # PostgreSQL + Mailpit
-yarn migrate:up
-yarn dev                     # http://localhost:3000
-```
-
-Magic links appear in Mailpit at http://localhost:8025. After schema changes: `yarn db:codegen`.
-
-**Checks:** `yarn typecheck`, `yarn test`, `yarn test:coverage`, `yarn test:e2e`. Manual validation scenarios: [`specs/001-typed-lists-companion/quickstart.md`](specs/001-typed-lists-companion/quickstart.md).
+**Checks:** `yarn typecheck`, `yarn test`, `yarn test:coverage`, `yarn test:e2e`. Manual scenarios: [v1 quickstart](specs/001-typed-lists-companion/quickstart.md); catalog features add [002](specs/002-book-barcode-scan/quickstart.md), [003](specs/003-movie-imdb-search/quickstart.md), [004](specs/004-music-artists-tracks/quickstart.md) when relevant.
 
 ## Specifications
 
