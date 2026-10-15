@@ -16,6 +16,7 @@ import {
   type ShoppingFieldValues,
 } from "@/components/fields";
 import { Button } from "@/components/ui/Button";
+import { useUndoDelete } from "@/components/UndoToast";
 import { t } from "@/i18n";
 
 function optionalText(value: string): string | null {
@@ -128,6 +129,7 @@ function patchFromValues(item: Item, values: FieldValues): ItemPatch {
 export default function ItemDetailPage() {
   const params = useParams();
   const id = typeof params.id === "string" ? params.id : null;
+  const { deleteWithUndo, isPendingUndo } = useUndoDelete();
   const [item, setItem] = useState<Item | null | undefined>(undefined);
   const [values, setValues] = useState<FieldValues | null>(null);
   const [titleError, setTitleError] = useState<string | undefined>();
@@ -140,19 +142,19 @@ export default function ItemDetailPage() {
     void getItemUseCases().then(async (useCases) => {
       const next = await useCases.getItem(id);
       if (cancelled) return;
-      if (next === undefined || next.deletedAt !== null) {
+      if (next === undefined || (next.deletedAt !== null && !isPendingUndo(id))) {
         setItem(null);
         setValues(null);
         return;
       }
       setItem(next);
-      setValues(valuesFromItem(next));
+      setValues((current) => (current === null ? valuesFromItem(next) : current));
     });
 
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, isPendingUndo]);
 
   const save = useCallback(async () => {
     if (id === null || item == null || values === null) return;
@@ -239,7 +241,11 @@ export default function ItemDetailPage() {
           <Button type="submit" disabled={saving}>
             {t("action.save")}
           </Button>
-          <Button type="button" variant="danger" data-delete-item={id}>
+          <Button
+            type="button"
+            variant="danger"
+            onClick={() => void deleteWithUndo(id)}
+          >
             {t("action.delete")}
           </Button>
         </div>
