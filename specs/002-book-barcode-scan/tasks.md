@@ -53,8 +53,8 @@
 - [x] T215 [US1] Implement `lookupBook` in `src/application/books/lookup-book.ts` (depends on T210, T214)
 - [x] T216 [P] [US1] Create unit tests for Open Library adapter mapping to `BookCatalogHit` with mocked fetch in `tests/unit/open-library-adapter.test.ts`
 - [x] T217 [US1] Implement Open Library adapter in `src/adapters/open-library/book-catalog-lookup.ts` with cache via T213 (depends on T216)
-- [ ] T218 [US1] Create route handler tests for `GET /api/books/lookup` (401, 400, 404, 200) in `tests/integration/books-lookup-route.test.ts`
-- [ ] T219 [US1] Implement `src/app/api/books/lookup/route.ts` wiring cache + adapter + session (depends on T215, T217, T218)
+- [x] T218 [US1] Create route handler tests for `GET /api/books/lookup` (401, 400, 404, 200) in `tests/integration/books-lookup-route.test.ts`
+- [x] T219 [US1] Implement `src/app/api/books/lookup/route.ts` wiring cache + adapter + session (depends on T215, T217, T218)
 - [x] T220 [P] [US1] Create unit tests for WASM/native `BarcodeScanner` adapter with injected frame source in `tests/unit/barcode-scanner.test.ts`
 - [x] T221 [US1] Implement `src/adapters/browser/barcode-scanner.ts` (iOS WASM always; Android BarcodeDetector when available) per research.md (depends on T220)
 - [ ] T222 [US1] Build `CatalogPreview` component in `src/components/books/catalog-preview.tsx` per contracts/ui-book-scan.md (depends on T202)
