@@ -78,5 +78,18 @@
   "books.lookup.invalidIsbn": "ISBN invalide.",
   "books.addManually": "Ajouter manuellement",
   "books.genres.add": "Ajouter un genre",
-  "books.genres.remove": "Retirer ce genre"
+  "books.genres.remove": "Retirer ce genre",
+  "movies.catalog.search": "Rechercher dans le catalogue",
+  "movies.catalog.search.placeholder": "Titre du film ou de la série",
+  "movies.catalog.loading": "Recherche…",
+  "movies.catalog.empty": "Aucun résultat.",
+  "movies.catalog.error": "La recherche a échoué. Réessayez plus tard.",
+  "movies.catalog.offline": "La recherche catalogue nécessite une connexion.",
+  "movies.preview.title": "Aperçu du film",
+  "movies.mediaKind.film": "Film",
+  "movies.mediaKind.series": "Série",
+  "field.releaseYear": "Année",
+  "field.catalogRating": "Note catalogue",
+  "field.imdbId": "IMDb",
+  "field.mediaKind": "Type"
 }
