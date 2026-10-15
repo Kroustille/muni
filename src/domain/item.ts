@@ -1,5 +1,7 @@
 import { z } from "zod";
 
+import { isValidIsbn } from "./isbn";
+
 export const ITEM_TYPES = ["shopping", "book", "movie", "recipe"] as const;
 export type ItemType = (typeof ITEM_TYPES)[number];
 
@@ -40,11 +42,29 @@ export type Item = {
   steps: string[] | null;
   deletedAt: string | null;
   fieldsUpdatedAt: Record<string, string>;
+  isbn: string | null;
+  synopsis: string | null;
+  genres: string[] | null;
+  publicationYear: number | null;
+  publisher: string | null;
+  pageCount: number | null;
 };
 
 const FIELDS_BY_TYPE: Record<ItemType, readonly (keyof Item)[]> = {
   shopping: ["quantity", "checked"],
-  book: ["author", "status", "recommendedBy", "rating", "notes"],
+  book: [
+    "author",
+    "status",
+    "recommendedBy",
+    "rating",
+    "notes",
+    "isbn",
+    "synopsis",
+    "genres",
+    "publicationYear",
+    "publisher",
+    "pageCount",
+  ],
   movie: ["status", "recommendedBy", "rating", "notes"],
   recipe: ["notes", "ingredients", "steps"],
 };
@@ -58,6 +78,12 @@ const TYPE_SPECIFIC_FIELDS = [
   "quantity",
   "ingredients",
   "steps",
+  "isbn",
+  "synopsis",
+  "genres",
+  "publicationYear",
+  "publisher",
+  "pageCount",
 ] as const satisfies readonly (keyof Item)[];
 
 const timestamp = z.iso.datetime({ offset: true });
@@ -79,12 +105,20 @@ const itemShape = {
   steps: z.array(z.string()).nullable(),
   deletedAt: timestamp.nullable(),
   fieldsUpdatedAt: z.record(z.string(), z.string()),
+  isbn: text,
+  synopsis: text,
+  genres: z
+    .union([z.array(z.string()), z.null()])
+    .transform((value) => (Array.isArray(value) && value.length === 0 ? null : value)),
+  publicationYear: z.number().int().min(1000).max(2100).nullable(),
+  publisher: text,
+  pageCount: z.number().int().min(1).nullable(),
 };
 
 function checkCrossType(value: Item, ctx: z.RefinementCtx, path: (f: string) => string): void {
   const allowed = FIELDS_BY_TYPE[value.type];
   for (const field of TYPE_SPECIFIC_FIELDS) {
-    if (!allowed.includes(field) && value[field] !== null) {
+    if (!allowed.includes(field) && (value[field] ?? null) !== null) {
       ctx.addIssue({
         code: "custom",
         path: [path(field)],
@@ -106,6 +140,13 @@ function checkCrossType(value: Item, ctx: z.RefinementCtx, path: (f: string) => 
       message: `invalid status for type ${value.type}`,
     });
   }
+  if (value.type === "book" && value.isbn !== null && !isValidIsbn(value.isbn)) {
+    ctx.addIssue({
+      code: "custom",
+      path: [path("isbn")],
+      message: "invalid ISBN",
+    });
+  }
 }
 
 const itemSchema = z
@@ -117,9 +158,19 @@ const SNAKE: Partial<Record<keyof Item, string>> = {
   recommendedBy: "recommended_by",
   deletedAt: "deleted_at",
   fieldsUpdatedAt: "fields_updated_at",
+  publicationYear: "publication_year",
+  pageCount: "page_count",
 };
 
 const snakeOf = (field: string): string => SNAKE[field as keyof Item] ?? field;
+
+const CAMEL = Object.fromEntries(Object.entries(SNAKE).map(([camel, snake]) => [snake, camel]));
+
+const camelOf = (field: string): string => CAMEL[field] ?? field;
+
+function mapKeys<T>(source: Record<string, T>, rename: (key: string) => string): Record<string, T> {
+  return Object.fromEntries(Object.entries(source).map(([key, value]) => [rename(key), value]));
+}
 
 export const itemWireSchema = z
   .strictObject({
@@ -138,12 +189,21 @@ export const itemWireSchema = z
     steps: itemShape.steps,
     deleted_at: itemShape.deletedAt,
     fields_updated_at: itemShape.fieldsUpdatedAt,
+    isbn: itemShape.isbn,
+    synopsis: itemShape.synopsis,
+    genres: itemShape.genres,
+    publication_year: itemShape.publicationYear,
+    publisher: itemShape.publisher,
+    page_count: itemShape.pageCount,
     server_updated_at: timestamp.nullable(),
   })
   .superRefine((wire, ctx) =>
     checkCrossType(
       {
-        ...wire,
+        ...mapKeys(
+          wire as Record<string, unknown>,
+          camelOf,
+        ),
         createdAt: wire.created_at,
         recommendedBy: wire.recommended_by,
         deletedAt: wire.deleted_at,
@@ -173,6 +233,12 @@ export type NewItemInput = {
     | "checked"
     | "ingredients"
     | "steps"
+    | "isbn"
+    | "synopsis"
+    | "genres"
+    | "publicationYear"
+    | "publisher"
+    | "pageCount"
   >
 >;
 
@@ -195,6 +261,12 @@ export function newItem(input: NewItemInput): Item {
     steps: input.steps ?? null,
     deletedAt: null,
     fieldsUpdatedAt: {},
+    isbn: input.isbn ?? null,
+    synopsis: input.synopsis ?? null,
+    genres: input.genres ?? null,
+    publicationYear: input.publicationYear ?? null,
+    publisher: input.publisher ?? null,
+    pageCount: input.pageCount ?? null,
   };
   return itemSchema.parse(candidate) as Item;
 }
@@ -212,14 +284,6 @@ export function updateItem(item: Item, patch: ItemPatch): Item {
   );
   const fieldsUpdatedAt = { ...item.fieldsUpdatedAt, ...patch.fieldsUpdatedAt };
   return itemSchema.parse({ ...item, ...defined, fieldsUpdatedAt }) as Item;
-}
-
-const CAMEL = Object.fromEntries(Object.entries(SNAKE).map(([camel, snake]) => [snake, camel]));
-
-const camelOf = (field: string): string => CAMEL[field] ?? field;
-
-function mapKeys<T>(source: Record<string, T>, rename: (key: string) => string): Record<string, T> {
-  return Object.fromEntries(Object.entries(source).map(([key, value]) => [rename(key), value]));
 }
 
 export function itemToWire(item: Item, serverUpdatedAt: string | null = null): ItemWire {

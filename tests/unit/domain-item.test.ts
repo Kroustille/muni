@@ -32,6 +32,12 @@ function wire(overrides: Record<string, unknown> = {}) {
     steps: null,
     deleted_at: null,
     fields_updated_at: { title: HLC },
+    isbn: null,
+    synopsis: null,
+    genres: null,
+    publication_year: null,
+    publisher: null,
+    page_count: null,
     server_updated_at: NOW,
     ...overrides,
   };
