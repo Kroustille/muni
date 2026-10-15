@@ -1,4 +1,4 @@
-import { ensureSearchResultsArray } from "@/application/ensure-search-results-array";
+import { ensureSearchResultsArray } from "@/domain/ensure-search-results-array";
 import type { BookCatalogHit } from "@/application/ports/book-catalog-lookup";
 
 export class BookCatalogSearchClientError extends Error {

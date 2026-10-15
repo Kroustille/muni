@@ -136,6 +136,8 @@
 - [X] T066 [P] [US2] Build the "recommended by" input with suggestions from the `recommenders(prefix)` use case in `src/components/RecommendedByInput.tsx` (depends on T063)
 - [X] T067 [US2] Mount QuickAdd in the shell for home, list and search screens in `src/app/(app)/layout.tsx` (depends on T064, T065, T066)
 - [X] T068 [US2] Build the minimal list view route `src/app/(app)/lists/[type]/page.tsx` (`shopping|books|movies|recipes` mapped to types) rendering items from the `listItems` use case and refreshing on `subscribe` (depends on T063)
+- [X] T068a [US2] Bottom nav **+** quick-add (`QuickAddProvider`, context-aware preset type from route) in `src/components/BottomNav.tsx` and `src/components/quick-add/`
+- [X] T068b [US2] Per-list **Ajouter** on typed list headers (`ListQuickAddButton`) in `src/components/lists/list-page-content.tsx` and music list pages; spec `ui-routes.md` + FR-003
 
 **Checkpoint**: US2 works offline against IndexedDB behind the sign-in gate.
 

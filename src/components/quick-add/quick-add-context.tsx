@@ -1,8 +1,14 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import type { ItemType } from "@/domain/item";
-import { getItemUseCases } from "@/composition/client";
 import { t } from "@/i18n";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
@@ -36,9 +42,9 @@ import {
   type ShoppingFieldValues,
 } from "@/components/fields";
 
-type ItemKind = ItemType;
+export type QuickAddItemKind = ItemType;
 
-const TYPE_OPTIONS: ItemKind[] = [
+const TYPE_OPTIONS: QuickAddItemKind[] = [
   "shopping",
   "book",
   "movie",
@@ -47,8 +53,8 @@ const TYPE_OPTIONS: ItemKind[] = [
   "music_track",
 ];
 
-const typeLabel = (kind: ItemKind): string => {
-  const map: Record<ItemKind, Parameters<typeof t>[0]> = {
+const typeLabel = (kind: QuickAddItemKind): string => {
+  const map: Record<QuickAddItemKind, Parameters<typeof t>[0]> = {
     shopping: "type.shopping",
     book: "type.book",
     movie: "type.movie",
@@ -67,7 +73,7 @@ type FieldValues =
   | MusicTrackFieldValues
   | RecipeFieldValues;
 
-function emptyFields(kind: ItemKind): FieldValues {
+function emptyFields(kind: QuickAddItemKind): FieldValues {
   switch (kind) {
     case "shopping":
       return emptyShoppingFieldValues();
@@ -88,10 +94,24 @@ function titleFromValues(values: FieldValues): string {
   return values.title;
 }
 
-export function QuickAdd() {
+type QuickAddContextValue = {
+  openQuickAdd: (presetType?: QuickAddItemKind) => void;
+};
+
+const QuickAddContext = createContext<QuickAddContextValue | null>(null);
+
+export function useQuickAdd(): QuickAddContextValue {
+  const value = useContext(QuickAddContext);
+  if (value === null) {
+    throw new Error("useQuickAdd must be used within QuickAddProvider");
+  }
+  return value;
+}
+
+export function QuickAddProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"pick-type" | "form">("pick-type");
-  const [kind, setKind] = useState<ItemKind | null>(null);
+  const [kind, setKind] = useState<QuickAddItemKind | null>(null);
   const [values, setValues] = useState<FieldValues>(emptyShoppingFieldValues());
   const [titleError, setTitleError] = useState<string | undefined>();
   const [artistError, setArtistError] = useState<string | undefined>();
@@ -107,22 +127,36 @@ export function QuickAdd() {
     setSubmitting(false);
   }, []);
 
-  const openFlow = useCallback(() => {
-    setOpen(true);
-    setStep("pick-type");
-    setKind(null);
-    setValues(emptyShoppingFieldValues());
-    setTitleError(undefined);
-    setArtistError(undefined);
-  }, []);
-
-  const pickType = useCallback((next: ItemKind) => {
+  const beginWithType = useCallback((next: QuickAddItemKind) => {
     setKind(next);
     setValues(emptyFields(next));
     setTitleError(undefined);
     setArtistError(undefined);
     setStep("form");
   }, []);
+
+  const openQuickAdd = useCallback(
+    (presetType?: QuickAddItemKind) => {
+      setOpen(true);
+      if (presetType !== undefined) {
+        beginWithType(presetType);
+      } else {
+        setStep("pick-type");
+        setKind(null);
+        setValues(emptyShoppingFieldValues());
+        setTitleError(undefined);
+        setArtistError(undefined);
+      }
+    },
+    [beginWithType],
+  );
+
+  const pickType = useCallback(
+    (next: QuickAddItemKind) => {
+      beginWithType(next);
+    },
+    [beginWithType],
+  );
 
   const updateValues = useCallback((next: FieldValues) => {
     setValues(next);
@@ -146,6 +180,7 @@ export function QuickAdd() {
     }
     setSubmitting(true);
     try {
+      const { getItemUseCases } = await import("@/composition/client");
       const useCases = await getItemUseCases();
       switch (kind) {
         case "shopping":
@@ -263,17 +298,11 @@ export function QuickAdd() {
     }
   };
 
-  return (
-    <>
-      <Button
-        type="button"
-        className="fixed bottom-20 right-4 z-30 shadow-lg"
-        onClick={openFlow}
-        aria-haspopup="dialog"
-      >
-        {t("nav.quickAdd")}
-      </Button>
+  const contextValue = useMemo(() => ({ openQuickAdd }), [openQuickAdd]);
 
+  return (
+    <QuickAddContext.Provider value={contextValue}>
+      {children}
       <BottomSheet open={open} onClose={close} title={sheetTitle}>
         {step === "pick-type" ? (
           <ul className="flex flex-col gap-2">
@@ -305,6 +334,6 @@ export function QuickAdd() {
           </form>
         ) : null}
       </BottomSheet>
-    </>
+    </QuickAddContext.Provider>
   );
 }

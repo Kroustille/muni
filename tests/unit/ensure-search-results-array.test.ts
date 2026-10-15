@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { ensureSearchResultsArray } from "@/application/ensure-search-results-array";
+import { ensureSearchResultsArray } from "@/domain/ensure-search-results-array";
 
 describe("ensureSearchResultsArray", () => {
   it("returns arrays unchanged", () => {

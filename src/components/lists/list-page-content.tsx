@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getItemUseCases, subscribeSyncStatus } from "@/composition/client";
+import { ListQuickAddButton } from "@/components/quick-add/list-quick-add-button";
 import { BookCatalogFlow } from "@/components/books/book-catalog-flow";
 import { BookTitleCatalogFlow } from "@/components/books/book-title-catalog-flow";
 import { MovieCatalogFlow } from "@/components/movies/movie-catalog-flow";
@@ -146,13 +147,16 @@ export function ListPageContent({ route }: ListPageContentProps) {
     <main className="p-4 pb-20">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-semibold">{t(ROUTE_TITLE_KEY[route])}</h1>
-        {route === "books" && isMobile ? (
-          <div className="flex flex-wrap gap-2">
-            <BookCatalogFlow onSaved={refreshList} showDefaultTrigger />
-            <BookTitleCatalogFlow onSaved={refreshList} />
-          </div>
-        ) : null}
-        {route === "movies" ? <MovieCatalogFlow onSaved={refreshList} /> : null}
+        <div className="flex flex-wrap items-center gap-2">
+          <ListQuickAddButton itemType={itemType} />
+          {route === "books" && isMobile ? (
+            <>
+              <BookCatalogFlow onSaved={refreshList} showDefaultTrigger />
+              <BookTitleCatalogFlow onSaved={refreshList} />
+            </>
+          ) : null}
+          {route === "movies" ? <MovieCatalogFlow onSaved={refreshList} /> : null}
+        </div>
       </div>
       {showStatusFilter ? (
         <StatusFilter

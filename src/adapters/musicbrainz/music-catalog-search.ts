@@ -1,4 +1,4 @@
-import { ensureSearchResultsArray } from "@/application/ensure-search-results-array";
+import { ensureSearchResultsArray } from "@/domain/ensure-search-results-array";
 import type { CatalogCacheRepository } from "@/application/ports/catalog-cache-repository";
 import {
   MusicCatalogSearch,
@@ -7,8 +7,10 @@ import {
   MusicTrackSearchHit,
 } from "@/application/ports/music-catalog-search";
 
+import { formatArtistCredit } from "./format-artist-credit";
+import { createMusicBrainzFetch, fetchMusicBrainzJson } from "./musicbrainz-fetch";
+
 const DEFAULT_API = "https://musicbrainz.org/ws/2";
-const USER_AGENT = "Muni/0.1 (music catalog; +https://github.com/Kroustille/muni)";
 
 export type MusicBrainzCatalogSearchDeps = {
   fetch?: typeof fetch;
@@ -30,7 +32,7 @@ type MbRecordingSearchResponse = {
     id: string;
     title: string;
     "first-release-date"?: string;
-    "artist-credit"?: { name: string }[];
+    "artist-credit"?: Array<{ name?: string; joinphrase?: string; artist?: { name?: string } }>;
     releases?: { title: string }[];
   }[];
 };
@@ -45,16 +47,6 @@ function artistCacheKey(query: string, limit: number): string {
 
 function recordingCacheKey(query: string, limit: number): string {
   return `recording-search:${normalizeQuery(query)}:${limit}`;
-}
-
-async function fetchJson<T>(fetchFn: typeof fetch, url: string): Promise<T> {
-  const response = await fetchFn(url, {
-    headers: { "User-Agent": USER_AGENT, Accept: "application/json" },
-  });
-  if (!response.ok) {
-    throw new MusicCatalogSearchError(`MusicBrainz request failed (${response.status})`);
-  }
-  return (await response.json()) as T;
 }
 
 function buildUrl(base: string, path: string, params: Record<string, string>): string {
@@ -83,10 +75,27 @@ function mapRecordingResponse(payload: MbRecordingSearchResponse): MusicTrackSea
   return (payload.recordings ?? []).map((recording) => ({
     musicBrainzRecordingId: recording.id,
     title: recording.title,
-    artist: recording["artist-credit"]?.[0]?.name ?? "",
+    artist: formatArtistCredit(recording["artist-credit"]),
     album: recording.releases?.[0]?.title,
     releaseYear: parseReleaseYear(recording["first-release-date"]),
   }));
+}
+
+async function writeCache(
+  cache: CatalogCacheRepository | undefined,
+  record: {
+    provider: "musicbrainz";
+    cacheKey: string;
+    payload: unknown;
+    fetchedAt: Date;
+  },
+): Promise<void> {
+  if (!cache) return;
+  try {
+    await cache.upsert(record);
+  } catch {
+    // Search should succeed even when cache persistence fails.
+  }
 }
 
 export function createMusicBrainzCatalogSearch(
@@ -94,6 +103,7 @@ export function createMusicBrainzCatalogSearch(
 ): MusicCatalogSearch {
   const fetchFn = deps.fetch ?? fetch;
   const apiBase = deps.apiBase ?? DEFAULT_API;
+  const mbFetch = createMusicBrainzFetch(fetchFn);
 
   return {
     async searchArtists(query: string, limit = 20): Promise<MusicArtistSearchHit[]> {
@@ -118,16 +128,14 @@ export function createMusicBrainzCatalogSearch(
           fmt: "json",
           limit: String(capped),
         });
-        const payload = await fetchJson<MbArtistSearchResponse>(fetchFn, url);
+        const payload = await fetchMusicBrainzJson<MbArtistSearchResponse>(mbFetch, url);
         const hits = mapArtistResponse(payload);
-        if (deps.cache) {
-          await deps.cache.upsert({
-            provider: "musicbrainz",
-            cacheKey,
-            payload: hits,
-            fetchedAt: now,
-          });
-        }
+        await writeCache(deps.cache, {
+          provider: "musicbrainz",
+          cacheKey,
+          payload: hits,
+          fetchedAt: now,
+        });
         return hits;
       } catch (error) {
         if (error instanceof MusicCatalogSearchError) throw error;
@@ -157,16 +165,14 @@ export function createMusicBrainzCatalogSearch(
           fmt: "json",
           limit: String(capped),
         });
-        const payload = await fetchJson<MbRecordingSearchResponse>(fetchFn, url);
-        const hits = mapRecordingResponse(payload).filter((hit) => hit.artist.trim() !== "");
-        if (deps.cache) {
-          await deps.cache.upsert({
-            provider: "musicbrainz",
-            cacheKey,
-            payload: hits,
-            fetchedAt: now,
-          });
-        }
+        const payload = await fetchMusicBrainzJson<MbRecordingSearchResponse>(mbFetch, url);
+        const hits = mapRecordingResponse(payload).filter((hit) => hit.artist !== "");
+        await writeCache(deps.cache, {
+          provider: "musicbrainz",
+          cacheKey,
+          payload: hits,
+          fetchedAt: now,
+        });
         return hits;
       } catch (error) {
         if (error instanceof MusicCatalogSearchError) throw error;

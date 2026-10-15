@@ -40,7 +40,7 @@ A new user must create an account before using the app, by requesting an email m
 
 ### User Story 2 - Capture an item fast, by type (Priority: P1)
 
-A user hears about a film or a book, or remembers they need milk. They open the app, use the quick-add control at the bottom of the screen, choose a type (book, movie, recipe, shopping), and see the fields for that type. They enter a title, optionally fill other fields such as "recommended by", and save.
+A user hears about a film or a book, or remembers they need milk. They open the app and add an item either from the **+** control in the bottom navigation (choosing a type when not already on a typed list) or from the **Ajouter** control on a specific list (shopping, books, movies, recipes, music artists, music tracks), which opens the form for that list immediately. They enter a title, optionally fill other fields such as "recommended by", and save.
 
 **Why this priority**: Capture is the core promise. Without fast capture there is no second brain.
 
@@ -48,10 +48,11 @@ A user hears about a film or a book, or remembers they need milk. They open the 
 
 **Acceptance Scenarios**:
 
-1. **Given** the user is on any screen, **When** they open quick add, **Then** they are asked for a type first and then shown only the fields for that type.
-2. **Given** the type is selected, **When** the user enters only a title and saves, **Then** the item is created with all other fields empty.
-3. **Given** the user enters "recommended by" text, **When** they type, **Then** matching names from their past entries are suggested.
-4. **Given** the user is offline, **When** they add an item, **Then** it is saved immediately and visible in the list.
+1. **Given** the user is on home or search, **When** they tap the bottom **+** control, **Then** they are asked for a type first and then shown only the fields for that type.
+2. **Given** the user is on a typed list (for example shopping), **When** they tap **Ajouter** on that list or the bottom **+** control, **Then** the quick-add form for that list opens without a type picker.
+3. **Given** the type is selected, **When** the user enters only a title and saves, **Then** the item is created with all other fields empty.
+4. **Given** the user enters "recommended by" text, **When** they type, **Then** matching names from their past entries are suggested.
+5. **Given** the user is offline, **When** they add an item, **Then** it is saved immediately and visible in the list.
 
 ---
 
@@ -140,7 +141,7 @@ The home screen shows a card per list with item count and recently added items, 
 
 - **FR-001**: The system MUST provide four list types: shopping, books, movies and recipes.
 - **FR-002**: Users MUST be able to add an item by choosing a type first, then filling the fields for that type; only the title (or name for shopping) is required.
-- **FR-003**: Quick add MUST be available at the bottom of the main screens.
+- **FR-003**: Quick add MUST be available from the bottom navigation **+** control on main app screens; typed list screens MUST also offer a list-specific **Ajouter** control that opens quick-add for that list without choosing the type again.
 - **FR-004**: Book items MUST support title, author, status (to read, reading, read), recommended by, optional rating (1 to 5, once read) and notes. A stored rating is kept but hidden if the status returns to an unfinished state.
 - **FR-005**: Movie items MUST support title, status (to watch, watched), recommended by, optional rating (1 to 5, once watched) and notes. A stored rating is kept but hidden if the status returns to "to watch".
 - **FR-006**: Recipe items MUST support title, a list of ingredients (quantity and name), ordered steps and notes.

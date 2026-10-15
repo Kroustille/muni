@@ -1,4 +1,4 @@
-import { ensureSearchResultsArray } from "@/application/ensure-search-results-array";
+import { ensureSearchResultsArray } from "@/domain/ensure-search-results-array";
 import {
   BookCatalogLookup,
   BookCatalogHit,

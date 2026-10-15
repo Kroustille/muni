@@ -1,4 +1,4 @@
-import { ensureSearchResultsArray } from "@/application/ensure-search-results-array";
+import { ensureSearchResultsArray } from "@/domain/ensure-search-results-array";
 import type { MovieCatalogDetail, MovieSearchHit } from "@/application/ports/movie-catalog-search";
 
 export class MovieCatalogClientError extends Error {

@@ -9,6 +9,8 @@ import { StatusFilter, type StatusFilterValue } from "@/components/StatusFilter"
 import { updateItem as applyItemPatch, type Item, type ItemPatch, type ItemType } from "@/domain/item";
 import { t, type MessageKey } from "@/i18n";
 
+import { ListQuickAddButton } from "@/components/quick-add/list-quick-add-button";
+
 import { MusicArtistCatalogFlow } from "./artist-catalog-flow";
 import { MusicTrackCatalogFlow } from "./track-catalog-flow";
 
@@ -112,11 +114,14 @@ export function MusicListPage({ kind }: MusicListPageProps) {
     <main className="p-4 pb-20">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-semibold">{t(TITLE_KEY[kind])}</h1>
-        {kind === "music_artist" ? (
-          <MusicArtistCatalogFlow onSaved={refreshList} />
-        ) : (
-          <MusicTrackCatalogFlow onSaved={refreshList} />
-        )}
+        <div className="flex flex-wrap items-center gap-2">
+          <ListQuickAddButton itemType={kind} />
+          {kind === "music_artist" ? (
+            <MusicArtistCatalogFlow onSaved={refreshList} />
+          ) : (
+            <MusicTrackCatalogFlow onSaved={refreshList} />
+          )}
+        </div>
       </div>
       {showStatusFilter ? (
         <StatusFilter itemType="music_track" value={statusFilter} onChange={setStatusFilter} />

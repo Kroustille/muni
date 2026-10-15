@@ -8,7 +8,7 @@
 
 - Each list: primary **Rechercher** (catalog) + standard list behaviors.
 - Catalog search field: lookup **2 seconds after typing stops** (submit still immediate).
-- No catalog on quick-add.
+- No catalog on quick-add; list header **Ajouter** and bottom **+** on `/music/artists` or `/music/tracks` open the manual quick-add form for that music type (same as other typed lists).
 
 ## Preview
 
