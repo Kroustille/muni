@@ -19,6 +19,7 @@ function fakeLookup(result: BookCatalogHit | null | Error): BookCatalogLookup {
       if (result instanceof Error) throw result;
       return result;
     }),
+    searchByTitle: vi.fn(async () => []),
   };
 }
 

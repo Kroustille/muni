@@ -5,6 +5,11 @@ import {
 } from "@/application/ports/book-catalog-lookup";
 import type { CatalogCacheRepository } from "@/application/ports/catalog-cache-repository";
 
+import {
+  mapSearchResponseToHits,
+  type OpenLibrarySearchResponse,
+} from "./open-library-search-mapper";
+
 type OpenLibraryEdition = {
   title?: string;
   publishers?: string[];
@@ -61,6 +66,14 @@ function normalizeSubjects(subjects: unknown): string[] | undefined {
     })
     .filter((value): value is string => value !== null && value.trim() !== "");
   return labels.length === 0 ? undefined : labels;
+}
+
+function normalizeQuery(query: string): string {
+  return query.trim().toLowerCase();
+}
+
+function searchCacheKey(query: string, limit: number): string {
+  return `search:${normalizeQuery(query)}:${limit}`;
 }
 
 async function fetchJson<T>(
@@ -162,6 +175,50 @@ export function createOpenLibraryBookCatalogLookup(
       }
 
       return hit;
+    },
+
+    async searchByTitle(query: string, limit = 20): Promise<BookCatalogHit[]> {
+      const trimmed = query.trim();
+      if (trimmed === "") return [];
+      const capped = Math.min(Math.max(1, limit), 20);
+      const now = deps.now?.() ?? new Date();
+      const cacheKey = searchCacheKey(trimmed, capped);
+
+      if (deps.cache) {
+        const cached = await deps.cache.get("open_library", cacheKey, now);
+        if (cached !== null) {
+          return cached as BookCatalogHit[];
+        }
+      }
+
+      const searchUrl = `${apiBase}/search.json?q=${encodeURIComponent(trimmed)}&limit=${capped}`;
+      let searchPayload: OpenLibrarySearchResponse;
+      try {
+        const result = await fetchJson<OpenLibrarySearchResponse>(fetchFn, searchUrl);
+        if (!result.ok) {
+          throw new CatalogLookupError(
+            `Open Library search failed (${result.status}) for ${searchUrl}`,
+          );
+        }
+        searchPayload = result.data;
+      } catch (error) {
+        throw error instanceof CatalogLookupError
+          ? error
+          : new CatalogLookupError("Open Library search failed", error);
+      }
+
+      const hits = mapSearchResponseToHits(searchPayload, capped);
+
+      if (deps.cache) {
+        await deps.cache.upsert({
+          provider: "open_library",
+          cacheKey,
+          payload: hits,
+          fetchedAt: now,
+        });
+      }
+
+      return hits;
     },
   };
 }

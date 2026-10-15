@@ -22,4 +22,6 @@ export class CatalogLookupError extends Error {
 export interface BookCatalogLookup {
   /** @param isbn Normalized ISBN-13. */
   lookupByIsbn(isbn: string): Promise<BookCatalogHit | null>;
+  /** Title search; returns hits with ISBN when Open Library provides one. */
+  searchByTitle(query: string, limit?: number): Promise<BookCatalogHit[]>;
 }

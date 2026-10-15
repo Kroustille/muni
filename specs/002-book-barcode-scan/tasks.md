@@ -101,6 +101,21 @@
 
 ---
 
+## Phase 8: User Story 1 extension — Title catalog search (B11)
+
+**Goal**: Mobile title search in Open Library; pick one row; same preview/merge as ISBN; desktop unchanged (B9).
+
+- [x] T239 Extend `BookCatalogLookup` port with `searchByTitle` in `src/application/ports/book-catalog-lookup.ts` and contracts/book-catalog-api.md
+- [x] T240 [P] Unit tests for Open Library search mapper and adapter `searchByTitle` in `tests/unit/open-library-search-mapper.test.ts` and `tests/unit/open-library-adapter.test.ts`
+- [x] T241 Implement Open Library `search.json` in adapter with `search:…` cache keys (array jsonb) in `src/adapters/open-library/`
+- [x] T242 Fix Postgres `catalog_cache` jsonb round-trip for array payloads + integration test in `tests/integration/postgres-catalog-cache.test.ts`
+- [x] T243 Implement `searchBooks` use case and `GET /api/books/search` route; wire `searchBooks` in `src/composition/server.ts`
+- [x] T244 [P] Route and use-case tests in `tests/integration/books-search-route.test.ts` and `tests/unit/search-books.test.ts`
+- [x] T245 Build mobile `BookCatalogSearchSheet` + **Rechercher par titre** on list and quick-add; i18n `fr.json`
+- [x] T246 Update spec clarifications (B11), contracts, and research.md for title search
+
+---
+
 ## Dependencies
 
 ```text

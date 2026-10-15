@@ -72,6 +72,44 @@ describe("Open Library BookCatalogLookup adapter", () => {
     await expect(lookup.lookupByIsbn(ISBN)).rejects.toBeInstanceOf(CatalogLookupError);
   });
 
+  it("searchByTitle maps Open Library search.json and caches results", async () => {
+    const fetch = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url.includes("/search.json?")) {
+        return jsonResponse({
+          docs: [
+            {
+              title: "Le Petit Prince",
+              author_name: ["Antoine de Saint-Exupéry"],
+              isbn: ["9782070368228"],
+              first_publish_year: 1943,
+            },
+          ],
+        });
+      }
+      return new Response("unexpected", { status: 404 });
+    });
+    const cache = new InMemoryCatalogCacheRepository();
+    const lookup = createOpenLibraryBookCatalogLookup({
+      fetch,
+      apiBase: API_BASE,
+      cache,
+      now: () => new Date("2026-06-01T00:00:00.000Z"),
+    });
+
+    await expect(lookup.searchByTitle("petit prince")).resolves.toEqual([
+      {
+        isbn: "9782070368228",
+        title: "Le Petit Prince",
+        author: "Antoine de Saint-Exupéry",
+        publicationYear: 1943,
+      },
+    ]);
+
+    await expect(lookup.searchByTitle("petit prince")).resolves.toHaveLength(1);
+    expect(fetch).toHaveBeenCalledTimes(1);
+  });
+
   it("serves fresh cache hits without calling Open Library", async () => {
     const fetch = vi.fn(async () => jsonResponse({ title: "Unexpected fetch" }));
     const cache = new InMemoryCatalogCacheRepository();

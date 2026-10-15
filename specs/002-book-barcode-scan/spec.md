@@ -24,6 +24,7 @@
 - **B8:** **Title only** required on add; author optional.
 - **B9:** **Desktop:** no scan, no manual ISBN field, no catalog lookup flow — standard manual book add only. ISBN scan + lookup is **mobile-only**.
 - **B10:** On lookup failure (mobile): fall back to manual add with **ISBN prefilled**.
+- **B11:** **Mobile title search** in Open Library — user picks one result (like M3 movies); same preview, dedupe, and merge rules as ISBN lookup; **desktop still no catalog** (B9). Entry on books list and book quick-add (N3).
 - **L1–L4 (locked):** Silent dedupe by ISBN (no warning); app search title-only; no cover images; catalog text French first, English fallback per field.
 - **N1:** Show page count on book detail when catalog provides it.
 - **N3:** Scan entry on **books list** and **book quick-add** (mobile).
@@ -33,9 +34,9 @@
 
 ## User Scenarios & Testing *(mandatory)*
 
-### User Story 1 - Scan ISBN on phone and add from catalog (Priority: P1)
+### User Story 1 - Scan or search by title on phone and add from catalog (Priority: P1)
 
-On mobile, the user opens the books list or book quick-add, starts scan, and the camera keeps scanning until a valid ISBN is detected. The app looks up the book via the server, shows a preview (title, author, synopsis, genres, year, publisher, page count when present), lets them edit any field, and saves to their list.
+On mobile, the user opens the books list or book quick-add, then either starts **scan** (camera until a valid ISBN is read) or **Rechercher par titre** (catalog title search, pick one row). The app looks up the book via the server, shows a preview (title, author, synopsis, genres, year, publisher, page count when present), lets them edit any field, and saves to their list.
 
 **Why this priority**: Core value of the feature — fast capture from a physical book.
 
@@ -44,9 +45,10 @@ On mobile, the user opens the books list or book quick-add, starts scan, and the
 **Acceptance Scenarios**:
 
 1. **Given** mobile books list, **When** user taps scan and a valid ISBN is read, **Then** lookup runs and preview is shown.
-2. **Given** preview, **When** user edits synopsis and saves, **Then** the book is stored with edited values.
-3. **Given** continuous scan, **When** no valid ISBN yet, **Then** scanning continues without forcing a single-shot capture.
-4. **Given** lookup succeeds, **When** user cancels preview, **Then** no book is created.
+2. **Given** mobile books list, **When** user searches by title and picks a result, **Then** lookup runs (by ISBN when available) and preview is shown.
+3. **Given** preview, **When** user edits synopsis and saves, **Then** the book is stored with edited values.
+4. **Given** continuous scan, **When** no valid ISBN yet, **Then** scanning continues without forcing a single-shot capture.
+5. **Given** lookup succeeds, **When** user cancels preview, **Then** no book is created.
 
 ---
 

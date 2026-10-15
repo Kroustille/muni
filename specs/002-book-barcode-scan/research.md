@@ -4,7 +4,7 @@ All Technical Context items resolved.
 
 ## 1. Catalog provider
 
-- **Decision**: Open Library Search/API by ISBN (`https://openlibrary.org/isbn/{isbn}.json` + works/editions for metadata).
+- **Decision**: Open Library Search/API by ISBN (`https://openlibrary.org/isbn/{isbn}.json` + works/editions for metadata) and title search (`https://openlibrary.org/search.json`).
 - **Rationale**: B1 — no API key; good ISBN coverage; fits X2 server proxy.
 - **Alternatives**: Google Books (key, quotas); dual provider (rejected — extra scope).
 

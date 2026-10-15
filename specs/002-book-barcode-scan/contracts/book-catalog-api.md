@@ -4,9 +4,11 @@
 
 ```typescript
 lookupByIsbn(isbn: string): Promise<BookCatalogHit | null>;
+searchByTitle(query: string, limit?: number): Promise<BookCatalogHit[]>;
 ```
 
-- Input: normalized ISBN-13.
+- `lookupByIsbn` input: normalized ISBN-13.
+- `searchByTitle` input: free-text title query; optional `limit` (default 20, max 20). Each hit includes `isbn` when Open Library provides one.
 - Output: `null` if not found; otherwise `BookCatalogHit` (see data-model.md).
 - Errors: network/provider errors propagate as typed `CatalogLookupError` for route mapping.
 
@@ -36,5 +38,31 @@ lookupByIsbn(isbn: string): Promise<BookCatalogHit | null>;
 **Response 400**: invalid ISBN format.
 
 **Caching**: Server checks `catalog_cache` before Open Library; stores on success (X4).
+
+## HTTP: `GET /api/books/search`
+
+**Auth**: Session required.
+
+**Query**: `q` (required) — title search string; optional `limit`.
+
+**Response 200**:
+
+```json
+{
+  "results": [
+    {
+      "isbn": "9782070368228",
+      "title": "...",
+      "author": "..."
+    }
+  ]
+}
+```
+
+**Response 400**: `{ "error": "missing_query" }`
+
+**Response 502**: provider error.
+
+**Caching**: Server caches search result arrays under `open_library` key `search:{normalizedQuery}:{limit}` (X4).
 
 **Client rule**: UI MUST NOT call Open Library directly (X2).

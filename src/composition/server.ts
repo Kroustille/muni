@@ -15,6 +15,7 @@ import { createOpenLibraryBookCatalogLookup } from "@/adapters/open-library/book
 import { createMusicBrainzCatalogSearch } from "@/adapters/musicbrainz/music-catalog-search";
 import { createWikidataMovieCatalogSearch } from "@/adapters/wikidata/movie-catalog-search";
 import { createLookupBook, type LookupBook } from "@/application/books/lookup-book";
+import { createSearchBooks, type SearchBooks } from "@/application/books/search-books";
 import {
   createFetchMovieCatalogDetail,
   createSearchMovies,
@@ -37,6 +38,7 @@ export interface ServerContainer {
   readonly google: GoogleUseCases | null;
   readonly sync: SyncService;
   readonly lookupBook: LookupBook;
+  readonly searchBooks: SearchBooks;
   readonly searchMovies: SearchMovies;
   readonly fetchMovieCatalogDetail: FetchMovieCatalogDetail;
   readonly searchMusicArtists: SearchMusicArtists;
@@ -96,6 +98,7 @@ export function createServerContainer(
   const catalogCache = createPostgresCatalogCacheRepository(db);
   const bookCatalog = createOpenLibraryBookCatalogLookup({ cache: catalogCache });
   const lookupBook = createLookupBook({ catalog: bookCatalog });
+  const searchBooks = createSearchBooks({ catalog: bookCatalog });
   const movieCatalog = createWikidataMovieCatalogSearch({ cache: catalogCache });
   const searchMovies = createSearchMovies({ catalog: movieCatalog });
   const fetchMovieCatalogDetail = createFetchMovieCatalogDetail({ catalog: movieCatalog });
@@ -110,6 +113,7 @@ export function createServerContainer(
     google,
     sync,
     lookupBook,
+    searchBooks,
     searchMovies,
     fetchMovieCatalogDetail,
     searchMusicArtists,

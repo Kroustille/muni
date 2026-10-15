@@ -2,8 +2,8 @@
 
 ## Entry points (mobile only)
 
-- Books list: primary action **Scanner** (N3).
-- Book quick-add (type=book): **Scanner** alongside manual fields (N3).
+- Books list: **Scanner** and **Rechercher par titre** (N3, B11).
+- Book quick-add (type=book): **Scanner** and **Rechercher par titre** alongside manual fields (N3, B11).
 
 Desktop: neither entry visible (B9).
 
