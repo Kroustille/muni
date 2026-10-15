@@ -113,6 +113,7 @@
 - [x] T244 [P] Route and use-case tests in `tests/integration/books-search-route.test.ts` and `tests/unit/search-books.test.ts`
 - [x] T245 Build mobile `BookCatalogSearchSheet` + **Rechercher par titre** on list and quick-add; i18n `fr.json`
 - [x] T246 Update spec clarifications (B11), contracts, and research.md for title search
+- [x] T247 Enable **Rechercher par titre** on desktop (books list + quick-add); scan/ISBN remain mobile-only; e2e `books-catalog-title-search.spec.ts`
 
 ---
 

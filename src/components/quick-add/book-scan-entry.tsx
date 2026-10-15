@@ -8,13 +8,12 @@ export type BookScanEntryProps = {
   onSaved?: () => void;
 };
 
-/** Mobile-only ISBN scanner entry for the book quick-add flow (N3). */
+/** Book catalog entry for quick-add: title search on all devices; scan/ISBN on mobile (N3). */
 export function BookScanEntry({ onSaved }: BookScanEntryProps) {
   const isMobile = useIsMobile();
-  if (!isMobile) return null;
   return (
     <div className="flex flex-wrap gap-2">
-      <BookCatalogFlow onSaved={onSaved} showDefaultTrigger />
+      {isMobile ? <BookCatalogFlow onSaved={onSaved} showDefaultTrigger /> : null}
       <BookTitleCatalogFlow onSaved={onSaved} />
     </div>
   );

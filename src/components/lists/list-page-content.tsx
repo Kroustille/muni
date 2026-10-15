@@ -163,9 +163,11 @@ export function ListPageContent({ route }: ListPageContentProps) {
         <h1 className="text-xl font-semibold">{t(ROUTE_TITLE_KEY[route])}</h1>
         <div className="flex flex-wrap items-center gap-2">
           <ListQuickAddButton itemType={itemType} />
-          {route === "books" && isMobile ? (
+          {route === "books" ? (
             <>
-              <BookCatalogFlow onSaved={refreshList} showDefaultTrigger />
+              {isMobile ? (
+                <BookCatalogFlow onSaved={refreshList} showDefaultTrigger />
+              ) : null}
               <BookTitleCatalogFlow onSaved={refreshList} />
             </>
           ) : null}

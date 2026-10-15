@@ -1,11 +1,11 @@
 # Contract: Book scan and preview UI
 
-## Entry points (mobile only)
+## Entry points
 
-- Books list: **Scanner** and **Rechercher par titre** (N3, B11).
-- Book quick-add (type=book): **Scanner** and **Rechercher par titre** alongside manual fields (N3, B11).
+- Books list: **Rechercher par titre** on all devices (B11); **Scanner** on mobile only (N3, B9).
+- Book quick-add (type=book): **Rechercher par titre** on all devices; **Scanner** on mobile only alongside manual fields.
 
-Desktop: neither entry visible (B9).
+Desktop: no scan and no manual ISBN lookup field (B9); title catalog search matches movies list behavior.
 
 ## Scan modal
 

@@ -22,9 +22,9 @@
 - **B6:** On preview before save, **all imported fields are editable**.
 - **B7:** **Multiple genres** (list of strings); editable on preview.
 - **B8:** **Title only** required on add; author optional.
-- **B9:** **Desktop:** no scan, no manual ISBN field, no catalog lookup flow — standard manual book add only. ISBN scan + lookup is **mobile-only**.
+- **B9:** **Desktop:** no barcode scan and no manual ISBN lookup field — standard manual book add remains available. ISBN scan + ISBN field lookup are **mobile-only**.
 - **B10:** On lookup failure (mobile): fall back to manual add with **ISBN prefilled**.
-- **B11:** **Mobile title search** in Open Library — user picks one result (like M3 movies); same preview, dedupe, and merge rules as ISBN lookup; **desktop still no catalog** (B9). Entry on books list and book quick-add (N3).
+- **B11:** **Title search** in Open Library on books list and book quick-add (all devices) — user picks one result (like M3 movies); same preview, dedupe, and merge rules as ISBN lookup.
 - **L1–L4 (locked):** Silent dedupe by ISBN (no warning); app search title-only; no cover images; catalog text French first, English fallback per field.
 - **N1:** Show page count on book detail when catalog provides it.
 - **N3:** Scan entry on **books list** and **book quick-add** (mobile).
@@ -115,7 +115,7 @@ On mobile, the user can type or paste an ISBN instead of scanning, then run the 
 - **FR-007**: Saved books MUST store ISBN and catalog fields: synopsis, genres (array), publication year, publisher, page count when available.
 - **FR-008**: Dedupe MUST be silent by ISBN (and merge rules for manual rows) per B4, B5, L1.
 - **FR-009**: Metadata language MUST prefer French labels, English fallback per field (L4).
-- **FR-010**: Desktop MUST NOT expose scan, ISBN lookup, or manual ISBN catalog flow (B9).
+- **FR-010**: Desktop MUST NOT expose barcode scan or manual ISBN catalog lookup (B9); title catalog search (B11) is allowed on desktop.
 - **FR-011**: Lookup failure on mobile MUST offer manual add with ISBN prefilled (B10).
 - **FR-012**: Title MUST be required on add; author MAY be empty (B8).
 - **FR-013**: Search index MUST remain title-only (L2); new fields are not searched in v1.
