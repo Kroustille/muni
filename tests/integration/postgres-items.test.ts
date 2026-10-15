@@ -1,4 +1,4 @@
-import { afterAll, beforeAll, describe, expect, it } from "vitest";
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createPostgresItemRepository } from "@/adapters/postgres/item-repository";
 import { createPostgresUserRepository } from "@/adapters/postgres/user-repository";
@@ -44,6 +44,10 @@ beforeAll(async () => {
 
 afterAll(async () => {
   await testDb?.destroy();
+});
+
+beforeEach(async () => {
+  await testDb.db.deleteFrom("items").execute();
 });
 
 function withServerTime(wire: ItemWire, serverUpdatedAt: string): ItemWire {
