@@ -64,6 +64,26 @@ describe("PostgreSQL ServerItemRepository", () => {
       });
     });
 
+    it("persists book catalog columns on upsert", async () => {
+      const wire = withServerTime(
+        makeServerItemWire({
+          item: {
+            isbn: "9782070368228",
+            synopsis: "Un conte.",
+            genres: ["Jeunesse"],
+            publicationYear: 1943,
+            publisher: "Gallimard",
+            pageCount: 96,
+          },
+        }),
+        isoAt(500),
+      );
+      await items.transaction(async (repo) => {
+        await repo.upsert(userA, [wire]);
+        expect(await repo.findByIds(userA, [wire.id])).toEqual([wire]);
+      });
+    });
+
     it("omits ids that are not stored for the user", async () => {
       const wire = withServerTime(makeServerItemWire(), isoAt(1_000));
       await items.transaction(async (repo) => {
