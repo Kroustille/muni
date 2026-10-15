@@ -6,7 +6,7 @@ import { t, type MessageKey } from "@/i18n";
 export type StatusFilterValue = "all" | ItemStatus;
 
 export type StatusFilterProps = {
-  itemType: "book" | "movie";
+  itemType: "book" | "movie" | "music_track";
   value: StatusFilterValue;
   onChange: (value: StatusFilterValue) => void;
 };

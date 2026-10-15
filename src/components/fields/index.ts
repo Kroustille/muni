@@ -28,3 +28,17 @@ export {
   type ShoppingFieldValues,
   type ShoppingFieldsProps,
 } from "./shopping-fields";
+export {
+  MusicArtistFields,
+  musicArtistFieldValuesToExtra,
+  emptyMusicArtistFieldValues,
+  type MusicArtistFieldValues,
+  type MusicArtistFieldsProps,
+} from "./music-artist-fields";
+export {
+  MusicTrackFields,
+  musicTrackFieldValuesToExtra,
+  emptyMusicTrackFieldValues,
+  type MusicTrackFieldValues,
+  type MusicTrackFieldsProps,
+} from "./music-track-fields";

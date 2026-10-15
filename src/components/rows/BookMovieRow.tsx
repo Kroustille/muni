@@ -3,21 +3,28 @@
 import Link from "next/link";
 import { Select } from "@/components/ui/Select";
 import { StarRating } from "@/components/StarRating";
-import { statusesFor, type BookStatus, type Item, type MovieStatus } from "@/domain/item";
+import {
+  statusesFor,
+  type BookStatus,
+  type Item,
+  type MovieStatus,
+  type MusicTrackStatus,
+} from "@/domain/item";
 import { t, type MessageKey } from "@/i18n";
 
 export type BookMovieRowProps = {
-  item: Item & ({ type: "book" } | { type: "movie" });
-  onStatusChange: (status: BookStatus | MovieStatus) => void;
+  item: Item & ({ type: "book" } | { type: "movie" } | { type: "music_track" });
+  onStatusChange: (status: BookStatus | MovieStatus | MusicTrackStatus) => void;
   onRatingChange: (rating: number) => void;
 };
 
 function ratingVisible(status: string | null): boolean {
-  return status === "read" || status === "watched";
+  return status === "read" || status === "watched" || status === "listened";
 }
 
 function secondaryText(item: BookMovieRowProps["item"]): string | null {
   if (item.type === "book") return item.author;
+  if (item.type === "music_track") return item.artist;
   return item.recommendedBy;
 }
 
@@ -43,7 +50,7 @@ export function BookMovieRow({ item, onStatusChange, onRatingChange }: BookMovie
           options={statusOptions}
           value={status}
           onChange={(event) =>
-            onStatusChange(event.target.value as BookStatus | MovieStatus)
+            onStatusChange(event.target.value as BookStatus | MovieStatus | MusicTrackStatus)
           }
         />
         {ratingVisible(status) ? (
