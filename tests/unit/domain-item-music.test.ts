@@ -122,9 +122,15 @@ describe("music item types", () => {
     ).toBe(false);
   });
 
+  it("accepts optional rating on music_artist", () => {
+    const parsed = itemWireSchema.parse(musicWire("music_artist", { rating: 4 }));
+    expect(parsed.rating).toBe(4);
+  });
+
   it("defaults music fields on newItem", () => {
     const artist = newItem({ id: ID, type: "music_artist", title: "Artist", createdAt: NOW });
     expect(artist.musicBrainzArtistId).toBeNull();
+    expect(artist.rating).toBeNull();
     const track = newItem({
       id: ID,
       type: "music_track",

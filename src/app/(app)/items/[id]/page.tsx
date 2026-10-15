@@ -105,6 +105,7 @@ function itemToRecipeValues(item: Item): RecipeFieldValues {
 function itemToMusicArtistValues(item: Item): MusicArtistFieldValues {
   return {
     title: item.title,
+    rating: item.rating,
     recommendedBy: item.recommendedBy ?? "",
     notes: item.notes ?? "",
     spotifyUrl: item.spotifyUrl ?? "",

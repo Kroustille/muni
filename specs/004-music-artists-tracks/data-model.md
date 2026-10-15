@@ -9,6 +9,7 @@ Extend `ITEM_TYPES` with `music_artist` and `music_track`.
 | Field | Rules |
 |-------|-------|
 | `title` | Artist name, required |
+| `rating` | optional 1–5 (always allowed; no status gate) |
 | `notes`, `recommendedBy` | optional text |
 | `musicBrainzArtistId` | UUID MBID, dedupe key |
 | `spotifyUrl`, `soundcloudUrl` | optional HTTPS URLs |

@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getItemUseCases, subscribeSyncStatus } from "@/composition/client";
 import { BookMovieRow } from "@/components/rows/BookMovieRow";
+import { MusicArtistRow } from "@/components/rows/MusicArtistRow";
 import { ListSortFilter } from "@/components/ListSortFilter";
 import { StatusFilter, type StatusFilterValue } from "@/components/StatusFilter";
 import {
@@ -110,6 +110,25 @@ export function MusicListPage({ kind }: MusicListPageProps) {
     setItems(await useCases.listItems(itemType, listOptionsForFilter()));
   }, [itemType, listOptionsForFilter]);
 
+  const updateArtistItem = useCallback(
+    (id: string, patch: ItemPatch) => {
+      setItems((current) =>
+        current.map((item) => {
+          if (item.id !== id) return item;
+          try {
+            return applyItemPatch(item, patch);
+          } catch {
+            return item;
+          }
+        }),
+      );
+      void getItemUseCases()
+        .then((useCases) => useCases.updateItem(id, patch))
+        .catch(() => revertList());
+    },
+    [revertList],
+  );
+
   const updateTrackItem = useCallback(
     (id: string, patch: ItemPatch) => {
       setItems((current) =>
@@ -170,18 +189,13 @@ export function MusicListPage({ kind }: MusicListPageProps) {
                 />
               );
             }
+            const artistItem = item as Item & { type: "music_artist" };
             return (
-              <li key={item.id} className="rounded-lg border border-border px-3 py-2">
-                <Link
-                  href={`/items/${item.id}`}
-                  className="font-medium underline-offset-2 hover:underline"
-                >
-                  {item.title}
-                </Link>
-                {item.recommendedBy ? (
-                  <p className="text-sm text-muted">{item.recommendedBy}</p>
-                ) : null}
-              </li>
+              <MusicArtistRow
+                key={item.id}
+                item={artistItem}
+                onRatingChange={(rating) => updateArtistItem(item.id, { rating })}
+              />
             );
           })}
         </ul>

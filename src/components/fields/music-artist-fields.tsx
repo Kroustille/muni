@@ -1,6 +1,7 @@
 "use client";
 
 import type { CreateItemExtra } from "@/application/items";
+import { StarRating } from "@/components/StarRating";
 import { TextField } from "@/components/ui/TextField";
 import { t } from "@/i18n";
 
@@ -9,6 +10,7 @@ import { MultilineField } from "./multiline-field";
 
 export type MusicArtistFieldValues = {
   title: string;
+  rating: number | null;
   recommendedBy: string;
   notes: string;
   spotifyUrl: string;
@@ -17,6 +19,7 @@ export type MusicArtistFieldValues = {
 
 export const emptyMusicArtistFieldValues = (): MusicArtistFieldValues => ({
   title: "",
+  rating: null,
   recommendedBy: "",
   notes: "",
   spotifyUrl: "",
@@ -44,6 +47,7 @@ export function musicArtistFieldValuesToExtra(values: MusicArtistFieldValues): C
   if (spotifyUrl) extra.spotifyUrl = spotifyUrl;
   const soundcloudUrl = optionalText(values.soundcloudUrl);
   if (soundcloudUrl) extra.soundcloudUrl = soundcloudUrl;
+  if (values.rating !== null) extra.rating = values.rating;
   return extra;
 }
 
@@ -56,6 +60,13 @@ export function MusicArtistFields({ values, onChange, titleError }: MusicArtistF
         onChange={(event) => onChange({ ...values, title: event.target.value })}
         error={titleError}
       />
+      <div className="flex flex-col gap-1">
+        <span className="text-sm text-muted">{t("field.rating")}</span>
+        <StarRating
+          value={values.rating}
+          onChange={(rating) => onChange({ ...values, rating })}
+        />
+      </div>
       <RecommendedByInput
         value={values.recommendedBy}
         onChange={(recommendedBy) => onChange({ ...values, recommendedBy })}

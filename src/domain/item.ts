@@ -105,6 +105,7 @@ const FIELDS_BY_TYPE: Record<ItemType, readonly (keyof Item)[]> = {
   recipe: ["notes", "ingredients", "steps"],
   music_artist: [
     "recommendedBy",
+    "rating",
     "notes",
     "musicBrainzArtistId",
     "spotifyUrl",

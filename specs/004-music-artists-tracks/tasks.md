@@ -55,9 +55,10 @@
 
 ---
 
-## Phase 6: User Story 4 — Track status (P2)
+## Phase 6: User Story 4 — Ratings, track status, list sort (P2)
 
 - [x] T421 [US4] Track status `to_listen`/`listened` and rating gating like movies
+- [x] T421a [US4] Artist optional 1–5 rating on list/detail; **Note** sort on artistes; specs + data-model + ui-music
 
 ---
 

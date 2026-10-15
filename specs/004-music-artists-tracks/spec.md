@@ -52,9 +52,13 @@ User opens prefilled or edited Spotify/SoundCloud URLs from the row (MU1b/MU-lin
 
 ---
 
-### User Story 4 - Track status, rating, and list sort (Priority: P2)
+### User Story 4 - Ratings, track status, and list sort (Priority: P2)
 
-Tracks: to listen / listened + personal 1–5 when listened; tracks list supports **Plus récents** / **Par note** sort (same rules as books/movies). Artists: notes and recommended-by.
+**Artists:** optional personal **note** (1–5) anytime on list rows and detail (color-coded controls; no status gate).
+
+**Tracks:** `to_listen` / `listened`; personal 1–5 when **listened** (rating kept but hidden if status returns to `to_listen`, same as books/movies).
+
+**Lists:** **Trier par** Date or Note + **Ordre** Croissant/Décroissant on artists and tracks (and books/movies).
 
 ---
 
@@ -84,11 +88,12 @@ Same artist MBID or recording MBID updates or restores soft-deleted row silently
 - **FR-009**: Track requires title + artist; album/year optional (MU5).
 - **FR-010**: FR-first metadata, EN fallback.
 - **FR-011**: Server catalog cache (X4).
+- **FR-012**: Personal **rating** (1–5): optional on **music_artist** (always editable); on **music_track** only when status is `listened` (stored value kept when status changes). Color-coded UI on lists; **Note** sort uses stored ratings.
 
 ### Key Entities
 
-- **Music artist**: name, notes, recommendedBy, `musicBrainzArtistId`, optional URLs.
-- **Music track**: title, artist text, album?, year?, status, rating?, notes, recommendedBy, `musicBrainzRecordingId`, optional URLs.
+- **Music artist**: name, optional **rating** (1–5), notes, recommendedBy, `musicBrainzArtistId`, optional URLs.
+- **Music track**: title, artist text, album?, year?, status, rating? (when listened), notes, recommendedBy, `musicBrainzRecordingId`, optional URLs.
 
 ## Success Criteria *(mandatory)*
 

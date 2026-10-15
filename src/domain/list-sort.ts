@@ -14,7 +14,7 @@ export type ListSort = {
 export const DEFAULT_LIST_SORT: ListSort = { field: "date", order: "desc" };
 
 export function itemTypeSupportsRatingSort(type: ItemType): boolean {
-  return type === "book" || type === "movie" || type === "music_track";
+  return type === "book" || type === "movie" || type === "music_artist" || type === "music_track";
 }
 
 function compareByDate(a: Item, b: Item, order: ListSortOrder): number {
