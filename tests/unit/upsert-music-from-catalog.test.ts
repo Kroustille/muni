@@ -56,7 +56,7 @@ describe("upsertMusicArtistFromCatalog", () => {
 
 describe("upsertMusicTrackFromCatalog", () => {
   it("merges into a manual track when title and artist match", async () => {
-    const manual = await ctx.useCases.createItem("music_track", "Time", {
+    const manual = await ctx.useCases.createItem("music_track", "Time (You and I)", {
       artist: "Khruangbin",
     });
     const saved = await ctx.useCases.upsertMusicTrackFromCatalog({

@@ -192,13 +192,31 @@ describe("getItem", () => {
 });
 
 describe("counts and recent", () => {
+  it("lists music tracks filtered by listened status", async () => {
+    await ctx.useCases.createItem("music_track", "A", { artist: "One", status: "to_listen" });
+    const listened = await ctx.useCases.createItem("music_track", "B", {
+      artist: "Two",
+      status: "listened",
+      rating: 4,
+    });
+    const filtered = await ctx.useCases.listItems("music_track", { status: "listened" });
+    expect(filtered.map((item) => item.id)).toEqual([listened.id]);
+  });
+
   it("counts non-deleted items per type, with zero for empty types", async () => {
     await ctx.useCases.createItem("book", "A");
     await ctx.useCases.createItem("book", "B");
     const gone = await ctx.useCases.createItem("movie", "M");
     await ctx.useCases.createItem("shopping", "Lait");
     await ctx.useCases.deleteItem(gone.id);
-    expect(await ctx.useCases.counts()).toEqual({ shopping: 1, book: 2, movie: 0, recipe: 0 });
+    expect(await ctx.useCases.counts()).toEqual({
+      shopping: 1,
+      book: 2,
+      movie: 0,
+      recipe: 0,
+      music_artist: 0,
+      music_track: 0,
+    });
   });
 
   it("recent returns the latest created non-deleted items across types, limited", async () => {
