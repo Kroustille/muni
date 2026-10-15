@@ -137,7 +137,7 @@ describe("createSyncService.push", () => {
 
   it("rejects rows that fail domain validation with per-row errors", async () => {
     const { repository, sync } = setup();
-    const invalid = validBookWire({ title: "   " });
+    const invalid = { ...validBookWire(), title: "   " } as ItemWire;
 
     let caught: SyncValidationError | undefined;
     try {
