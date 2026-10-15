@@ -11,6 +11,8 @@ const TYPE_LABEL_KEY: Record<ItemType, MessageKey> = {
   book: "type.book",
   movie: "type.movie",
   recipe: "type.recipe",
+  music_artist: "type.music_artist",
+  music_track: "type.music_track",
 };
 
 export default function SearchPage() {
