@@ -36,6 +36,12 @@
       },
       "barcodeScanner": {
         "wasm": "@undecaf/zbar-wasm@0.11.0"
+      },
+      "movies": {
+        "provider": "wikidata",
+        "apiBase": "https://www.wikidata.org/w/api.php",
+        "npmPackage": null,
+        "note": "Server-side fetch only (X2); keyless Wikidata API"
       }
     }
   },
