@@ -49,7 +49,7 @@
 - [X] T014 [P] Create unit tests for the hybrid logical clock (monotonic ticks, compare with device-id tie-break, clock-skew tolerance, string format `<wallMs>-<counter>-<deviceId>`) in `tests/unit/domain-clock.test.ts`
 - [X] T015 [P] Implement the hybrid logical clock value object in `src/domain/clock.ts` (depends on T014)
 - [X] T016 Create the shared JSON merge test vectors `tests/vectors/merge-vectors.json` and unit tests for the merge function (per-field LWW, device-id tie-break, `deleted_at` as a field, convergent, idempotent, commutative) in `tests/unit/domain-merge.test.ts` (depends on T011, T015 for types and clock)
-- [ ] T017 Implement the field-level LWW merge domain service (per field greater `fields_updated_at[f]` wins, ties by device id; `deleted_at` is a field like any other), used by both the client and the server sync service, in `src/domain/merge.ts` (depends on T011, T015, T016)
+- [X] T017 Implement the field-level LWW merge domain service (per field greater `fields_updated_at[f]` wins, ties by device id; `deleted_at` is a field like any other), used by both the client and the server sync service, in `src/domain/merge.ts` (depends on T011, T015, T016)
 
 ### Client ports, use cases and the dependency rule
 
