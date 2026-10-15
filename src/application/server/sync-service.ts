@@ -43,16 +43,22 @@ function formatZodIssues(error: { issues: { message: string }[] }): string {
   return messages.length > 0 ? messages.join("; ") : "validation failed";
 }
 
-function validatePushPayload(items: ItemWire[]): ItemWire[] {
+export function validatePushItems(items: unknown[]): ItemWire[] {
   const rowErrors: RowError[] = [];
   const validated: ItemWire[] = [];
 
   for (let index = 0; index < items.length; index++) {
-    const item = items[index]!;
-    if (Object.prototype.hasOwnProperty.call(item, "user_id")) {
+    const item = items[index];
+    if (item === null || typeof item !== "object") {
+      rowErrors.push({ index, message: "invalid item" });
+      continue;
+    }
+    const record = item as Record<string, unknown>;
+    const id = typeof record.id === "string" ? record.id : undefined;
+    if (Object.prototype.hasOwnProperty.call(record, "user_id")) {
       rowErrors.push({
         index,
-        id: item.id,
+        id,
         message: "user_id must not be present",
       });
       continue;
@@ -61,7 +67,7 @@ function validatePushPayload(items: ItemWire[]): ItemWire[] {
     if (!parsed.success) {
       rowErrors.push({
         index,
-        id: item.id,
+        id,
         message: formatZodIssues(parsed.error),
       });
       continue;
@@ -86,7 +92,7 @@ export function createSyncService(deps: SyncServiceDeps): SyncService {
   return {
     async push(userId, items) {
       assertUserId(userId);
-      const validated = validatePushPayload(items);
+      const validated = validatePushItems(items);
 
       return repository.transaction(async (repo) => {
         const results: ItemWire[] = [];

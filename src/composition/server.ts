@@ -9,6 +9,8 @@ import { createUuidIdGenerator } from "@/adapters/browser/id-generator";
 import { createGoogleUseCases, type GoogleUseCases } from "@/application/auth/google";
 import { createMagicLinkUseCases, type MagicLinkUseCases } from "@/application/auth/magic-link";
 import { createSessionUseCases, type SessionUseCases } from "@/application/auth/sessions";
+import { createPostgresItemRepository } from "@/adapters/postgres/item-repository";
+import { createSyncService, type SyncService } from "@/application/server/sync-service";
 import { loadConfig, type ServerConfig } from "@/composition/config";
 
 export interface ServerContainer {
@@ -16,6 +18,7 @@ export interface ServerContainer {
   readonly magicLink: MagicLinkUseCases;
   readonly sessions: SessionUseCases;
   readonly google: GoogleUseCases | null;
+  readonly sync: SyncService;
   readonly destroy: () => Promise<void>;
 }
 
@@ -66,11 +69,15 @@ export function createServerContainer(
           signInWithIdentity: sessions.signInWithIdentity,
         });
 
+  const items = createPostgresItemRepository(db);
+  const sync = createSyncService({ repository: items, now });
+
   return {
     appUrl: config.appUrl,
     magicLink,
     sessions,
     google,
+    sync,
     destroy: () => pg.destroy(),
   };
 }

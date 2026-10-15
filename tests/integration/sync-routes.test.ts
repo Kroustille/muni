@@ -112,7 +112,7 @@ function buildContainer(): SyncRouteTestContainer {
     sessions: auth.sessions,
     tokens: auth.tokens,
     ids: { newId: () => `id-${++idCounter}` },
-    now: state.now,
+    now: () => state.now(),
   });
   return {
     appUrl: APP_URL,
@@ -124,7 +124,7 @@ function buildContainer(): SyncRouteTestContainer {
       mailer: auth.mailer,
       tokens: auth.tokens,
       ids: { newId: () => `id-${++idCounter}` },
-      now: state.now,
+      now: () => state.now(),
       appUrl: APP_URL,
     }),
     google: createGoogleUseCases({
@@ -218,7 +218,8 @@ describe("POST /api/sync/push", () => {
 
   it("answers 401 when the session is expired", async () => {
     const token = await sessionToken("user@example.test");
-    state.now = () => new Date(state.now().getTime() + SESSION_TTL_MS + 1);
+    const signedInAt = state.now();
+    state.now = () => new Date(signedInAt.getTime() + SESSION_TTL_MS + 1);
     const { POST } = await import("@/app/api/sync/push/route");
 
     const response = await POST(
@@ -285,7 +286,7 @@ describe("POST /api/sync/push", () => {
     const { POST } = await import("@/app/api/sync/push/route");
     const token = await sessionToken("user@example.test");
     const userId = await userIdForEmail("user@example.test");
-    const bad = sampleWire({ title: "" });
+    const bad = { ...sampleWire(), title: "" };
 
     const response = await POST(authedPost("/api/sync/push", { items: [bad] }, token));
 
@@ -336,7 +337,8 @@ describe("GET /api/sync/pull", () => {
 
   it("answers 401 when the session is expired", async () => {
     const token = await sessionToken("user@example.test");
-    state.now = () => new Date(state.now().getTime() + SESSION_TTL_MS + 1);
+    const signedInAt = state.now();
+    state.now = () => new Date(signedInAt.getTime() + SESSION_TTL_MS + 1);
     const { GET } = await import("@/app/api/sync/pull/route");
 
     expect((await GET(authedGet("/api/sync/pull?limit=10", token))).status).toBe(401);
