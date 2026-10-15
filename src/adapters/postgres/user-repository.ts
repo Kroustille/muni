@@ -1,9 +1,9 @@
-import type { Kysely } from "kysely";
+import type { Kysely, Selectable } from "kysely";
 
 import type { User, UserRepository } from "../../application/ports/user-repository";
 import type { DB, Users } from "./db-types";
 
-function toUser(row: Users): User {
+function toUser(row: Selectable<Users>): User {
   return {
     id: row.id,
     email: row.email,

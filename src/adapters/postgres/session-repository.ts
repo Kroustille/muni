@@ -1,9 +1,9 @@
-import type { Kysely } from "kysely";
+import type { Kysely, Selectable } from "kysely";
 
 import type { Session, SessionRepository } from "../../application/ports/session-repository";
 import type { DB, Sessions } from "./db-types";
 
-function toSession(row: Sessions): Session {
+function toSession(row: Selectable<Sessions>): Session {
   return {
     id: row.id,
     userId: row.user_id,
