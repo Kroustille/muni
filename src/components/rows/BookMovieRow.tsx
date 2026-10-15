@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { Select } from "@/components/ui/Select";
+import { ratingBadgeClass } from "@/components/rating-colors";
 import { StarRating } from "@/components/StarRating";
 import {
   statusesFor,
@@ -38,12 +39,19 @@ export function BookMovieRow({ item, onStatusChange, onRatingChange }: BookMovie
   return (
     <li className="rounded-lg border border-border px-3 py-2">
       <div className="flex flex-col gap-2">
-        <Link
-          href={`/items/${item.id}`}
-          className="font-medium underline-offset-2 hover:underline"
-        >
-          {item.title}
-        </Link>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href={`/items/${item.id}`}
+            className="font-medium underline-offset-2 hover:underline"
+          >
+            {item.title}
+          </Link>
+          {ratingVisible(status) && item.rating !== null ? (
+            <span className={ratingBadgeClass(item.rating)} aria-label={t("field.rating")}>
+              {item.rating}
+            </span>
+          ) : null}
+        </div>
         {secondaryText(item) ? <p className="text-sm text-muted">{secondaryText(item)}</p> : null}
         <Select
           label={t("field.status")}
