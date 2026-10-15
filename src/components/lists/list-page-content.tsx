@@ -12,7 +12,12 @@ import { BookMovieRow } from "@/components/rows/BookMovieRow";
 import { ShoppingRow } from "@/components/rows/ShoppingRow";
 import { ListSortFilter } from "@/components/ListSortFilter";
 import { StatusFilter, type StatusFilterValue } from "@/components/StatusFilter";
-import { itemTypeSupportsRatingSort, type ListSortMode } from "@/domain/list-sort";
+import {
+  DEFAULT_LIST_SORT,
+  itemTypeSupportsRatingSort,
+  normalizeListSort,
+  type ListSort,
+} from "@/domain/list-sort";
 import { useIsMobile } from "@/components/use-is-mobile";
 import type { Item, ItemPatch, ItemStatus, ItemType } from "@/domain/item";
 import { updateItem as applyItemPatch } from "@/domain/item";
@@ -61,16 +66,16 @@ export function ListPageContent({ route }: ListPageContentProps) {
   const isMobile = useIsMobile();
   const [items, setItems] = useState<Item[]>([]);
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("all");
-  const [listSort, setListSort] = useState<ListSortMode>("newest");
+  const [listSort, setListSort] = useState<ListSort>(DEFAULT_LIST_SORT);
   const refreshRef = useRef<(() => Promise<void>) | null>(null);
 
   const itemType = ROUTE_TO_TYPE[route];
   const showStatusFilter = itemType === "book" || itemType === "movie";
-  const showRatingSort = itemTypeSupportsRatingSort(itemType);
+  const allowRatingSortField = itemTypeSupportsRatingSort(itemType);
 
   useEffect(() => {
     setStatusFilter("all");
-    setListSort("newest");
+    setListSort(DEFAULT_LIST_SORT);
   }, [itemType]);
 
   useEffect(() => {
@@ -81,8 +86,8 @@ export function ListPageContent({ route }: ListPageContentProps) {
 
     void getItemUseCases().then(async (useCases) => {
       const refresh = async () => {
-        const listOptions: { status?: ItemStatus; sort?: ListSortMode } = {
-          sort: showRatingSort ? listSort : "newest",
+        const listOptions: { status?: ItemStatus; sort?: ListSort } = {
+          sort: normalizeListSort(listSort, allowRatingSortField),
         };
         if (showStatusFilter && statusFilter !== "all") {
           listOptions.status = statusFilter;
@@ -116,7 +121,7 @@ export function ListPageContent({ route }: ListPageContentProps) {
       unsubscribeSync?.();
       refreshRef.current = null;
     };
-  }, [itemType, showStatusFilter, statusFilter, showRatingSort, listSort]);
+  }, [itemType, showStatusFilter, statusFilter, allowRatingSortField, listSort]);
 
   const listOptionsForFilter = useCallback(
     () => (showStatusFilter && statusFilter !== "all" ? { status: statusFilter } : {}),
@@ -174,7 +179,11 @@ export function ListPageContent({ route }: ListPageContentProps) {
           onChange={setStatusFilter}
         />
       ) : null}
-      {showRatingSort ? <ListSortFilter value={listSort} onChange={setListSort} /> : null}
+      <ListSortFilter
+        value={listSort}
+        onChange={setListSort}
+        allowRatingField={allowRatingSortField}
+      />
       {items.length === 0 ? (
         <p>{t("list.empty")}</p>
       ) : (

@@ -7,7 +7,7 @@
 | `/auth/callback` | Google return (route handler) | Completes Google sign-in (state, code exchange, verified email), sets the session, redirects to `/` |
 | `/api/auth/*`, `/api/sync/*`, `/api/health` | Backend endpoints (not screens) | See auth-api.md and remote-store.md |
 | `/` | Home | Card per list with count and recent items; search entry; empty state on first launch |
-| `/lists/[type]` | List view (`shopping`, `books`, `movies`, `recipes`) | Status filter where applicable; **Plus récents** / **Par note** sort on books and movies; check-off for shopping; personal rating (1–5) shown with **color-coded** controls and a colored badge on the row when set; **list quick-add** opens the manual form for that list type (no type picker); catalog flows stay separate where defined (books, movies) |
+| `/lists/[type]` | List view (`shopping`, `books`, `movies`, `recipes`) | Status filter where applicable; **Trier par** (Date; Note on books/movies) + **Ordre** (Croissant/Décroissant) on every list; check-off for shopping; personal rating (1–5) color-coded when set; **list quick-add** for that type; catalog flows on books/movies |
 | `/items/[id]` | Detail and edit | Type-specific fields; recipe ingredients (quantity and name) and ordered steps; delete with Undo toast |
 | `/search` | Cross-list search | Results show type; empty state; query runs **2s after typing stops** (submit still immediate) |
 | `/settings` | Settings | Sign out |

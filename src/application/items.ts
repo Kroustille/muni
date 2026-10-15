@@ -12,7 +12,7 @@ import {
   type ItemWire,
   type NewItemInput,
 } from "../domain/item";
-import { type ListSortMode, sortItemsForList } from "../domain/list-sort";
+import { DEFAULT_LIST_SORT, type ListSort, sortItemsForList } from "../domain/list-sort";
 import { merge } from "../domain/merge";
 import { normalizeText } from "../domain/text";
 import { createUpsertBookFromCatalog } from "./books/upsert-from-catalog";
@@ -46,7 +46,7 @@ export type ItemUseCases = {
   getItem(id: string): Promise<Item | undefined>;
   listItems(
     type: ItemType,
-    options?: { status?: ItemStatus; sort?: ListSortMode },
+    options?: { status?: ItemStatus; sort?: ListSort },
   ): Promise<Item[]>;
   counts(): Promise<Record<ItemType, number>>;
   recent(limit: number): Promise<Item[]>;
@@ -180,7 +180,7 @@ export function createItemUseCases({
 
     listItems: async (type, options = {}) => {
       const rows = await repository.query({ type, status: options.status });
-      return sortItemsForList(rows, options.sort ?? "newest");
+      return sortItemsForList(rows, options.sort ?? DEFAULT_LIST_SORT);
     },
 
     counts: async () => {

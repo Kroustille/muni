@@ -69,7 +69,7 @@ A user opens a list and sees its items. They can check off shopping items, chang
 1. **Given** a shopping list with items, **When** the user checks an item, **Then** it is shown as checked.
 2. **Given** a book with status "to read", **When** the user changes it to "read", **Then** the status updates and a rating can be added.
 3. **Given** a list view, **When** the user filters by status, **Then** only matching items are shown.
-4. **Given** a books or movies list, **When** the user chooses sort **Par note**, **Then** items with a stored rating (1–5) appear highest first and items without a rating appear last (newest first within each group).
+4. **Given** a books or movies list, **When** the user chooses sort field **Note** and order **Décroissant**, **Then** items with a stored rating (1–5) appear highest first and items without a rating appear last (newest first within ties). **Croissant** / **Décroissant** also apply to **Date** sort.
 4. **Given** a recipe, **When** the user opens it, **Then** they see title, ingredients (quantity and name), ordered steps and notes, and can edit them.
 
 ---
@@ -151,7 +151,7 @@ The home screen shows a card per list with item count and recently added items, 
 - **FR-009**: "Recommended by" MUST be free text with suggestions drawn from the user's previous entries.
 - **FR-010**: Users MUST be able to edit and delete any item. Deletion MUST NOT require a confirmation dialog and MUST offer a short-lived undo.
 - **FR-011**: List views MUST allow filtering by status where a status exists.
-- **FR-011a**: Books and movies list views MUST allow sorting by **Par note** (highest rating first when a rating is stored; unrated items last, then by recency) in addition to default **Plus récents**.
+- **FR-011a**: List views with personal ratings MUST expose two sort controls: **Trier par** (**Date** or **Note**) and **Ordre** (**Croissant** or **Décroissant**). Default is Date + Décroissant. Note sort keeps unrated items last; ties break by newest date.
 - **FR-012**: Users MUST be able to search by text across all lists, matching on title (or name) only, using case-insensitive and accent-insensitive substring matching. Search is a starting point: other fields MAY be added to the search later, but are not searched in v1.
 - **FR-013**: The home screen MUST show a card per list with its item count and a list of recently added items.
 - **FR-014**: All functionality (add, edit, delete, check off, filter, search) MUST work with no network connection.

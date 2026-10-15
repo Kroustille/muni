@@ -7,7 +7,12 @@ import { getItemUseCases, subscribeSyncStatus } from "@/composition/client";
 import { BookMovieRow } from "@/components/rows/BookMovieRow";
 import { ListSortFilter } from "@/components/ListSortFilter";
 import { StatusFilter, type StatusFilterValue } from "@/components/StatusFilter";
-import { itemTypeSupportsRatingSort, type ListSortMode } from "@/domain/list-sort";
+import {
+  DEFAULT_LIST_SORT,
+  itemTypeSupportsRatingSort,
+  normalizeListSort,
+  type ListSort,
+} from "@/domain/list-sort";
 import {
   updateItem as applyItemPatch,
   type Item,
@@ -36,15 +41,15 @@ export type MusicListPageProps = {
 export function MusicListPage({ kind }: MusicListPageProps) {
   const itemType: ItemType = kind;
   const showStatusFilter = kind === "music_track";
-  const showRatingSort = itemTypeSupportsRatingSort(kind);
+  const allowRatingSortField = itemTypeSupportsRatingSort(kind);
   const [items, setItems] = useState<Item[]>([]);
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("all");
-  const [listSort, setListSort] = useState<ListSortMode>("newest");
+  const [listSort, setListSort] = useState<ListSort>(DEFAULT_LIST_SORT);
   const refreshRef = useRef<(() => Promise<void>) | null>(null);
 
   useEffect(() => {
     setStatusFilter("all");
-    setListSort("newest");
+    setListSort(DEFAULT_LIST_SORT);
   }, [kind]);
 
   useEffect(() => {
@@ -55,8 +60,8 @@ export function MusicListPage({ kind }: MusicListPageProps) {
 
     void getItemUseCases().then(async (useCases) => {
       const refresh = async () => {
-        const listOptions: { status?: ItemStatus; sort?: ListSortMode } = {
-          sort: showRatingSort ? listSort : "newest",
+        const listOptions: { status?: ItemStatus; sort?: ListSort } = {
+          sort: normalizeListSort(listSort, allowRatingSortField),
         };
         if (showStatusFilter && statusFilter !== "all") {
           listOptions.status = statusFilter;
@@ -90,15 +95,15 @@ export function MusicListPage({ kind }: MusicListPageProps) {
       unsubscribeSync?.();
       refreshRef.current = null;
     };
-  }, [itemType, showStatusFilter, statusFilter, showRatingSort, listSort]);
+  }, [itemType, showStatusFilter, statusFilter, allowRatingSortField, listSort]);
 
   const listOptionsForFilter = useCallback(() => {
-    const options: { status?: ItemStatus; sort?: ListSortMode } = {
-      sort: showRatingSort ? listSort : "newest",
+    const options: { status?: ItemStatus; sort?: ListSort } = {
+      sort: normalizeListSort(listSort, allowRatingSortField),
     };
     if (showStatusFilter && statusFilter !== "all") options.status = statusFilter;
     return options;
-  }, [showStatusFilter, statusFilter, showRatingSort, listSort]);
+  }, [showStatusFilter, statusFilter, allowRatingSortField, listSort]);
 
   const revertList = useCallback(async () => {
     const useCases = await getItemUseCases();
@@ -144,7 +149,11 @@ export function MusicListPage({ kind }: MusicListPageProps) {
       {showStatusFilter ? (
         <StatusFilter itemType="music_track" value={statusFilter} onChange={setStatusFilter} />
       ) : null}
-      {showRatingSort ? <ListSortFilter value={listSort} onChange={setListSort} /> : null}
+      <ListSortFilter
+        value={listSort}
+        onChange={setListSort}
+        allowRatingField={allowRatingSortField}
+      />
       {items.length === 0 ? (
         <p>{t("list.empty")}</p>
       ) : (
