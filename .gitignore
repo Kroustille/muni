@@ -2,3 +2,20 @@ node_modules/
 .next/
 next-env.d.ts
 *.tsbuildinfo
+
+# env
+.env
+.env.local
+.env.*.local
+
+# build / test output
+coverage/
+dist/
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# local docker artifacts
+pgdata/
+.docker/
