@@ -1,0 +1,707 @@
+[
+  {
+    "name": "disjoint fields both kept",
+    "local": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": 4,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "rating": "2000-0-dev-a"
+      },
+      "server_updated_at": null
+    },
+    "remote": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": "great",
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "notes": "3000-0-dev-b"
+      },
+      "server_updated_at": null
+    },
+    "expected": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": 4,
+      "notes": "great",
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "rating": "2000-0-dev-a",
+        "notes": "3000-0-dev-b"
+      },
+      "server_updated_at": null
+    }
+  },
+  {
+    "name": "greater wall time wins",
+    "local": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "reading",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "status": "2000-0-dev-a"
+      },
+      "server_updated_at": null
+    },
+    "remote": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "status": "3000-0-dev-b"
+      },
+      "server_updated_at": null
+    },
+    "expected": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "status": "3000-0-dev-b"
+      },
+      "server_updated_at": null
+    }
+  },
+  {
+    "name": "greater counter wins on same wall time",
+    "local": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "reading",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "status": "2000-5-dev-a"
+      },
+      "server_updated_at": null
+    },
+    "remote": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "status": "2000-2-dev-b"
+      },
+      "server_updated_at": null
+    },
+    "expected": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "reading",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "status": "2000-5-dev-a"
+      },
+      "server_updated_at": null
+    }
+  },
+  {
+    "name": "device id breaks exact wall and counter tie",
+    "local": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune A",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "title": "2000-1-dev-a"
+      },
+      "server_updated_at": null
+    },
+    "remote": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune B",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "title": "2000-1-dev-b"
+      },
+      "server_updated_at": null
+    },
+    "expected": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune B",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "title": "2000-1-dev-b"
+      },
+      "server_updated_at": null
+    }
+  },
+  {
+    "name": "field with timestamp beats field without",
+    "local": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {},
+      "server_updated_at": null
+    },
+    "remote": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": "hi",
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "notes": "1000-0-dev-b"
+      },
+      "server_updated_at": null
+    },
+    "expected": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": "hi",
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "notes": "1000-0-dev-b"
+      },
+      "server_updated_at": null
+    }
+  },
+  {
+    "name": "later delete beats earlier edit",
+    "local": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": 3,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "rating": "2000-0-dev-a"
+      },
+      "server_updated_at": null
+    },
+    "remote": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": "2026-01-02T00:00:00.000Z",
+      "fields_updated_at": {
+        "deleted_at": "3000-0-dev-b"
+      },
+      "server_updated_at": null
+    },
+    "expected": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": 3,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": "2026-01-02T00:00:00.000Z",
+      "fields_updated_at": {
+        "rating": "2000-0-dev-a",
+        "deleted_at": "3000-0-dev-b"
+      },
+      "server_updated_at": null
+    }
+  },
+  {
+    "name": "later restore clears earlier delete",
+    "local": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": "2026-01-02T00:00:00.000Z",
+      "fields_updated_at": {
+        "deleted_at": "3000-0-dev-a"
+      },
+      "server_updated_at": null
+    },
+    "remote": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "deleted_at": "4000-0-dev-b"
+      },
+      "server_updated_at": null
+    },
+    "expected": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "deleted_at": "4000-0-dev-b"
+      },
+      "server_updated_at": null
+    }
+  },
+  {
+    "name": "earlier restore loses to later delete",
+    "local": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "deleted_at": "3000-0-dev-a"
+      },
+      "server_updated_at": null
+    },
+    "remote": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": "2026-01-05T00:00:00.000Z",
+      "fields_updated_at": {
+        "deleted_at": "4000-0-dev-b"
+      },
+      "server_updated_at": null
+    },
+    "expected": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": "2026-01-05T00:00:00.000Z",
+      "fields_updated_at": {
+        "deleted_at": "4000-0-dev-b"
+      },
+      "server_updated_at": null
+    }
+  },
+  {
+    "name": "identical rows unchanged",
+    "local": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": 2,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "rating": "2000-0-dev-a"
+      },
+      "server_updated_at": null
+    },
+    "remote": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": 2,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "rating": "2000-0-dev-a"
+      },
+      "server_updated_at": null
+    },
+    "expected": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": 2,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {
+        "rating": "2000-0-dev-a"
+      },
+      "server_updated_at": null
+    }
+  },
+  {
+    "name": "array fields merge as whole values",
+    "local": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "recipe",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": null,
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": [
+        {
+          "quantity": "1",
+          "name": "egg"
+        }
+      ],
+      "steps": ["mix"],
+      "deleted_at": null,
+      "fields_updated_at": {
+        "ingredients": "2000-0-dev-a",
+        "steps": "2000-1-dev-a"
+      },
+      "server_updated_at": null
+    },
+    "remote": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "recipe",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": null,
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": [
+        {
+          "quantity": "2",
+          "name": "egg"
+        }
+      ],
+      "steps": ["beat"],
+      "deleted_at": null,
+      "fields_updated_at": {
+        "ingredients": "2500-0-dev-b",
+        "steps": "1500-0-dev-b"
+      },
+      "server_updated_at": null
+    },
+    "expected": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "recipe",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": null,
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": [
+        {
+          "quantity": "2",
+          "name": "egg"
+        }
+      ],
+      "steps": ["mix"],
+      "deleted_at": null,
+      "fields_updated_at": {
+        "ingredients": "2500-0-dev-b",
+        "steps": "2000-1-dev-a"
+      },
+      "server_updated_at": null
+    }
+  },
+  {
+    "name": "server_updated_at takes the later non-null value",
+    "local": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {},
+      "server_updated_at": "2026-02-01T00:00:00.000Z"
+    },
+    "remote": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {},
+      "server_updated_at": null
+    },
+    "expected": {
+      "id": "11111111-1111-4111-8111-111111111111",
+      "type": "book",
+      "title": "Dune",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "author": null,
+      "status": "to_read",
+      "recommended_by": null,
+      "rating": null,
+      "notes": null,
+      "quantity": null,
+      "checked": false,
+      "ingredients": null,
+      "steps": null,
+      "deleted_at": null,
+      "fields_updated_at": {},
+      "server_updated_at": "2026-02-01T00:00:00.000Z"
+    }
+  }
+]
