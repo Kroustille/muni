@@ -116,7 +116,7 @@
 - [ ] T057 [US1] Build the auth route handlers: `src/app/api/auth/magic-link/route.ts`, `src/app/api/auth/google/route.ts`, `src/app/api/auth/session/route.ts`, `src/app/api/auth/sign-out/route.ts`, `src/app/auth/verify/route.ts`, `src/app/auth/callback/route.ts`, plus a shared helper that resolves the session user id from the cookie, as thin adapters over the use cases (depends on T045, T056)
 - [X] T058 [US1] Implement the HTTP `AuthGateway` adapter in `src/adapters/http/auth-gateway.ts` (depends on T044)
 - [X] T059 [US1] Implement the client session use case (first-use gate, offline open, expired-session policy) in `src/application/session.ts` (depends on T039, T018)
-- [ ] T060 [US1] Build the `/sign-in` screen (email field for magic link, Google button, no password, offline message explaining the one-time connection need, expired/used link message) in `src/app/(auth)/sign-in/page.tsx` (depends on T058)
+- [X] T060 [US1] Build the `/sign-in` screen (email field for magic link, Google button, no password, offline message explaining the one-time connection need, expired/used link message) in `src/app/(auth)/sign-in/page.tsx` (depends on T058)
 - [ ] T061 [US1] Wire the HTTP `AuthGateway` and session use case into `src/composition/client.ts` and add the session gate in `src/app/(app)/layout.tsx`: first use requires sign-in with a connection; afterwards the app opens offline from local data; an expired session never blocks local data and a non-blocking re-auth prompt is shown (depends on T033, T057, T058, T059, T060)
 - [ ] T062 [US1] Build `/settings` with sign out in `src/app/(app)/settings/page.tsx` (FR-020) (depends on T061)
 
