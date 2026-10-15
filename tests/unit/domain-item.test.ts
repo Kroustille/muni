@@ -6,7 +6,9 @@ import {
   itemWireSchema,
   newItem,
   statusesFor,
+  itemToWire,
   updateItem,
+  wireToItem,
 } from "@/domain/item";
 
 const ID = "6f1c1d52-7a53-4a3e-9a47-0d8f6b6f2a10";
@@ -221,5 +223,60 @@ describe("updateItem", () => {
   it("never changes id or created_at", () => {
     expect(() => updateItem(item, { id: "x" } as never)).toThrow();
     expect(() => updateItem(item, { createdAt: "2030-01-01T00:00:00.000Z" } as never)).toThrow();
+  });
+});
+
+describe("fieldsUpdatedAt", () => {
+  const base = () => newItem({ id: ID, type: "book", title: "La Peste", createdAt: NOW });
+
+  it("defaults to an empty record", () => {
+    expect(base().fieldsUpdatedAt).toEqual({});
+  });
+
+  it("updateItem keeps existing stamps and merges the patched ones", () => {
+    const stamped = updateItem(base(), { fieldsUpdatedAt: { title: HLC } });
+    const next = updateItem(stamped, {
+      notes: "ok",
+      fieldsUpdatedAt: { notes: "1767261600001-0-device-a" },
+    });
+    expect(next.fieldsUpdatedAt).toEqual({ title: HLC, notes: "1767261600001-0-device-a" });
+    expect(updateItem(stamped, { notes: "ok" }).fieldsUpdatedAt).toEqual({ title: HLC });
+  });
+
+  it("rejects non-string stamps", () => {
+    expect(() => updateItem(base(), { fieldsUpdatedAt: { title: 1 } } as never)).toThrow();
+  });
+});
+
+describe("wire mapping", () => {
+  it("maps an item to snake_case wire with camelCase stamp keys converted", () => {
+    const item = updateItem(
+      newItem({ id: ID, type: "book", title: "La Peste", createdAt: NOW, recommendedBy: "Léa" }),
+      { deletedAt: NOW, fieldsUpdatedAt: { recommendedBy: HLC, deletedAt: HLC } },
+    );
+    const w = itemToWire(item, NOW);
+    expect(w).toMatchObject({
+      created_at: NOW,
+      recommended_by: "Léa",
+      deleted_at: NOW,
+      fields_updated_at: { recommended_by: HLC, deleted_at: HLC },
+      server_updated_at: NOW,
+    });
+    expect(itemWireSchema.safeParse(w).success).toBe(true);
+    expect(itemToWire(item).server_updated_at).toBeNull();
+  });
+
+  it("round-trips and drops server_updated_at", () => {
+    const item = newItem({ id: ID, type: "movie", title: "Alien", createdAt: NOW, rating: 4 });
+    expect(wireToItem(itemToWire(item, NOW))).toEqual(item);
+    const parsed = wireToItem(
+      itemWireSchema.parse(wire({ fields_updated_at: { deleted_at: HLC, title: HLC } })),
+    );
+    expect(parsed.fieldsUpdatedAt).toEqual({ deletedAt: HLC, title: HLC });
+    expect(parsed).not.toHaveProperty("server_updated_at");
+  });
+
+  it("rejects an invalid wire row", () => {
+    expect(() => wireToItem(wire({ title: "" }) as never)).toThrow();
   });
 });

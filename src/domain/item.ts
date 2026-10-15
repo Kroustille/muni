@@ -39,6 +39,7 @@ export type Item = {
   ingredients: Ingredient[] | null;
   steps: string[] | null;
   deletedAt: string | null;
+  fieldsUpdatedAt: Record<string, string>;
 };
 
 const FIELDS_BY_TYPE: Record<ItemType, readonly (keyof Item)[]> = {
@@ -77,6 +78,7 @@ const itemShape = {
   ingredients: z.array(z.strictObject({ quantity: z.string(), name: z.string() })).nullable(),
   steps: z.array(z.string()).nullable(),
   deletedAt: timestamp.nullable(),
+  fieldsUpdatedAt: z.record(z.string(), z.string()),
 };
 
 function checkCrossType(value: Item, ctx: z.RefinementCtx, path: (f: string) => string): void {
@@ -114,6 +116,7 @@ const SNAKE: Partial<Record<keyof Item, string>> = {
   createdAt: "created_at",
   recommendedBy: "recommended_by",
   deletedAt: "deleted_at",
+  fieldsUpdatedAt: "fields_updated_at",
 };
 
 const snakeOf = (field: string): string => SNAKE[field as keyof Item] ?? field;
@@ -134,7 +137,7 @@ export const itemWireSchema = z
     ingredients: itemShape.ingredients,
     steps: itemShape.steps,
     deleted_at: itemShape.deletedAt,
-    fields_updated_at: z.record(z.string(), z.string()),
+    fields_updated_at: itemShape.fieldsUpdatedAt,
     server_updated_at: timestamp.nullable(),
   })
   .superRefine((wire, ctx) =>
@@ -144,6 +147,7 @@ export const itemWireSchema = z
         createdAt: wire.created_at,
         recommendedBy: wire.recommended_by,
         deletedAt: wire.deleted_at,
+        fieldsUpdatedAt: wire.fields_updated_at,
       } as Item,
       ctx,
       snakeOf,
@@ -190,6 +194,7 @@ export function newItem(input: NewItemInput): Item {
     ingredients: input.ingredients ?? null,
     steps: input.steps ?? null,
     deletedAt: null,
+    fieldsUpdatedAt: {},
   };
   return itemSchema.parse(candidate) as Item;
 }
@@ -205,5 +210,32 @@ export function updateItem(item: Item, patch: ItemPatch): Item {
   const defined = Object.fromEntries(
     Object.entries(patch).filter(([, value]) => value !== undefined),
   );
-  return itemSchema.parse({ ...item, ...defined }) as Item;
+  const fieldsUpdatedAt = { ...item.fieldsUpdatedAt, ...patch.fieldsUpdatedAt };
+  return itemSchema.parse({ ...item, ...defined, fieldsUpdatedAt }) as Item;
+}
+
+const CAMEL = Object.fromEntries(Object.entries(SNAKE).map(([camel, snake]) => [snake, camel]));
+
+const camelOf = (field: string): string => CAMEL[field] ?? field;
+
+function mapKeys<T>(source: Record<string, T>, rename: (key: string) => string): Record<string, T> {
+  return Object.fromEntries(Object.entries(source).map(([key, value]) => [rename(key), value]));
+}
+
+export function itemToWire(item: Item, serverUpdatedAt: string | null = null): ItemWire {
+  const { fieldsUpdatedAt, ...rest } = item;
+  return {
+    ...(mapKeys(rest, snakeOf) as Omit<ItemWire, "fields_updated_at" | "server_updated_at">),
+    fields_updated_at: mapKeys(fieldsUpdatedAt, snakeOf),
+    server_updated_at: serverUpdatedAt,
+  };
+}
+
+export function wireToItem(wire: ItemWire): Item {
+  const { fields_updated_at, ...rest } = wire;
+  delete (rest as Partial<ItemWire>).server_updated_at;
+  return itemSchema.parse({
+    ...mapKeys(rest, camelOf),
+    fieldsUpdatedAt: mapKeys(fields_updated_at, camelOf),
+  }) as Item;
 }
