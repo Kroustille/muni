@@ -22,6 +22,7 @@
 - [x] T403 Extend `ITEM_TYPES` with `music_artist` and `music_track` in `src/domain/item.ts` with field maps per data-model.md
 - [x] T404 Unit tests domain validation (track requires artist text MU5, statuses, URL format) in `tests/unit/domain-item-music.test.ts`
 - [x] T405 Migration `db/migrations/0006_music_item_types.ts` + codegen
+- [x] T405a Migration `db/migrations/0007_music_artist_rating.ts` — allow `rating` on `music_artist` in `items_type_fields` (sync with FR-012)
 - [x] T406 Define `MusicCatalogSearch` port in `src/application/ports/music-catalog-search.ts`
 - [x] T407 Implement `buildSpotifySearchUrl` / `buildSoundCloudSearchUrl` in `src/application/music/deep-links.ts` with tests in `tests/unit/music-deep-links.test.ts`
 - [x] T408 MusicBrainz adapter + cache in `src/adapters/musicbrainz/music-catalog-search.ts` with fixture tests
