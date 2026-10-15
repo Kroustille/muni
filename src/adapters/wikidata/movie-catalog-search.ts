@@ -1,3 +1,4 @@
+import { ensureSearchResultsArray } from "@/application/ensure-search-results-array";
 import type { CatalogCacheRepository } from "@/application/ports/catalog-cache-repository";
 import {
   MovieCatalogSearch,
@@ -69,7 +70,9 @@ export function createWikidataMovieCatalogSearch(
       if (deps.cache) {
         const cached = await deps.cache.get("wikidata", cacheKey, now);
         if (cached !== null) {
-          return cached as MovieSearchHit[];
+          if (Array.isArray(cached)) return cached as MovieSearchHit[];
+          const recovered = ensureSearchResultsArray<MovieSearchHit>(cached);
+          if (recovered.length > 0) return recovered;
         }
       }
 

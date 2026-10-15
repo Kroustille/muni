@@ -1,3 +1,4 @@
+import { ensureSearchResultsArray } from "@/application/ensure-search-results-array";
 import type { BookCatalogHit } from "@/application/ports/book-catalog-lookup";
 
 export class BookCatalogSearchClientError extends Error {
@@ -34,6 +35,6 @@ export async function fetchBookCatalogSearch(
   if (response.status === 502) throw new BookCatalogSearchClientError("provider_error");
   if (!response.ok) throw new BookCatalogSearchClientError("network");
 
-  const body = (await response.json()) as { results?: BookCatalogHit[] };
-  return body.results ?? [];
+  const body = (await response.json()) as { results?: unknown };
+  return ensureSearchResultsArray<BookCatalogHit>(body.results);
 }

@@ -1,3 +1,4 @@
+import { ensureSearchResultsArray } from "@/application/ensure-search-results-array";
 import type { MusicArtistSearchHit, MusicTrackSearchHit } from "@/application/ports/music-catalog-search";
 
 export class MusicCatalogClientError extends Error {
@@ -35,8 +36,8 @@ async function searchCatalog<T>(
   if (response.status === 502) throw new MusicCatalogClientError("provider_error");
   if (!response.ok) throw new MusicCatalogClientError("network");
 
-  const body = (await response.json()) as { results?: T[] };
-  return body.results ?? [];
+  const body = (await response.json()) as { results?: unknown };
+  return ensureSearchResultsArray<T>(body.results);
 }
 
 export function searchMusicArtistsCatalog(

@@ -1,3 +1,4 @@
+import { ensureSearchResultsArray } from "@/application/ensure-search-results-array";
 import type { CatalogCacheRepository } from "@/application/ports/catalog-cache-repository";
 import {
   MusicCatalogSearch,
@@ -104,7 +105,11 @@ export function createMusicBrainzCatalogSearch(
 
       if (deps.cache) {
         const cached = await deps.cache.get("musicbrainz", cacheKey, now);
-        if (cached !== null) return cached as MusicArtistSearchHit[];
+        if (cached !== null) {
+          if (Array.isArray(cached)) return cached as MusicArtistSearchHit[];
+          const recovered = ensureSearchResultsArray<MusicArtistSearchHit>(cached);
+          if (recovered.length > 0) return recovered;
+        }
       }
 
       try {
@@ -139,7 +144,11 @@ export function createMusicBrainzCatalogSearch(
 
       if (deps.cache) {
         const cached = await deps.cache.get("musicbrainz", cacheKey, now);
-        if (cached !== null) return cached as MusicTrackSearchHit[];
+        if (cached !== null) {
+          if (Array.isArray(cached)) return cached as MusicTrackSearchHit[];
+          const recovered = ensureSearchResultsArray<MusicTrackSearchHit>(cached);
+          if (recovered.length > 0) return recovered;
+        }
       }
 
       try {

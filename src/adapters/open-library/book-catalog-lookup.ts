@@ -1,3 +1,4 @@
+import { ensureSearchResultsArray } from "@/application/ensure-search-results-array";
 import {
   BookCatalogLookup,
   BookCatalogHit,
@@ -187,7 +188,9 @@ export function createOpenLibraryBookCatalogLookup(
       if (deps.cache) {
         const cached = await deps.cache.get("open_library", cacheKey, now);
         if (cached !== null) {
-          return cached as BookCatalogHit[];
+          if (Array.isArray(cached)) return cached as BookCatalogHit[];
+          const recovered = ensureSearchResultsArray<BookCatalogHit>(cached);
+          if (recovered.length > 0) return recovered;
         }
       }
 

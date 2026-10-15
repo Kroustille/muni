@@ -1,3 +1,4 @@
+import { ensureSearchResultsArray } from "@/application/ensure-search-results-array";
 import type { MovieCatalogDetail, MovieSearchHit } from "@/application/ports/movie-catalog-search";
 
 export class MovieCatalogClientError extends Error {
@@ -34,8 +35,8 @@ export async function searchMoviesCatalog(
   if (response.status === 502) throw new MovieCatalogClientError("provider_error");
   if (!response.ok) throw new MovieCatalogClientError("network");
 
-  const body = (await response.json()) as { results?: MovieSearchHit[] };
-  return body.results ?? [];
+  const body = (await response.json()) as { results?: unknown };
+  return ensureSearchResultsArray<MovieSearchHit>(body.results);
 }
 
 export async function fetchMovieCatalogDetail(
