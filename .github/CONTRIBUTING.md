@@ -1,0 +1,1 @@
+Contributions follow the specs in [`specs/`](../specs/) and [GitHub Spec Kit](https://github.com/github/spec-kit) workflow (constitution → spec → plan → tasks → implement). Open an issue or discuss before large changes.
