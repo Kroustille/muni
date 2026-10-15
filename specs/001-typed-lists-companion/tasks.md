@@ -179,7 +179,7 @@
 - [ ] T083 [P] [US4] Create unit tests for the sync scheduler with a fake `Connectivity` and fake timers (runs on app open, `online` event, visibility change to visible, every 60 s while online, debounce about 2 s after local writes, no run while offline or paused) in `tests/unit/scheduler.test.ts` (depends on T018)
 - [ ] T084 [P] [US4] Create unit tests for the browser `Connectivity` adapter (reports `navigator.onLine`, emits on `online`, `offline` and visibility events) in `tests/unit/browser-connectivity.test.ts` (depends on T018)
 - [ ] T085 [P] [US4] Create unit tests for the HTTP `RemoteStore` adapter with mocked fetch (push and pull request shapes, `since` and `limit`, 401 mapped to `unauthenticated`, 422 to `validation`, network failure) in `tests/unit/http-remote-store.test.ts` (depends on T018)
-- [ ] T086 [US4] Write the e2e sync scenarios first (must fail): two Playwright contexts converge after offline edits within 10 s, same-field conflict latest wins, delete propagates, two accounts never see each other's data in `tests/e2e/sync.spec.ts` (depends on T062)
+- [X] T086 [US4] Write the e2e sync scenarios first (must fail): two Playwright contexts converge after offline edits within 10 s, same-field conflict latest wins, delete propagates, two accounts never see each other's data in `tests/e2e/sync.spec.ts` (depends on T062)
 
 ### Backend implementation
 
