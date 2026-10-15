@@ -10,7 +10,41 @@ export type Generated<T> =
     ? ColumnType<S, I | undefined, U>
     : ColumnType<T, T | undefined, T>;
 
+export type ItemType = "book" | "movie" | "recipe" | "shopping";
+
+export type Json = JsonValue;
+
+export type JsonArray = JsonValue[];
+
+export type JsonObject = {
+  [x: string]: JsonValue | undefined;
+};
+
+export type JsonPrimitive = boolean | number | string | null;
+
+export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
+
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
+
+export interface Items {
+  author: string | null;
+  checked: Generated<boolean>;
+  created_at: Timestamp;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  ingredients: Json | null;
+  notes: string | null;
+  quantity: string | null;
+  rating: number | null;
+  recommended_by: string | null;
+  server_updated_at: Timestamp;
+  status: string | null;
+  steps: Json | null;
+  title: string;
+  type: ItemType;
+  user_id: string;
+}
 
 export interface MagicLinkTokens {
   consumed_at: Timestamp | null;
@@ -37,6 +71,7 @@ export interface Users {
 }
 
 export interface DB {
+  items: Items;
   magic_link_tokens: MagicLinkTokens;
   sessions: Sessions;
   users: Users;
