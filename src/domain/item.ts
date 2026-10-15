@@ -1,6 +1,10 @@
 import { z } from "zod";
 
+import { isValidImdbId } from "./imdb";
 import { isValidIsbn } from "./isbn";
+
+export const MEDIA_KINDS = ["film", "series"] as const;
+export type MediaKind = (typeof MEDIA_KINDS)[number];
 
 export const ITEM_TYPES = ["shopping", "book", "movie", "recipe"] as const;
 export type ItemType = (typeof ITEM_TYPES)[number];
@@ -48,6 +52,10 @@ export type Item = {
   publicationYear: number | null;
   publisher: string | null;
   pageCount: number | null;
+  imdbId: string | null;
+  releaseYear: number | null;
+  catalogRating: number | null;
+  mediaKind: MediaKind | null;
 };
 
 const FIELDS_BY_TYPE: Record<ItemType, readonly (keyof Item)[]> = {
@@ -65,7 +73,17 @@ const FIELDS_BY_TYPE: Record<ItemType, readonly (keyof Item)[]> = {
     "publisher",
     "pageCount",
   ],
-  movie: ["status", "recommendedBy", "rating", "notes"],
+  movie: [
+    "status",
+    "recommendedBy",
+    "rating",
+    "notes",
+    "imdbId",
+    "synopsis",
+    "releaseYear",
+    "catalogRating",
+    "mediaKind",
+  ],
   recipe: ["notes", "ingredients", "steps"],
 };
 
@@ -84,6 +102,10 @@ const TYPE_SPECIFIC_FIELDS = [
   "publicationYear",
   "publisher",
   "pageCount",
+  "imdbId",
+  "releaseYear",
+  "catalogRating",
+  "mediaKind",
 ] as const satisfies readonly (keyof Item)[];
 
 const timestamp = z.iso.datetime({ offset: true });
@@ -113,6 +135,10 @@ const itemShape = {
   publicationYear: z.number().int().min(1000).max(2100).nullable(),
   publisher: text,
   pageCount: z.number().int().min(1).nullable(),
+  imdbId: text,
+  releaseYear: z.number().int().min(1000).max(2100).nullable(),
+  catalogRating: z.number().min(0).max(10).nullable(),
+  mediaKind: z.enum(MEDIA_KINDS).nullable(),
 };
 
 function checkCrossType(value: Item, ctx: z.RefinementCtx, path: (f: string) => string): void {
@@ -147,6 +173,13 @@ function checkCrossType(value: Item, ctx: z.RefinementCtx, path: (f: string) => 
       message: "invalid ISBN",
     });
   }
+  if (value.type === "movie" && value.imdbId != null && !isValidImdbId(value.imdbId)) {
+    ctx.addIssue({
+      code: "custom",
+      path: [path("imdbId")],
+      message: "invalid IMDb id",
+    });
+  }
 }
 
 const itemSchema = z
@@ -160,6 +193,10 @@ const SNAKE: Partial<Record<keyof Item, string>> = {
   fieldsUpdatedAt: "fields_updated_at",
   publicationYear: "publication_year",
   pageCount: "page_count",
+  imdbId: "imdb_id",
+  releaseYear: "release_year",
+  catalogRating: "catalog_rating",
+  mediaKind: "media_kind",
 };
 
 const snakeOf = (field: string): string => SNAKE[field as keyof Item] ?? field;
@@ -195,6 +232,10 @@ export const itemWireSchema = z
     publication_year: itemShape.publicationYear.optional(),
     publisher: itemShape.publisher.optional(),
     page_count: itemShape.pageCount.optional(),
+    imdb_id: itemShape.imdbId.optional(),
+    release_year: itemShape.releaseYear.optional(),
+    catalog_rating: itemShape.catalogRating.optional(),
+    media_kind: itemShape.mediaKind.optional(),
     server_updated_at: timestamp.nullable(),
   })
   .superRefine((wire, ctx) =>
@@ -236,6 +277,10 @@ export type NewItemInput = {
     | "publicationYear"
     | "publisher"
     | "pageCount"
+    | "imdbId"
+    | "releaseYear"
+    | "catalogRating"
+    | "mediaKind"
   >
 >;
 
@@ -264,6 +309,10 @@ export function newItem(input: NewItemInput): Item {
     publicationYear: input.publicationYear ?? null,
     publisher: input.publisher ?? null,
     pageCount: input.pageCount ?? null,
+    imdbId: input.imdbId ?? null,
+    releaseYear: input.releaseYear ?? null,
+    catalogRating: input.catalogRating ?? null,
+    mediaKind: input.mediaKind ?? null,
   };
   return itemSchema.parse(candidate) as Item;
 }
@@ -303,13 +352,29 @@ function coalesceCatalogWireFields(
     publicationYear: wire.publication_year ?? null,
     publisher: wire.publisher ?? null,
     pageCount: wire.page_count ?? null,
+    imdbId: wire.imdb_id ?? null,
+    releaseYear: wire.release_year ?? null,
+    catalogRating: wire.catalog_rating ?? null,
+    mediaKind: wire.media_kind ?? null,
   };
 }
 
 function restWithoutCatalog(
   wire: Omit<ItemWire, "fields_updated_at" | "server_updated_at">,
 ): Record<string, unknown> {
-  const { isbn, synopsis, genres, publication_year, publisher, page_count, ...rest } = wire;
+  const {
+    isbn,
+    synopsis,
+    genres,
+    publication_year,
+    publisher,
+    page_count,
+    imdb_id,
+    release_year,
+    catalog_rating,
+    media_kind,
+    ...rest
+  } = wire;
   return rest as Record<string, unknown>;
 }
 

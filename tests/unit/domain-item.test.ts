@@ -38,6 +38,10 @@ function wire(overrides: Record<string, unknown> = {}) {
     publication_year: null,
     publisher: null,
     page_count: null,
+    imdb_id: null,
+    release_year: null,
+    catalog_rating: null,
+    media_kind: null,
     server_updated_at: NOW,
     ...overrides,
   };

@@ -28,6 +28,10 @@ function bookWire(overrides: Record<string, unknown> = {}) {
     publication_year: null,
     publisher: null,
     page_count: null,
+    imdb_id: null,
+    release_year: null,
+    catalog_rating: null,
+    media_kind: null,
     server_updated_at: NOW,
     ...overrides,
   };
@@ -70,7 +74,8 @@ describe("book catalog fields on Item", () => {
 
   it.each([
     ["shopping", { isbn: "9782070368228" }],
-    ["movie", { synopsis: "x" }],
+    ["book", { imdb_id: "tt0211915" }],
+    ["movie", { isbn: "9782070368228" }],
     ["recipe", { genres: ["Roman"] }],
     ["shopping", { publication_year: 2000 }],
     ["movie", { page_count: 100 }],
