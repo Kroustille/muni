@@ -8,10 +8,14 @@ Returns HTTPS URL opening Spotify search with encoded query `artist + title` or 
 
 Same for SoundCloud search.
 
-## Row URLs
+## Catalog preview (MU1b)
 
-- When `spotifyUrl` / `soundcloudUrl` set and valid HTTPS, primary buttons open those URLs.
-- Deep-link actions always available as secondary when query text known.
+- When the user picks a MusicBrainz hit, the preview form **prefills** `spotifyUrl` and `soundcloudUrl` with `buildSpotifySearchUrl` / `buildSoundCloudSearchUrl` from title (+ artist for tracks) unless the hit already has stored URLs.
+- No separate “search on Spotify/SoundCloud” buttons on catalog preview; the user edits or saves the prefilled URL fields.
+
+## Row URLs (detail / edit)
+
+- Optional **Ouvrir sur Spotify** / **Ouvrir sur SoundCloud** buttons only when the row has a non-empty URL in that field.
 
 ## Constraints
 

@@ -4,6 +4,7 @@ import {
   buildSoundCloudSearchUrl,
   buildSpotifySearchUrl,
   openExternalSearch,
+  prefillMusicExternalSearchUrls,
 } from "@/application/music/deep-links";
 
 describe("music deep links", () => {
@@ -28,5 +29,14 @@ describe("music deep links", () => {
   it("openExternalSearch dispatches by platform", () => {
     expect(openExternalSearch("spotify", { title: "A" })).toContain("open.spotify.com");
     expect(openExternalSearch("soundcloud", { title: "A" })).toContain("soundcloud.com");
+  });
+
+  it("prefillMusicExternalSearchUrls fills missing platform URLs", () => {
+    const urls = prefillMusicExternalSearchUrls(
+      { title: "Track", artist: "Artist" },
+      { spotifyUrl: "https://open.spotify.com/track/abc" },
+    );
+    expect(urls.spotifyUrl).toBe("https://open.spotify.com/track/abc");
+    expect(urls.soundcloudUrl).toBe("https://soundcloud.com/search?q=Artist%20Track");
   });
 });

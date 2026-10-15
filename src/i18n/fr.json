@@ -117,8 +117,6 @@
   "music.catalog.offline": "La recherche catalogue nécessite une connexion.",
   "music.preview.artist": "Aperçu de l'artiste",
   "music.preview.track": "Aperçu du morceau",
-  "music.external.searchSpotify": "Rechercher sur Spotify",
-  "music.external.searchSoundCloud": "Rechercher sur SoundCloud",
   "music.external.openSpotify": "Ouvrir sur Spotify",
   "music.external.openSoundCloud": "Ouvrir sur SoundCloud",
   "validation.artistRequired": "L'artiste est obligatoire pour un morceau."

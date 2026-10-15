@@ -326,7 +326,6 @@ export default function ItemDetailPage() {
               titleError={titleError}
             />
             <ExternalLinkActions
-              title={values.title}
               spotifyUrl={(values as MusicArtistFieldValues).spotifyUrl}
               soundcloudUrl={(values as MusicArtistFieldValues).soundcloudUrl}
             />
@@ -345,8 +344,6 @@ export default function ItemDetailPage() {
               artistError={artistError}
             />
             <ExternalLinkActions
-              title={values.title}
-              artist={(values as MusicTrackFieldValues).artist}
               spotifyUrl={(values as MusicTrackFieldValues).spotifyUrl}
               soundcloudUrl={(values as MusicTrackFieldValues).soundcloudUrl}
             />

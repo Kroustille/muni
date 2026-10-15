@@ -15,7 +15,7 @@
 ### Session 2026-10-15
 
 - **MU1:** Prefer **keyless** catalog (e.g. MusicBrainz) for in-app search metadata.
-- **MU1b:** **Hybrid (C):** in-app search = keyless metadata; plus **Search on Spotify** / **Search on SoundCloud** actions opening site/app with **prefilled query** (no platform API keys).
+- **MU1b:** **Hybrid (C):** in-app search = keyless metadata; on catalog preview, **Spotify** and **SoundCloud** URL fields are **prefilled** with platform search URLs (title + artist for tracks); no separate search buttons (no platform API keys).
 - **MU2:** Silent update/restore on same catalog id (**artist** MBID vs **track** MBID separate); no duplicate, no warning; soft-deleted → restore + refresh (like books/movies).
 - **MU-scope:** **No in-app playback** — list, search, and link only.
 - **MU3:** Two list types: **artist** rows and **track** rows; track has optional free-text **artist** with suggestions from artists list; **no required link** to an artist row.
@@ -48,7 +48,7 @@ On artists list or tracks list only (MU4), user searches via server (MusicBrainz
 
 ### User Story 3 - External listen links (Priority: P1)
 
-User uses **Search on Spotify** / **Search on SoundCloud** (MU1b) or stored URLs (MU-links). No audio inside Muni (MU-scope).
+User opens prefilled or edited Spotify/SoundCloud URLs from the row (MU1b/MU-links). No audio inside Muni (MU-scope).
 
 ---
 

@@ -2,13 +2,12 @@
 
 import { useEffect, useState } from "react";
 
+import { prefillMusicExternalSearchUrls } from "@/application/music/deep-links";
 import type { MusicTrackSearchHit } from "@/application/ports/music-catalog-search";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
 import { t } from "@/i18n";
-
-import { ExternalLinkActions } from "./external-link-actions";
 
 export type MusicTrackPreviewValues = {
   musicBrainzRecordingId: string;
@@ -29,14 +28,18 @@ export type MusicTrackCatalogPreviewProps = {
 };
 
 function hitToValues(hit: MusicTrackSearchHit): MusicTrackPreviewValues {
+  const urls = prefillMusicExternalSearchUrls(
+    { title: hit.title, artist: hit.artist },
+    { spotifyUrl: hit.spotifyUrl, soundcloudUrl: hit.soundcloudUrl },
+  );
   return {
     musicBrainzRecordingId: hit.musicBrainzRecordingId,
     title: hit.title,
     artist: hit.artist,
     album: hit.album ?? "",
     releaseYear: hit.releaseYear !== undefined ? String(hit.releaseYear) : "",
-    spotifyUrl: hit.spotifyUrl ?? "",
-    soundcloudUrl: hit.soundcloudUrl ?? "",
+    spotifyUrl: urls.spotifyUrl,
+    soundcloudUrl: urls.soundcloudUrl,
   };
 }
 
@@ -97,12 +100,6 @@ export function MusicTrackCatalogPreview({
           label={t("field.soundcloudUrl")}
           value={values.soundcloudUrl}
           onChange={(event) => setValues({ ...values, soundcloudUrl: event.target.value })}
-        />
-        <ExternalLinkActions
-          title={values.title}
-          artist={values.artist}
-          spotifyUrl={values.spotifyUrl}
-          soundcloudUrl={values.soundcloudUrl}
         />
         <div className="flex gap-2">
           <Button type="button" variant="secondary" className="flex-1" onClick={onClose} disabled={saving}>
