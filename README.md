@@ -17,3 +17,7 @@ Run these in the agent, in order:
 2. `/speckit-plan` to produce the technical plan (Next.js, TypeScript, Tailwind, IndexedDB, self-hosted PostgreSQL).
 3. `/speckit-tasks` to produce the task list.
 4. `/speckit-implement` to build it.
+
+## Commit convention
+
+All commits follow [Conventional Commits 1.0.0](https://www.conventionalcommits.org/en/v1.0.0/), e.g. `feat: add quick add bar` or `docs: update spec`. See the constitution for details.
