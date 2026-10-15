@@ -185,7 +185,7 @@
 
 - [X] T087 [US4] Write the Kysely migration for the `items` table in `db/migrations/0002_items.ts` (columns, types and nullability per data-model.md, `type` enum, primary key `(user_id, id)`, CHECK constraints mirroring the domain rules: status values per type, rating between 1 and 5, type-specific fields null for other types, index on `(user_id, server_updated_at)`; no merge logic in SQL), then regenerate and commit `src/adapters/postgres/db-types.ts` with `yarn run db:codegen` (depends on T047, T079)
 - [ ] T088 [US4] Implement the server `sync-service` use cases in `src/application/server/sync-service.ts`: `push(userId, items)` and `pull(userId, since, limit)` using the domain `merge` inside a repository transaction (depends on T075, T077, T078)
-- [ ] T089 [US4] Implement the PostgreSQL `ServerItemRepository` adapter in `src/adapters/postgres/item-repository.ts` with Kysely (`transaction()`, `selectFrom(...).forUpdate()` by `(user_id, id)`, upsert with `onConflict`, `listSince`) typed by the regenerated `db-types.ts` (depends on T053, T079, T087)
+- [X] T089 [US4] Implement the PostgreSQL `ServerItemRepository` adapter in `src/adapters/postgres/item-repository.ts` with Kysely (`transaction()`, `selectFrom(...).forUpdate()` by `(user_id, id)`, upsert with `onConflict`, `listSince`) typed by the regenerated `db-types.ts` (depends on T053, T079, T087)
 - [ ] T090 [US4] Wire the sync service into `src/composition/server.ts` and build the route handlers `src/app/api/sync/push/route.ts` and `src/app/api/sync/pull/route.ts` (session user id from the shared helper, zod payload validation, size limit, same-origin check) (depends on T057, T080, T088, T089)
 
 ### Client sync
