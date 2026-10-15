@@ -3,7 +3,6 @@
 import { useCallback, useState, type ReactNode } from "react";
 
 import type { BookCatalogHit } from "@/application/ports/book-catalog-lookup";
-import { defaultStatus } from "@/domain/item";
 import { getItemUseCases } from "@/composition/client";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
@@ -14,14 +13,15 @@ import {
 import { t } from "@/i18n";
 
 import { CatalogPreview, type CatalogPreviewValues } from "./catalog-preview";
+import { ManualBookAddSheet } from "./manual-book-add-sheet";
 import { ScanModal } from "./scan-modal";
 
-type FlowPhase = "idle" | "scanning" | "loading" | "preview" | "lookupError";
+type FlowPhase = "idle" | "scanning" | "loading" | "preview" | "lookupError" | "manual";
 
 export type BookCatalogFlowProps = {
   onSaved?: () => void;
   /** Render prop for the scan trigger (mobile only). */
-  children?: (startScan: () => void) => ReactNode;
+  children?: (actions: { startScan: () => void; lookupIsbn: (raw: string) => void }) => ReactNode;
   /** When true, always render the default scan button if no children. */
   showDefaultTrigger?: boolean;
 };
@@ -40,22 +40,16 @@ function parseOptionalInt(value: string): number | null {
 
 async function saveCatalogPreview(values: CatalogPreviewValues): Promise<void> {
   const useCases = await getItemUseCases();
-  const extra: Parameters<typeof useCases.createItem>[2] = {
-    status: defaultStatus("book") ?? undefined,
+  await useCases.upsertBookFromCatalog({
     isbn: values.isbn,
-  };
-  const author = optionalText(values.author);
-  if (author) extra.author = author;
-  const synopsis = optionalText(values.synopsis);
-  if (synopsis) extra.synopsis = synopsis;
-  if (values.genres.length > 0) extra.genres = values.genres;
-  const publicationYear = parseOptionalInt(values.publicationYear);
-  if (publicationYear !== null) extra.publicationYear = publicationYear;
-  const publisher = optionalText(values.publisher);
-  if (publisher) extra.publisher = publisher;
-  const pageCount = parseOptionalInt(values.pageCount);
-  if (pageCount !== null) extra.pageCount = pageCount;
-  await useCases.createItem("book", values.title.trim(), extra);
+    title: values.title.trim(),
+    author: optionalText(values.author),
+    synopsis: optionalText(values.synopsis),
+    genres: values.genres.length > 0 ? values.genres : null,
+    publicationYear: parseOptionalInt(values.publicationYear),
+    publisher: optionalText(values.publisher),
+    pageCount: parseOptionalInt(values.pageCount),
+  });
 }
 
 export function BookCatalogFlow({
@@ -66,6 +60,7 @@ export function BookCatalogFlow({
   const [phase, setPhase] = useState<FlowPhase>("idle");
   const [hit, setHit] = useState<BookCatalogHit | null>(null);
   const [lookupError, setLookupError] = useState<string | null>(null);
+  const [failedIsbn, setFailedIsbn] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
 
   const startScan = useCallback(() => {
@@ -80,6 +75,7 @@ export function BookCatalogFlow({
   }, []);
 
   const runLookup = useCallback(async (rawIsbn: string) => {
+    setFailedIsbn(rawIsbn);
     setPhase("loading");
     try {
       const nextHit = await fetchBookCatalogHit(rawIsbn);
@@ -123,8 +119,15 @@ export function BookCatalogFlow({
     [closeAll, onSaved],
   );
 
+  const lookupIsbn = useCallback(
+    (raw: string) => {
+      void runLookup(raw);
+    },
+    [runLookup],
+  );
+
   const trigger =
-    children?.(startScan) ??
+    children?.({ startScan, lookupIsbn }) ??
     (showDefaultTrigger ? (
       <Button type="button" onClick={startScan}>
         {t("books.scan")}
@@ -153,10 +156,29 @@ export function BookCatalogFlow({
         <Toast
           message={lookupError}
           action={
-            <Button type="button" variant="secondary" onClick={closeAll}>
-              {t("action.close")}
-            </Button>
+            <div className="flex gap-2">
+              {failedIsbn ? (
+                <Button
+                  type="button"
+                  variant="secondary"
+                  onClick={() => setPhase("manual")}
+                >
+                  {t("books.addManually")}
+                </Button>
+              ) : null}
+              <Button type="button" variant="secondary" onClick={closeAll}>
+                {t("action.close")}
+              </Button>
+            </div>
           }
+        />
+      ) : null}
+      {failedIsbn !== null ? (
+        <ManualBookAddSheet
+          open={phase === "manual"}
+          isbn={failedIsbn}
+          onClose={closeAll}
+          onSaved={onSaved}
         />
       ) : null}
     </>

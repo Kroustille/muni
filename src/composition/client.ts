@@ -55,6 +55,7 @@ function wrapLocalWrites(items: ItemUseCases, onLocalWrite: () => void): ItemUse
     updateItem: after(items.updateItem),
     deleteItem: after(items.deleteItem),
     restoreItem: after(items.restoreItem),
+    upsertBookFromCatalog: after(items.upsertBookFromCatalog),
   };
 }
 
