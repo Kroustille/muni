@@ -12,7 +12,14 @@ import { createSessionUseCases, type SessionUseCases } from "@/application/auth/
 import { createPostgresCatalogCacheRepository } from "@/adapters/postgres/catalog-cache-repository";
 import { createPostgresItemRepository } from "@/adapters/postgres/item-repository";
 import { createOpenLibraryBookCatalogLookup } from "@/adapters/open-library/book-catalog-lookup";
+import { createWikidataMovieCatalogSearch } from "@/adapters/wikidata/movie-catalog-search";
 import { createLookupBook, type LookupBook } from "@/application/books/lookup-book";
+import {
+  createFetchMovieCatalogDetail,
+  createSearchMovies,
+  type FetchMovieCatalogDetail,
+  type SearchMovies,
+} from "@/application/movies/search-movies";
 import { createSyncService, type SyncService } from "@/application/server/sync-service";
 import { loadConfig, type ServerConfig } from "@/composition/config";
 
@@ -23,6 +30,8 @@ export interface ServerContainer {
   readonly google: GoogleUseCases | null;
   readonly sync: SyncService;
   readonly lookupBook: LookupBook;
+  readonly searchMovies: SearchMovies;
+  readonly fetchMovieCatalogDetail: FetchMovieCatalogDetail;
   readonly destroy: () => Promise<void>;
 }
 
@@ -76,8 +85,11 @@ export function createServerContainer(
   const items = createPostgresItemRepository(db);
   const sync = createSyncService({ repository: items, now });
   const catalogCache = createPostgresCatalogCacheRepository(db);
-  const catalog = createOpenLibraryBookCatalogLookup({ cache: catalogCache });
-  const lookupBook = createLookupBook({ catalog });
+  const bookCatalog = createOpenLibraryBookCatalogLookup({ cache: catalogCache });
+  const lookupBook = createLookupBook({ catalog: bookCatalog });
+  const movieCatalog = createWikidataMovieCatalogSearch({ cache: catalogCache });
+  const searchMovies = createSearchMovies({ catalog: movieCatalog });
+  const fetchMovieCatalogDetail = createFetchMovieCatalogDetail({ catalog: movieCatalog });
 
   return {
     appUrl: config.appUrl,
@@ -86,6 +98,8 @@ export function createServerContainer(
     google,
     sync,
     lookupBook,
+    searchMovies,
+    fetchMovieCatalogDetail,
     destroy: () => pg.destroy(),
   };
 }
