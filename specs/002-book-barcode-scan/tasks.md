@@ -37,7 +37,7 @@
 - [x] T210 Define `BookCatalogLookup` port in `src/application/ports/book-catalog-lookup.ts` per contracts/book-catalog-api.md
 - [x] T211 Define `BarcodeScanner` port (`scanContinuous(callback)`, `stop()`) in `src/application/ports/barcode-scanner.ts`
 - [x] T212 [P] Create unit tests for `CatalogCacheRepository` TTL logic in `tests/unit/catalog-cache.test.ts`
-- [ ] T213 Implement `CatalogCacheRepository` port and Postgres adapter in `src/application/ports/catalog-cache-repository.ts` and `src/adapters/postgres/catalog-cache-repository.ts` (depends on T208, T212)
+- [x] T213 Implement `CatalogCacheRepository` port and Postgres adapter in `src/application/ports/catalog-cache-repository.ts` and `src/adapters/postgres/catalog-cache-repository.ts` (depends on T208, T212)
 
 **Checkpoint**: Domain and persistence ready.
 
@@ -95,7 +95,7 @@
 
 ## Phase 7: Polish
 
-- [ ] T236 [P] Show `pageCount` on book detail when present (N1) in book detail component
+- [x] T236 [P] Show `pageCount` on book detail when present (N1) in book detail component
 - [ ] T237 Update `specs/002-book-barcode-scan/quickstart.md` with any command fixes after implementation
 - [ ] T238 Run full CI (`typecheck`, `test:coverage`, `test:e2e` book scenarios) and fix regressions
 

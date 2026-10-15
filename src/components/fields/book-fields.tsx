@@ -36,6 +36,8 @@ export type BookFieldsProps = {
   values: BookFieldValues;
   onChange: (values: BookFieldValues) => void;
   titleError?: string;
+  /** Read-only catalog metadata (N1). */
+  pageCount?: number | null;
 };
 
 function optionalText(value: string): string | null {
@@ -62,9 +64,14 @@ export function bookFieldValuesToExtra(values: BookFieldValues): CreateItemExtra
   return extra;
 }
 
-export function BookFields({ values, onChange, titleError }: BookFieldsProps) {
+export function BookFields({ values, onChange, titleError, pageCount }: BookFieldsProps) {
   return (
     <div className="flex flex-col gap-4">
+      {pageCount != null ? (
+        <p className="text-sm text-muted">
+          {t("field.pageCount")}: {pageCount}
+        </p>
+      ) : null}
       <TextField
         label={t("field.title")}
         value={values.title}
