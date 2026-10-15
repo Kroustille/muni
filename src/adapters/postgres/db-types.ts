@@ -10,7 +10,13 @@ export type Generated<T> =
     ? ColumnType<S, I | undefined, U>
     : ColumnType<T, T | undefined, T>;
 
-export type ItemType = "book" | "movie" | "recipe" | "shopping";
+export type ItemType =
+  | "book"
+  | "movie"
+  | "music_artist"
+  | "music_track"
+  | "recipe"
+  | "shopping";
 
 export type Json = JsonValue;
 
@@ -34,6 +40,8 @@ export interface CatalogCache {
 }
 
 export interface Items {
+  album: string | null;
+  artist: string | null;
   author: string | null;
   catalog_rating: number | null;
   checked: Generated<boolean>;
@@ -46,6 +54,8 @@ export interface Items {
   ingredients: Json | null;
   isbn: string | null;
   media_kind: string | null;
+  music_brainz_artist_id: string | null;
+  music_brainz_recording_id: string | null;
   notes: string | null;
   page_count: number | null;
   publication_year: number | null;
@@ -56,6 +66,8 @@ export interface Items {
   recommended_by: string | null;
   server_updated_at: Timestamp;
   status: string | null;
+  soundcloud_url: string | null;
+  spotify_url: string | null;
   steps: Json | null;
   synopsis: string | null;
   title: string;

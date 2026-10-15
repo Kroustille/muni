@@ -37,6 +37,12 @@ function toWire(row: Selectable<Items>): ItemWire {
     release_year: row.release_year,
     catalog_rating: row.catalog_rating,
     media_kind: row.media_kind as ItemWire["media_kind"],
+    artist: row.artist,
+    album: row.album,
+    music_brainz_artist_id: row.music_brainz_artist_id,
+    music_brainz_recording_id: row.music_brainz_recording_id,
+    spotify_url: row.spotify_url,
+    soundcloud_url: row.soundcloud_url,
     server_updated_at: toIso(row.server_updated_at),
   };
 }
@@ -72,6 +78,12 @@ function toRow(userId: string, wire: ItemWire): Insertable<Items> {
     release_year: wire.release_year ?? null,
     catalog_rating: wire.catalog_rating ?? null,
     media_kind: wire.media_kind ?? null,
+    artist: wire.artist ?? null,
+    album: wire.album ?? null,
+    music_brainz_artist_id: wire.music_brainz_artist_id ?? null,
+    music_brainz_recording_id: wire.music_brainz_recording_id ?? null,
+    spotify_url: wire.spotify_url ?? null,
+    soundcloud_url: wire.soundcloud_url ?? null,
     server_updated_at: wire.server_updated_at,
   };
 }
@@ -137,6 +149,12 @@ function createRepo(db: DbOrTrx, inTransaction: boolean): ServerItemRepository {
               release_year: values.release_year,
               catalog_rating: values.catalog_rating,
               media_kind: values.media_kind,
+              artist: values.artist,
+              album: values.album,
+              music_brainz_artist_id: values.music_brainz_artist_id,
+              music_brainz_recording_id: values.music_brainz_recording_id,
+              spotify_url: values.spotify_url,
+              soundcloud_url: values.soundcloud_url,
               server_updated_at: values.server_updated_at,
             }),
           )
