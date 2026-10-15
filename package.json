@@ -5,6 +5,7 @@
   "private": true,
   "packageManager": "yarn@1.22.22",
   "scripts": {
+    "predev": "yarn migrate:up",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

@@ -12,9 +12,8 @@ Validation scenarios for Muni v1. Setup details are filled in during implementat
 corepack enable
 yarn install
 docker compose up -d        # PostgreSQL and Mailpit
-yarn run migrate:up          # compiles and applies db/migrations (Kysely Migrator)
-yarn run db:codegen          # regenerates src/adapters/postgres/db-types.ts after a schema change
-yarn dev                 # http://localhost:3000
+yarn dev                 # http://localhost:3000 — `predev` runs migrate:up first
+yarn run db:codegen          # after a schema change: regenerates src/adapters/postgres/db-types.ts
 ```
 
 ## Automated checks

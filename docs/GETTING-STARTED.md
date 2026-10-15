@@ -34,13 +34,14 @@ Configure `.env.local` from [`.env.example`](../.env.example):
 | `SMTP_FROM` | `Muni <no-reply@muni.local>` | From address |
 | `GOOGLE_CLIENT_ID` / `GOOGLE_CLIENT_SECRET` | empty | Optional; only for Google sign-in checks |
 
-Start backing services, apply migrations, and run the dev server:
+Start backing services and run the dev server (migrations apply automatically via `predev`):
 
 ```bash
 yarn db:up          # or: docker compose up -d
-yarn migrate:up
-yarn dev            # http://localhost:3000
+yarn dev            # http://localhost:3000 — runs migrate:up first
 ```
+
+To apply migrations without starting the app: `yarn migrate:up`.
 
 After a schema change: `yarn db:codegen` (regenerates `src/adapters/postgres/db-types.ts`).
 
