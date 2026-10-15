@@ -14,7 +14,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:up": "docker compose up -d --wait",
-    "db:down": "docker compose down"
+    "db:down": "docker compose down",
+    "build:migrations": "tsc -p db/tsconfig.json",
+    "migrate:up": "npm run build:migrations && node dist/db/migrate.js up",
+    "migrate:down": "npm run build:migrations && node dist/db/migrate.js down"
   },
   "engines": {
     "node": ">=22"
