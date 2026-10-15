@@ -2,6 +2,7 @@
   "name": "muni",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "yarn@1.22.22",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -16,10 +17,10 @@
     "db:up": "docker compose up -d --wait",
     "db:down": "docker compose down",
     "build:migrations": "tsc -p db/tsconfig.json",
-    "migrate:up": "npm run build:migrations && node dist/db/migrate.js up",
-    "migrate:down": "npm run build:migrations && node dist/db/migrate.js down",
-    "db:codegen": "npm run migrate:up && kysely-codegen --dialect postgres --exclude-pattern 'kysely_*' --out-file src/adapters/postgres/db-types.ts && prettier --write src/adapters/postgres/db-types.ts",
-    "db:codegen:check": "npm run db:codegen && git diff --exit-code src/adapters/postgres/db-types.ts"
+    "migrate:up": "yarn run build:migrations && node dist/db/migrate.js up",
+    "migrate:down": "yarn run build:migrations && node dist/db/migrate.js down",
+    "db:codegen": "yarn run migrate:up && kysely-codegen --dialect postgres --exclude-pattern 'kysely_*' --out-file src/adapters/postgres/db-types.ts && prettier --write src/adapters/postgres/db-types.ts",
+    "db:codegen:check": "yarn run db:codegen && git diff --exit-code src/adapters/postgres/db-types.ts"
   },
   "engines": {
     "node": ">=22"
@@ -55,6 +56,7 @@
     "prettier": "^3.9.10",
     "tailwindcss": "^4.3.3",
     "typescript": "^5.9.3",
+    "vite": "^8.3.4",
     "vitest": "^5.0.5"
   }
 }

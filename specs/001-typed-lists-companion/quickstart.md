@@ -3,24 +3,25 @@
 Validation scenarios for Muni v1. Setup details are filled in during implementation.
 
 ## Prerequisites
-- Node.js 22, npm, Docker with Docker Compose.
+- Node.js 22, [Corepack](https://nodejs.org/api/corepack.html) enabled (`corepack enable`), Docker with Docker Compose.
 - `.env.local` copied from `.env.example` (database URL, `APP_URL`, SMTP settings pointing at Mailpit, test database URL).
 - Google OAuth credentials only for the Google sign-in check; magic links are read in Mailpit (http://localhost:8025).
 
 ## Run
 ```bash
-npm install
+corepack enable
+yarn install
 docker compose up -d        # PostgreSQL and Mailpit
-npm run migrate:up          # compiles and applies db/migrations (Kysely Migrator)
-npm run db:codegen          # regenerates src/adapters/postgres/db-types.ts after a schema change
-npm run dev                 # http://localhost:3000
+yarn run migrate:up          # compiles and applies db/migrations (Kysely Migrator)
+yarn run db:codegen          # regenerates src/adapters/postgres/db-types.ts after a schema change
+yarn dev                 # http://localhost:3000
 ```
 
 ## Automated checks
 ```bash
-npm run test:coverage         # Vitest with the 80% gate on logic folders: domain, use cases, adapters, PostgreSQL isolation, merge vectors, sync, search, architecture
-npm run lint:tracking         # no analytics or tracking dependencies
-npm run test:e2e              # Playwright: auth, offline, two-device sync, install
+yarn run test:coverage         # Vitest with the 80% gate on logic folders: domain, use cases, adapters, PostgreSQL isolation, merge vectors, sync, search, architecture
+yarn run lint:tracking         # no analytics or tracking dependencies
+yarn run test:e2e              # Playwright: auth, offline, two-device sync, install
 ```
 
 ## Deployment smoke check (Docker Compose, not final)
