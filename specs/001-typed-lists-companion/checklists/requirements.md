@@ -31,4 +31,4 @@
 
 ## Notes
 
-- Shopping staying a single list in v1 is an assumption from the interview; confirm.
+- Shopping staying a single list in v1 is an assumption from the interview; confirmed by the user.
