@@ -10,6 +10,12 @@ import {
   type BookFieldValues,
   MovieFields,
   type MovieFieldValues,
+  MusicArtistFields,
+  type MusicArtistFieldValues,
+  musicArtistFieldValuesToExtra,
+  MusicTrackFields,
+  type MusicTrackFieldValues,
+  musicTrackFieldValuesToExtra,
   RecipeFields,
   type RecipeFieldValues,
   ShoppingFields,
@@ -17,6 +23,7 @@ import {
 } from "@/components/fields";
 import { Button } from "@/components/ui/Button";
 import { useUndoDelete } from "@/components/UndoToast";
+import { ExternalLinkActions } from "@/components/music/external-link-actions";
 import { t } from "@/i18n";
 
 function optionalText(value: string): string | null {
@@ -95,6 +102,42 @@ function itemToRecipeValues(item: Item): RecipeFieldValues {
   };
 }
 
+function itemToMusicArtistValues(item: Item): MusicArtistFieldValues {
+  return {
+    title: item.title,
+    recommendedBy: item.recommendedBy ?? "",
+    notes: item.notes ?? "",
+    spotifyUrl: item.spotifyUrl ?? "",
+    soundcloudUrl: item.soundcloudUrl ?? "",
+  };
+}
+
+function musicArtistValuesToPatch(values: MusicArtistFieldValues): ItemPatch {
+  return musicArtistFieldValuesToExtra(values) as ItemPatch;
+}
+
+function itemToMusicTrackValues(item: Item): MusicTrackFieldValues {
+  return {
+    title: item.title,
+    artist: item.artist ?? "",
+    album: item.album ?? "",
+    releaseYear: item.releaseYear !== null ? String(item.releaseYear) : "",
+    status: (item.status ?? "to_listen") as MusicTrackFieldValues["status"],
+    rating: item.rating,
+    recommendedBy: item.recommendedBy ?? "",
+    notes: item.notes ?? "",
+    spotifyUrl: item.spotifyUrl ?? "",
+    soundcloudUrl: item.soundcloudUrl ?? "",
+  };
+}
+
+function musicTrackValuesToPatch(values: MusicTrackFieldValues): ItemPatch {
+  return {
+    ...musicTrackFieldValuesToExtra(values),
+    title: values.title.trim(),
+  };
+}
+
 function recipeValuesToPatch(values: RecipeFieldValues): ItemPatch {
   const ingredients = values.ingredients
     .map((row) => ({ quantity: row.quantity.trim(), name: row.name.trim() }))
@@ -108,7 +151,13 @@ function recipeValuesToPatch(values: RecipeFieldValues): ItemPatch {
   };
 }
 
-type FieldValues = ShoppingFieldValues | BookFieldValues | MovieFieldValues | RecipeFieldValues;
+type FieldValues =
+  | ShoppingFieldValues
+  | BookFieldValues
+  | MovieFieldValues
+  | MusicArtistFieldValues
+  | MusicTrackFieldValues
+  | RecipeFieldValues;
 
 function valuesFromItem(item: Item): FieldValues {
   switch (item.type) {
@@ -120,6 +169,10 @@ function valuesFromItem(item: Item): FieldValues {
       return itemToMovieValues(item);
     case "recipe":
       return itemToRecipeValues(item);
+    case "music_artist":
+      return itemToMusicArtistValues(item);
+    case "music_track":
+      return itemToMusicTrackValues(item);
   }
 }
 
@@ -133,6 +186,10 @@ function patchFromValues(item: Item, values: FieldValues): ItemPatch {
       return movieValuesToPatch(values as MovieFieldValues);
     case "recipe":
       return recipeValuesToPatch(values as RecipeFieldValues);
+    case "music_artist":
+      return { ...musicArtistValuesToPatch(values as MusicArtistFieldValues), title: values.title.trim() };
+    case "music_track":
+      return musicTrackValuesToPatch(values as MusicTrackFieldValues);
   }
 }
 
@@ -143,6 +200,7 @@ export default function ItemDetailPage() {
   const [item, setItem] = useState<Item | null | undefined>(undefined);
   const [values, setValues] = useState<FieldValues | null>(null);
   const [titleError, setTitleError] = useState<string | undefined>();
+  const [artistError, setArtistError] = useState<string | undefined>();
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -173,8 +231,16 @@ export default function ItemDetailPage() {
       setTitleError(t("validation.titleRequired"));
       return;
     }
+    if (item.type === "music_track") {
+      const artist = (values as MusicTrackFieldValues).artist.trim();
+      if (!artist) {
+        setArtistError(t("validation.artistRequired"));
+        return;
+      }
+    }
     setSaving(true);
     setTitleError(undefined);
+    setArtistError(undefined);
     try {
       const useCases = await getItemUseCases();
       const updated = await useCases.updateItem(id, patchFromValues(item, values));
@@ -248,6 +314,43 @@ export default function ItemDetailPage() {
             }}
             titleError={titleError}
           />
+        ) : null}
+        {item.type === "music_artist" ? (
+          <>
+            <MusicArtistFields
+              values={values as MusicArtistFieldValues}
+              onChange={(next) => {
+                setValues(next);
+                setTitleError(undefined);
+              }}
+              titleError={titleError}
+            />
+            <ExternalLinkActions
+              title={values.title}
+              spotifyUrl={(values as MusicArtistFieldValues).spotifyUrl}
+              soundcloudUrl={(values as MusicArtistFieldValues).soundcloudUrl}
+            />
+          </>
+        ) : null}
+        {item.type === "music_track" ? (
+          <>
+            <MusicTrackFields
+              values={values as MusicTrackFieldValues}
+              onChange={(next) => {
+                setValues(next);
+                setTitleError(undefined);
+                setArtistError(undefined);
+              }}
+              titleError={titleError}
+              artistError={artistError}
+            />
+            <ExternalLinkActions
+              title={values.title}
+              artist={(values as MusicTrackFieldValues).artist}
+              spotifyUrl={(values as MusicTrackFieldValues).spotifyUrl}
+              soundcloudUrl={(values as MusicTrackFieldValues).soundcloudUrl}
+            />
+          </>
         ) : null}
 
         <div className="flex flex-col gap-2 sm:flex-row">
