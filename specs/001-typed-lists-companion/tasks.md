@@ -168,7 +168,7 @@
 
 ### Ports, doubles and tests first (TDD)
 
-- [ ] T075 [US4] Define the `ServerItemRepository` port as an interface only in `src/application/ports/server-item-repository.ts`: every method takes `userId` (`findByIds(userId, ids)` with row lock, `upsert(userId, rows)`, `listSince(userId, since, limit)`) and a `transaction(fn)` unit of work (depends on T011, T018)
+- [X] T075 [US4] Define the `ServerItemRepository` port as an interface only in `src/application/ports/server-item-repository.ts`: every method takes `userId` (`findByIds(userId, ids)` with row lock, `upsert(userId, rows)`, `listSince(userId, since, limit)`) and a `transaction(fn)` unit of work (depends on T011, T018)
 - [ ] T076 [US4] Implement the in-memory `ServerItemRepository` test double in `tests/helpers/in-memory-server-item-repository.ts` (depends on T075)
 - [ ] T077 [P] [US4] Create unit tests for the server `sync-service` using the shared vectors `tests/vectors/merge-vectors.json` (push inserts rows for the caller, merges per field by HLC with device-id tie-break, idempotent, convergent in any order, edit-vs-delete latest wins, per-row validation errors, rejects a payload carrying `user_id`; pull ordered ascending with `since` and `limit`, includes soft-deleted rows) in `tests/unit/sync-service.test.ts` (depends on T017, T076)
 - [ ] T078 [P] [US4] Create unit tests for per-user authorization and isolation at use-case level (two users: A never reads, overwrites or deletes B's rows, even reusing the same item id; pull returns only the caller's rows; calls without a user id are rejected) in `tests/unit/sync-isolation.test.ts` (depends on T076)
