@@ -33,6 +33,10 @@ function toWire(row: Selectable<Items>): ItemWire {
     publication_year: row.publication_year,
     publisher: row.publisher,
     page_count: row.page_count,
+    imdb_id: row.imdb_id,
+    release_year: row.release_year,
+    catalog_rating: row.catalog_rating,
+    media_kind: row.media_kind as ItemWire["media_kind"],
     server_updated_at: toIso(row.server_updated_at),
   };
 }
@@ -64,6 +68,10 @@ function toRow(userId: string, wire: ItemWire): Insertable<Items> {
     publication_year: wire.publication_year ?? null,
     publisher: wire.publisher ?? null,
     page_count: wire.page_count ?? null,
+    imdb_id: wire.imdb_id ?? null,
+    release_year: wire.release_year ?? null,
+    catalog_rating: wire.catalog_rating ?? null,
+    media_kind: wire.media_kind ?? null,
     server_updated_at: wire.server_updated_at,
   };
 }
@@ -125,6 +133,10 @@ function createRepo(db: DbOrTrx, inTransaction: boolean): ServerItemRepository {
               publication_year: values.publication_year,
               publisher: values.publisher,
               page_count: values.page_count,
+              imdb_id: values.imdb_id,
+              release_year: values.release_year,
+              catalog_rating: values.catalog_rating,
+              media_kind: values.media_kind,
               server_updated_at: values.server_updated_at,
             }),
           )

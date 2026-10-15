@@ -19,6 +19,10 @@ const MERGED_FIELDS = [
   "publication_year",
   "publisher",
   "page_count",
+  "imdb_id",
+  "release_year",
+  "catalog_rating",
+  "media_kind",
 ] as const satisfies readonly (keyof ItemWire)[];
 
 function compareValues(a: unknown, b: unknown): number {

@@ -35,18 +35,22 @@ export interface CatalogCache {
 
 export interface Items {
   author: string | null;
+  catalog_rating: number | null;
   checked: Generated<boolean>;
   created_at: Timestamp;
   deleted_at: Timestamp | null;
   fields_updated_at: Json;
   genres: Json | null;
   id: string;
+  imdb_id: string | null;
   ingredients: Json | null;
   isbn: string | null;
+  media_kind: string | null;
   notes: string | null;
   page_count: number | null;
   publication_year: number | null;
   publisher: string | null;
+  release_year: number | null;
   quantity: string | null;
   rating: number | null;
   recommended_by: string | null;
