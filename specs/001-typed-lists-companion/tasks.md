@@ -66,7 +66,7 @@
 
 ### i18n, theme and shell (UI side)
 
-- [ ] T028 [P] Create unit tests for the i18n helper (typed keys resolve, every key referenced exists in `fr.json`, no empty values) in `tests/unit/i18n.test.ts`
+- [X] T028 [P] Create unit tests for the i18n helper (typed keys resolve, every key referenced exists in `fr.json`, no empty values) in `tests/unit/i18n.test.ts`
 - [ ] T029 [P] Implement the French message catalog `src/i18n/fr.json` and typed `t(key)` helper in `src/i18n/index.ts` (all user-facing strings go through it, FR-022) (depends on T028)
 - [ ] T030 [P] Implement light/dark theme following `prefers-color-scheme` (system only, no toggle) with Tailwind dark variant in `src/app/globals.css` (FR-023, verified by the e2e in T100)
 - [ ] T031 [P] Build base hand-made Tailwind components (`Button`, `TextField`, `Select`, `Toast`, `BottomSheet`) in `src/components/ui/`
