@@ -6,13 +6,19 @@ import { Select } from "@/components/ui/Select";
 import { TextField } from "@/components/ui/TextField";
 import { t, type MessageKey } from "@/i18n";
 
+import { StarRating } from "@/components/StarRating";
 import { RecommendedByInput } from "@/components/RecommendedByInput";
 import { MultilineField } from "./multiline-field";
+
+function ratingVisible(status: BookStatus): boolean {
+  return status === "read";
+}
 
 export type BookFieldValues = {
   title: string;
   author: string;
   status: BookStatus;
+  rating: number | null;
   recommendedBy: string;
   notes: string;
 };
@@ -21,6 +27,7 @@ export const emptyBookFieldValues = (): BookFieldValues => ({
   title: "",
   author: "",
   status: defaultStatus("book") as BookStatus,
+  rating: null,
   recommendedBy: "",
   notes: "",
 });
@@ -49,6 +56,9 @@ export function bookFieldValuesToExtra(values: BookFieldValues): CreateItemExtra
   if (recommendedBy) extra.recommendedBy = recommendedBy;
   const notes = optionalText(values.notes);
   if (notes) extra.notes = notes;
+  if (ratingVisible(values.status) && values.rating !== null) {
+    extra.rating = values.rating;
+  }
   return extra;
 }
 
@@ -76,6 +86,15 @@ export function BookFields({ values, onChange, titleError }: BookFieldsProps) {
           onChange({ ...values, status: event.target.value as BookStatus })
         }
       />
+      {ratingVisible(values.status) ? (
+        <div className="flex flex-col gap-1">
+          <span className="text-sm text-muted">{t("field.rating")}</span>
+          <StarRating
+            value={values.rating}
+            onChange={(rating) => onChange({ ...values, rating })}
+          />
+        </div>
+      ) : null}
       <RecommendedByInput
         value={values.recommendedBy}
         onChange={(recommendedBy) => onChange({ ...values, recommendedBy })}

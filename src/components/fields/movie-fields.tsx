@@ -6,12 +6,18 @@ import { Select } from "@/components/ui/Select";
 import { TextField } from "@/components/ui/TextField";
 import { t, type MessageKey } from "@/i18n";
 
+import { StarRating } from "@/components/StarRating";
 import { RecommendedByInput } from "@/components/RecommendedByInput";
 import { MultilineField } from "./multiline-field";
+
+function ratingVisible(status: MovieStatus): boolean {
+  return status === "watched";
+}
 
 export type MovieFieldValues = {
   title: string;
   status: MovieStatus;
+  rating: number | null;
   recommendedBy: string;
   notes: string;
 };
@@ -19,6 +25,7 @@ export type MovieFieldValues = {
 export const emptyMovieFieldValues = (): MovieFieldValues => ({
   title: "",
   status: defaultStatus("movie") as MovieStatus,
+  rating: null,
   recommendedBy: "",
   notes: "",
 });
@@ -45,6 +52,9 @@ export function movieFieldValuesToExtra(values: MovieFieldValues): CreateItemExt
   if (recommendedBy) extra.recommendedBy = recommendedBy;
   const notes = optionalText(values.notes);
   if (notes) extra.notes = notes;
+  if (ratingVisible(values.status) && values.rating !== null) {
+    extra.rating = values.rating;
+  }
   return extra;
 }
 
@@ -66,6 +76,15 @@ export function MovieFields({ values, onChange, titleError }: MovieFieldsProps) 
           onChange({ ...values, status: event.target.value as MovieStatus })
         }
       />
+      {ratingVisible(values.status) ? (
+        <div className="flex flex-col gap-1">
+          <span className="text-sm text-muted">{t("field.rating")}</span>
+          <StarRating
+            value={values.rating}
+            onChange={(rating) => onChange({ ...values, rating })}
+          />
+        </div>
+      ) : null}
       <RecommendedByInput
         value={values.recommendedBy}
         onChange={(recommendedBy) => onChange({ ...values, recommendedBy })}

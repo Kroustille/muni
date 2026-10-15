@@ -16,7 +16,7 @@ export function StarRating({ value, onChange }: StarRatingProps) {
         <button
           key={stars}
           type="button"
-          className="min-h-9 min-w-9 rounded-md border border-border px-2 text-sm aria-pressed:bg-primary aria-pressed:text-primary-foreground"
+          className="min-h-9 min-w-9 rounded-md border border-border px-2 text-sm transition-colors aria-pressed:border-primary aria-pressed:bg-primary aria-pressed:font-semibold aria-pressed:text-primary-foreground aria-pressed:shadow-sm"
           aria-pressed={value === stars}
           onClick={() => onChange(stars)}
         >

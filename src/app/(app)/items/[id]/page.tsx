@@ -43,37 +43,47 @@ function itemToBookValues(item: Item): BookFieldValues {
     title: item.title,
     author: item.author ?? "",
     status: item.status as BookFieldValues["status"],
+    rating: item.rating,
     recommendedBy: item.recommendedBy ?? "",
     notes: item.notes ?? "",
   };
 }
 
 function bookValuesToPatch(values: BookFieldValues): ItemPatch {
-  return {
+  const patch: ItemPatch = {
     title: values.title.trim(),
     author: optionalText(values.author),
     status: values.status,
     recommendedBy: optionalText(values.recommendedBy),
     notes: optionalText(values.notes),
   };
+  if (values.status === "read") {
+    patch.rating = values.rating;
+  }
+  return patch;
 }
 
 function itemToMovieValues(item: Item): MovieFieldValues {
   return {
     title: item.title,
     status: item.status as MovieFieldValues["status"],
+    rating: item.rating,
     recommendedBy: item.recommendedBy ?? "",
     notes: item.notes ?? "",
   };
 }
 
 function movieValuesToPatch(values: MovieFieldValues): ItemPatch {
-  return {
+  const patch: ItemPatch = {
     title: values.title.trim(),
     status: values.status,
     recommendedBy: optionalText(values.recommendedBy),
     notes: optionalText(values.notes),
   };
+  if (values.status === "watched") {
+    patch.rating = values.rating;
+  }
+  return patch;
 }
 
 function itemToRecipeValues(item: Item): RecipeFieldValues {

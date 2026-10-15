@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import { getItemUseCases } from "@/composition/client";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { getItemUseCases, subscribeSyncStatus } from "@/composition/client";
 import { BookMovieRow } from "@/components/rows/BookMovieRow";
 import { ShoppingRow } from "@/components/rows/ShoppingRow";
 import { StatusFilter, type StatusFilterValue } from "@/components/StatusFilter";
-import type { Item, ItemType } from "@/domain/item";
+import type { Item, ItemPatch, ItemType } from "@/domain/item";
+import { updateItem as applyItemPatch } from "@/domain/item";
 import { t, type MessageKey } from "@/i18n";
 
 type ListRoute = "shopping" | "books" | "movies" | "recipes";
@@ -51,6 +52,7 @@ export default function ListPage() {
   const route = typeof routeParam === "string" && isListRoute(routeParam) ? routeParam : null;
   const [items, setItems] = useState<Item[]>([]);
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("all");
+  const refreshRef = useRef<(() => Promise<void>) | null>(null);
 
   if (route === null) {
     notFound();
@@ -65,7 +67,9 @@ export default function ListPage() {
 
   useEffect(() => {
     let cancelled = false;
-    let unsubscribe: (() => void) | undefined;
+    let unsubscribeItems: (() => void) | undefined;
+    let unsubscribeSync: (() => void) | undefined;
+    let previousSyncStatus: string | undefined;
 
     void getItemUseCases().then(async (useCases) => {
       const refresh = async () => {
@@ -74,17 +78,63 @@ export default function ListPage() {
         const next = await useCases.listItems(itemType, listOptions);
         if (!cancelled) setItems(next);
       };
+      refreshRef.current = refresh;
       await refresh();
-      unsubscribe = useCases.subscribe(() => {
+      unsubscribeItems = useCases.subscribe(() => {
         void refresh();
       });
     });
 
+    void subscribeSyncStatus((state) => {
+      if (previousSyncStatus !== undefined && previousSyncStatus !== "idle" && state === "idle") {
+        void refreshRef.current?.();
+      }
+      previousSyncStatus = state;
+    }).then((unsub) => {
+      if (cancelled) {
+        unsub();
+        return;
+      }
+      unsubscribeSync = unsub;
+    });
+
     return () => {
       cancelled = true;
-      unsubscribe?.();
+      unsubscribeItems?.();
+      unsubscribeSync?.();
+      refreshRef.current = null;
     };
   }, [itemType, showStatusFilter, statusFilter]);
+
+  const listOptionsForFilter = useCallback(
+    () => (showStatusFilter && statusFilter !== "all" ? { status: statusFilter } : {}),
+    [showStatusFilter, statusFilter],
+  );
+
+  const revertList = useCallback(async () => {
+    const useCases = await getItemUseCases();
+    const next = await useCases.listItems(itemType, listOptionsForFilter());
+    setItems(next);
+  }, [itemType, listOptionsForFilter]);
+
+  const updateBookMovieItem = useCallback(
+    (id: string, patch: ItemPatch) => {
+      setItems((current) =>
+        current.map((item) => {
+          if (item.id !== id) return item;
+          try {
+            return applyItemPatch(item, patch);
+          } catch {
+            return item;
+          }
+        }),
+      );
+      void getItemUseCases()
+        .then((useCases) => useCases.updateItem(id, patch))
+        .catch(() => revertList());
+    },
+    [revertList],
+  );
 
   return (
     <main className="p-4 pb-20">
@@ -120,14 +170,10 @@ export default function ListPage() {
                   key={item.id}
                   item={item}
                   onStatusChange={(status) => {
-                    void getItemUseCases().then((useCases) =>
-                      useCases.updateItem(item.id, { status }),
-                    );
+                    updateBookMovieItem(item.id, { status });
                   }}
                   onRatingChange={(rating) => {
-                    void getItemUseCases().then((useCases) =>
-                      useCases.updateItem(item.id, { rating }),
-                    );
+                    updateBookMovieItem(item.id, { rating });
                   }}
                 />
               );
