@@ -219,6 +219,7 @@ export default function ItemDetailPage() {
         {item.type === "book" ? (
           <BookFields
             values={values as BookFieldValues}
+            pageCount={item.pageCount}
             onChange={(next) => {
               setValues(next);
               setTitleError(undefined);
