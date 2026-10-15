@@ -49,8 +49,8 @@
 
 **Independent Test**: quickstart.md mobile scan section.
 
-- [ ] T214 [US1] Create unit tests for `lookupBook` use case (valid ISBN, not found, provider error) with fake port in `tests/unit/lookup-book.test.ts`
-- [ ] T215 [US1] Implement `lookupBook` in `src/application/books/lookup-book.ts` (depends on T210, T214)
+- [x] T214 [US1] Create unit tests for `lookupBook` use case (valid ISBN, not found, provider error) with fake port in `tests/unit/lookup-book.test.ts`
+- [x] T215 [US1] Implement `lookupBook` in `src/application/books/lookup-book.ts` (depends on T210, T214)
 - [x] T216 [P] [US1] Create unit tests for Open Library adapter mapping to `BookCatalogHit` with mocked fetch in `tests/unit/open-library-adapter.test.ts`
 - [x] T217 [US1] Implement Open Library adapter in `src/adapters/open-library/book-catalog-lookup.ts` with cache via T213 (depends on T216)
 - [ ] T218 [US1] Create route handler tests for `GET /api/books/lookup` (401, 400, 404, 200) in `tests/integration/books-lookup-route.test.ts`
