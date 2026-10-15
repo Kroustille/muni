@@ -4,7 +4,7 @@ Validation scenarios for Muni v1. Setup details are filled in during implementat
 
 ## Prerequisites
 - Node.js 22, [Corepack](https://nodejs.org/api/corepack.html) enabled (`corepack enable`), Docker with Docker Compose.
-- `.env.local` copied from `.env.example` (database URL, `APP_URL`, SMTP settings pointing at Mailpit, test database URL).
+- `.env.local` copied from `.env.example` (database URL, `APP_URL`, SMTP settings pointing at Mailpit, test database URL). The migration CLI reads `.env` and `.env.local` from the project root (same as Next.js); shell `export` still overrides.
 - Google OAuth credentials only for the Google sign-in check; magic links are read in Mailpit (http://localhost:8025).
 
 ## Run

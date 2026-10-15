@@ -1,7 +1,10 @@
+import { loadLocalEnv } from "./load-env";
 import { Kysely, PostgresDialect } from "kysely";
 import { Migrator } from "kysely/migration";
 import { Pool } from "pg";
 import { migrationProvider } from "./migrations";
+
+loadLocalEnv();
 
 type Direction = "up" | "down";
 
