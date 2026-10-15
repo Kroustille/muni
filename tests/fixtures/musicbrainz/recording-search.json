@@ -1,0 +1,11 @@
+{
+  "recordings": [
+    {
+      "id": "a1b2c3d4-e5f6-4789-a012-3456789abcde",
+      "title": "Time (You and I)",
+      "first-release-date": "2020-06-26",
+      "artist-credit": [{ "name": "Khruangbin" }],
+      "releases": [{ "title": "Mordechai" }]
+    }
+  ]
+}
