@@ -12,6 +12,7 @@ import { createSessionUseCases, type SessionUseCases } from "@/application/auth/
 import { createPostgresCatalogCacheRepository } from "@/adapters/postgres/catalog-cache-repository";
 import { createPostgresItemRepository } from "@/adapters/postgres/item-repository";
 import { createOpenLibraryBookCatalogLookup } from "@/adapters/open-library/book-catalog-lookup";
+import { createMusicBrainzCatalogSearch } from "@/adapters/musicbrainz/music-catalog-search";
 import { createWikidataMovieCatalogSearch } from "@/adapters/wikidata/movie-catalog-search";
 import { createLookupBook, type LookupBook } from "@/application/books/lookup-book";
 import {
@@ -20,6 +21,12 @@ import {
   type FetchMovieCatalogDetail,
   type SearchMovies,
 } from "@/application/movies/search-movies";
+import {
+  createSearchMusicArtists,
+  createSearchMusicTracks,
+  type SearchMusicArtists,
+  type SearchMusicTracks,
+} from "@/application/music/search-music";
 import { createSyncService, type SyncService } from "@/application/server/sync-service";
 import { loadConfig, type ServerConfig } from "@/composition/config";
 
@@ -32,6 +39,8 @@ export interface ServerContainer {
   readonly lookupBook: LookupBook;
   readonly searchMovies: SearchMovies;
   readonly fetchMovieCatalogDetail: FetchMovieCatalogDetail;
+  readonly searchMusicArtists: SearchMusicArtists;
+  readonly searchMusicTracks: SearchMusicTracks;
   readonly destroy: () => Promise<void>;
 }
 
@@ -90,6 +99,9 @@ export function createServerContainer(
   const movieCatalog = createWikidataMovieCatalogSearch({ cache: catalogCache });
   const searchMovies = createSearchMovies({ catalog: movieCatalog });
   const fetchMovieCatalogDetail = createFetchMovieCatalogDetail({ catalog: movieCatalog });
+  const musicCatalog = createMusicBrainzCatalogSearch({ cache: catalogCache });
+  const searchMusicArtists = createSearchMusicArtists({ catalog: musicCatalog });
+  const searchMusicTracks = createSearchMusicTracks({ catalog: musicCatalog });
 
   return {
     appUrl: config.appUrl,
@@ -100,6 +112,8 @@ export function createServerContainer(
     lookupBook,
     searchMovies,
     fetchMovieCatalogDetail,
+    searchMusicArtists,
+    searchMusicTracks,
     destroy: () => pg.destroy(),
   };
 }
