@@ -49,7 +49,14 @@ function wire(overrides: Record<string, unknown> = {}) {
 
 describe("item types", () => {
   it("lists the four types", () => {
-    expect([...ITEM_TYPES]).toEqual(["shopping", "book", "movie", "recipe"]);
+    expect([...ITEM_TYPES]).toEqual([
+      "shopping",
+      "book",
+      "movie",
+      "recipe",
+      "music_artist",
+      "music_track",
+    ]);
   });
 });
 
