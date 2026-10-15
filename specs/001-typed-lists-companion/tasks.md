@@ -44,7 +44,7 @@
 
 - [X] T010 [P] Create unit tests for domain validation (empty/whitespace title rejected, status values per type, status default, rating 1..5, `type` immutable, cross-type null fields) in `tests/unit/domain-item.test.ts`
 - [X] T011 [P] Define the `Item` aggregate, per-type field definitions, value objects and zod schemas in `src/domain/item.ts` per data-model.md: `type` enum `shopping|book|movie|recipe` immutable after creation; `title` "required, trimmed, non-empty"; book status `to_read|reading|read`; movie status `to_watch|watched` (default first value); `rating` "1..5"; `quantity` free text; `checked` default false; `ingredients` ordered array of `{quantity, name}`; `steps` ordered array of strings; "type-specific fields must be null for other types"; the wire schema has no `user_id` (depends on T010)
-- [ ] T012 [P] Create unit tests for text normalization (lowercase plus NFD accent stripping, "Éléphant" matches "elephant", substring match) in `tests/unit/domain-text.test.ts`
+- [X] T012 [P] Create unit tests for text normalization (lowercase plus NFD accent stripping, "Éléphant" matches "elephant", substring match) in `tests/unit/domain-text.test.ts`
 - [ ] T013 [P] Implement text normalization and title matching in `src/domain/text.ts` (depends on T012)
 - [ ] T014 [P] Create unit tests for the hybrid logical clock (monotonic ticks, compare with device-id tie-break, clock-skew tolerance, string format `<wallMs>-<counter>-<deviceId>`) in `tests/unit/domain-clock.test.ts`
 - [ ] T015 [P] Implement the hybrid logical clock value object in `src/domain/clock.ts` (depends on T014)
