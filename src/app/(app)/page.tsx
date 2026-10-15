@@ -7,8 +7,10 @@ import type { Item, ItemType } from "@/domain/item";
 import { t, type MessageKey } from "@/i18n";
 
 type ListRoute = "shopping" | "books" | "movies" | "recipes";
+type MusicRoute = "musicArtists" | "musicTracks";
 
 const LIST_ROUTES: ListRoute[] = ["shopping", "books", "movies", "recipes"];
+const MUSIC_ROUTES: MusicRoute[] = ["musicArtists", "musicTracks"];
 
 const ROUTE_TO_TYPE: Record<ListRoute, ItemType> = {
   shopping: "shopping",
@@ -22,6 +24,21 @@ const ROUTE_TITLE_KEY: Record<ListRoute, MessageKey> = {
   books: "list.books",
   movies: "list.movies",
   recipes: "list.recipes",
+};
+
+const MUSIC_ROUTE_HREF: Record<MusicRoute, string> = {
+  musicArtists: "/music/artists",
+  musicTracks: "/music/tracks",
+};
+
+const MUSIC_ROUTE_TITLE_KEY: Record<MusicRoute, MessageKey> = {
+  musicArtists: "list.musicArtists",
+  musicTracks: "list.musicTracks",
+};
+
+const MUSIC_ROUTE_TYPE: Record<MusicRoute, ItemType> = {
+  musicArtists: "music_artist",
+  musicTracks: "music_track",
 };
 
 const RECENT_LIMIT = 20;
@@ -60,7 +77,12 @@ export default function HomePage() {
   const total =
     counts === null
       ? null
-      : counts.shopping + counts.book + counts.movie + counts.recipe;
+      : counts.shopping +
+        counts.book +
+        counts.movie +
+        counts.recipe +
+        counts.music_artist +
+        counts.music_track;
   const showEmpty = total === 0;
 
   return (
@@ -84,6 +106,23 @@ export default function HomePage() {
               className="rounded-lg border border-black/10 p-3 dark:border-white/10"
             >
               <Link href={`/lists/${route}`} className="block">
+                <h2 className="font-semibold">{label}</h2>
+                <p className="mt-1 text-2xl tabular-nums">{count}</p>
+              </Link>
+            </section>
+          );
+        })}
+        {MUSIC_ROUTES.map((route) => {
+          const type = MUSIC_ROUTE_TYPE[route];
+          const label = t(MUSIC_ROUTE_TITLE_KEY[route]);
+          const count = counts?.[type] ?? 0;
+          return (
+            <section
+              key={route}
+              aria-label={label}
+              className="rounded-lg border border-black/10 p-3 dark:border-white/10"
+            >
+              <Link href={MUSIC_ROUTE_HREF[route]} className="block">
                 <h2 className="font-semibold">{label}</h2>
                 <p className="mt-1 text-2xl tabular-nums">{count}</p>
               </Link>
