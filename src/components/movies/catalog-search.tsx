@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { MovieSearchHit } from "@/application/ports/movie-catalog-search";
 import {
@@ -11,6 +11,7 @@ import {
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
+import { useDebouncedSearch } from "@/components/use-debounced-search";
 import { useOnline } from "@/components/use-online";
 import { t, type MessageKey } from "@/i18n";
 
@@ -88,6 +89,15 @@ export function MovieCatalogSearchSheet({
       setLoading(false);
     }
   }, [online, query]);
+
+  useDebouncedSearch(query, open && !previewOpen && online, runSearch);
+
+  useEffect(() => {
+    if (query.trim() === "") {
+      setResults([]);
+      setError(null);
+    }
+  }, [query]);
 
   const pickHit = useCallback(async (hit: MovieSearchHit) => {
     setDetailLoading(true);

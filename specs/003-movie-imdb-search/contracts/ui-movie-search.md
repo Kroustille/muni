@@ -7,7 +7,7 @@
 
 ## Search sheet
 
-- Text field + submit; loading state; result list (title, year, kind film/série, catalog rating if any).
+- Text field + submit; catalog lookup runs **2 seconds after typing stops** (submit still immediate); loading state; result list (title, year, kind film/série, catalog rating if any).
 - Tap row → load detail → preview sheet (all fields editable, M8).
 
 ## Preview

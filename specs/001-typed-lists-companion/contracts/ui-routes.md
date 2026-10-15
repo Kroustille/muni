@@ -9,7 +9,7 @@
 | `/` | Home | Card per list with count and recent items; search entry; empty state on first launch |
 | `/lists/[type]` | List view (`shopping`, `books`, `movies`, `recipes`) | Status filter where applicable; check-off for shopping; rating for read/watched |
 | `/items/[id]` | Detail and edit | Type-specific fields; recipe ingredients (quantity and name) and ordered steps; delete with Undo toast |
-| `/search` | Cross-list search | Results show type; empty state |
+| `/search` | Cross-list search | Results show type; empty state; query runs **2s after typing stops** (submit still immediate) |
 | `/settings` | Settings | Sign out |
 
 Shared shell: bottom quick-add button on home, list and search screens. Flow: choose type, then type-specific fields with only title/name required; reachable within 3 taps plus title (SC-002). All strings come from `src/i18n/fr.json`. Theme follows system.

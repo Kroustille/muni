@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 import type { BookCatalogHit } from "@/application/ports/book-catalog-lookup";
 import {
@@ -11,6 +11,7 @@ import { fetchBookCatalogSearch } from "@/application/books/fetch-book-catalog-s
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
+import { useDebouncedSearch } from "@/components/use-debounced-search";
 import { useOnline } from "@/components/use-online";
 import { t } from "@/i18n";
 
@@ -79,6 +80,15 @@ export function BookCatalogSearchSheet({
       setLoading(false);
     }
   }, [online, query]);
+
+  useDebouncedSearch(query, open && !previewOpen && online, runSearch);
+
+  useEffect(() => {
+    if (query.trim() === "") {
+      setResults([]);
+      setError(null);
+    }
+  }, [query]);
 
   const pickHit = useCallback(async (searchHit: BookCatalogHit) => {
     setDetailLoading(true);

@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { useDebouncedSearch } from "@/components/use-debounced-search";
 import { getSearchUseCase } from "@/composition/client";
 import type { Item, ItemType } from "@/domain/item";
 import { t, type MessageKey } from "@/i18n";
@@ -20,7 +21,7 @@ export default function SearchPage() {
   const [results, setResults] = useState<Item[]>([]);
   const [searched, setSearched] = useState(false);
 
-  async function runSearch(): Promise<void> {
+  const runSearch = useCallback(async (): Promise<void> => {
     const trimmed = query.trim();
     if (trimmed.length === 0) {
       setResults([]);
@@ -31,7 +32,16 @@ export default function SearchPage() {
     const next = await search.search(trimmed);
     setResults(next);
     setSearched(true);
-  }
+  }, [query]);
+
+  useDebouncedSearch(query, true, runSearch);
+
+  useEffect(() => {
+    if (query.trim() === "") {
+      setResults([]);
+      setSearched(false);
+    }
+  }, [query]);
 
   return (
     <main className="mx-auto max-w-xl p-4 pb-20">

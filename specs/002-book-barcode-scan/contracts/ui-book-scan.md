@@ -27,3 +27,7 @@ Desktop: neither entry visible (B9).
 ## Manual ISBN (mobile)
 
 - Optional field **ISBN** + **Rechercher** triggers same preview flow without camera.
+
+## Title catalog search (B11)
+
+- Search sheet: typing triggers catalog lookup **2 seconds after the user stops typing**; submit button still runs search immediately.

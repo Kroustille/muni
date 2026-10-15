@@ -7,6 +7,7 @@
 ## Lists (MU4)
 
 - Each list: primary **Rechercher** (catalog) + standard list behaviors.
+- Catalog search field: lookup **2 seconds after typing stops** (submit still immediate).
 - No catalog on quick-add.
 
 ## Preview
