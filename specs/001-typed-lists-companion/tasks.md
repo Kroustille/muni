@@ -149,7 +149,7 @@
 
 - [X] T069 [US3] Write the e2e scenarios first (must fail): check off, status change plus rating hide/restore, status filter, edit persists after reload including recipe ingredients and steps, delete then Undo in `tests/e2e/lists.spec.ts` (depends on T068)
 - [X] T070 [P] [US3] Add shopping check-off toggle and quantity display to the list row in `src/components/rows/ShoppingRow.tsx` (depends on T069)
-- [ ] T071 [P] [US3] Add status selector and 1 to 5 star rating (rating visible and editable only when status is `read`/`watched`, stored value kept but hidden otherwise) in `src/components/rows/BookMovieRow.tsx` and `src/components/StarRating.tsx` (depends on T069)
+- [X] T071 [P] [US3] Add status selector and 1 to 5 star rating (rating visible and editable only when status is `read`/`watched`, stored value kept but hidden otherwise) in `src/components/rows/BookMovieRow.tsx` and `src/components/StarRating.tsx` (depends on T069)
 - [ ] T072 [P] [US3] Add status filter (books: to read, reading, read; movies: to watch, watched) to the list view in `src/components/StatusFilter.tsx`, wired through `listItems(type, {status})` in `src/app/(app)/lists/[type]/page.tsx` (depends on T069)
 - [X] T073 [US3] Build the item detail and edit route with type-specific fields, recipe ingredients (quantity and name) and ordered steps editing in `src/app/(app)/items/[id]/page.tsx` (depends on T065, T069)
 - [X] T074 [US3] Implement delete without confirmation plus a few-seconds "Undo" toast (`deleteItem`/`restoreItem` use cases) in `src/components/UndoToast.tsx` and use it from list rows and the detail screen (depends on T069)

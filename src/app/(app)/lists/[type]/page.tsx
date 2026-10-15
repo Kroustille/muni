@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { getItemUseCases } from "@/composition/client";
+import { BookMovieRow } from "@/components/rows/BookMovieRow";
 import { ShoppingRow } from "@/components/rows/ShoppingRow";
 import type { Item, ItemType } from "@/domain/item";
 import { t, type MessageKey } from "@/i18n";
@@ -92,6 +93,24 @@ export default function ListPage() {
                   onCheckedChange={(checked) => {
                     void getItemUseCases().then((useCases) =>
                       useCases.updateItem(item.id, { checked }),
+                    );
+                  }}
+                />
+              );
+            }
+            if (item.type === "book" || item.type === "movie") {
+              return (
+                <BookMovieRow
+                  key={item.id}
+                  item={item}
+                  onStatusChange={(status) => {
+                    void getItemUseCases().then((useCases) =>
+                      useCases.updateItem(item.id, { status }),
+                    );
+                  }}
+                  onRatingChange={(rating) => {
+                    void getItemUseCases().then((useCases) =>
+                      useCases.updateItem(item.id, { rating }),
                     );
                   }}
                 />
