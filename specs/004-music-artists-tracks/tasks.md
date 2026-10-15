@@ -70,6 +70,6 @@
 ## Phase 8: Polish
 
 - [ ] T423 Update search index to include music artist title and track title only (L2)
-- [ ] T424 Run CI; validate quickstart.md
+- [ ] T424 Local quality gate (no GitHub CI): `yarn typecheck`, `yarn test` / vitest; e2e when Docker stack available; validate quickstart.md
 
 **Sequence note**: Implements catalog feature **004** after **002** books and **003** movies per X1.

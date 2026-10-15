@@ -61,6 +61,6 @@
 
 ## Phase 7: Polish
 
-- [ ] T320 Run CI; update quickstart.md if needed
+- [ ] T320 Local quality gate (no GitHub CI): `yarn typecheck`, `yarn test` / vitest; e2e when Docker stack available; update quickstart.md if needed
 
 **Cross-feature**: Do not start 004 until T320 complete.

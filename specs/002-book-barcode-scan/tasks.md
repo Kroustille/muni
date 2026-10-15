@@ -97,7 +97,7 @@
 
 - [x] T236 [P] Show `pageCount` on book detail when present (N1) in book detail component
 - [x] T237 Update `specs/002-book-barcode-scan/quickstart.md` with any command fixes after implementation
-- [x] T238 Run full CI (`typecheck`, `test:coverage`, `test:e2e` book scenarios) and fix regressions
+- [x] T238 Local quality gate (no GitHub CI): `yarn typecheck`, `yarn test` / vitest; e2e when Docker stack available — and fix regressions
 
 ---
 
