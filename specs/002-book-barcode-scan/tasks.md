@@ -57,12 +57,12 @@
 - [x] T219 [US1] Implement `src/app/api/books/lookup/route.ts` wiring cache + adapter + session (depends on T215, T217, T218)
 - [x] T220 [P] [US1] Create unit tests for WASM/native `BarcodeScanner` adapter with injected frame source in `tests/unit/barcode-scanner.test.ts`
 - [x] T221 [US1] Implement `src/adapters/browser/barcode-scanner.ts` (iOS WASM always; Android BarcodeDetector when available) per research.md (depends on T220)
-- [ ] T222 [US1] Build `CatalogPreview` component in `src/components/books/catalog-preview.tsx` per contracts/ui-book-scan.md (depends on T202)
-- [ ] T223 [US1] Build `ScanModal` in `src/components/books/scan-modal.tsx` continuous scan UX (depends on T221, T222)
-- [ ] T224 [US1] Wire scan + lookup + preview into books list page `src/app/(app)/books/page.tsx` (mobile only) (depends on T219, T223)
-- [ ] T225 [US1] Wire scan entry into book quick-add flow in `src/components/quick-add/` (mobile only, N3) (depends on T224)
-- [ ] T226 [US1] Extend IndexedDB item repository mapping for new book fields in `src/adapters/indexeddb/item-repository.ts` (depends on T205)
-- [ ] T227 [US1] Extend Postgres item repository for new columns in `src/adapters/postgres/server-item-repository.ts` (depends on T207, T209)
+- [x] T222 [US1] Build `CatalogPreview` component in `src/components/books/catalog-preview.tsx` per contracts/ui-book-scan.md (depends on T202)
+- [x] T223 [US1] Build `ScanModal` in `src/components/books/scan-modal.tsx` continuous scan UX (depends on T221, T222)
+- [x] T224 [US1] Wire scan + lookup + preview into books list page `src/app/(app)/books/page.tsx` (mobile only) (depends on T219, T223)
+- [x] T225 [US1] Wire scan entry into book quick-add flow in `src/components/quick-add/` (mobile only, N3) (depends on T224)
+- [x] T226 [US1] Extend IndexedDB item repository mapping for new book fields in `src/adapters/indexeddb/item-repository.ts` (depends on T205)
+- [x] T227 [US1] Extend Postgres item repository for new columns in `src/adapters/postgres/server-item-repository.ts` (depends on T207, T209)
 
 ---
 
