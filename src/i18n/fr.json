@@ -54,5 +54,7 @@
   "signIn.linkExpired": "Ce lien a expiré ou a déjà été utilisé. Demandez-en un nouveau.",
   "signIn.error": "La connexion a échoué. Réessayez.",
   "mail.magicLink.subject": "Votre lien de connexion à Muni",
-  "mail.magicLink.intro": "Voici votre lien de connexion à Muni. Il est valable 15 minutes et ne peut servir qu'une fois."
+  "mail.magicLink.intro": "Voici votre lien de connexion à Muni. Il est valable 15 minutes et ne peut servir qu'une fois.",
+  "field.recommendedBy": "Recommandé par",
+  "validation.titleRequired": "Le titre est obligatoire."
 }
