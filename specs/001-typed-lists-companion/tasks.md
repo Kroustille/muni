@@ -177,9 +177,15 @@
 - [X] T081 [US4] Implement the in-memory client `RemoteStore` test double that applies the domain `merge` (no HTTP), in `tests/helpers/in-memory-remote-store.ts` (depends on T017, T018)
 - [ ] T082 [US4] Create sync engine integration tests with the in-memory remote and repositories (two local stores converge in any order, edit vs delete latest wins, offline accumulation then bulk sync, outbox retention on failure, idempotent push, quarantine of `validation` rows, pause on `unauthenticated`, long-offline many-changes case) in `tests/integration/sync.test.ts` (depends on T023, T025, T081)
 - [X] T083 [P] [US4] Create unit tests for the sync scheduler with a fake `Connectivity` and fake timers (runs on app open, `online` event, visibility change to visible, every 60 s while online, debounce about 2 s after local writes, no run while offline or paused) in `tests/unit/scheduler.test.ts` (depends on T018)
+<<<<<<< HEAD
 - [ ] T084 [P] [US4] Create unit tests for the browser `Connectivity` adapter (reports `navigator.onLine`, emits on `online`, `offline` and visibility events) in `tests/unit/browser-connectivity.test.ts` (depends on T018)
 - [ ] T085 [P] [US4] Create unit tests for the HTTP `RemoteStore` adapter with mocked fetch (push and pull request shapes, `since` and `limit`, 401 mapped to `unauthenticated`, 422 to `validation`, network failure) in `tests/unit/http-remote-store.test.ts` (depends on T018)
 - [X] T086 [US4] Write the e2e sync scenarios first (must fail): two Playwright contexts converge after offline edits within 10 s, same-field conflict latest wins, delete propagates, two accounts never see each other's data in `tests/e2e/sync.spec.ts` (depends on T062)
+=======
+- [X] T084 [P] [US4] Create unit tests for the browser `Connectivity` adapter (reports `navigator.onLine`, emits on `online`, `offline` and visibility events) in `tests/unit/browser-connectivity.test.ts` (depends on T018)
+- [X] T085 [P] [US4] Create unit tests for the HTTP `RemoteStore` adapter with mocked fetch (push and pull request shapes, `since` and `limit`, 401 mapped to `unauthenticated`, 422 to `validation`, network failure) in `tests/unit/http-remote-store.test.ts` (depends on T018)
+- [ ] T086 [US4] Write the e2e sync scenarios first (must fail): two Playwright contexts converge after offline edits within 10 s, same-field conflict latest wins, delete propagates, two accounts never see each other's data in `tests/e2e/sync.spec.ts` (depends on T062)
+>>>>>>> 7b987e1 (test(US4): add browser Connectivity adapter tests (T084))
 
 ### Backend implementation
 
