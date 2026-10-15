@@ -30,6 +30,7 @@
   "action.add": "Ajouter",
   "action.save": "Enregistrer",
   "action.cancel": "Annuler",
+  "action.close": "Fermer",
   "action.delete": "Supprimer",
   "action.undo": "Annuler la suppression",
   "action.addIngredient": "Ajouter un ingrédient",
