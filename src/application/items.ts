@@ -16,6 +16,8 @@ import { merge } from "../domain/merge";
 import { normalizeText } from "../domain/text";
 import { createUpsertBookFromCatalog } from "./books/upsert-from-catalog";
 import type { UpsertBookFromCatalogInput } from "./books/upsert-from-catalog";
+import { createUpsertMovieFromCatalog } from "./movies/upsert-from-catalog";
+import type { UpsertMovieFromCatalogInput } from "./movies/upsert-from-catalog";
 import type { IdGenerator } from "./ports/id-generator";
 import type { ItemRepository, Unsubscribe } from "./ports/item-repository";
 
@@ -40,6 +42,7 @@ export type ItemUseCases = {
   subscribe(listener: () => void): Unsubscribe;
   applyRemote(rows: ItemWire[]): Promise<void>;
   upsertBookFromCatalog(input: UpsertBookFromCatalogInput): Promise<Item>;
+  upsertMovieFromCatalog(input: UpsertMovieFromCatalogInput): Promise<Item>;
 };
 
 const byNewest = (a: Item, b: Item): number =>
@@ -86,6 +89,12 @@ export function createItemUseCases({
   }
 
   const upsertBookFromCatalog = createUpsertBookFromCatalog({
+    repository,
+    idGenerator,
+    now,
+  });
+
+  const upsertMovieFromCatalog = createUpsertMovieFromCatalog({
     repository,
     idGenerator,
     now,
@@ -170,6 +179,8 @@ export function createItemUseCases({
     subscribe: (listener) => repository.subscribe(listener),
 
     upsertBookFromCatalog: (input) => serialized(() => upsertBookFromCatalog(input)),
+
+    upsertMovieFromCatalog: (input) => serialized(() => upsertMovieFromCatalog(input)),
 
     applyRemote: (rows) =>
       serialized(async () => {
