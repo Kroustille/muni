@@ -64,9 +64,13 @@ test("shows per-list counts and recent items newest first on home", async ({ pag
   const recent = home.recentItems(page);
   await expect(recent).toHaveCount(4);
   await expect(recent.nth(0)).toContainText("Le Fabuleux Destin d'Amélie Poulain");
+  await expect(recent.nth(0)).toContainText(t("type.movie"));
   await expect(recent.nth(1)).toContainText("Les Misérables");
+  await expect(recent.nth(1)).toContainText(t("type.book"));
   await expect(recent.nth(2)).toContainText("Beurre");
+  await expect(recent.nth(2)).toContainText(t("type.shopping"));
   await expect(recent.nth(3)).toContainText("Pain");
+  await expect(recent.nth(3)).toContainText(t("type.shopping"));
 });
 
 test("follows the system color scheme for light and dark theme", async ({ page }) => {
@@ -111,6 +115,7 @@ test("reloads the home screen offline after the shell is cached", async ({ page,
   await addItem(page, "recipe", "Tarte tatin");
   await page.goto("/");
   await expect(home.recentItems(page).first()).toContainText("Tarte tatin");
+  await expect(home.recentItems(page).first()).toContainText(t("type.recipe"));
 
   await page.evaluate(() => navigator.serviceWorker.ready);
   await page.reload();

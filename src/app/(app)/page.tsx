@@ -43,6 +43,15 @@ const MUSIC_ROUTE_TYPE: Record<MusicRoute, ItemType> = {
 
 const RECENT_LIMIT = 20;
 
+const TYPE_LABEL_KEY: Record<ItemType, MessageKey> = {
+  shopping: "type.shopping",
+  book: "type.book",
+  movie: "type.movie",
+  recipe: "type.recipe",
+  music_artist: "type.music_artist",
+  music_track: "type.music_track",
+};
+
 export default function HomePage() {
   const [counts, setCounts] = useState<Record<ItemType, number> | null>(null);
   const [recent, setRecent] = useState<Item[]>([]);
@@ -135,10 +144,17 @@ export default function HomePage() {
           <h2 className="mb-2 text-lg font-semibold">{t("home.recent")}</h2>
           <ul className="flex flex-col gap-2">
             {recent.map((item) => (
-              <li key={item.id}>
-                <Link href={`/items/${item.id}`} className="underline-offset-2 hover:underline">
+              <li
+                key={item.id}
+                className="rounded-lg border border-border px-3 py-2"
+              >
+                <Link
+                  href={`/items/${item.id}`}
+                  className="font-medium underline-offset-2 hover:underline"
+                >
                   {item.title}
                 </Link>
+                <p className="text-sm text-muted">{t(TYPE_LABEL_KEY[item.type])}</p>
               </li>
             ))}
           </ul>

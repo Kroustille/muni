@@ -145,6 +145,17 @@ test.beforeEach(async ({ request }) => {
   await request.delete(`${mailpit}/api/v1/messages`).catch(() => undefined);
 });
 
+test("generic quick add resets the chosen type after dismiss", async ({ page }) => {
+  await signIn(page);
+  await locators.quickAddButton(page).click();
+  await locators.typeButton(page, "book").click();
+  await expect(locators.titleField(page, "book")).toBeVisible();
+  await page.getByRole("button", { name: fr["action.close"] }).click();
+  await locators.quickAddButton(page).click();
+  await expect(locators.typeButton(page, "book")).toBeVisible();
+  await expect(locators.titleField(page, "book")).toHaveCount(0);
+});
+
 test("adds one item of each type and shows entered fields in its list", async ({ page }) => {
   await signIn(page);
 

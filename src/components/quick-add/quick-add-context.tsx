@@ -4,6 +4,7 @@ import {
   createContext,
   useCallback,
   useContext,
+  useEffect,
   useMemo,
   useState,
   type ReactNode,
@@ -108,6 +109,24 @@ export function useQuickAdd(): QuickAddContextValue {
   return value;
 }
 
+function initialDraftState(): {
+  step: "pick-type" | "form";
+  kind: QuickAddItemKind | null;
+  values: FieldValues;
+  titleError: undefined;
+  artistError: undefined;
+  submitting: false;
+} {
+  return {
+    step: "pick-type",
+    kind: null,
+    values: emptyShoppingFieldValues(),
+    titleError: undefined,
+    artistError: undefined,
+    submitting: false,
+  };
+}
+
 export function QuickAddProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"pick-type" | "form">("pick-type");
@@ -117,15 +136,24 @@ export function QuickAddProvider({ children }: { children: ReactNode }) {
   const [artistError, setArtistError] = useState<string | undefined>();
   const [submitting, setSubmitting] = useState(false);
 
+  const resetDraft = useCallback(() => {
+    const initial = initialDraftState();
+    setStep(initial.step);
+    setKind(initial.kind);
+    setValues(initial.values);
+    setTitleError(initial.titleError);
+    setArtistError(initial.artistError);
+    setSubmitting(initial.submitting);
+  }, []);
+
   const close = useCallback(() => {
     setOpen(false);
-    setStep("pick-type");
-    setKind(null);
-    setValues(emptyShoppingFieldValues());
-    setTitleError(undefined);
-    setArtistError(undefined);
-    setSubmitting(false);
-  }, []);
+    resetDraft();
+  }, [resetDraft]);
+
+  useEffect(() => {
+    if (!open) resetDraft();
+  }, [open, resetDraft]);
 
   const beginWithType = useCallback((next: QuickAddItemKind) => {
     setKind(next);
@@ -137,18 +165,14 @@ export function QuickAddProvider({ children }: { children: ReactNode }) {
 
   const openQuickAdd = useCallback(
     (presetType?: QuickAddItemKind) => {
-      setOpen(true);
       if (presetType !== undefined) {
         beginWithType(presetType);
       } else {
-        setStep("pick-type");
-        setKind(null);
-        setValues(emptyShoppingFieldValues());
-        setTitleError(undefined);
-        setArtistError(undefined);
+        resetDraft();
       }
+      setOpen(true);
     },
-    [beginWithType],
+    [beginWithType, resetDraft],
   );
 
   const pickType = useCallback(
@@ -304,6 +328,7 @@ export function QuickAddProvider({ children }: { children: ReactNode }) {
     <QuickAddContext.Provider value={contextValue}>
       {children}
       <BottomSheet open={open} onClose={close} title={sheetTitle}>
+        <div key={open ? `${step}-${kind ?? "pick"}` : "closed"}>
         {step === "pick-type" ? (
           <ul className="flex flex-col gap-2">
             {TYPE_OPTIONS.map((option) => (
@@ -333,6 +358,7 @@ export function QuickAddProvider({ children }: { children: ReactNode }) {
             </Button>
           </form>
         ) : null}
+        </div>
       </BottomSheet>
     </QuickAddContext.Provider>
   );
