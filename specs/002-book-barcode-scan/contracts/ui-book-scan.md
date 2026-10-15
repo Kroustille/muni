@@ -30,4 +30,4 @@ Desktop: neither entry visible (B9).
 
 ## Title catalog search (B11)
 
-- Search sheet: typing triggers catalog lookup **2 seconds after the user stops typing**; submit button still runs search immediately.
+- Search sheet: typing triggers catalog lookup **1 second after the user stops typing**; submit button still runs search immediately.

@@ -10,7 +10,7 @@
 | `/lists/[type]` | List view (`shopping`, `books`, `movies`, `recipes`) | Status filter where applicable; **Trier par** + **Ordre** on every list (Note where ratings exist); check-off for shopping; personal rating color-coded when set; **list quick-add**; catalog on books/movies |
 | `/music/artists`, `/music/tracks` | Music lists (004) | Catalog **Rechercher**; artist **note** anytime; track **note** when `listened`; **Trier par** Date/Note + **Ordre** |
 | `/items/[id]` | Detail and edit | Type-specific fields; recipe ingredients (quantity and name) and ordered steps; delete with Undo toast |
-| `/search` | Cross-list search | Results show type; empty state; query runs **2s after typing stops** (submit still immediate) |
+| `/search` | Cross-list search | Results show type; empty state; query runs **1s after typing stops** (submit still immediate) |
 | `/settings` | Settings | Sign out |
 
 Shared shell: bottom navigation includes a centered **+** control (`nav.quickAdd` accessible name) on all main app screens. From home or search it opens the type picker, then type-specific fields; from a typed list (including `/music/artists` and `/music/tracks`) the same control opens quick-add **directly** for that list’s type. Each typed list screen also exposes an **Ajouter** control in the list header for the same one-step form. Only title/name required; reachable within 2 taps plus title from a list (SC-002). All strings come from `src/i18n/fr.json`. Theme follows system.

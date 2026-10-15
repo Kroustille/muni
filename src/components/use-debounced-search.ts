@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 /** Catalog and in-app search: run lookup after the user pauses typing. */
-export const SEARCH_DEBOUNCE_MS = 2000;
+export const SEARCH_DEBOUNCE_MS = 1000;
 
 /**
  * Invokes `onSearch` after `delayMs` with no `query` changes. No-op when disabled or query is blank.
