@@ -6,6 +6,7 @@ import { getItemUseCases } from "@/composition/client";
 import { t } from "@/i18n";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
+import { BookScanEntry } from "@/components/quick-add/book-scan-entry";
 import {
   BookFields,
   bookFieldValuesToExtra,
@@ -162,11 +163,14 @@ export function QuickAdd() {
         );
       case "book":
         return (
-          <BookFields
-            values={values as BookFieldValues}
-            onChange={updateValues}
-            titleError={titleError}
-          />
+          <>
+            <BookScanEntry onSaved={close} />
+            <BookFields
+              values={values as BookFieldValues}
+              onChange={updateValues}
+              titleError={titleError}
+            />
+          </>
         );
       case "movie":
         return (

@@ -55,6 +55,19 @@ export function runItemRepositoryContract(
         expect(await repo.get(item.id)).toEqual(item);
       });
 
+      it("round-trips book catalog metadata", async () => {
+        const item = makeItem({
+          isbn: "9782070368228",
+          synopsis: "Un conte.",
+          genres: ["Jeunesse", "Classique"],
+          publicationYear: 1943,
+          publisher: "Gallimard",
+          pageCount: 96,
+        });
+        await repo.put(item, { enqueue: false });
+        expect(await repo.get(item.id)).toEqual(item);
+      });
+
       it("replaces an existing item with the same id", async () => {
         const item = makeItem();
         await repo.put(item, { enqueue: false });
