@@ -1,0 +1,21 @@
+{
+  "entities": {
+    "Q1234567": {
+      "labels": {
+        "fr": { "value": "Pilot" }
+      },
+      "claims": {
+        "P31": [
+          {
+            "mainsnak": {
+              "datavalue": {
+                "type": "wikibase-entityid",
+                "value": { "id": "Q21191270" }
+              }
+            }
+          }
+        ]
+      }
+    }
+  }
+}

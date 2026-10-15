@@ -1,0 +1,56 @@
+{
+  "entities": {
+    "Q193048": {
+      "labels": {
+        "fr": { "value": "Le Fabuleux Destin d'Amélie Poulain" },
+        "en": { "value": "Amélie" }
+      },
+      "descriptions": {
+        "fr": { "value": "film français de Jean-Pierre Jeunet" }
+      },
+      "claims": {
+        "P31": [
+          {
+            "mainsnak": {
+              "datavalue": {
+                "type": "wikibase-entityid",
+                "value": { "id": "Q11424" }
+              }
+            }
+          }
+        ],
+        "P345": [
+          {
+            "mainsnak": {
+              "datavalue": { "type": "string", "value": "tt0211915" }
+            }
+          }
+        ],
+        "P577": [
+          {
+            "mainsnak": {
+              "datavalue": {
+                "type": "time",
+                "value": { "time": "+2001-04-25T00:00:00Z", "precision": 11 }
+              }
+            }
+          }
+        ],
+        "P444": [
+          {
+            "mainsnak": {
+              "datavalue": { "type": "string", "value": "8.3" }
+            }
+          }
+        ],
+        "P1922": [
+          {
+            "mainsnak": {
+              "datavalue": { "type": "string", "value": "Amélie est une serveuse discrète." }
+            }
+          }
+        ]
+      }
+    }
+  }
+}
