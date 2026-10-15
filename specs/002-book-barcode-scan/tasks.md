@@ -72,31 +72,31 @@
 
 **Independent Test**: quickstart.md dedupe and soft-delete sections.
 
-- [ ] T228 [US2] Create unit tests for `upsertBookFromCatalog` (duplicate ISBN update, restore deleted, manual merge title+author) in `tests/unit/upsert-book-from-catalog.test.ts`
-- [ ] T229 [US2] Implement `upsertBookFromCatalog` in `src/application/books/upsert-from-catalog.ts` per research.md merge rules (depends on T228, T215)
-- [ ] T230 [US2] Connect preview confirm to `upsertBookFromCatalog` in `src/components/books/catalog-preview.tsx` (depends on T229, T222)
+- [x] T228 [US2] Create unit tests for `upsertBookFromCatalog` (duplicate ISBN update, restore deleted, manual merge title+author) in `tests/unit/upsert-book-from-catalog.test.ts`
+- [x] T229 [US2] Implement `upsertBookFromCatalog` in `src/application/books/upsert-from-catalog.ts` per research.md merge rules (depends on T228, T215)
+- [x] T230 [US2] Connect preview confirm to `upsertBookFromCatalog` in `src/components/books/catalog-preview.tsx` (depends on T229, T222)
 
 ---
 
 ## Phase 5: User Story 3 — Lookup failure & desktop boundary (P2)
 
-- [ ] T231 [US3] Implement lookup failure → manual add with ISBN prefilled in scan/preview flow (depends on T224, B10)
-- [ ] T232 [US3] Add e2e test desktop has no scan control in `tests/e2e/books-desktop.spec.ts`
-- [ ] T233 [US3] Add e2e test lookup failure path with mocked API in `tests/e2e/books-lookup-failure.spec.ts`
+- [x] T231 [US3] Implement lookup failure → manual add with ISBN prefilled in scan/preview flow (depends on T224, B10)
+- [x] T232 [US3] Add e2e test desktop has no scan control in `tests/e2e/books-desktop.spec.ts`
+- [x] T233 [US3] Add e2e test lookup failure path with mocked API in `tests/e2e/books-lookup-failure.spec.ts`
 
 ---
 
 ## Phase 6: User Story 4 — Manual ISBN on mobile (P2)
 
-- [ ] T234 [US4] Add manual ISBN field + lookup trigger on mobile book add UI per contracts/ui-book-scan.md
-- [ ] T235 [US4] Unit test manual ISBN path reuses preview in `tests/unit/books-manual-isbn.test.ts`
+- [x] T234 [US4] Add manual ISBN field + lookup trigger on mobile book add UI per contracts/ui-book-scan.md
+- [x] T235 [US4] Unit test manual ISBN path reuses preview in `tests/unit/books-manual-isbn.test.ts`
 
 ---
 
 ## Phase 7: Polish
 
 - [x] T236 [P] Show `pageCount` on book detail when present (N1) in book detail component
-- [ ] T237 Update `specs/002-book-barcode-scan/quickstart.md` with any command fixes after implementation
+- [x] T237 Update `specs/002-book-barcode-scan/quickstart.md` with any command fixes after implementation
 - [ ] T238 Run full CI (`typecheck`, `test:coverage`, `test:e2e` book scenarios) and fix regressions
 
 ---
