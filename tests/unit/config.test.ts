@@ -46,19 +46,26 @@ describe("loadConfig", () => {
     expect(config.smtp.password).toBe("p");
   });
 
-  it.each([
-    "DATABASE_URL",
-    "APP_URL",
-    "SMTP_HOST",
-    "SMTP_PORT",
-    "SMTP_FROM",
-    "GOOGLE_CLIENT_ID",
-    "GOOGLE_CLIENT_SECRET",
-  ] as const)("fails fast naming %s when it is missing", (name) => {
-    expect(() => loadConfig(without(name))).toThrow(name);
+  it.each(["DATABASE_URL", "APP_URL", "SMTP_HOST", "SMTP_PORT", "SMTP_FROM"] as const)(
+    "fails fast naming %s when it is missing",
+    (name) => {
+      expect(() => loadConfig(without(name))).toThrow(name);
+    },
+  );
+
+  it("leaves Google undefined when neither credential is set", () => {
+    const bare = { ...validEnv } as Record<string, string>;
+    delete bare.GOOGLE_CLIENT_ID;
+    delete bare.GOOGLE_CLIENT_SECRET;
+    expect(loadConfig(bare).google).toBeUndefined();
+    expect(
+      loadConfig({ ...validEnv, GOOGLE_CLIENT_ID: "", GOOGLE_CLIENT_SECRET: "" }).google,
+    ).toBeUndefined();
   });
 
-  it("rejects an empty Google client id", () => {
+  it("requires both Google credentials when one is set", () => {
+    expect(() => loadConfig(without("GOOGLE_CLIENT_SECRET"))).toThrow("GOOGLE_CLIENT_SECRET");
+    expect(() => loadConfig(without("GOOGLE_CLIENT_ID"))).toThrow("GOOGLE_CLIENT_ID");
     expect(() => loadConfig({ ...validEnv, GOOGLE_CLIENT_ID: "" })).toThrow("GOOGLE_CLIENT_ID");
   });
 
@@ -80,6 +87,6 @@ describe("loadConfig", () => {
     const attempt = () => loadConfig({});
 
     expect(attempt).toThrow("DATABASE_URL");
-    expect(attempt).toThrow("GOOGLE_CLIENT_SECRET");
+    expect(attempt).toThrow("SMTP_FROM");
   });
 });
