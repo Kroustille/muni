@@ -194,7 +194,7 @@
 - [X] T092 [US4] Implement the sync scheduler in `src/application/sync/scheduler.ts` over the `Connectivity` port (no Background Sync API) (depends on T083, T091)
 - [X] T093 [P] [US4] Implement the browser `Connectivity` adapter in `src/adapters/browser/connectivity.ts` (depends on T084)
 - [X] T094 [P] [US4] Implement the HTTP `RemoteStore` adapter in `src/adapters/http/remote-store.ts` (depends on T085)
-- [ ] T095 [US4] Wire `RemoteStore`, `Connectivity`, engine and scheduler in `src/composition/client.ts`, start the scheduler after authentication, and expose a small sync status indicator in `src/components/SyncStatus.tsx` (depends on T061, T090, T092, T093, T094)
+- [X] T095 [US4] Wire `RemoteStore`, `Connectivity`, engine and scheduler in `src/composition/client.ts`, start the scheduler after authentication, and expose a small sync status indicator in `src/components/SyncStatus.tsx` (depends on T061, T090, T092, T093, T094)
 
 **Checkpoint (Milestone 2)**: full P1 scope of the spec, including sync and per-user isolation.
 

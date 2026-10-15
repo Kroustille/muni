@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type ReactNode } from "react";
-import { getSessionUseCases } from "@/composition/client";
+import { getSessionUseCases, startClientSync } from "@/composition/client";
 import { t } from "@/i18n";
 
 type GateState =
@@ -23,6 +23,7 @@ export function SessionGate({ children }: { children: ReactNode }) {
         router.replace("/sign-in");
         return;
       }
+      await startClientSync();
       setState({ phase: "ready", reauthRequired: result.reauthRequired });
     });
     return () => {
