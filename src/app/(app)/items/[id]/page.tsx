@@ -230,6 +230,8 @@ export default function ItemDetailPage() {
         {item.type === "movie" ? (
           <MovieFields
             values={values as MovieFieldValues}
+            catalogRating={item.catalogRating}
+            imdbId={item.imdbId}
             onChange={(next) => {
               setValues(next);
               setTitleError(undefined);

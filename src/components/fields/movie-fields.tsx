@@ -34,6 +34,9 @@ export type MovieFieldsProps = {
   values: MovieFieldValues;
   onChange: (values: MovieFieldValues) => void;
   titleError?: string;
+  /** Read-only catalog metadata (M4). */
+  catalogRating?: number | null;
+  imdbId?: string | null;
 };
 
 function optionalText(value: string): string | null {
@@ -58,9 +61,25 @@ export function movieFieldValuesToExtra(values: MovieFieldValues): CreateItemExt
   return extra;
 }
 
-export function MovieFields({ values, onChange, titleError }: MovieFieldsProps) {
+export function MovieFields({
+  values,
+  onChange,
+  titleError,
+  catalogRating,
+  imdbId,
+}: MovieFieldsProps) {
   return (
     <div className="flex flex-col gap-4">
+      {catalogRating != null ? (
+        <p className="text-sm text-muted">
+          {t("field.catalogRating")}: {catalogRating}
+        </p>
+      ) : null}
+      {imdbId != null && imdbId.trim() !== "" ? (
+        <p className="text-sm text-muted">
+          {t("field.imdbId")}: {imdbId}
+        </p>
+      ) : null}
       <TextField
         label={t("field.title")}
         value={values.title}
