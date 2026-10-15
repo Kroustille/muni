@@ -4,7 +4,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { RemoteStoreError } from "@/application/ports/remote-store";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
-import { getHttpAuthGateway } from "@/composition/http-auth-gateway";
+import { getAuthGateway } from "@/composition/client";
 import { t } from "@/i18n";
 
 export type SignInFormProps = {
@@ -36,7 +36,7 @@ export function SignInForm({ linkExpired, googleSignInEnabled }: SignInFormProps
     setSubmitError(false);
     setSubmitting(true);
     try {
-      await getHttpAuthGateway().startMagicLinkSignIn(email.trim());
+      await (await getAuthGateway()).startMagicLinkSignIn(email.trim());
       setLinkSent(true);
     } catch (error) {
       if (error instanceof RemoteStoreError && error.kind === "network") {
@@ -91,7 +91,7 @@ export function SignInForm({ linkExpired, googleSignInEnabled }: SignInFormProps
           type="button"
           variant="secondary"
           disabled={offline || submitting}
-          onClick={() => getHttpAuthGateway().startGoogleSignIn()}
+          onClick={() => void getAuthGateway().then((gateway) => gateway.startGoogleSignIn())}
         >
           {t("signIn.google")}
         </Button>

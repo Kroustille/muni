@@ -1,16 +1,7 @@
-import { createHttpAuthGateway } from "@/adapters/http/auth-gateway";
 import type { AuthGateway } from "@/application/ports/auth-gateway";
+import { getAuthGateway } from "@/composition/client";
 
-let gateway: AuthGateway | undefined;
-
-/** Browser HTTP auth gateway for screens that are not yet wired through `client.ts`. */
-export function getHttpAuthGateway(): AuthGateway {
-  gateway ??= createHttpAuthGateway({
-    fetch: globalThis.fetch.bind(globalThis),
-    baseUrl: "",
-    navigate: (url) => {
-      window.location.assign(url);
-    },
-  });
-  return gateway;
+/** @deprecated Use `getAuthGateway()` from `@/composition/client`. */
+export function getHttpAuthGateway(): Promise<AuthGateway> {
+  return getAuthGateway();
 }

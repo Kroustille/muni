@@ -43,6 +43,8 @@
   "item.deleted": "Élément supprimé",
   "settings.title": "Réglages",
   "settings.signOut": "Se déconnecter",
+  "session.reauthMessage": "Votre session a expiré. Reconnectez-vous pour synchroniser vos données.",
+  "session.reauthLink": "Se reconnecter",
   "signIn.title": "Connexion",
   "signIn.email": "Adresse e-mail",
   "signIn.sendLink": "Recevoir un lien de connexion",
