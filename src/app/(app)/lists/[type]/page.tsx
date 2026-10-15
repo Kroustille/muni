@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { getItemUseCases } from "@/composition/client";
 import { BookMovieRow } from "@/components/rows/BookMovieRow";
 import { ShoppingRow } from "@/components/rows/ShoppingRow";
+import { StatusFilter, type StatusFilterValue } from "@/components/StatusFilter";
 import type { Item, ItemType } from "@/domain/item";
 import { t, type MessageKey } from "@/i18n";
 
@@ -49,12 +50,18 @@ export default function ListPage() {
   const routeParam = params.type;
   const route = typeof routeParam === "string" && isListRoute(routeParam) ? routeParam : null;
   const [items, setItems] = useState<Item[]>([]);
+  const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("all");
 
   if (route === null) {
     notFound();
   }
 
   const itemType = ROUTE_TO_TYPE[route];
+  const showStatusFilter = itemType === "book" || itemType === "movie";
+
+  useEffect(() => {
+    setStatusFilter("all");
+  }, [itemType]);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,7 +69,9 @@ export default function ListPage() {
 
     void getItemUseCases().then(async (useCases) => {
       const refresh = async () => {
-        const next = await useCases.listItems(itemType);
+        const listOptions =
+          showStatusFilter && statusFilter !== "all" ? { status: statusFilter } : {};
+        const next = await useCases.listItems(itemType, listOptions);
         if (!cancelled) setItems(next);
       };
       await refresh();
@@ -75,11 +84,18 @@ export default function ListPage() {
       cancelled = true;
       unsubscribe?.();
     };
-  }, [itemType]);
+  }, [itemType, showStatusFilter, statusFilter]);
 
   return (
     <main className="p-4 pb-20">
       <h1 className="mb-4 text-xl font-semibold">{t(ROUTE_TITLE_KEY[route])}</h1>
+      {showStatusFilter ? (
+        <StatusFilter
+          itemType={itemType}
+          value={statusFilter}
+          onChange={setStatusFilter}
+        />
+      ) : null}
       {items.length === 0 ? (
         <p>{t("list.empty")}</p>
       ) : (
