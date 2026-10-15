@@ -5,6 +5,7 @@ import { createUuidIdGenerator } from "../adapters/browser/id-generator";
 import { openMuniDb } from "../adapters/indexeddb/db";
 import { createIndexedDbItemRepository } from "../adapters/indexeddb/item-repository";
 import { createItemUseCases, type ItemUseCases } from "../application/items";
+import { createSearchUseCase, type SearchUseCase } from "../application/search";
 import type { AuthGateway } from "../application/ports/auth-gateway";
 import type { Unsubscribe } from "../application/ports/item-repository";
 import { createSessionUseCases, type SessionUseCases } from "../application/session";
@@ -18,6 +19,7 @@ export type SyncStatusState = "idle" | "syncing" | "offline" | "paused";
 
 export type ClientContext = {
   itemUseCases: ItemUseCases;
+  searchUseCase: SearchUseCase;
   sessionUseCases: SessionUseCases;
   authGateway: AuthGateway;
   subscribeSyncStatus(listener: (state: SyncStatusState) => void): Unsubscribe;
@@ -124,6 +126,8 @@ function buildClientContext(): Promise<ClientContext> {
       syncScheduler?.notifyLocalWrite();
     });
 
+    const searchUseCase = createSearchUseCase({ repository });
+
     const sessionUseCases = createSessionUseCases({
       gateway: authGateway,
       meta: repository.meta,
@@ -140,6 +144,7 @@ function buildClientContext(): Promise<ClientContext> {
 
     return {
       itemUseCases,
+      searchUseCase,
       sessionUseCases: wrappedSession,
       authGateway,
       subscribeSyncStatus(listener) {
@@ -163,6 +168,10 @@ export function getClientContext(): Promise<ClientContext> {
 
 export function getItemUseCases(): Promise<ItemUseCases> {
   return getClientContext().then((ctx) => ctx.itemUseCases);
+}
+
+export function getSearchUseCase(): Promise<SearchUseCase> {
+  return getClientContext().then((ctx) => ctx.searchUseCase);
 }
 
 export function getSessionUseCases(): Promise<SessionUseCases> {

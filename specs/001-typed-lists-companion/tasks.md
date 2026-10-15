@@ -208,7 +208,7 @@
 
 - [X] T096 [P] [US5] Create unit tests for the search use case against the in-memory repository ("elephant" finds "Éléphant", case-insensitive, title/name only, "recommended by" and notes not matched, empty result is normal, index updated on writes and `applyRemote`) and a speed check at 5,000 items under 1 s (SC-006) in `tests/unit/search.test.ts` (depends on T023, T013)
 - [X] T097 [P] [US5] Write the offline e2e scenario for search first (must fail) in `tests/e2e/search.spec.ts` (depends on T068)
-- [ ] T098 [US5] Implement the in-memory normalized search index use case built from the `ItemRepository` at start and updated on writes and `applyRemote`, exposing `search(query)`, in `src/application/search.ts` and wire it in `src/composition/client.ts` (depends on T025, T096)
+- [X] T098 [US5] Implement the in-memory normalized search index use case built from the `ItemRepository` at start and updated on writes and `applyRemote`, exposing `search(query)`, in `src/application/search.ts` and wire it in `src/composition/client.ts` (depends on T025, T096)
 - [ ] T099 [US5] Build the `/search` screen with results showing type and an empty state in `src/app/(app)/search/page.tsx` and a search entry on home (depends on T097, T098)
 
 ---
