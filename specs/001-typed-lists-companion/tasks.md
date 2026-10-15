@@ -219,7 +219,7 @@
 
 **Independent Test**: Install from a mobile browser, open from the home screen, confirm counts and recent items are accurate and the theme follows the system.
 
-- [ ] T100 [US6] Write the e2e checks first (must fail): home counts and recent order, first-launch empty state, dark theme via emulated color scheme, manifest and service-worker registration, offline reload still loads in `tests/e2e/home-pwa.spec.ts` (depends on T068)
+- [X] T100 [US6] Write the e2e checks first (must fail): home counts and recent order, first-launch empty state, dark theme via emulated color scheme, manifest and service-worker registration, offline reload still loads in `tests/e2e/home-pwa.spec.ts` (depends on T068)
 - [ ] T101 [P] [US6] Build the home screen with a card per list (count) and recent items newest first, plus a first-launch empty state explaining how to add the first item, in `src/app/(app)/page.tsx` using the `counts()` and `recent()` use cases (depends on T100)
 - [ ] T102 [P] [US6] Add the web manifest (standalone display, icons, French name "Muni") in `src/app/manifest.ts` and icon assets in `public/icons/` (depends on T100)
 - [ ] T103 [P] [US6] Implement the Serwist service worker precaching the app shell and static assets in `src/app/sw.ts` and `next.config.ts` so repeat loads work offline (depends on T100)
