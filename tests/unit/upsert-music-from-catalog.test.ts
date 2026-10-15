@@ -55,6 +55,19 @@ describe("upsertMusicArtistFromCatalog", () => {
 });
 
 describe("upsertMusicTrackFromCatalog", () => {
+  it("merges into a manual track when title and artist match", async () => {
+    const manual = await ctx.useCases.createItem("music_track", "Time", {
+      artist: "Khruangbin",
+    });
+    const saved = await ctx.useCases.upsertMusicTrackFromCatalog({
+      musicBrainzRecordingId: MBID_RECORDING,
+      title: "Time (You and I)",
+      artist: "Khruangbin",
+    });
+    expect(saved.id).toBe(manual.id);
+    expect(saved.musicBrainzRecordingId).toBe(MBID_RECORDING);
+  });
+
   it("restores a soft-deleted track on the same recording MBID", async () => {
     const existing = await ctx.useCases.createItem("music_track", "Time", {
       artist: "Khruangbin",
