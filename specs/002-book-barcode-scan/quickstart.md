@@ -5,8 +5,9 @@
 ## Validate server lookup
 
 1. Sign in; ensure network available.
-2. `curl -b cookies.txt "http://localhost:3000/api/books/lookup?isbn=9782070368228"` (session cookie from browser) → JSON hit with French/English title fields.
-3. Repeat within TTL → same payload, `fetched_at` unchanged or served from cache (check logs).
+2. `yarn db:up && yarn migrate:up` before first lookup if Postgres is fresh.
+3. `curl -b cookies.txt "http://localhost:3000/api/books/lookup?isbn=9782070368228"` (session cookie from browser) → JSON hit with French/English title fields.
+4. Repeat within TTL → same payload, `fetched_at` unchanged or served from cache (check logs).
 
 ## Validate mobile scan (manual / mocked)
 
@@ -17,7 +18,7 @@
 
 ## Validate desktop boundary
 
-1. Desktop width: books list has no scan button; quick-add book has no ISBN field.
+1. Desktop width: books list has no scan button; quick-add book has no scan or ISBN lookup controls.
 
 ## Validate lookup failure
 
