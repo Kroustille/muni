@@ -16,7 +16,7 @@ export function Select({ label, options, className = "", ...rest }: SelectProps)
       </label>
       <select
         id={id}
-        className={`min-h-11 rounded-lg border border-border bg-background px-3 text-foreground ${className}`}
+        className={`cursor-pointer min-h-11 rounded-lg border border-border bg-background px-3 text-foreground ${className}`}
         {...rest}
       >
         {options.map((o) => (

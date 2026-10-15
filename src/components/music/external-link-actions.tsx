@@ -21,7 +21,7 @@ export function ExternalLinkActions({ spotifyUrl, soundcloudUrl }: ExternalLinkA
       {spotify !== "" ? (
         <button
           type="button"
-          className="rounded-lg border border-border px-3 py-2 text-sm"
+          className="cursor-pointer rounded-lg border border-border px-3 py-2 text-sm"
           onClick={() => openUrl(spotify)}
         >
           {t("music.external.openSpotify")}
@@ -30,7 +30,7 @@ export function ExternalLinkActions({ spotifyUrl, soundcloudUrl }: ExternalLinkA
       {soundcloud !== "" ? (
         <button
           type="button"
-          className="rounded-lg border border-border px-3 py-2 text-sm"
+          className="cursor-pointer rounded-lg border border-border px-3 py-2 text-sm"
           onClick={() => openUrl(soundcloud)}
         >
           {t("music.external.openSoundCloud")}

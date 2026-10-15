@@ -15,7 +15,7 @@ export function ShoppingRow({ item, onCheckedChange }: ShoppingRowProps) {
       <div className="flex items-start gap-3">
         <input
           type="checkbox"
-          className="mt-1 size-5 shrink-0 accent-primary"
+          className="mt-1 size-5 shrink-0 cursor-pointer accent-primary"
           aria-label={item.title}
           checked={item.checked}
           onChange={(event) => onCheckedChange(event.target.checked)}
@@ -23,7 +23,7 @@ export function ShoppingRow({ item, onCheckedChange }: ShoppingRowProps) {
         <div className="min-w-0 flex-1">
           <Link
             href={`/items/${item.id}`}
-            className={`font-medium underline-offset-2 hover:underline ${item.checked ? "text-muted line-through" : ""}`}
+            className={`cursor-pointer font-medium underline-offset-2 hover:underline ${item.checked ? "text-muted line-through" : ""}`}
           >
             {item.title}
           </Link>

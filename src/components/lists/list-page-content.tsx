@@ -221,7 +221,10 @@ export function ListPageContent({ route }: ListPageContentProps) {
             const secondary = rowSecondaryText(item);
             return (
               <li key={item.id} className="rounded-lg border border-border px-3 py-2">
-                <Link href={`/items/${item.id}`} className="font-medium underline-offset-2 hover:underline">
+                <Link
+                  href={`/items/${item.id}`}
+                  className="cursor-pointer font-medium underline-offset-2 hover:underline"
+                >
                   {item.title}
                 </Link>
                 {secondary ? <p className="text-sm text-muted">{secondary}</p> : null}

@@ -21,7 +21,7 @@ export function StarRating({ value, onChange }: StarRatingProps) {
           <button
             key={stars}
             type="button"
-            className={`min-h-9 min-w-9 rounded-md border px-2 text-sm font-semibold transition-colors ${
+            className={`cursor-pointer min-h-9 min-w-9 rounded-md border px-2 text-sm font-semibold transition-colors ${
               filled
                 ? `${ratingTierClass(stars)} shadow-sm`
                 : "border-border bg-surface text-muted"

@@ -26,7 +26,7 @@ export function StatusFilter({ itemType, value, onChange }: StatusFilterProps) {
         <button
           key={option.value}
           type="button"
-          className={`min-h-11 rounded-lg border px-3 text-sm ${
+          className={`cursor-pointer min-h-11 rounded-lg border px-3 text-sm ${
             value === option.value
               ? "border-primary bg-primary text-primary-foreground"
               : "border-border"

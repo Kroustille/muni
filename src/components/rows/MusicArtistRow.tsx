@@ -19,7 +19,7 @@ export function MusicArtistRow({ item, onRatingChange }: MusicArtistRowProps) {
         <div className="flex flex-wrap items-center gap-2">
           <Link
             href={`/items/${item.id}`}
-            className="font-medium underline-offset-2 hover:underline"
+            className="cursor-pointer font-medium underline-offset-2 hover:underline"
           >
             {item.title}
           </Link>

@@ -26,7 +26,7 @@ const ORDER_LABEL: Record<ListSortOrder, Parameters<typeof t>[0]> = {
 };
 
 function chipClass(active: boolean): string {
-  return `min-h-11 rounded-lg border px-3 text-sm ${
+  return `cursor-pointer min-h-11 rounded-lg border px-3 text-sm ${
     active
       ? "border-foreground bg-foreground text-background"
       : "border-border bg-surface text-foreground"
