@@ -18,6 +18,14 @@ import {
   movieFieldValuesToExtra,
   emptyMovieFieldValues,
   type MovieFieldValues,
+  MusicArtistFields,
+  musicArtistFieldValuesToExtra,
+  emptyMusicArtistFieldValues,
+  type MusicArtistFieldValues,
+  MusicTrackFields,
+  musicTrackFieldValuesToExtra,
+  emptyMusicTrackFieldValues,
+  type MusicTrackFieldValues,
   RecipeFields,
   recipeFieldValuesToExtra,
   emptyRecipeFieldValues,
@@ -30,7 +38,14 @@ import {
 
 type ItemKind = ItemType;
 
-const TYPE_OPTIONS: ItemKind[] = ["shopping", "book", "movie", "recipe"];
+const TYPE_OPTIONS: ItemKind[] = [
+  "shopping",
+  "book",
+  "movie",
+  "recipe",
+  "music_artist",
+  "music_track",
+];
 
 const typeLabel = (kind: ItemKind): string => {
   const map: Record<ItemKind, Parameters<typeof t>[0]> = {
@@ -38,6 +53,8 @@ const typeLabel = (kind: ItemKind): string => {
     book: "type.book",
     movie: "type.movie",
     recipe: "type.recipe",
+    music_artist: "type.music_artist",
+    music_track: "type.music_track",
   };
   return t(map[kind]);
 };
@@ -46,6 +63,8 @@ type FieldValues =
   | ShoppingFieldValues
   | BookFieldValues
   | MovieFieldValues
+  | MusicArtistFieldValues
+  | MusicTrackFieldValues
   | RecipeFieldValues;
 
 function emptyFields(kind: ItemKind): FieldValues {
@@ -56,6 +75,10 @@ function emptyFields(kind: ItemKind): FieldValues {
       return emptyBookFieldValues();
     case "movie":
       return emptyMovieFieldValues();
+    case "music_artist":
+      return emptyMusicArtistFieldValues();
+    case "music_track":
+      return emptyMusicTrackFieldValues();
     case "recipe":
       return emptyRecipeFieldValues();
   }
@@ -71,6 +94,7 @@ export function QuickAdd() {
   const [kind, setKind] = useState<ItemKind | null>(null);
   const [values, setValues] = useState<FieldValues>(emptyShoppingFieldValues());
   const [titleError, setTitleError] = useState<string | undefined>();
+  const [artistError, setArtistError] = useState<string | undefined>();
   const [submitting, setSubmitting] = useState(false);
 
   const close = useCallback(() => {
@@ -79,6 +103,7 @@ export function QuickAdd() {
     setKind(null);
     setValues(emptyShoppingFieldValues());
     setTitleError(undefined);
+    setArtistError(undefined);
     setSubmitting(false);
   }, []);
 
@@ -88,18 +113,21 @@ export function QuickAdd() {
     setKind(null);
     setValues(emptyShoppingFieldValues());
     setTitleError(undefined);
+    setArtistError(undefined);
   }, []);
 
   const pickType = useCallback((next: ItemKind) => {
     setKind(next);
     setValues(emptyFields(next));
     setTitleError(undefined);
+    setArtistError(undefined);
     setStep("form");
   }, []);
 
   const updateValues = useCallback((next: FieldValues) => {
     setValues(next);
     setTitleError(undefined);
+    setArtistError(undefined);
   }, []);
 
   const submit = useCallback(async () => {
@@ -108,6 +136,13 @@ export function QuickAdd() {
     if (!trimmedTitle) {
       setTitleError(t("validation.titleRequired"));
       return;
+    }
+    if (kind === "music_track") {
+      const artist = (values as MusicTrackFieldValues).artist.trim();
+      if (!artist) {
+        setArtistError(t("validation.artistRequired"));
+        return;
+      }
     }
     setSubmitting(true);
     try {
@@ -132,6 +167,20 @@ export function QuickAdd() {
             kind,
             trimmedTitle,
             movieFieldValuesToExtra(values as MovieFieldValues),
+          );
+          break;
+        case "music_artist":
+          await useCases.createItem(
+            kind,
+            trimmedTitle,
+            musicArtistFieldValuesToExtra(values as MusicArtistFieldValues),
+          );
+          break;
+        case "music_track":
+          await useCases.createItem(
+            kind,
+            trimmedTitle,
+            musicTrackFieldValuesToExtra(values as MusicTrackFieldValues),
           );
           break;
         case "recipe":
@@ -185,6 +234,23 @@ export function QuickAdd() {
               titleError={titleError}
             />
           </>
+        );
+      case "music_artist":
+        return (
+          <MusicArtistFields
+            values={values as MusicArtistFieldValues}
+            onChange={updateValues}
+            titleError={titleError}
+          />
+        );
+      case "music_track":
+        return (
+          <MusicTrackFields
+            values={values as MusicTrackFieldValues}
+            onChange={updateValues}
+            titleError={titleError}
+            artistError={artistError}
+          />
         );
       case "recipe":
         return (
