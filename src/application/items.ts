@@ -14,6 +14,8 @@ import {
 } from "../domain/item";
 import { merge } from "../domain/merge";
 import { normalizeText } from "../domain/text";
+import { createUpsertBookFromCatalog } from "./books/upsert-from-catalog";
+import type { UpsertBookFromCatalogInput } from "./books/upsert-from-catalog";
 import type { IdGenerator } from "./ports/id-generator";
 import type { ItemRepository, Unsubscribe } from "./ports/item-repository";
 
@@ -37,6 +39,7 @@ export type ItemUseCases = {
   recommenders(prefix: string): Promise<string[]>;
   subscribe(listener: () => void): Unsubscribe;
   applyRemote(rows: ItemWire[]): Promise<void>;
+  upsertBookFromCatalog(input: UpsertBookFromCatalogInput): Promise<Item>;
 };
 
 const byNewest = (a: Item, b: Item): number =>
@@ -81,6 +84,12 @@ export function createItemUseCases({
     if (item === undefined) throw new Error(`Unknown item: ${id}`);
     return item;
   }
+
+  const upsertBookFromCatalog = createUpsertBookFromCatalog({
+    repository,
+    idGenerator,
+    now,
+  });
 
   async function patchItem(id: string, patch: ItemPatch): Promise<Item> {
     const current = await requireItem(id);
@@ -159,6 +168,8 @@ export function createItemUseCases({
     },
 
     subscribe: (listener) => repository.subscribe(listener),
+
+    upsertBookFromCatalog: (input) => serialized(() => upsertBookFromCatalog(input)),
 
     applyRemote: (rows) =>
       serialized(async () => {
