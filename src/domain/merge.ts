@@ -23,6 +23,12 @@ const MERGED_FIELDS = [
   "release_year",
   "catalog_rating",
   "media_kind",
+  "artist",
+  "album",
+  "music_brainz_artist_id",
+  "music_brainz_recording_id",
+  "spotify_url",
+  "soundcloud_url",
 ] as const satisfies readonly (keyof ItemWire)[];
 
 function compareValues(a: unknown, b: unknown): number {

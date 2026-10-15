@@ -1,12 +1,21 @@
 import { z } from "zod";
 
+import { isValidHttpsUrl } from "./external-url";
 import { isValidImdbId } from "./imdb";
 import { isValidIsbn } from "./isbn";
+import { isValidMusicBrainzId } from "./musicbrainz";
 
 export const MEDIA_KINDS = ["film", "series"] as const;
 export type MediaKind = (typeof MEDIA_KINDS)[number];
 
-export const ITEM_TYPES = ["shopping", "book", "movie", "recipe"] as const;
+export const ITEM_TYPES = [
+  "shopping",
+  "book",
+  "movie",
+  "recipe",
+  "music_artist",
+  "music_track",
+] as const;
 export type ItemType = (typeof ITEM_TYPES)[number];
 
 const STATUSES = {
@@ -14,11 +23,14 @@ const STATUSES = {
   book: ["to_read", "reading", "read"],
   movie: ["to_watch", "watched"],
   recipe: [],
+  music_artist: [],
+  music_track: ["to_listen", "listened"],
 } as const satisfies Record<ItemType, readonly string[]>;
 
 export type BookStatus = (typeof STATUSES.book)[number];
 export type MovieStatus = (typeof STATUSES.movie)[number];
-export type ItemStatus = BookStatus | MovieStatus;
+export type MusicTrackStatus = (typeof STATUSES.music_track)[number];
+export type ItemStatus = BookStatus | MovieStatus | MusicTrackStatus;
 
 export function statusesFor(type: ItemType): readonly string[] {
   return STATUSES[type];
@@ -56,6 +68,12 @@ export type Item = {
   releaseYear: number | null;
   catalogRating: number | null;
   mediaKind: MediaKind | null;
+  artist: string | null;
+  album: string | null;
+  musicBrainzArtistId: string | null;
+  musicBrainzRecordingId: string | null;
+  spotifyUrl: string | null;
+  soundcloudUrl: string | null;
 };
 
 const FIELDS_BY_TYPE: Record<ItemType, readonly (keyof Item)[]> = {
@@ -85,6 +103,25 @@ const FIELDS_BY_TYPE: Record<ItemType, readonly (keyof Item)[]> = {
     "mediaKind",
   ],
   recipe: ["notes", "ingredients", "steps"],
+  music_artist: [
+    "recommendedBy",
+    "notes",
+    "musicBrainzArtistId",
+    "spotifyUrl",
+    "soundcloudUrl",
+  ],
+  music_track: [
+    "artist",
+    "album",
+    "releaseYear",
+    "status",
+    "recommendedBy",
+    "rating",
+    "notes",
+    "musicBrainzRecordingId",
+    "spotifyUrl",
+    "soundcloudUrl",
+  ],
 };
 
 const TYPE_SPECIFIC_FIELDS = [
@@ -106,6 +143,12 @@ const TYPE_SPECIFIC_FIELDS = [
   "releaseYear",
   "catalogRating",
   "mediaKind",
+  "artist",
+  "album",
+  "musicBrainzArtistId",
+  "musicBrainzRecordingId",
+  "spotifyUrl",
+  "soundcloudUrl",
 ] as const satisfies readonly (keyof Item)[];
 
 const timestamp = z.iso.datetime({ offset: true });
@@ -139,6 +182,12 @@ const itemShape = {
   releaseYear: z.number().int().min(1000).max(2100).nullable(),
   catalogRating: z.number().min(0).max(10).nullable(),
   mediaKind: z.enum(MEDIA_KINDS).nullable(),
+  artist: text,
+  album: text,
+  musicBrainzArtistId: text,
+  musicBrainzRecordingId: text,
+  spotifyUrl: text,
+  soundcloudUrl: text,
 };
 
 function checkCrossType(value: Item, ctx: z.RefinementCtx, path: (f: string) => string): void {
@@ -180,6 +229,48 @@ function checkCrossType(value: Item, ctx: z.RefinementCtx, path: (f: string) => 
       message: "invalid IMDb id",
     });
   }
+  if (
+    value.type === "music_artist" &&
+    value.musicBrainzArtistId != null &&
+    !isValidMusicBrainzId(value.musicBrainzArtistId)
+  ) {
+    ctx.addIssue({
+      code: "custom",
+      path: [path("musicBrainzArtistId")],
+      message: "invalid MusicBrainz artist id",
+    });
+  }
+  if (
+    value.type === "music_track" &&
+    value.musicBrainzRecordingId != null &&
+    !isValidMusicBrainzId(value.musicBrainzRecordingId)
+  ) {
+    ctx.addIssue({
+      code: "custom",
+      path: [path("musicBrainzRecordingId")],
+      message: "invalid MusicBrainz recording id",
+    });
+  }
+  if (value.type === "music_track") {
+    const artistText = value.artist?.trim() ?? "";
+    if (artistText === "") {
+      ctx.addIssue({
+        code: "custom",
+        path: [path("artist")],
+        message: "artist is required for music_track",
+      });
+    }
+  }
+  for (const urlField of ["spotifyUrl", "soundcloudUrl"] as const) {
+    const urlValue = value[urlField];
+    if (urlValue != null && urlValue !== "" && !isValidHttpsUrl(urlValue)) {
+      ctx.addIssue({
+        code: "custom",
+        path: [path(urlField)],
+        message: `${urlField} must be a valid HTTPS URL`,
+      });
+    }
+  }
 }
 
 const itemSchema = z
@@ -197,6 +288,10 @@ const SNAKE: Partial<Record<keyof Item, string>> = {
   releaseYear: "release_year",
   catalogRating: "catalog_rating",
   mediaKind: "media_kind",
+  musicBrainzArtistId: "music_brainz_artist_id",
+  musicBrainzRecordingId: "music_brainz_recording_id",
+  spotifyUrl: "spotify_url",
+  soundcloudUrl: "soundcloud_url",
 };
 
 const snakeOf = (field: string): string => SNAKE[field as keyof Item] ?? field;
@@ -236,6 +331,12 @@ export const itemWireSchema = z
     release_year: itemShape.releaseYear.optional(),
     catalog_rating: itemShape.catalogRating.optional(),
     media_kind: itemShape.mediaKind.optional(),
+    artist: itemShape.artist.optional(),
+    album: itemShape.album.optional(),
+    music_brainz_artist_id: itemShape.musicBrainzArtistId.optional(),
+    music_brainz_recording_id: itemShape.musicBrainzRecordingId.optional(),
+    spotify_url: itemShape.spotifyUrl.optional(),
+    soundcloud_url: itemShape.soundcloudUrl.optional(),
     server_updated_at: timestamp.nullable(),
   })
   .superRefine((wire, ctx) =>
@@ -281,6 +382,12 @@ export type NewItemInput = {
     | "releaseYear"
     | "catalogRating"
     | "mediaKind"
+    | "artist"
+    | "album"
+    | "musicBrainzArtistId"
+    | "musicBrainzRecordingId"
+    | "spotifyUrl"
+    | "soundcloudUrl"
   >
 >;
 
@@ -313,6 +420,12 @@ export function newItem(input: NewItemInput): Item {
     releaseYear: input.releaseYear ?? null,
     catalogRating: input.catalogRating ?? null,
     mediaKind: input.mediaKind ?? null,
+    artist: input.artist ?? null,
+    album: input.album ?? null,
+    musicBrainzArtistId: input.musicBrainzArtistId ?? null,
+    musicBrainzRecordingId: input.musicBrainzRecordingId ?? null,
+    spotifyUrl: input.spotifyUrl ?? null,
+    soundcloudUrl: input.soundcloudUrl ?? null,
   };
   return itemSchema.parse(candidate) as Item;
 }
@@ -356,6 +469,12 @@ function coalesceCatalogWireFields(
     releaseYear: wire.release_year ?? null,
     catalogRating: wire.catalog_rating ?? null,
     mediaKind: wire.media_kind ?? null,
+    artist: wire.artist ?? null,
+    album: wire.album ?? null,
+    musicBrainzArtistId: wire.music_brainz_artist_id ?? null,
+    musicBrainzRecordingId: wire.music_brainz_recording_id ?? null,
+    spotifyUrl: wire.spotify_url ?? null,
+    soundcloudUrl: wire.soundcloud_url ?? null,
   };
 }
 
@@ -373,6 +492,12 @@ function restWithoutCatalog(
     release_year,
     catalog_rating,
     media_kind,
+    artist,
+    album,
+    music_brainz_artist_id,
+    music_brainz_recording_id,
+    spotify_url,
+    soundcloud_url,
     ...rest
   } = wire;
   return rest as Record<string, unknown>;
