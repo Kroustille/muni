@@ -52,9 +52,9 @@ User opens prefilled or edited Spotify/SoundCloud URLs from the row (MU1b/MU-lin
 
 ---
 
-### User Story 4 - Track status and rating (Priority: P2)
+### User Story 4 - Track status, rating, and list sort (Priority: P2)
 
-Tracks: to listen / listened + personal 1–5 when listened. Artists: notes and recommended-by.
+Tracks: to listen / listened + personal 1–5 when listened; tracks list supports **Plus récents** / **Par note** sort (same rules as books/movies). Artists: notes and recommended-by.
 
 ---
 

@@ -12,6 +12,7 @@ import {
   type ItemWire,
   type NewItemInput,
 } from "../domain/item";
+import { type ListSortMode, sortItemsForList } from "../domain/list-sort";
 import { merge } from "../domain/merge";
 import { normalizeText } from "../domain/text";
 import { createUpsertBookFromCatalog } from "./books/upsert-from-catalog";
@@ -43,7 +44,10 @@ export type ItemUseCases = {
   deleteItem(id: string): Promise<void>;
   restoreItem(id: string): Promise<void>;
   getItem(id: string): Promise<Item | undefined>;
-  listItems(type: ItemType, options?: { status?: ItemStatus }): Promise<Item[]>;
+  listItems(
+    type: ItemType,
+    options?: { status?: ItemStatus; sort?: ListSortMode },
+  ): Promise<Item[]>;
   counts(): Promise<Record<ItemType, number>>;
   recent(limit: number): Promise<Item[]>;
   recommenders(prefix: string): Promise<string[]>;
@@ -174,8 +178,10 @@ export function createItemUseCases({
 
     getItem: (id) => repository.get(id),
 
-    listItems: async (type, options = {}) =>
-      (await repository.query({ type, status: options.status })).sort(byNewest),
+    listItems: async (type, options = {}) => {
+      const rows = await repository.query({ type, status: options.status });
+      return sortItemsForList(rows, options.sort ?? "newest");
+    },
 
     counts: async () => {
       const result = Object.fromEntries(ITEM_TYPES.map((type) => [type, 0])) as Record<

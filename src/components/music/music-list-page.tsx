@@ -5,8 +5,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getItemUseCases, subscribeSyncStatus } from "@/composition/client";
 import { BookMovieRow } from "@/components/rows/BookMovieRow";
+import { ListSortFilter } from "@/components/ListSortFilter";
 import { StatusFilter, type StatusFilterValue } from "@/components/StatusFilter";
-import { updateItem as applyItemPatch, type Item, type ItemPatch, type ItemType } from "@/domain/item";
+import { itemTypeSupportsRatingSort, type ListSortMode } from "@/domain/list-sort";
+import {
+  updateItem as applyItemPatch,
+  type Item,
+  type ItemPatch,
+  type ItemStatus,
+  type ItemType,
+} from "@/domain/item";
 import { t, type MessageKey } from "@/i18n";
 
 import { ListQuickAddButton } from "@/components/quick-add/list-quick-add-button";
@@ -28,12 +36,15 @@ export type MusicListPageProps = {
 export function MusicListPage({ kind }: MusicListPageProps) {
   const itemType: ItemType = kind;
   const showStatusFilter = kind === "music_track";
+  const showRatingSort = itemTypeSupportsRatingSort(kind);
   const [items, setItems] = useState<Item[]>([]);
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("all");
+  const [listSort, setListSort] = useState<ListSortMode>("newest");
   const refreshRef = useRef<(() => Promise<void>) | null>(null);
 
   useEffect(() => {
     setStatusFilter("all");
+    setListSort("newest");
   }, [kind]);
 
   useEffect(() => {
@@ -44,8 +55,12 @@ export function MusicListPage({ kind }: MusicListPageProps) {
 
     void getItemUseCases().then(async (useCases) => {
       const refresh = async () => {
-        const listOptions =
-          showStatusFilter && statusFilter !== "all" ? { status: statusFilter } : {};
+        const listOptions: { status?: ItemStatus; sort?: ListSortMode } = {
+          sort: showRatingSort ? listSort : "newest",
+        };
+        if (showStatusFilter && statusFilter !== "all") {
+          listOptions.status = statusFilter;
+        }
         const next = await useCases.listItems(itemType, listOptions);
         if (!cancelled) setItems(next);
       };
@@ -75,12 +90,15 @@ export function MusicListPage({ kind }: MusicListPageProps) {
       unsubscribeSync?.();
       refreshRef.current = null;
     };
-  }, [itemType, showStatusFilter, statusFilter]);
+  }, [itemType, showStatusFilter, statusFilter, showRatingSort, listSort]);
 
-  const listOptionsForFilter = useCallback(
-    () => (showStatusFilter && statusFilter !== "all" ? { status: statusFilter } : {}),
-    [showStatusFilter, statusFilter],
-  );
+  const listOptionsForFilter = useCallback(() => {
+    const options: { status?: ItemStatus; sort?: ListSortMode } = {
+      sort: showRatingSort ? listSort : "newest",
+    };
+    if (showStatusFilter && statusFilter !== "all") options.status = statusFilter;
+    return options;
+  }, [showStatusFilter, statusFilter, showRatingSort, listSort]);
 
   const revertList = useCallback(async () => {
     const useCases = await getItemUseCases();
@@ -126,6 +144,7 @@ export function MusicListPage({ kind }: MusicListPageProps) {
       {showStatusFilter ? (
         <StatusFilter itemType="music_track" value={statusFilter} onChange={setStatusFilter} />
       ) : null}
+      {showRatingSort ? <ListSortFilter value={listSort} onChange={setListSort} /> : null}
       {items.length === 0 ? (
         <p>{t("list.empty")}</p>
       ) : (

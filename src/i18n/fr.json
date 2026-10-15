@@ -44,6 +44,8 @@
   "home.empty": "Rien ici pour l'instant. Ajoutez votre premier élément.",
   "home.recent": "Ajouts récents",
   "list.empty": "Cette liste est vide.",
+  "list.sort.newest": "Plus récents",
+  "list.sort.rating": "Par note",
   "search.placeholder": "Rechercher dans toutes les listes",
   "search.empty": "Aucun résultat.",
   "item.deleted": "Élément supprimé",
