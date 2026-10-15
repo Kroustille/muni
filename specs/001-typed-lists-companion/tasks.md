@@ -134,7 +134,7 @@
 - [X] T064 [P] [US2] Build the quick-add bottom control and flow (choose type first, then only that type's fields; only title/name required; at most 3 taps plus title; inline error for empty/whitespace title) calling the `createItem` use case in `src/components/QuickAdd.tsx` (depends on T063)
 - [X] T065 [P] [US2] Build type-specific field editors (shopping: name, quantity; book: title, author, status, recommended by, notes; movie: title, status, recommended by, notes; recipe: title, ingredients quantity and name, ordered steps, notes) in `src/components/fields/` (one file per type) (depends on T063)
 - [X] T066 [P] [US2] Build the "recommended by" input with suggestions from the `recommenders(prefix)` use case in `src/components/RecommendedByInput.tsx` (depends on T063)
-- [ ] T067 [US2] Mount QuickAdd in the shell for home, list and search screens in `src/app/(app)/layout.tsx` (depends on T064, T065, T066)
+- [X] T067 [US2] Mount QuickAdd in the shell for home, list and search screens in `src/app/(app)/layout.tsx` (depends on T064, T065, T066)
 - [X] T068 [US2] Build the minimal list view route `src/app/(app)/lists/[type]/page.tsx` (`shopping|books|movies|recipes` mapped to types) rendering items from the `listItems` use case and refreshing on `subscribe` (depends on T063)
 
 **Checkpoint**: US2 works offline against IndexedDB behind the sign-in gate.

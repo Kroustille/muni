@@ -1,13 +1,29 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import type { CreateItemExtra } from "@/application/items";
 import type { ItemType } from "@/domain/item";
 import { getItemUseCases } from "@/composition/client";
 import { t } from "@/i18n";
 import { BottomSheet } from "@/components/ui/BottomSheet";
 import { Button } from "@/components/ui/Button";
-import { TextField } from "@/components/ui/TextField";
+import {
+  BookFields,
+  bookFieldValuesToExtra,
+  emptyBookFieldValues,
+  type BookFieldValues,
+  MovieFields,
+  movieFieldValuesToExtra,
+  emptyMovieFieldValues,
+  type MovieFieldValues,
+  RecipeFields,
+  recipeFieldValuesToExtra,
+  emptyRecipeFieldValues,
+  type RecipeFieldValues,
+  ShoppingFields,
+  shoppingFieldValuesToExtra,
+  emptyShoppingFieldValues,
+  type ShoppingFieldValues,
+} from "@/components/fields";
 
 type ItemKind = ItemType;
 
@@ -23,54 +39,34 @@ const typeLabel = (kind: ItemKind): string => {
   return t(map[kind]);
 };
 
-const titleLabel = (kind: ItemKind): string =>
-  kind === "shopping" ? t("field.name") : t("field.title");
+type FieldValues =
+  | ShoppingFieldValues
+  | BookFieldValues
+  | MovieFieldValues
+  | RecipeFieldValues;
 
-type FormState = {
-  title: string;
-  author: string;
-  quantity: string;
-  recommendedBy: string;
-  notes: string;
-};
+function emptyFields(kind: ItemKind): FieldValues {
+  switch (kind) {
+    case "shopping":
+      return emptyShoppingFieldValues();
+    case "book":
+      return emptyBookFieldValues();
+    case "movie":
+      return emptyMovieFieldValues();
+    case "recipe":
+      return emptyRecipeFieldValues();
+  }
+}
 
-const emptyForm = (): FormState => ({
-  title: "",
-  author: "",
-  quantity: "",
-  recommendedBy: "",
-  notes: "",
-});
-
-function buildExtra(kind: ItemKind, form: FormState): CreateItemExtra {
-  const extra: CreateItemExtra = {};
-  const set = (key: keyof CreateItemExtra, value: string) => {
-    const trimmed = value.trim();
-    if (trimmed) (extra as Record<string, string>)[key] = trimmed;
-  };
-  if (kind === "shopping") {
-    set("quantity", form.quantity);
-  }
-  if (kind === "book") {
-    set("author", form.author);
-    set("recommendedBy", form.recommendedBy);
-    set("notes", form.notes);
-  }
-  if (kind === "movie") {
-    set("recommendedBy", form.recommendedBy);
-    set("notes", form.notes);
-  }
-  if (kind === "recipe") {
-    set("notes", form.notes);
-  }
-  return extra;
+function titleFromValues(values: FieldValues): string {
+  return values.title;
 }
 
 export function QuickAdd() {
   const [open, setOpen] = useState(false);
   const [step, setStep] = useState<"pick-type" | "form">("pick-type");
   const [kind, setKind] = useState<ItemKind | null>(null);
-  const [form, setForm] = useState<FormState>(emptyForm);
+  const [values, setValues] = useState<FieldValues>(emptyShoppingFieldValues());
   const [titleError, setTitleError] = useState<string | undefined>();
   const [submitting, setSubmitting] = useState(false);
 
@@ -78,7 +74,7 @@ export function QuickAdd() {
     setOpen(false);
     setStep("pick-type");
     setKind(null);
-    setForm(emptyForm());
+    setValues(emptyShoppingFieldValues());
     setTitleError(undefined);
     setSubmitting(false);
   }, []);
@@ -87,25 +83,25 @@ export function QuickAdd() {
     setOpen(true);
     setStep("pick-type");
     setKind(null);
-    setForm(emptyForm());
+    setValues(emptyShoppingFieldValues());
     setTitleError(undefined);
   }, []);
 
   const pickType = useCallback((next: ItemKind) => {
     setKind(next);
-    setForm(emptyForm());
+    setValues(emptyFields(next));
     setTitleError(undefined);
     setStep("form");
   }, []);
 
-  const updateForm = useCallback((patch: Partial<FormState>) => {
-    setForm((prev) => ({ ...prev, ...patch }));
-    if (patch.title !== undefined) setTitleError(undefined);
+  const updateValues = useCallback((next: FieldValues) => {
+    setValues(next);
+    setTitleError(undefined);
   }, []);
 
   const submit = useCallback(async () => {
     if (kind === null) return;
-    const trimmedTitle = form.title.trim();
+    const trimmedTitle = titleFromValues(values).trim();
     if (!trimmedTitle) {
       setTitleError(t("validation.titleRequired"));
       return;
@@ -113,16 +109,83 @@ export function QuickAdd() {
     setSubmitting(true);
     try {
       const useCases = await getItemUseCases();
-      await useCases.createItem(kind, trimmedTitle, buildExtra(kind, form));
+      switch (kind) {
+        case "shopping":
+          await useCases.createItem(
+            kind,
+            trimmedTitle,
+            shoppingFieldValuesToExtra(values as ShoppingFieldValues),
+          );
+          break;
+        case "book":
+          await useCases.createItem(
+            kind,
+            trimmedTitle,
+            bookFieldValuesToExtra(values as BookFieldValues),
+          );
+          break;
+        case "movie":
+          await useCases.createItem(
+            kind,
+            trimmedTitle,
+            movieFieldValuesToExtra(values as MovieFieldValues),
+          );
+          break;
+        case "recipe":
+          await useCases.createItem(
+            kind,
+            trimmedTitle,
+            recipeFieldValuesToExtra(values as RecipeFieldValues),
+          );
+          break;
+      }
       close();
     } catch {
       setTitleError(t("validation.titleRequired"));
       setSubmitting(false);
     }
-  }, [close, form, kind]);
+  }, [close, kind, values]);
 
   const sheetTitle =
     step === "pick-type" || kind === null ? t("nav.quickAdd") : typeLabel(kind);
+
+  const renderFields = () => {
+    if (kind === null) return null;
+    switch (kind) {
+      case "shopping":
+        return (
+          <ShoppingFields
+            values={values as ShoppingFieldValues}
+            onChange={updateValues}
+            titleError={titleError}
+          />
+        );
+      case "book":
+        return (
+          <BookFields
+            values={values as BookFieldValues}
+            onChange={updateValues}
+            titleError={titleError}
+          />
+        );
+      case "movie":
+        return (
+          <MovieFields
+            values={values as MovieFieldValues}
+            onChange={updateValues}
+            titleError={titleError}
+          />
+        );
+      case "recipe":
+        return (
+          <RecipeFields
+            values={values as RecipeFieldValues}
+            onChange={updateValues}
+            titleError={titleError}
+          />
+        );
+    }
+  };
 
   return (
     <>
@@ -159,41 +222,7 @@ export function QuickAdd() {
               void submit();
             }}
           >
-            <TextField
-              label={titleLabel(kind)}
-              value={form.title}
-              onChange={(e) => updateForm({ title: e.target.value })}
-              error={titleError}
-              autoFocus
-            />
-            {kind === "shopping" ? (
-              <TextField
-                label={t("field.quantity")}
-                value={form.quantity}
-                onChange={(e) => updateForm({ quantity: e.target.value })}
-              />
-            ) : null}
-            {kind === "book" ? (
-              <TextField
-                label={t("field.author")}
-                value={form.author}
-                onChange={(e) => updateForm({ author: e.target.value })}
-              />
-            ) : null}
-            {kind === "book" || kind === "movie" ? (
-              <TextField
-                label={t("field.recommendedBy")}
-                value={form.recommendedBy}
-                onChange={(e) => updateForm({ recommendedBy: e.target.value })}
-              />
-            ) : null}
-            {kind === "book" || kind === "movie" || kind === "recipe" ? (
-              <TextField
-                label={t("field.notes")}
-                value={form.notes}
-                onChange={(e) => updateForm({ notes: e.target.value })}
-              />
-            ) : null}
+            {renderFields()}
             <Button type="submit" disabled={submitting}>
               {t("action.add")}
             </Button>

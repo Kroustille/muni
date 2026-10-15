@@ -6,7 +6,7 @@ import { Select } from "@/components/ui/Select";
 import { TextField } from "@/components/ui/TextField";
 import { t, type MessageKey } from "@/i18n";
 
-import { recommendedByLabel } from "./labels";
+import { RecommendedByInput } from "@/components/RecommendedByInput";
 import { MultilineField } from "./multiline-field";
 
 export type MovieFieldValues = {
@@ -66,11 +66,9 @@ export function MovieFields({ values, onChange, titleError }: MovieFieldsProps) 
           onChange({ ...values, status: event.target.value as MovieStatus })
         }
       />
-      <TextField
-        label={recommendedByLabel()}
+      <RecommendedByInput
         value={values.recommendedBy}
-        onChange={(event) => onChange({ ...values, recommendedBy: event.target.value })}
-        autoComplete="off"
+        onChange={(recommendedBy) => onChange({ ...values, recommendedBy })}
       />
       <MultilineField
         label={t("field.notes")}
