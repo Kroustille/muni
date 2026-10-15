@@ -9,7 +9,10 @@ import { createUuidIdGenerator } from "@/adapters/browser/id-generator";
 import { createGoogleUseCases, type GoogleUseCases } from "@/application/auth/google";
 import { createMagicLinkUseCases, type MagicLinkUseCases } from "@/application/auth/magic-link";
 import { createSessionUseCases, type SessionUseCases } from "@/application/auth/sessions";
+import { createPostgresCatalogCacheRepository } from "@/adapters/postgres/catalog-cache-repository";
 import { createPostgresItemRepository } from "@/adapters/postgres/item-repository";
+import { createOpenLibraryBookCatalogLookup } from "@/adapters/open-library/book-catalog-lookup";
+import { createLookupBook, type LookupBook } from "@/application/books/lookup-book";
 import { createSyncService, type SyncService } from "@/application/server/sync-service";
 import { loadConfig, type ServerConfig } from "@/composition/config";
 
@@ -19,6 +22,7 @@ export interface ServerContainer {
   readonly sessions: SessionUseCases;
   readonly google: GoogleUseCases | null;
   readonly sync: SyncService;
+  readonly lookupBook: LookupBook;
   readonly destroy: () => Promise<void>;
 }
 
@@ -71,6 +75,9 @@ export function createServerContainer(
 
   const items = createPostgresItemRepository(db);
   const sync = createSyncService({ repository: items, now });
+  const catalogCache = createPostgresCatalogCacheRepository(db);
+  const catalog = createOpenLibraryBookCatalogLookup({ cache: catalogCache });
+  const lookupBook = createLookupBook({ catalog });
 
   return {
     appUrl: config.appUrl,
@@ -78,6 +85,7 @@ export function createServerContainer(
     sessions,
     google,
     sync,
+    lookupBook,
     destroy: () => pg.destroy(),
   };
 }
