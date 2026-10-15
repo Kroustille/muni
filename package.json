@@ -17,7 +17,9 @@
     "db:down": "docker compose down",
     "build:migrations": "tsc -p db/tsconfig.json",
     "migrate:up": "npm run build:migrations && node dist/db/migrate.js up",
-    "migrate:down": "npm run build:migrations && node dist/db/migrate.js down"
+    "migrate:down": "npm run build:migrations && node dist/db/migrate.js down",
+    "db:codegen": "npm run migrate:up && kysely-codegen --dialect postgres --exclude-pattern 'kysely_*' --out-file src/adapters/postgres/db-types.ts && prettier --write src/adapters/postgres/db-types.ts",
+    "db:codegen:check": "npm run db:codegen && git diff --exit-code src/adapters/postgres/db-types.ts"
   },
   "engines": {
     "node": ">=22"
@@ -25,6 +27,7 @@
   "dependencies": {
     "@serwist/next": "^9.5.13",
     "idb": "^8.0.4",
+    "jose": "^6.2.12",
     "kysely": "^0.29.6",
     "next": "^15.5.28",
     "nodemailer": "^10.1.1",
