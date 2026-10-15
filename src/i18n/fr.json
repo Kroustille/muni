@@ -50,5 +50,7 @@
   "signIn.google": "Continuer avec Google",
   "signIn.offline": "Une connexion internet est nécessaire pour vous connecter la première fois.",
   "signIn.linkExpired": "Ce lien a expiré ou a déjà été utilisé. Demandez-en un nouveau.",
-  "signIn.error": "La connexion a échoué. Réessayez."
+  "signIn.error": "La connexion a échoué. Réessayez.",
+  "mail.magicLink.subject": "Votre lien de connexion à Muni",
+  "mail.magicLink.intro": "Voici votre lien de connexion à Muni. Il est valable 15 minutes et ne peut servir qu'une fois."
 }
