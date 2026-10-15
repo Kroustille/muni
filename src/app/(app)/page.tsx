@@ -65,6 +65,12 @@ export default function HomePage() {
 
   return (
     <main className="p-4 pb-20">
+      <Link
+        href="/search"
+        className="mb-4 block rounded-lg border border-black/10 px-3 py-2 opacity-70 dark:border-white/10"
+      >
+        {t("search.placeholder")}
+      </Link>
       {showEmpty ? <p className="mb-4 text-sm opacity-80">{t("home.empty")}</p> : null}
       <div className="mb-6 grid grid-cols-2 gap-3">
         {LIST_ROUTES.map((route) => {
