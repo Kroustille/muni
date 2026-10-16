@@ -6,6 +6,8 @@ import {
 } from "@/application/ports/book-catalog-lookup";
 import type { CatalogCacheRepository } from "@/application/ports/catalog-cache-repository";
 
+import { normalizeOpenLibraryWorkKey } from "@/application/books/work-grouping";
+
 import {
   mapSearchResponseToHits,
   type OpenLibrarySearchResponse,
@@ -165,6 +167,10 @@ export function createOpenLibraryBookCatalogLookup(
       if (publicationYear !== undefined) hit.publicationYear = publicationYear;
       if (publisher) hit.publisher = publisher;
       if (pageCount !== undefined) hit.pageCount = pageCount;
+      if (workKey) {
+        const normalizedWorkId = normalizeOpenLibraryWorkKey(workKey);
+        if (normalizedWorkId !== "") hit.workId = normalizedWorkId;
+      }
 
       if (hit && deps.cache) {
         await deps.cache.upsert({

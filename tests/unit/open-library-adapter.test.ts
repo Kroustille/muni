@@ -57,6 +57,7 @@ describe("Open Library BookCatalogLookup adapter", () => {
       publicationYear: 1943,
       publisher: "Gallimard",
       pageCount: 96,
+      workId: "OL456W",
     });
   });
 
