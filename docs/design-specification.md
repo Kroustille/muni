@@ -1,6 +1,6 @@
 # Muni — design specification (draft)
 
-**Status:** partially locked (Valentin 2026-10-16)  
+**Status:** locked for implementation (Valentin 2026-10-16)  
 **Last updated:** 2026-10-16  
 **Scope:** visual identity, UX tone, and UI system — not feature requirements (those stay in `specs/`).
 
@@ -74,31 +74,31 @@ Avoid literal Viking branding. Use **subtle memory metaphors**:
 
 ### 4.2 Color system
 
-Replace generic indigo while keeping semantic colors for ratings. **Accent palette: TBD** — see §8.1 (warm amber vs cool ink + teal). **Home cards (locked):** type **color stripe + Lucide icon** per list.
+Replace generic indigo while keeping semantic colors for ratings. **Accent (locked): B — cool ink + teal.** **Home cards (locked):** type **color stripe + Lucide icon** per list. **Density (locked):** airy spacing (keep generous `p-4`, `gap-3`, min-h-11 targets).
 
-**Light**
+**Light (ink + teal)**
 
-| Token | Role | Suggested value | Notes |
-|-------|------|-----------------|--------|
-| `--background` | Page | `#f7f5f0` | Warm paper, not pure white |
-| `--foreground` | Text | `#1c1917` | Stone-900 ink |
-| `--surface` | Cards, sheets | `#fffcf7` | Slightly lifted paper |
-| `--border` | Hairlines | `#e7e2d9` | Warm border |
-| `--muted` | Secondary text | `#57534e` | |
-| `--accent` | Primary CTA, links | `#b45309` | Amber-700 — warm, not startup purple |
-| `--accent-foreground` | On accent | `#fffbeb` | |
+| Token | Role | Value | Notes |
+|-------|------|-------|--------|
+| `--background` | Page | `#f4f6f8` | Cool mist, not warm paper |
+| `--foreground` | Text | `#0f172a` | Slate-900 ink |
+| `--surface` | Cards, sheets | `#ffffff` | |
+| `--border` | Hairlines | `#e2e8f0` | Slate-200 |
+| `--muted` | Secondary text | `#64748b` | |
+| `--accent` | Primary CTA, links | `#0d9488` | Teal-600 |
+| `--accent-foreground` | On accent | `#f0fdfa` | |
 
-**Dark**
+**Dark (ink + teal)**
 
-| Token | Role | Suggested value |
-|-------|------|-----------------|
-| `--background` | Page | `#0c0a09` |
-| `--foreground` | Text | `#f5f5f4` |
-| `--surface` | Cards | `#1c1917` |
-| `--border` | | `#292524` |
-| `--muted` | | `#a8a29e` |
-| `--accent` | | `#fbbf24` | Amber-400 for dark |
-| `--accent-foreground` | | `#1c1917` |
+| Token | Role | Value |
+|-------|------|-------|
+| `--background` | Page | `#020617` |
+| `--foreground` | Text | `#f1f5f9` |
+| `--surface` | Cards | `#0f172a` |
+| `--border` | | `#334155` |
+| `--muted` | | `#94a3b8` |
+| `--accent` | | `#14b8a6` | Teal-500 |
+| `--accent-foreground` | | `#042f2e` |
 
 **List type accents** (secondary — badges, card stripe, icon tint; not full backgrounds):
 
@@ -225,8 +225,8 @@ Unchanged routes; **visual hierarchy** should reinforce:
 | 2 | Titles | **Fraunces** for headings |
 | 3 | Raven | **Yes** — calm, friendly; icon + light empty-state use |
 | 4 | Home cards | **Type color stripe + icons** (table §4.2) |
-| 1 | Accent mood | **Pending** — warm amber (§4.2 light table) vs cool ink + teal (§8.1) |
-| 5 | Density | **Pending** — airy (default) vs tighter lists |
+| 1 | Accent mood | **B — cool ink + teal** (§4.2) |
+| 5 | Density | **Airy** |
 
 ### 8.1 Accent options explained
 
@@ -246,13 +246,13 @@ Two coherent palettes for the *same* product soul; only the **primary accent** (
 
 Both respect system light/dark. List-type stripe colors (§4.2) stay the same in either option.
 
-**Recommendation with your raven + stripe choices:** **A (warm amber)** unless you want a cooler, more “night mode product” personality — then **B**.
+**Chosen:** **B** with airy layout.
 
 ---
 
 ## 9. Next step
 
-When accent (and optionally density) are locked, open **`specs/005-design-system`** (spec + tasks) and execute **Phase A → B** from §6.
+Execute **Phase A → B** from §6; track in **`specs/005-design-system`** when created.
 
 ---
 
