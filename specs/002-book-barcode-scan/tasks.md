@@ -215,9 +215,9 @@
 
 - [x] T323 [US9] Unit tests for mood/pace validation and combined filters in `tests/unit/book-discovery-filters.test.ts`
 - [x] T324 [US9] Implement `filterBooksByDiscovery` in `src/application/books/discovery-filters.ts` (depends on T323, T298)
-- [ ] T325 [US9] Mood/pace pickers on book detail per `contracts/book-discovery-ui.md` in `src/components/books/book-discovery-fields.tsx`
-- [ ] T326 [US9] Discovery browse sheet with mood/pace/tag filters on `src/app/(app)/books/page.tsx` per book-discovery-ui.md (depends on T324, T325)
-- [ ] T327 [US9] E2e discovery filter by mood and tag in `tests/e2e/books-discovery-filters.spec.ts`
+- [x] T325 [US9] Mood/pace pickers on book detail per `contracts/book-discovery-ui.md` in `src/components/books/book-discovery-fields.tsx`
+- [x] T326 [US9] Discovery browse sheet with mood/pace/tag filters on `src/app/(app)/books/page.tsx` per book-discovery-ui.md (depends on T324, T325)
+- [x] T327 [US9] E2e discovery filter by mood and tag in `tests/e2e/books-discovery-filters.spec.ts`
 
 ---
 
@@ -227,10 +227,10 @@
 
 **Independent Test**: Library with varied tags/mood → recommendations list; no external API.
 
-- [ ] T328 [US10] Unit tests for `suggestBooks` scoring (tags, mood, status, no network) in `tests/unit/book-recommendations.test.ts`
-- [ ] T329 [US10] Implement `suggestBooks` in `src/application/books/recommendations.ts` (depends on T328, T324)
-- [ ] T330 [US10] Recommendations panel on books list per book-discovery-ui.md in `src/components/books/book-recommendations.tsx` (depends on T329)
-- [ ] T331 [US10] E2e recommendations visible for seeded library in `tests/e2e/books-recommendations.spec.ts`
+- [x] T328 [US10] Unit tests for `suggestBooks` scoring (tags, mood, status, no network) in `tests/unit/book-recommendations.test.ts`
+- [x] T329 [US10] Implement `suggestBooks` in `src/application/books/recommendations.ts` (depends on T328, T324)
+- [x] T330 [US10] Recommendations panel on books list per book-discovery-ui.md in `src/components/books/book-recommendations.tsx` (depends on T329)
+- [x] T331 [US10] E2e recommendations visible for seeded library in `tests/e2e/books-recommendations.spec.ts`
 
 ---
 
