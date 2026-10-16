@@ -15,7 +15,13 @@ runItemRepositoryContract("IndexedDbItemRepository", async () =>
 describe("IndexedDB schema", () => {
   it("creates the items, outbox and meta stores", async () => {
     const db = await openMuniDb(freshName());
-    expect([...db.objectStoreNames].sort()).toEqual(["items", "meta", "outbox"]);
+    expect([...db.objectStoreNames].sort()).toEqual([
+      "bookQuotes",
+      "items",
+      "meta",
+      "outbox",
+      "quoteOutbox",
+    ]);
     db.close();
   });
 
