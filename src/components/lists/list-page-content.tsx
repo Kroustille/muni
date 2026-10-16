@@ -27,7 +27,13 @@ import {
   filterBooksByTagOrSeries,
   type BookTagSeriesFilter,
 } from "@/application/books/book-library-filters";
+import { BookDiscoverySheet } from "@/components/books/book-discovery-sheet";
+import { BookRecommendations } from "@/components/books/book-recommendations";
 import { BookTagSeriesFilters } from "@/components/books/book-tag-series-filters";
+import {
+  filterBooksByDiscovery,
+  type BookDiscoveryFilter,
+} from "@/application/books/discovery-filters";
 import { useIsMobile } from "@/components/use-is-mobile";
 import { groupBooksByWork, type BookWorkGroup } from "@/application/books/work-grouping";
 import type { Item, ItemPatch, ItemStatus, ItemType } from "@/domain/item";
@@ -103,6 +109,8 @@ export function ListPageContent({
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("all");
   const [listSort, setListSort] = useState<ListSort>(DEFAULT_LIST_SORT);
   const [tagSeriesFilter, setTagSeriesFilter] = useState<BookTagSeriesFilter>({});
+  const [discoveryFilter, setDiscoveryFilter] = useState<BookDiscoveryFilter>({});
+  const [discoveryOpen, setDiscoveryOpen] = useState(false);
   const [libraryBooks, setLibraryBooks] = useState<Item[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const refreshRef = useRef<(() => Promise<void>) | null>(null);
@@ -116,6 +124,7 @@ export function ListPageContent({
     setStatusFilter("all");
     setListSort(DEFAULT_LIST_SORT);
     setTagSeriesFilter({});
+    setDiscoveryFilter({});
     setSelectedId(null);
   }, [itemType]);
 
@@ -137,7 +146,12 @@ export function ListPageContent({
         if (!cancelled) {
           if (bookLibraryUi && itemType === "book") {
             setLibraryBooks(next);
-            setItems(filterBooksByTagOrSeries(next, tagSeriesFilter));
+            setItems(
+              filterBooksByDiscovery(
+                filterBooksByTagOrSeries(next, tagSeriesFilter),
+                discoveryFilter,
+              ),
+            );
           } else {
             setItems(next);
           }
@@ -177,12 +191,18 @@ export function ListPageContent({
     listSort,
     bookLibraryUi,
     tagSeriesFilter,
+    discoveryFilter,
   ]);
 
   useEffect(() => {
     if (!bookLibraryUi || itemType !== "book") return;
-    setItems(filterBooksByTagOrSeries(libraryBooks, tagSeriesFilter));
-  }, [bookLibraryUi, itemType, libraryBooks, tagSeriesFilter]);
+    setItems(
+      filterBooksByDiscovery(
+        filterBooksByTagOrSeries(libraryBooks, tagSeriesFilter),
+        discoveryFilter,
+      ),
+    );
+  }, [bookLibraryUi, itemType, libraryBooks, tagSeriesFilter, discoveryFilter]);
 
   const listOptionsForFilter = useCallback(
     () => (showStatusFilter && statusFilter !== "all" ? { status: statusFilter } : {}),
@@ -234,6 +254,15 @@ export function ListPageContent({
                 <BookCatalogFlow onSaved={refreshList} showDefaultTrigger />
               ) : null}
               <BookTitleCatalogFlow onSaved={refreshList} />
+              {bookLibraryUi ? (
+                <button
+                  type="button"
+                  className="min-h-11 rounded-lg border border-border px-3 text-sm"
+                  onClick={() => setDiscoveryOpen(true)}
+                >
+                  {t("books.discovery.filters")}
+                </button>
+              ) : null}
             </>
           ) : null}
           {route === "movies" ? <MovieCatalogFlow onSaved={refreshList} /> : null}
@@ -254,11 +283,23 @@ export function ListPageContent({
           seriesNames={collectLibrarySeriesNames(libraryBooks)}
         />
       ) : null}
+      {bookLibraryUi && route === "books" ? (
+        <BookDiscoverySheet
+          open={discoveryOpen}
+          onClose={() => setDiscoveryOpen(false)}
+          value={discoveryFilter}
+          onChange={setDiscoveryFilter}
+          libraryBooks={libraryBooks}
+        />
+      ) : null}
       <ListSortFilter
         value={listSort}
         onChange={setListSort}
         allowRatingField={allowRatingSortField}
       />
+      {bookLibraryUi && route === "books" ? (
+        <BookRecommendations libraryBooks={libraryBooks} onSelect={setSelectedId} />
+      ) : null}
       <div className={desktopSplit ? "grid gap-4 md:grid-cols-2 md:items-start" : undefined}>
         <div className="min-w-0">
           {items.length === 0 ? (
