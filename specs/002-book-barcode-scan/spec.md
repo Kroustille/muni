@@ -17,7 +17,7 @@
 | Phase | Theme | Status |
 |-------|--------|--------|
 | **A — Catalog** | Scan, title search, manual add, dedupe/merge, Open Library via server | **Shipped** (see User Stories 1–4) |
-| **B — Library** | Tags, series, editions/works grouping, **en pause** + pages read, lending, private notes, quotes | Specified; **pending clarify** on data shape for editions, quotes, lending |
+| **B — Library** | Tags, series, editions/works grouping, **en pause** + pages read, lending, private notes, quotes | Specified; editions **clarified**; quotes & lending **pending clarify** |
 | **C — Discovery** | Mood & pace, private recommendations, filter/browse by those dimensions | Specified; pending plan |
 | **D — Insights** | Annual reading goal, streaks, activity heatmap, stats breakdowns, year-in-review | Specified; **pending clarify** on what counts as “reading activity” without session timer |
 
@@ -47,7 +47,7 @@
 
 **Accepted for books**
 
-- Catalog: ISBN barcode scan → catalog fill (mobile); title catalog search (all devices); manual entry offline (title-only OK); “already in library” at scan/search; multiple editions / **work grouping** (model **pending clarify**); free-form **tags** (not custom shelves); **series** (name + volume/order).
+- Catalog: ISBN barcode scan → catalog fill (mobile); title catalog search (all devices); manual entry offline (title-only OK); “already in library” at scan/search; multiple editions / **work grouping** (one row per edition, grouped by work); free-form **tags** (not custom shelves); **series** (name + volume/order).
 - Lifecycle: **`en pause`** status (set aside, may resume) — not a separate “DNF” label; **pages read** when en pause; integer **1–5 star** rating only (no fractional stars).
 - Personal data: **private notes**; **quotes & highlights** as first-class citations per book (storage **pending clarify**); **lending** (“prêté à…”, shape **pending clarify**).
 - Discovery: **mood & pace** metadata; **private** personalized recommendations; **discovery filters** on mood, pace, tags.
@@ -61,6 +61,10 @@
 
 - Goodreads / CSV **import** (low priority).
 - **Reading challenges** (themed goals) — **cross-list** (books + movies + …); defer to a companion-wide feature, not book-only.
+
+### Session 2026-10-16 (clarify Q&A)
+
+- **Q:** When you add several editions of the same work (different ISBNs), how should they appear in the library? → **A:** **One library row per edition** (per item/ISBN), with editions **grouped under a shared work** in list and detail UI (catalog work id when available; manual link otherwise).
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -133,7 +137,7 @@ On mobile, the user can type or paste an ISBN instead of scanning, then run the 
 User assigns free-form tags and optional series name + volume/order; filters list by tag or series.
 
 **User Story 6 — Editions grouped by work (P1)**  
-User can see multiple editions (ISBNs) of the same literary work without treating them as unrelated duplicates (**grouping rules pending clarify**).
+User keeps **one book item per edition** (typically one ISBN each). List and detail views **group editions under the same work** (Open Library work id when present; user may link manual rows). Scanning a second ISBN for the same work adds or updates that edition’s row, not a duplicate work.
 
 **User Story 7 — En pause and lending (P1)**  
 User marks a book **en pause** (optional pages read), or records that it is **prêté à** someone, and can clear/resume later.
@@ -193,7 +197,7 @@ User opens stats (per month, tags/genres, authors, pages) and an optional year-i
 - **FR-B04**: Books MUST support **lending** metadata (“prêté à…”) per **pending clarify**.
 - **FR-B05**: Books MUST support **private notes** (existing field scope may extend).
 - **FR-B06**: Books MUST support **multiple quotes/highlights** per book per **pending clarify**.
-- **FR-B07**: Multiple **editions / work grouping** MUST behave per **pending clarify** (Q1 in 2026-10-16 clarify session).
+- **FR-B07**: Each **edition** MUST be a distinct book **item** (ISBN dedupe unchanged). Items MUST be linkable to a shared **work** (catalog work id or user-defined work key). UI MUST **group editions by work** in browse/detail; MUST NOT collapse editions into a single row.
 
 **Phase C — Discovery (draft)**
 
