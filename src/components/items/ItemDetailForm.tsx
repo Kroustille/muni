@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
+import type { BookQuoteUseCases } from "@/application/books/book-quotes";
 import type { Item, ItemPatch } from "@/domain/item";
 import {
   BookFields,
@@ -24,7 +25,8 @@ import {
   itemToBookDiscoveryValues,
   type BookDiscoveryFieldValues,
 } from "@/components/books/book-discovery-fields";
-import { getItemUseCases } from "@/composition/client";
+import { BookQuotesSection } from "@/components/books/book-quotes-section";
+import { getBookQuoteUseCases, getItemUseCases } from "@/composition/client";
 import { Button } from "@/components/ui/Button";
 import { ExternalLinkActions } from "@/components/music/external-link-actions";
 import { t } from "@/i18n";
@@ -59,6 +61,12 @@ export function ItemDetailForm({
   const [titleError, setTitleError] = useState<string | undefined>();
   const [artistError, setArtistError] = useState<string | undefined>();
   const [saving, setSaving] = useState(false);
+  const [bookQuoteUseCases, setBookQuoteUseCases] = useState<BookQuoteUseCases | null>(null);
+
+  useEffect(() => {
+    if (item.type !== "book") return;
+    void getBookQuoteUseCases().then(setBookQuoteUseCases);
+  }, [item.type]);
 
   const save = useCallback(async () => {
     const errors = validateFieldValues(item, values);
@@ -123,6 +131,9 @@ export function ItemDetailForm({
               onLibraryChange?.();
             }}
           />
+          {bookQuoteUseCases !== null ? (
+            <BookQuotesSection bookItemId={item.id} useCases={bookQuoteUseCases} />
+          ) : null}
         </>
       ) : null}
       {item.type === "book" ? (

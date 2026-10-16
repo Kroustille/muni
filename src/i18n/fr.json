@@ -38,6 +38,7 @@
   "action.cancel": "Annuler",
   "action.close": "Fermer",
   "action.delete": "Supprimer",
+  "action.edit": "Modifier",
   "action.loading": "Chargement…",
   "action.undo": "Annuler la suppression",
   "action.addIngredient": "Ajouter un ingrédient",
