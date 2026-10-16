@@ -1,6 +1,6 @@
 # Muni — design specification (draft)
 
-**Status:** draft for review with Valentin  
+**Status:** partially locked (Valentin 2026-10-16)  
 **Last updated:** 2026-10-16  
 **Scope:** visual identity, UX tone, and UI system — not feature requirements (those stay in `specs/`).
 
@@ -69,12 +69,12 @@ This spec defines **character** (what Muni should feel like) and **system** (how
 Avoid literal Viking branding. Use **subtle memory metaphors**:
 
 - **Carnet / page:** soft surfaces, slight paper warmth in light mode; ink-like foreground in dark mode.
-- **Raven:** at most a **small mark** (app icon, empty state, splash) — single-color, geometric, not mascot cosplay.
+- **Raven (locked):** **calm, friendly** raven — rounded shapes, soft eye, no sharp horror-Norse vibe. Use for app icon, select empty states, optional small watermark. Single-color or two-tone max; never a chatty mascot.
 - **Feather / bookmark:** optional divider or list empty-state illustration (SVG, one color).
 
-### 4.2 Color system (proposal)
+### 4.2 Color system
 
-Replace generic indigo with a palette that feels **ink + amber** (memory, candlelight, old paper) while keeping semantic colors for ratings.
+Replace generic indigo while keeping semantic colors for ratings. **Accent palette: TBD** — see §8.1 (warm amber vs cool ink + teal). **Home cards (locked):** type **color stripe + Lucide icon** per list.
 
 **Light**
 
@@ -113,7 +113,7 @@ Replace generic indigo with a palette that feels **ink + amber** (memory, candle
 
 Keep **rating tier colors** as today; they already encode meaning.
 
-### 4.3 Typography (proposal)
+### 4.3 Typography (locked)
 
 | Role | Font | Fallback | Usage |
 |------|------|----------|--------|
@@ -218,19 +218,45 @@ Unchanged routes; **visual hierarchy** should reinforce:
 
 ---
 
-## 8. Open decisions (need Valentin)
+## 8. Decisions log
 
-1. **Warm amber accent** vs **cool ink + teal accent** — which emotional pole fits you?
-2. **Fraunces serif** for titles — yes/no? (Alternative: stay sans-only but stronger weight scale.)
-3. **Raven motif** — none / icon only / light illustration in empty states?
-4. **Type colors** — approve table in §4.2 or simplify to monochrome + icons only?
-5. **Density** — keep airy lists or tighter for power users?
+| # | Topic | Decision |
+|---|--------|----------|
+| 2 | Titles | **Fraunces** for headings |
+| 3 | Raven | **Yes** — calm, friendly; icon + light empty-state use |
+| 4 | Home cards | **Type color stripe + icons** (table §4.2) |
+| 1 | Accent mood | **Pending** — warm amber (§4.2 light table) vs cool ink + teal (§8.1) |
+| 5 | Density | **Pending** — airy (default) vs tighter lists |
 
-Reply with preferences (even bullet answers); we can lock §4–6 and spawn a `specs/005-design-system` implementation track.
+### 8.1 Accent options explained
+
+Two coherent palettes for the *same* product soul; only the **primary accent** (`--accent`, links, FAB, active nav) changes.
+
+**A — Warm amber (paper & candle)**  
+- Feel: carnet on a kitchen table, late afternoon, personal and welcoming.  
+- Light accent ~`#b45309` (amber-700); dark ~`#fbbf24`.  
+- Pairs naturally with **warm paper backgrounds** and a **friendly raven** (soft browns/grays, not cold).  
+- Best if Muni should feel like a **companion notebook**.
+
+**B — Cool ink + teal (desk at night)**  
+- Feel: deep **ink** neutrals (blue-black text, cool gray surfaces) + **teal** accent (~`#0d9488` / `#14b8a6` in dark).  
+- Less “cozy paper”, more **focused tool**: calm, precise, slightly literary.  
+- Teal reads modern and clear on mobile; can still stay friendly with rounded UI and a soft raven.  
+- Best if Muni should feel like a **quiet studio** rather than a scrapbook.
+
+Both respect system light/dark. List-type stripe colors (§4.2) stay the same in either option.
+
+**Recommendation with your raven + stripe choices:** **A (warm amber)** unless you want a cooler, more “night mode product” personality — then **B**.
 
 ---
 
-## 9. References
+## 9. Next step
+
+When accent (and optionally density) are locked, open **`specs/005-design-system`** (spec + tasks) and execute **Phase A → B** from §6.
+
+---
+
+## 10. References
 
 - [Constitution](../.specify/memory/constitution.md) — capture speed, French UI, system theme.
 - [UI routes contract](../specs/001-typed-lists-companion/contracts/ui-routes.md) — screens and behaviors.
