@@ -8,16 +8,12 @@ import { createUuidIdGenerator } from "../adapters/browser/id-generator";
 import { openMuniDb } from "../adapters/indexeddb/db";
 import { createIndexedDbBookQuoteRepository } from "../adapters/indexeddb/book-quote-repository";
 import { createIndexedDbItemRepository } from "../adapters/indexeddb/item-repository";
-<<<<<<< HEAD
 import { createHttpBookQuoteRemoteStore } from "../adapters/http/book-quote-remote-store";
 import { createBookQuoteUseCases, type BookQuoteUseCases } from "../application/books/book-quotes";
-import { createItemUseCases, type ItemUseCases } from "../application/items";
-import { createBookQuotesSyncEngine } from "../application/sync/book-quotes-engine";
-=======
 import { createReadingSettings, type ReadingSettingsUseCases } from "../application/books/reading-settings";
 import { createItemUseCases, type ItemUseCases } from "../application/items";
 import { createIndexedDbReadingGoalRepository } from "../adapters/indexeddb/reading-goal-repository";
->>>>>>> bd5c4f0 (feat(002): T334 reading goal settings and repositories)
+import { createBookQuotesSyncEngine } from "../application/sync/book-quotes-engine";
 import { createSearchUseCase, type SearchUseCase } from "../application/search";
 import type { AuthGateway } from "../application/ports/auth-gateway";
 import type { Unsubscribe } from "../application/ports/item-repository";
@@ -32,11 +28,8 @@ export type SyncStatusState = "idle" | "syncing" | "offline" | "paused";
 
 export type ClientContext = {
   itemUseCases: ItemUseCases;
-<<<<<<< HEAD
   bookQuoteUseCases: BookQuoteUseCases;
-=======
   readingSettingsUseCases: ReadingSettingsUseCases;
->>>>>>> bd5c4f0 (feat(002): T334 reading goal settings and repositories)
   searchUseCase: SearchUseCase;
   sessionUseCases: SessionUseCases;
   authGateway: AuthGateway;
@@ -208,11 +201,8 @@ function buildClientContext(): Promise<ClientContext> {
 
     return {
       itemUseCases,
-<<<<<<< HEAD
       bookQuoteUseCases,
-=======
       readingSettingsUseCases,
->>>>>>> bd5c4f0 (feat(002): T334 reading goal settings and repositories)
       searchUseCase,
       sessionUseCases: wrappedSession,
       authGateway,
@@ -239,13 +229,12 @@ export function getItemUseCases(): Promise<ItemUseCases> {
   return getClientContext().then((ctx) => ctx.itemUseCases);
 }
 
-<<<<<<< HEAD
 export function getBookQuoteUseCases(): Promise<BookQuoteUseCases> {
   return getClientContext().then((ctx) => ctx.bookQuoteUseCases);
-=======
+}
+
 export function getReadingSettingsUseCases(): Promise<ReadingSettingsUseCases> {
   return getClientContext().then((ctx) => ctx.readingSettingsUseCases);
->>>>>>> bd5c4f0 (feat(002): T334 reading goal settings and repositories)
 }
 
 export function getSearchUseCase(): Promise<SearchUseCase> {

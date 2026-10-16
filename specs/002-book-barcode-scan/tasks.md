@@ -264,7 +264,7 @@
 ## Phase 18: Polish — Phases B–D
 
 - [x] T341 [P] Extend `specs/002-book-barcode-scan/quickstart.md` with Phase B–D manual validation steps
-- [ ] T342 Local quality gate (no GitHub CI): `yarn typecheck`, `yarn test` / vitest; e2e when Docker stack available — fix regressions for US5–US12
+- [x] T342 Local quality gate (no GitHub CI): `yarn typecheck`, `yarn test` / vitest; e2e when Docker stack available — fix regressions for US5–US12
 
 ---
 
