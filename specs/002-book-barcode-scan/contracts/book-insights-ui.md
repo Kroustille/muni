@@ -30,3 +30,12 @@
 
 - Toggle show/hide streak and heatmap on books tab.
 - Timezone for activity days: default Europe/Paris until user preference exists (OD-002-9).
+
+## FR mapping
+
+| UI area | Requirements |
+|---------|----------------|
+| Objectif de lecture | FR-D01 |
+| Heatmap, streak | FR-D02 |
+| Stats breakdowns | FR-D03 |
+| Bilan / year in review | FR-D04 |
