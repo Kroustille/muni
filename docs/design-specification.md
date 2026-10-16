@@ -206,42 +206,42 @@ Routes stay the same; **layout and chrome** differ by breakpoint (see §5.1). Hi
 
 ### Phase A — Foundation (1–2 days dev)
 
-- [ ] Unify tokens in `globals.css` (warm palette above or Valentin-approved tweak).
-- [ ] Replace hardcoded `border-black/10` / `bg-white` / `dark:bg-black` with semantic tokens.
-- [ ] Add `next/font` for Fraunces + Source Sans 3; apply to `layout.tsx`.
+- [x] Unify tokens in `globals.css` (warm palette above or Valentin-approved tweak).
+- [x] Replace hardcoded `border-black/10` / `bg-white` / `dark:bg-black` with semantic tokens.
+- [x] Add `next/font` for Fraunces + Source Sans 3; apply to `layout.tsx`.
 - [ ] Document tokens in this file → `docs/design-tokens.md` (optional split).
 
 ### Phase B — Shell character (2–3 days)
 
-- [ ] Bottom nav icons + active state (accent).
-- [ ] Home cards: icon + type accent stripe.
-- [ ] FAB restyle; search entry on home as proper search bar.
-- [ ] App icon + `manifest` refresh (simple raven/book mark).
+- [x] Bottom nav icons + active state (accent).
+- [x] Home cards: icon + type accent stripe.
+- [x] FAB restyle; search entry on home as proper search bar.
+- [x] App icon + `manifest` refresh (simple raven/book mark).
 
 ### Phase C — Lists & sheets (ongoing)
 
-- [ ] Row component pass (shared `ListRow` shell).
-- [ ] Bottom sheet header typography (Fraunces).
-- [ ] Empty states per list type (one illustration pattern).
+- [x] Row component pass (shared `ListRow` shell).
+- [x] Bottom sheet header typography (Fraunces).
+- [x] Empty states per list type (one illustration pattern).
 
 ### Phase D — Theme picker
 
-- [ ] `ThemeProvider` + Settings appearance control (Clair / Sombre / Système).
-- [ ] Class-based dark + system; update `globals.css` / Tailwind dark variant.
-- [ ] Amend **FR-023** in `specs/001` (system default + user override).
-- [ ] E2E: forced light and forced dark via settings (not only emulate OS).
+- [x] `ThemeProvider` + Settings appearance control (Clair / Sombre / Système).
+- [x] Class-based dark + system; update `globals.css` / Tailwind dark variant.
+- [x] Amend **FR-023** in `specs/001` (system default + user override).
+- [x] E2E: forced light and dark via settings (not only emulate OS).
 
 ### Phase E — Desktop shell
 
-- [ ] `AppShell` with `SidebarNav` (desktop) vs `BottomNav` (mobile).
-- [ ] Hide center FAB on `md+`; expose Ajouter on list headers + sidebar action.
-- [ ] Desktop home layout (wider grid / recent list).
-- [ ] Quick-add / catalog: modal or drawer on desktop instead of full-width bottom sheet only.
+- [x] `AppShell` with `SidebarNav` (desktop) vs `BottomNav` (mobile).
+- [x] Hide center FAB on `md+`; expose Ajouter on list headers + sidebar action.
+- [x] Desktop home layout (wider grid / recent list).
+- [x] Quick-add / catalog: modal or drawer on desktop instead of full-width bottom sheet only.
 
 ### Phase F — Polish
 
-- [ ] Motion tokens; reduced-motion.
-- [ ] Optional list+detail split on desktop (later).
+- [x] Motion tokens; reduced-motion.
+- [x] Optional list+detail split on desktop (later).
 
 **Out of scope:** user-chosen accent colors, cover art grids, social sharing cards.
 
@@ -292,7 +292,7 @@ Both respect system light/dark. List-type stripe colors (§4.2) stay the same in
 
 ## 9. Next step
 
-Execute **Phase A → B** from §6; track in **`specs/005-design-system`** when created.
+Phases A–F tracked in **`specs/005-design-system`**; optional `docs/design-tokens.md` split remains open.
 
 ---
 

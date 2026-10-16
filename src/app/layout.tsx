@@ -16,7 +16,13 @@ const sourceSans3 = Source_Sans_3({
   display: "swap",
 });
 
-export const metadata = { title: "Muni" };
+export const metadata = {
+  title: "Muni",
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    apple: "/icons/icon-192.png",
+  },
+};
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (

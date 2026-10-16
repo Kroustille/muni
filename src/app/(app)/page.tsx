@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import { RavenIllustration } from "@/components/illustrations/RavenIllustration";
 import { LIST_TYPE_VISUAL } from "@/components/list-type-visual";
 import { getItemUseCases } from "@/composition/client";
 import type { Item, ItemType } from "@/domain/item";
@@ -140,7 +141,13 @@ export default function HomePage() {
         <Search className="h-5 w-5 shrink-0 text-muted" strokeWidth={1.5} aria-hidden />
         <span className="truncate">{t("search.placeholder")}</span>
       </Link>
-      {showEmpty ? <p className="mb-4 text-sm text-muted">{t("home.empty")}</p> : null}
+      {showEmpty ? (
+        <div className="mb-6 flex flex-col items-center gap-2 py-4 text-center" role="status">
+          <RavenIllustration className="h-12 w-12 text-muted" />
+          <p className="text-sm text-foreground">{t("home.empty")}</p>
+          <p className="text-sm text-muted">{t("home.empty.hint")}</p>
+        </div>
+      ) : null}
       <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3">
         {LIST_ROUTES.map((route) => {
           const type = ROUTE_TO_TYPE[route];

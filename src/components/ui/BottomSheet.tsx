@@ -26,12 +26,14 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
   if (!open) return null;
 
   const panelClass = isMobile
-    ? "max-h-[85vh] w-full overflow-y-auto rounded-t-2xl border-t border-border bg-background p-4 text-foreground"
-    : "max-h-[min(90vh,40rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-background p-4 text-foreground shadow-lg";
+    ? "bottom-sheet-panel-mobile max-h-[85vh] w-full overflow-y-auto rounded-t-2xl border-t border-border bg-background p-4 text-foreground"
+    : "bottom-sheet-panel-desktop max-h-[min(90vh,40rem)] w-full max-w-lg overflow-y-auto rounded-2xl border border-border bg-background p-4 text-foreground shadow-lg";
 
   return (
     <div
-      className={`fixed inset-0 z-40 flex bg-black/50 ${isMobile ? "items-end" : "items-center justify-center p-4"}`}
+      className={`bottom-sheet-overlay fixed inset-0 z-40 flex bg-black/50 ${
+        isMobile ? "items-end" : "items-center justify-center p-4"
+      }`}
       onClick={onClose}
     >
       <div
@@ -42,7 +44,7 @@ export function BottomSheet({ open, onClose, title, children }: BottomSheetProps
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-lg">{title}</h2>
+          <h2 className="font-display text-lg font-semibold">{title}</h2>
           <button
             type="button"
             aria-label={t("action.close")}

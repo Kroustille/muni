@@ -1,208 +1,17 @@
 "use client";
 
 import { notFound, useParams } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
-import type { ItemPatch } from "@/domain/item";
+import { useEffect, useState } from "react";
 import type { Item } from "@/domain/item";
 import { getItemUseCases } from "@/composition/client";
-import {
-  BookFields,
-  type BookFieldValues,
-  MovieFields,
-  type MovieFieldValues,
-  MusicArtistFields,
-  type MusicArtistFieldValues,
-  musicArtistFieldValuesToExtra,
-  MusicTrackFields,
-  type MusicTrackFieldValues,
-  musicTrackFieldValuesToExtra,
-  RecipeFields,
-  type RecipeFieldValues,
-  ShoppingFields,
-  type ShoppingFieldValues,
-} from "@/components/fields";
-import { Button } from "@/components/ui/Button";
+import { ItemDetailForm } from "@/components/items/ItemDetailForm";
 import { useUndoDelete } from "@/components/UndoToast";
-import { ExternalLinkActions } from "@/components/music/external-link-actions";
-import { t } from "@/i18n";
-
-function optionalText(value: string): string | null {
-  const trimmed = value.trim();
-  return trimmed === "" ? null : trimmed;
-}
-
-function itemToShoppingValues(item: Item): ShoppingFieldValues {
-  return {
-    title: item.title,
-    quantity: item.quantity ?? "",
-  };
-}
-
-function shoppingValuesToPatch(values: ShoppingFieldValues): ItemPatch {
-  return {
-    title: values.title.trim(),
-    quantity: optionalText(values.quantity),
-  };
-}
-
-function itemToBookValues(item: Item): BookFieldValues {
-  return {
-    title: item.title,
-    author: item.author ?? "",
-    status: item.status as BookFieldValues["status"],
-    rating: item.rating,
-    recommendedBy: item.recommendedBy ?? "",
-    notes: item.notes ?? "",
-  };
-}
-
-function bookValuesToPatch(values: BookFieldValues): ItemPatch {
-  const patch: ItemPatch = {
-    title: values.title.trim(),
-    author: optionalText(values.author),
-    status: values.status,
-    recommendedBy: optionalText(values.recommendedBy),
-    notes: optionalText(values.notes),
-  };
-  if (values.status === "read") {
-    patch.rating = values.rating;
-  }
-  return patch;
-}
-
-function itemToMovieValues(item: Item): MovieFieldValues {
-  return {
-    title: item.title,
-    status: item.status as MovieFieldValues["status"],
-    rating: item.rating,
-    recommendedBy: item.recommendedBy ?? "",
-    notes: item.notes ?? "",
-  };
-}
-
-function movieValuesToPatch(values: MovieFieldValues): ItemPatch {
-  const patch: ItemPatch = {
-    title: values.title.trim(),
-    status: values.status,
-    recommendedBy: optionalText(values.recommendedBy),
-    notes: optionalText(values.notes),
-  };
-  if (values.status === "watched") {
-    patch.rating = values.rating;
-  }
-  return patch;
-}
-
-function itemToRecipeValues(item: Item): RecipeFieldValues {
-  return {
-    title: item.title,
-    ingredients: item.ingredients ?? [],
-    steps: item.steps ?? [],
-    notes: item.notes ?? "",
-  };
-}
-
-function itemToMusicArtistValues(item: Item): MusicArtistFieldValues {
-  return {
-    title: item.title,
-    rating: item.rating,
-    recommendedBy: item.recommendedBy ?? "",
-    notes: item.notes ?? "",
-    spotifyUrl: item.spotifyUrl ?? "",
-    soundcloudUrl: item.soundcloudUrl ?? "",
-  };
-}
-
-function musicArtistValuesToPatch(values: MusicArtistFieldValues): ItemPatch {
-  return musicArtistFieldValuesToExtra(values) as ItemPatch;
-}
-
-function itemToMusicTrackValues(item: Item): MusicTrackFieldValues {
-  return {
-    title: item.title,
-    artist: item.artist ?? "",
-    album: item.album ?? "",
-    releaseYear: item.releaseYear !== null ? String(item.releaseYear) : "",
-    status: (item.status ?? "to_listen") as MusicTrackFieldValues["status"],
-    rating: item.rating,
-    recommendedBy: item.recommendedBy ?? "",
-    notes: item.notes ?? "",
-    spotifyUrl: item.spotifyUrl ?? "",
-    soundcloudUrl: item.soundcloudUrl ?? "",
-  };
-}
-
-function musicTrackValuesToPatch(values: MusicTrackFieldValues): ItemPatch {
-  return {
-    ...musicTrackFieldValuesToExtra(values),
-    title: values.title.trim(),
-  };
-}
-
-function recipeValuesToPatch(values: RecipeFieldValues): ItemPatch {
-  const ingredients = values.ingredients
-    .map((row) => ({ quantity: row.quantity.trim(), name: row.name.trim() }))
-    .filter((row) => row.quantity !== "" || row.name !== "");
-  const steps = values.steps.map((step) => step.trim()).filter((step) => step !== "");
-  return {
-    title: values.title.trim(),
-    notes: optionalText(values.notes),
-    ingredients: ingredients.length === 0 ? null : ingredients,
-    steps: steps.length === 0 ? null : steps,
-  };
-}
-
-type FieldValues =
-  | ShoppingFieldValues
-  | BookFieldValues
-  | MovieFieldValues
-  | MusicArtistFieldValues
-  | MusicTrackFieldValues
-  | RecipeFieldValues;
-
-function valuesFromItem(item: Item): FieldValues {
-  switch (item.type) {
-    case "shopping":
-      return itemToShoppingValues(item);
-    case "book":
-      return itemToBookValues(item);
-    case "movie":
-      return itemToMovieValues(item);
-    case "recipe":
-      return itemToRecipeValues(item);
-    case "music_artist":
-      return itemToMusicArtistValues(item);
-    case "music_track":
-      return itemToMusicTrackValues(item);
-  }
-}
-
-function patchFromValues(item: Item, values: FieldValues): ItemPatch {
-  switch (item.type) {
-    case "shopping":
-      return shoppingValuesToPatch(values as ShoppingFieldValues);
-    case "book":
-      return bookValuesToPatch(values as BookFieldValues);
-    case "movie":
-      return movieValuesToPatch(values as MovieFieldValues);
-    case "recipe":
-      return recipeValuesToPatch(values as RecipeFieldValues);
-    case "music_artist":
-      return { ...musicArtistValuesToPatch(values as MusicArtistFieldValues), title: values.title.trim() };
-    case "music_track":
-      return musicTrackValuesToPatch(values as MusicTrackFieldValues);
-  }
-}
 
 export default function ItemDetailPage() {
   const params = useParams();
   const id = typeof params.id === "string" ? params.id : null;
   const { deleteWithUndo, isPendingUndo } = useUndoDelete();
   const [item, setItem] = useState<Item | null | undefined>(undefined);
-  const [values, setValues] = useState<FieldValues | null>(null);
-  const [titleError, setTitleError] = useState<string | undefined>();
-  const [artistError, setArtistError] = useState<string | undefined>();
-  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     if (id === null) return;
@@ -213,11 +22,9 @@ export default function ItemDetailPage() {
       if (cancelled) return;
       if (next === undefined || (next.deletedAt !== null && !isPendingUndo(id))) {
         setItem(null);
-        setValues(null);
         return;
       }
       setItem(next);
-      setValues((current) => (current === null ? valuesFromItem(next) : current));
     });
 
     return () => {
@@ -225,38 +32,11 @@ export default function ItemDetailPage() {
     };
   }, [id, isPendingUndo]);
 
-  const save = useCallback(async () => {
-    if (id === null || item == null || values === null) return;
-    const trimmedTitle = values.title.trim();
-    if (!trimmedTitle) {
-      setTitleError(t("validation.titleRequired"));
-      return;
-    }
-    if (item.type === "music_track") {
-      const artist = (values as MusicTrackFieldValues).artist.trim();
-      if (!artist) {
-        setArtistError(t("validation.artistRequired"));
-        return;
-      }
-    }
-    setSaving(true);
-    setTitleError(undefined);
-    setArtistError(undefined);
-    try {
-      const useCases = await getItemUseCases();
-      const updated = await useCases.updateItem(id, patchFromValues(item, values));
-      setItem(updated);
-      setValues(valuesFromItem(updated));
-    } finally {
-      setSaving(false);
-    }
-  }, [id, item, values]);
-
   if (id === null) {
     notFound();
   }
 
-  if (item === undefined || values === null) {
+  if (item === undefined) {
     return <main className="p-4 pb-20" aria-busy="true" />;
   }
 
@@ -265,105 +45,18 @@ export default function ItemDetailPage() {
   }
 
   return (
-    <main className="p-4 pb-20">
-      <form
-        className="flex flex-col gap-6"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void save();
+    <main className="p-4 pb-20 md:pb-4">
+      <ItemDetailForm
+        key={item.id}
+        item={item}
+        onSave={async (patch) => {
+          const useCases = await getItemUseCases();
+          const updated = await useCases.updateItem(id, patch);
+          setItem(updated);
+          return updated;
         }}
-      >
-        {item.type === "shopping" ? (
-          <ShoppingFields
-            values={values as ShoppingFieldValues}
-            onChange={(next) => {
-              setValues(next);
-              setTitleError(undefined);
-            }}
-            titleError={titleError}
-          />
-        ) : null}
-        {item.type === "book" ? (
-          <BookFields
-            values={values as BookFieldValues}
-            pageCount={item.pageCount}
-            onChange={(next) => {
-              setValues(next);
-              setTitleError(undefined);
-            }}
-            titleError={titleError}
-          />
-        ) : null}
-        {item.type === "movie" ? (
-          <MovieFields
-            values={values as MovieFieldValues}
-            catalogRating={item.catalogRating}
-            imdbId={item.imdbId}
-            onChange={(next) => {
-              setValues(next);
-              setTitleError(undefined);
-            }}
-            titleError={titleError}
-          />
-        ) : null}
-        {item.type === "recipe" ? (
-          <RecipeFields
-            values={values as RecipeFieldValues}
-            onChange={(next) => {
-              setValues(next);
-              setTitleError(undefined);
-            }}
-            titleError={titleError}
-          />
-        ) : null}
-        {item.type === "music_artist" ? (
-          <>
-            <MusicArtistFields
-              values={values as MusicArtistFieldValues}
-              onChange={(next) => {
-                setValues(next);
-                setTitleError(undefined);
-              }}
-              titleError={titleError}
-            />
-            <ExternalLinkActions
-              spotifyUrl={(values as MusicArtistFieldValues).spotifyUrl}
-              soundcloudUrl={(values as MusicArtistFieldValues).soundcloudUrl}
-            />
-          </>
-        ) : null}
-        {item.type === "music_track" ? (
-          <>
-            <MusicTrackFields
-              values={values as MusicTrackFieldValues}
-              onChange={(next) => {
-                setValues(next);
-                setTitleError(undefined);
-                setArtistError(undefined);
-              }}
-              titleError={titleError}
-              artistError={artistError}
-            />
-            <ExternalLinkActions
-              spotifyUrl={(values as MusicTrackFieldValues).spotifyUrl}
-              soundcloudUrl={(values as MusicTrackFieldValues).soundcloudUrl}
-            />
-          </>
-        ) : null}
-
-        <div className="flex flex-col gap-2 sm:flex-row">
-          <Button type="submit" disabled={saving}>
-            {t("action.save")}
-          </Button>
-          <Button
-            type="button"
-            variant="danger"
-            onClick={() => void deleteWithUndo(id)}
-          >
-            {t("action.delete")}
-          </Button>
-        </div>
-      </form>
+        onDelete={() => void deleteWithUndo(id)}
+      />
     </main>
   );
 }

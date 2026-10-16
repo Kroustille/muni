@@ -1,17 +1,20 @@
 "use client";
 
-import Link from "next/link";
 import type { Item } from "@/domain/item";
 import { t } from "@/i18n";
+import { ListRowShell } from "./ListRowShell";
+import { ListRowTitle } from "./ListRowTitle";
 
 export type ShoppingRowProps = {
   item: Item & { type: "shopping" };
   onCheckedChange: (checked: boolean) => void;
+  onSelect?: (id: string) => void;
+  selected?: boolean;
 };
 
-export function ShoppingRow({ item, onCheckedChange }: ShoppingRowProps) {
+export function ShoppingRow({ item, onCheckedChange, onSelect, selected }: ShoppingRowProps) {
   return (
-    <li className="rounded-lg border border-border px-3 py-2">
+    <ListRowShell itemType="shopping" selected={selected}>
       <div className="flex items-start gap-3">
         <input
           type="checkbox"
@@ -21,12 +24,13 @@ export function ShoppingRow({ item, onCheckedChange }: ShoppingRowProps) {
           onChange={(event) => onCheckedChange(event.target.checked)}
         />
         <div className="min-w-0 flex-1">
-          <Link
-            href={`/items/${item.id}`}
-            className={`cursor-pointer font-medium underline-offset-2 hover:underline ${item.checked ? "text-muted line-through" : ""}`}
+          <ListRowTitle
+            itemId={item.id}
+            onSelect={onSelect}
+            className={item.checked ? "text-muted line-through" : ""}
           >
             {item.title}
-          </Link>
+          </ListRowTitle>
           {item.quantity ? (
             <p className="text-sm text-muted">
               <span className="sr-only">{t("field.quantity")}: </span>
@@ -35,6 +39,6 @@ export function ShoppingRow({ item, onCheckedChange }: ShoppingRowProps) {
           ) : null}
         </div>
       </div>
-    </li>
+    </ListRowShell>
   );
 }

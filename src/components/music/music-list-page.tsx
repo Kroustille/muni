@@ -3,8 +3,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { getItemUseCases, subscribeSyncStatus } from "@/composition/client";
+import { ItemDetailPanel } from "@/components/items/ItemDetailPanel";
+import { ListEmptyState } from "@/components/lists/ListEmptyState";
 import { BookMovieRow } from "@/components/rows/BookMovieRow";
 import { MusicArtistRow } from "@/components/rows/MusicArtistRow";
+import { useIsMobile } from "@/components/use-is-mobile";
 import { ListSortFilter } from "@/components/ListSortFilter";
 import { StatusFilter, type StatusFilterValue } from "@/components/StatusFilter";
 import {
@@ -39,17 +42,21 @@ export type MusicListPageProps = {
 };
 
 export function MusicListPage({ kind }: MusicListPageProps) {
+  const isMobile = useIsMobile();
   const itemType: ItemType = kind;
   const showStatusFilter = kind === "music_track";
   const allowRatingSortField = itemTypeSupportsRatingSort(kind);
   const [items, setItems] = useState<Item[]>([]);
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("all");
   const [listSort, setListSort] = useState<ListSort>(DEFAULT_LIST_SORT);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const refreshRef = useRef<(() => Promise<void>) | null>(null);
+  const desktopSplit = !isMobile;
 
   useEffect(() => {
     setStatusFilter("all");
     setListSort(DEFAULT_LIST_SORT);
+    setSelectedId(null);
   }, [kind]);
 
   useEffect(() => {
@@ -152,8 +159,12 @@ export function MusicListPage({ kind }: MusicListPageProps) {
     void refreshRef.current?.();
   }, []);
 
+  const onSelectRow = desktopSplit ? setSelectedId : undefined;
+
   return (
-    <main className="mx-auto w-full max-w-4xl p-4 pb-20 md:pb-4">
+    <main
+      className={`mx-auto w-full p-4 pb-20 md:pb-4 ${desktopSplit ? "max-w-6xl" : "max-w-4xl"}`}
+    >
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-semibold">{t(TITLE_KEY[kind])}</h1>
         <div className="flex flex-wrap items-center gap-2">
@@ -173,33 +184,54 @@ export function MusicListPage({ kind }: MusicListPageProps) {
         onChange={setListSort}
         allowRatingField={allowRatingSortField}
       />
-      {items.length === 0 ? (
-        <p>{t("list.empty")}</p>
-      ) : (
-        <ul className="flex flex-col gap-2">
-          {items.map((item) => {
-            if (item.type === "music_track") {
-              const trackItem = item as Item & { type: "music_track" };
-              return (
-                <BookMovieRow
-                  key={item.id}
-                  item={trackItem}
-                  onStatusChange={(status) => updateTrackItem(item.id, { status })}
-                  onRatingChange={(rating) => updateTrackItem(item.id, { rating })}
-                />
-              );
-            }
-            const artistItem = item as Item & { type: "music_artist" };
-            return (
-              <MusicArtistRow
-                key={item.id}
-                item={artistItem}
-                onRatingChange={(rating) => updateArtistItem(item.id, { rating })}
-              />
-            );
-          })}
-        </ul>
-      )}
+      <div className={desktopSplit ? "grid gap-4 md:grid-cols-2 md:items-start" : undefined}>
+        <div className="min-w-0">
+          {items.length === 0 ? (
+            <ListEmptyState itemType={itemType} />
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {items.map((item) => {
+                if (item.type === "music_track") {
+                  const trackItem = item as Item & { type: "music_track" };
+                  return (
+                    <BookMovieRow
+                      key={item.id}
+                      item={trackItem}
+                      selected={selectedId === item.id}
+                      onSelect={onSelectRow}
+                      onStatusChange={(status) => updateTrackItem(item.id, { status })}
+                      onRatingChange={(rating) => updateTrackItem(item.id, { rating })}
+                    />
+                  );
+                }
+                const artistItem = item as Item & { type: "music_artist" };
+                return (
+                  <MusicArtistRow
+                    key={item.id}
+                    item={artistItem}
+                    selected={selectedId === item.id}
+                    onSelect={onSelectRow}
+                    onRatingChange={(rating) => updateArtistItem(item.id, { rating })}
+                  />
+                );
+              })}
+            </ul>
+          )}
+        </div>
+        {desktopSplit && selectedId ? (
+          <aside
+            className="sticky top-4 min-h-[16rem] rounded-xl border border-border bg-surface"
+            aria-label={t("item.detailPanel")}
+          >
+            <ItemDetailPanel
+              itemId={selectedId}
+              onUpdated={() => {
+                void refreshRef.current?.();
+              }}
+            />
+          </aside>
+        ) : null}
+      </div>
     </main>
   );
 }

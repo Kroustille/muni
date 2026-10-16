@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { Select } from "@/components/ui/Select";
 import { ratingBadgeClass } from "@/components/rating-colors";
 import { StarRating } from "@/components/StarRating";
@@ -12,11 +11,15 @@ import {
   type MusicTrackStatus,
 } from "@/domain/item";
 import { t, type MessageKey } from "@/i18n";
+import { ListRowShell } from "./ListRowShell";
+import { ListRowTitle } from "./ListRowTitle";
 
 export type BookMovieRowProps = {
   item: Item & ({ type: "book" } | { type: "movie" } | { type: "music_track" });
   onStatusChange: (status: BookStatus | MovieStatus | MusicTrackStatus) => void;
   onRatingChange: (rating: number) => void;
+  onSelect?: (id: string) => void;
+  selected?: boolean;
 };
 
 function ratingVisible(status: string | null): boolean {
@@ -29,7 +32,13 @@ function secondaryText(item: BookMovieRowProps["item"]): string | null {
   return item.recommendedBy;
 }
 
-export function BookMovieRow({ item, onStatusChange, onRatingChange }: BookMovieRowProps) {
+export function BookMovieRow({
+  item,
+  onStatusChange,
+  onRatingChange,
+  onSelect,
+  selected,
+}: BookMovieRowProps) {
   const status = item.status ?? statusesFor(item.type)[0];
   const statusOptions = statusesFor(item.type).map((value) => ({
     value,
@@ -37,15 +46,12 @@ export function BookMovieRow({ item, onStatusChange, onRatingChange }: BookMovie
   }));
 
   return (
-    <li className="rounded-lg border border-border px-3 py-2">
+    <ListRowShell itemType={item.type} selected={selected}>
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-2">
-          <Link
-            href={`/items/${item.id}`}
-            className="cursor-pointer font-medium underline-offset-2 hover:underline"
-          >
+          <ListRowTitle itemId={item.id} onSelect={onSelect}>
             {item.title}
-          </Link>
+          </ListRowTitle>
           {ratingVisible(status) && item.rating !== null ? (
             <span className={ratingBadgeClass(item.rating)} aria-label={t("field.rating")}>
               {item.rating}
@@ -65,6 +71,6 @@ export function BookMovieRow({ item, onStatusChange, onRatingChange }: BookMovie
           <StarRating value={item.rating} onChange={onRatingChange} />
         ) : null}
       </div>
-    </li>
+    </ListRowShell>
   );
 }

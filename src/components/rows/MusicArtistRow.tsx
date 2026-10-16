@@ -1,28 +1,27 @@
 "use client";
 
-import Link from "next/link";
-
 import { ratingBadgeClass } from "@/components/rating-colors";
 import { StarRating } from "@/components/StarRating";
 import type { Item } from "@/domain/item";
 import { t } from "@/i18n";
+import { ListRowShell } from "./ListRowShell";
+import { ListRowTitle } from "./ListRowTitle";
 
 export type MusicArtistRowProps = {
   item: Item & { type: "music_artist" };
   onRatingChange: (rating: number) => void;
+  onSelect?: (id: string) => void;
+  selected?: boolean;
 };
 
-export function MusicArtistRow({ item, onRatingChange }: MusicArtistRowProps) {
+export function MusicArtistRow({ item, onRatingChange, onSelect, selected }: MusicArtistRowProps) {
   return (
-    <li className="rounded-lg border border-border px-3 py-2">
+    <ListRowShell itemType="music_artist" selected={selected}>
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-2">
-          <Link
-            href={`/items/${item.id}`}
-            className="cursor-pointer font-medium underline-offset-2 hover:underline"
-          >
+          <ListRowTitle itemId={item.id} onSelect={onSelect}>
             {item.title}
-          </Link>
+          </ListRowTitle>
           {item.rating !== null ? (
             <span className={ratingBadgeClass(item.rating)} aria-label={t("field.rating")}>
               {item.rating}
@@ -32,6 +31,6 @@ export function MusicArtistRow({ item, onRatingChange }: MusicArtistRowProps) {
         {item.recommendedBy ? <p className="text-sm text-muted">{item.recommendedBy}</p> : null}
         <StarRating value={item.rating} onChange={onRatingChange} />
       </div>
-    </li>
+    </ListRowShell>
   );
 }
