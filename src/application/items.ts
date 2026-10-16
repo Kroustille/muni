@@ -15,6 +15,7 @@ import {
 import { DEFAULT_LIST_SORT, type ListSort, sortItemsForList } from "../domain/list-sort";
 import { merge } from "../domain/merge";
 import { normalizeText } from "../domain/text";
+import { readingActivityFieldStamps } from "./books/reading-activity";
 import { createUpsertBookFromCatalog } from "./books/upsert-from-catalog";
 import type { UpsertBookFromCatalogInput } from "./books/upsert-from-catalog";
 import { createUpsertMovieFromCatalog } from "./movies/upsert-from-catalog";
@@ -137,9 +138,14 @@ export function createItemUseCases({
     if (changed.length === 0) return applyPatch(current, {});
     applyPatch(current, fields);
     const stamp = await nextStamp();
+    const patchFields = Object.fromEntries(changed) as ItemPatch;
+    const activityStamps = readingActivityFieldStamps(current, patchFields, stamp);
     const updated = applyPatch(current, {
-      ...Object.fromEntries(changed),
-      fieldsUpdatedAt: Object.fromEntries(changed.map(([key]) => [key, stamp])),
+      ...patchFields,
+      fieldsUpdatedAt: {
+        ...Object.fromEntries(changed.map(([key]) => [key, stamp])),
+        ...activityStamps,
+      },
     });
     await repository.put(updated, { enqueue: true });
     return updated;

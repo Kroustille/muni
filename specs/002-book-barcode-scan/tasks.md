@@ -185,7 +185,7 @@
 - [x] T310 [US7] Unit tests for `paused` status, `pagesRead`, and loan field rules (FR-B03, FR-B04) in `tests/unit/book-pause-lending.test.ts`
 - [x] T311 [US7] Extend `BookFields` / detail for `paused` + `pagesRead` per book-library-ui.md in `src/components/fields/book-fields.tsx` (depends on T287, T310)
 - [x] T312 [US7] Lending inputs + clear-loan action in `src/components/items/ItemDetailForm.tsx` per FR-B04 (depends on T311)
-- [ ] T313 [US7] Emit reading-activity events on book status/`pagesRead` writes via `src/application/items.ts` for insights (depends on T295, T312)
+- [x] T313 [US7] Emit reading-activity events on book status/`pagesRead` writes via `src/application/items.ts` for insights (depends on T295, T312)
 - [ ] T314 [US7] E2e pause, pages read, lend/return in `tests/e2e/books-pause-lending.spec.ts`
 
 ---

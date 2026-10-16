@@ -1,4 +1,4 @@
-import type { Item } from "@/domain/item";
+import type { Item, ItemPatch } from "@/domain/item";
 import { statusesFor } from "@/domain/item";
 
 const BOOK_STATUSES = new Set(statusesFor("book"));
@@ -43,6 +43,11 @@ export function deriveReadingActivityDays(
     if (item.status === "read" && statusAt) {
       days.add(toLocalDateKey(statusAt, timeZone));
     }
+
+    const readAt = item.fieldsUpdatedAt.read;
+    if (readAt) {
+      days.add(toLocalDateKey(readAt, timeZone));
+    }
   }
 
   return days;
@@ -66,5 +71,3 @@ export function readingActivityFieldStamps(
   }
   return extra;
 }
-
-export type ItemPatch = import("@/domain/item").ItemPatch;

@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import type { Item } from "@/domain/item";
-import { deriveReadingActivityDays } from "@/application/books/reading-activity";
+import {
+  deriveReadingActivityDays,
+  readingActivityFieldStamps,
+} from "@/application/books/reading-activity";
 
 const BOOK_ID = "6f1c1d52-7a53-4a3e-9a47-0d8f6b6f2a10";
 
@@ -103,6 +106,16 @@ describe("deriveReadingActivityDays", () => {
     expect(days.size).toBe(0);
   });
 
+  it("marks a day active from fieldsUpdatedAt.read", () => {
+    const items = [
+      book({
+        status: "read",
+        fieldsUpdatedAt: { read: "2026-08-02T09:00:00.000Z" },
+      }),
+    ];
+    expect(deriveReadingActivityDays(items, "Europe/Paris").has("2026-08-02")).toBe(true);
+  });
+
   it("includes paused status updates", () => {
     const items = [
       book({
@@ -111,5 +124,19 @@ describe("deriveReadingActivityDays", () => {
       }),
     ];
     expect(deriveReadingActivityDays(items, "Europe/Paris").has("2026-07-01")).toBe(true);
+  });
+});
+
+describe("readingActivityFieldStamps", () => {
+  it("stamps read when status becomes read", () => {
+    const item = book({ status: "reading" });
+    expect(
+      readingActivityFieldStamps(item, { status: "read" }, "2026-01-02T00:00:00.000Z"),
+    ).toEqual({ read: "2026-01-02T00:00:00.000Z" });
+  });
+
+  it("ignores non-book items", () => {
+    const movie = { ...book(), type: "movie" as const, status: "to_watch" as const };
+    expect(readingActivityFieldStamps(movie as Item, { status: "read" }, "x")).toEqual({});
   });
 });
