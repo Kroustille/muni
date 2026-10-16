@@ -32,6 +32,18 @@ export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
+export interface BookQuotes {
+  book_item_id: string;
+  created_at: Timestamp;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  page: number | null;
+  server_updated_at: Timestamp;
+  text: string;
+  user_id: string;
+}
+
 export interface CatalogCache {
   cache_key: string;
   fetched_at: Timestamp;
@@ -53,7 +65,12 @@ export interface Items {
   imdb_id: string | null;
   ingredients: Json | null;
   isbn: string | null;
+  loaned_at: Timestamp | null;
+  loaned_to: string | null;
   media_kind: string | null;
+  mood: string | null;
+  pace: string | null;
+  pages_read: number | null;
   music_brainz_artist_id: string | null;
   music_brainz_recording_id: string | null;
   notes: string | null;
@@ -61,6 +78,10 @@ export interface Items {
   publication_year: number | null;
   publisher: string | null;
   release_year: number | null;
+  series_name: string | null;
+  series_position: string | null;
+  tags: Json | null;
+  work_id: string | null;
   quantity: string | null;
   rating: number | null;
   recommended_by: string | null;
@@ -73,6 +94,14 @@ export interface Items {
   title: string;
   type: ItemType;
   user_id: string;
+}
+
+export interface ReadingGoals {
+  fields_updated_at: Json;
+  server_updated_at: Timestamp;
+  target_count: number;
+  user_id: string;
+  year: number;
 }
 
 export interface MagicLinkTokens {
@@ -100,8 +129,10 @@ export interface Users {
 }
 
 export interface DB {
+  book_quotes: BookQuotes;
   catalog_cache: CatalogCache;
   items: Items;
+  reading_goals: ReadingGoals;
   magic_link_tokens: MagicLinkTokens;
   sessions: Sessions;
   users: Users;

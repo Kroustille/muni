@@ -134,7 +134,7 @@
 - [x] T288 Write Kysely migration `db/migrations/0008_book_library_fields.ts` (tags jsonb, series, work ids, pages_read, loaned_to, loaned_at, mood, pace)
 - [x] T289 Write Kysely migration `db/migrations/0009_book_quotes.ts` for `book_quotes` child table per book-quotes-sync.md
 - [x] T290 [P] Write Kysely migration `db/migrations/0010_user_reading_settings.ts` for private annual goal (calendar year + target count) per book-insights-ui.md
-- [ ] T291 Regenerate and commit `src/adapters/postgres/db-types.ts` via `yarn run db:codegen` after T288–T290
+- [x] T291 Regenerate and commit `src/adapters/postgres/db-types.ts` via `yarn run db:codegen` after T288–T290
 - [ ] T292 [P] Create `BookQuote` domain type + zod in `src/domain/book-quote.ts` with unit tests in `tests/unit/domain-book-quote.test.ts`
 - [ ] T293 Define `BookQuoteRepository` port in `src/application/ports/book-quote-repository.ts` per book-quotes-sync.md
 - [ ] T294 Create unit tests for reading activity day rules (FR-D02: status change among book statuses, `pagesRead` update, transition to `read`) in `tests/unit/reading-activity.test.ts`
