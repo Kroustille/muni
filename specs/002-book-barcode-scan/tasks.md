@@ -196,14 +196,14 @@
 
 **Independent Test**: Add/edit/delete quotes offline; sync; notes unchanged scope.
 
-- [ ] T315 [US8] Unit tests for quote CRUD use cases in `tests/unit/book-quotes.test.ts`
-- [ ] T316 [US8] Implement quote use cases in `src/application/books/book-quotes.ts` (depends on T293, T315)
-- [ ] T317 [P] [US8] IndexedDB `BookQuoteRepository` in `src/adapters/indexeddb/book-quote-repository.ts`
-- [ ] T318 [US8] Postgres `BookQuoteRepository` in `src/adapters/postgres/book-quote-repository.ts` (depends on T289, T317)
-- [ ] T319 [US8] Wire quote push/pull API and client sync per `contracts/book-quotes-sync.md` (`src/app/api/sync/book-quotes/push/route.ts`, `pull/route.ts`, `src/application/sync/book-quotes-engine.ts`) (depends on T316, T318)
-- [ ] T320 [US8] `BookQuotesSection` list/add/edit/delete on book detail per book-library-ui.md in `src/components/books/book-quotes-section.tsx` (depends on T319)
-- [ ] T321 [US8] Two-user isolation integration tests for quotes in `tests/integration/book-quotes-isolation.test.ts`
-- [ ] T322 [US8] E2e quote offline add then sync in `tests/e2e/books-quotes.spec.ts`
+- [x] T315 [US8] Unit tests for quote CRUD use cases in `tests/unit/book-quotes.test.ts`
+- [x] T316 [US8] Implement quote use cases in `src/application/books/book-quotes.ts` (depends on T293, T315)
+- [x] T317 [P] [US8] IndexedDB `BookQuoteRepository` in `src/adapters/indexeddb/book-quote-repository.ts`
+- [x] T318 [US8] Postgres `BookQuoteRepository` in `src/adapters/postgres/book-quote-repository.ts` (depends on T289, T317)
+- [x] T319 [US8] Wire quote push/pull API and client sync per `contracts/book-quotes-sync.md` (`src/app/api/sync/book-quotes/push/route.ts`, `pull/route.ts`, `src/application/sync/book-quotes-engine.ts`) (depends on T316, T318)
+- [x] T320 [US8] `BookQuotesSection` list/add/edit/delete on book detail per book-library-ui.md in `src/components/books/book-quotes-section.tsx` (depends on T319)
+- [x] T321 [US8] Two-user isolation integration tests for quotes in `tests/integration/book-quotes-isolation.test.ts`
+- [x] T322 [US8] E2e quote offline add then sync in `tests/e2e/books-quotes.spec.ts`
 
 ---
 
