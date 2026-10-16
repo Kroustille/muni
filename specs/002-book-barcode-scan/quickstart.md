@@ -34,28 +34,101 @@
 
 ---
 
-## Phase B — Library (smoke after T280+)
+## Phase B — Library (manual after T280+)
 
-### Tags, paused, and pages read
+### Tags, series, and list filters
 
 1. Open an existing book → add tags `sf`, `favori`.
-2. Set status **En pause**, set **Pages lues** to `120`, save.
-3. Books list filter by tag `sf` → book appears; clear filter.
-4. Change status to **En cours** → pages read retained.
+2. Set **Série** to `Dune`, **Tome** to `1`, save.
+3. On `/books`, filter by tag `sf` → book appears; clear filter.
+4. Filter by **Série** `Dune` → same book; clear filter.
+
+### En pause and pages read
+
+1. Set status **En pause**, set **Pages lues** to `120`, save.
+2. Books list still shows the book; reopen detail → pages read unchanged.
+3. Set status **En cours** → pages read retained.
+
+### Lending
+
+1. In **Prêt**, set **Prêté à** to `Marie`, optional **Depuis le** to today, save.
+2. Reopen detail → loan fields present.
+3. **Marquer comme rendu** → **Prêté à** and date cleared.
+
+### Editions grouped by work
+
+1. Add or scan a second book with a different ISBN but same Open Library work (or two items that share `catalogWorkId` after lookup).
+2. List shows grouped editions (stack or cluster per `groupBooksByWork`).
+3. On one edition, open **Autres éditions** → sibling visible; tap opens sibling detail.
+4. Optional: **Lier à une édition…** on an orphan book → pick sibling → both share a work group; **Dissocier** on one edition leaves the other grouped.
+
+### Private notes
+
+1. Add text in **Notes privées**; save and reload → notes unchanged and not shown on list rows.
 
 ### Quotes (offline-friendly)
 
-1. While offline (devtools → offline), add citation text *« Il faut cultiver notre jardin. »* with page `42`.
+1. While offline (devtools → offline), add citation *« Il faut cultiver notre jardin. »* with page `42`.
 2. Go online; wait for sync (or trigger sync).
-3. Reload app on another session/device → citation still on book detail.
+3. Reload app on another session/device → citation still on book detail; edit or delete one quote and sync again.
 
 ---
 
-## Phase D — Insights (smoke after insights tasks)
+## Phase C — Discovery (manual after US9–US10)
 
-### Goal and heatmap
+### Mood and pace on detail
 
-1. Set **Objectif de lecture** for current year to `12`.
+1. On a **Lu** book, set **Ambiance** and **Rythme** from the dropdowns; save.
+2. Clear one field → saves as empty (null).
+
+### Discovery filters (books list)
+
+1. On `/books`, open **Filtres découverte**.
+2. Select the same **Ambiance** / **Rythme** and a tag used on another book → only matching rows remain.
+3. Clear discovery filters → full library list returns (status filters still apply if set).
+
+### Private recommendations
+
+1. Seed at least three **À lire** / **En cours** books with overlapping tags or mood with your **Lu** books.
+2. On `/books`, section **Pour vous** lists up to five library titles (no external API).
+3. Tap a suggestion → opens that book’s detail.
+
+---
+
+## Phase D — Insights (manual after US11–US12)
+
+Navigate to `/books/insights` (or the insights entry on the books tab if linked).
+
+### Reading goal, heatmap, and streak
+
+1. Set **Objectif de lecture** for the current year to `12`.
 2. Mark two different books **Lu** today (or toggle status with sync).
-3. Open **Activité de lecture** → today’s cell highlighted; goal shows `2 / 12` (or current finish count).
-4. Optional: verify streak increments when yesterday also had activity (seed via changing `pagesRead` on another day in tests).
+3. **Activité de lecture** → today’s cell highlighted; goal shows progress such as `2 / 12`.
+4. If yesterday also had qualifying activity, **Série actuelle : N jours** shows `N ≥ 1`.
+
+### Stats breakdowns
+
+1. With several **Lu** books across months/tags/genres, open **Statistiques** sections (by month, genres, tags, authors, pages).
+2. Totals match your library (rough spot-check against list filters).
+
+### Year in review
+
+1. For a past calendar year with finished books, open **Bilan {year}**.
+2. Summary cards show books read, pages, and top tags/genres consistent with that year’s **Lu** items.
+
+---
+
+## Automated checks (local)
+
+After manual smoke above:
+
+```bash
+yarn typecheck
+yarn vitest run tests/unit
+```
+
+When Docker stack is up (`yarn db:up` per `001` quickstart):
+
+```bash
+yarn test:e2e tests/e2e/books-*.spec.ts
+```
