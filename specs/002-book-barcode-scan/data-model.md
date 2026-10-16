@@ -95,9 +95,17 @@ Optional future: `activity_events` materialized table if derivation cost exceeds
 
 Primary key `(provider, cache_key)`.
 
+## Naming aliases (implementation)
+
+| Task / API name | Stored field |
+|-----------------|--------------|
+| `catalogWorkId` on `BookCatalogHit` / catalog JSON | **`workId`** (Open Library work key, e.g. `OL45804W`) |
+| Manual edition **`workKey`** / grouping id | **`workId`** with prefix `local:{uuid}` when not from catalog |
+| Reading goal “settings” (migration `0010_user_reading_settings`) | Table **`reading_goals`** (`year`, `target_count`) |
+
 ## Domain types
 
-- **BookCatalogHit** (Phase A + B): Phase A fields plus optional **`workId`** when edition lookup provides it.
+- **BookCatalogHit** (Phase A + B): Phase A fields plus optional **`workId`** (`catalogWorkId` in task IDs) when edition lookup provides it.
 - **BookQuote**: see table above.
 - **ReadingGoal**: `{ year, targetCount, fieldsUpdatedAt }`.
 
