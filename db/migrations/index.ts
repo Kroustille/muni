@@ -10,6 +10,9 @@ import * as m0007MusicArtistRating from "./0007_music_artist_rating";
 import * as m0008BookLibraryFields from "./0008_book_library_fields";
 import * as m0009BookQuotes from "./0009_book_quotes";
 import * as m0010UserReadingSettings from "./0010_user_reading_settings";
+import * as m0011MovieLibraryFields from "./0011_movie_library_fields";
+import * as m0012MovieQuotes from "./0012_movie_quotes";
+import * as m0013UserWatchSettings from "./0013_user_watch_settings";
 
 // Static registry: add each migration module here, keyed by its sortable name.
 const migrations: Record<string, Migration> = {
@@ -23,6 +26,9 @@ const migrations: Record<string, Migration> = {
   "0008_book_library_fields": m0008BookLibraryFields,
   "0009_book_quotes": m0009BookQuotes,
   "0010_user_reading_settings": m0010UserReadingSettings,
+  "0011_movie_library_fields": m0011MovieLibraryFields,
+  "0012_movie_quotes": m0012MovieQuotes,
+  "0013_user_watch_settings": m0013UserWatchSettings,
 };
 
 export const migrationProvider: MigrationProvider = {

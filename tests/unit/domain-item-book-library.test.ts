@@ -107,13 +107,13 @@ describe("book library fields on Item", () => {
     expect(itemWireSchema.safeParse(bookWire({ pace: "fast" })).success).toBe(false);
   });
 
-  it("rejects library fields on non-book types", () => {
+  it("rejects book-only library fields on movies", () => {
     expect(
       itemWireSchema.safeParse({
         ...bookWire(),
         type: "movie",
         status: "to_watch",
-        tags: ["x"],
+        work_id: "OL123",
       }).success,
     ).toBe(false);
   });

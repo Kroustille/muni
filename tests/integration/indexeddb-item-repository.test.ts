@@ -19,6 +19,8 @@ describe("IndexedDB schema", () => {
       "bookQuotes",
       "items",
       "meta",
+      "movieQuoteOutbox",
+      "movieQuotes",
       "outbox",
       "quoteOutbox",
     ]);

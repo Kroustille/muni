@@ -14,6 +14,7 @@ export type MetaValues = {
   pullCursor: string;
   quotePullCursor: string;
   readingGoals: ReadingGoal[];
+  watchGoals: import("@/domain/watch-goal").WatchGoal[];
 };
 
 export type MetaKey = keyof MetaValues;

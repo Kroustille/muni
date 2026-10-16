@@ -27,13 +27,26 @@ import {
   filterBooksByTagOrSeries,
   type BookTagSeriesFilter,
 } from "@/application/books/book-library-filters";
+import {
+  collectLibraryFranchiseNames,
+  collectLibraryTags as collectMovieLibraryTags,
+  filterMoviesByTagOrFranchise,
+  type MovieTagFranchiseFilter,
+} from "@/application/movies/movie-library-filters";
 import { BookDiscoverySheet } from "@/components/books/book-discovery-sheet";
 import { BookRecommendations } from "@/components/books/book-recommendations";
 import { BookTagSeriesFilters } from "@/components/books/book-tag-series-filters";
+import { MovieTagFranchiseFilters } from "@/components/movies/movie-tag-franchise-filters";
+import { MovieDiscoverySheet } from "@/components/movies/movie-discovery-sheet";
+import { MovieRecommendations } from "@/components/movies/movie-recommendations";
 import {
   filterBooksByDiscovery,
   type BookDiscoveryFilter,
 } from "@/application/books/discovery-filters";
+import {
+  filterMoviesByDiscovery,
+  type MovieDiscoveryFilter,
+} from "@/application/movies/discovery-filters";
 import { useIsMobile } from "@/components/use-is-mobile";
 import { groupBooksByWork, type BookWorkGroup } from "@/application/books/work-grouping";
 import type { Item, ItemPatch, ItemStatus, ItemType } from "@/domain/item";
@@ -81,6 +94,7 @@ export type ListPageContentProps = {
   groupBooksByWork?: boolean;
   /** Enables tag/series filters and discovery UI on the books list. */
   bookLibraryUi?: boolean;
+  movieLibraryUi?: boolean;
 };
 
 function editionGroupLabel(count: number): string {
@@ -103,6 +117,7 @@ export function ListPageContent({
   route,
   groupBooksByWork: groupBooksByWorkEnabled = false,
   bookLibraryUi = false,
+  movieLibraryUi = false,
 }: ListPageContentProps) {
   const isMobile = useIsMobile();
   const [items, setItems] = useState<Item[]>([]);
@@ -112,6 +127,10 @@ export function ListPageContent({
   const [discoveryFilter, setDiscoveryFilter] = useState<BookDiscoveryFilter>({});
   const [discoveryOpen, setDiscoveryOpen] = useState(false);
   const [libraryBooks, setLibraryBooks] = useState<Item[]>([]);
+  const [tagFranchiseFilter, setTagFranchiseFilter] = useState<MovieTagFranchiseFilter>({});
+  const [movieDiscoveryFilter, setMovieDiscoveryFilter] = useState<MovieDiscoveryFilter>({});
+  const [movieDiscoveryOpen, setMovieDiscoveryOpen] = useState(false);
+  const [libraryMovies, setLibraryMovies] = useState<Item[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const refreshRef = useRef<(() => Promise<void>) | null>(null);
   const desktopSplit = !isMobile;
@@ -125,6 +144,8 @@ export function ListPageContent({
     setListSort(DEFAULT_LIST_SORT);
     setTagSeriesFilter({});
     setDiscoveryFilter({});
+    setTagFranchiseFilter({});
+    setMovieDiscoveryFilter({});
     setSelectedId(null);
   }, [itemType]);
 
@@ -150,6 +171,14 @@ export function ListPageContent({
               filterBooksByDiscovery(
                 filterBooksByTagOrSeries(next, tagSeriesFilter),
                 discoveryFilter,
+              ),
+            );
+          } else if (movieLibraryUi && itemType === "movie") {
+            setLibraryMovies(next);
+            setItems(
+              filterMoviesByDiscovery(
+                filterMoviesByTagOrFranchise(next, tagFranchiseFilter),
+                movieDiscoveryFilter,
               ),
             );
           } else {
@@ -190,8 +219,11 @@ export function ListPageContent({
     allowRatingSortField,
     listSort,
     bookLibraryUi,
+    movieLibraryUi,
     tagSeriesFilter,
     discoveryFilter,
+    tagFranchiseFilter,
+    movieDiscoveryFilter,
   ]);
 
   useEffect(() => {
@@ -203,6 +235,16 @@ export function ListPageContent({
       ),
     );
   }, [bookLibraryUi, itemType, libraryBooks, tagSeriesFilter, discoveryFilter]);
+
+  useEffect(() => {
+    if (!movieLibraryUi || itemType !== "movie") return;
+    setItems(
+      filterMoviesByDiscovery(
+        filterMoviesByTagOrFranchise(libraryMovies, tagFranchiseFilter),
+        movieDiscoveryFilter,
+      ),
+    );
+  }, [movieLibraryUi, itemType, libraryMovies, tagFranchiseFilter, movieDiscoveryFilter]);
 
   const listOptionsForFilter = useCallback(
     () => (showStatusFilter && statusFilter !== "all" ? { status: statusFilter } : {}),
@@ -265,7 +307,20 @@ export function ListPageContent({
               ) : null}
             </>
           ) : null}
-          {route === "movies" ? <MovieCatalogFlow onSaved={refreshList} /> : null}
+          {route === "movies" ? (
+            <>
+              <MovieCatalogFlow onSaved={refreshList} />
+              {movieLibraryUi ? (
+                <button
+                  type="button"
+                  className="min-h-11 rounded-lg border border-border px-3 text-sm"
+                  onClick={() => setMovieDiscoveryOpen(true)}
+                >
+                  {t("movies.discovery.filters")}
+                </button>
+              ) : null}
+            </>
+          ) : null}
         </div>
       </div>
       {showStatusFilter ? (
@@ -299,6 +354,26 @@ export function ListPageContent({
       />
       {bookLibraryUi && route === "books" ? (
         <BookRecommendations libraryBooks={libraryBooks} onSelect={setSelectedId} />
+      ) : null}
+      {movieLibraryUi && route === "movies" ? (
+        <MovieTagFranchiseFilters
+          value={tagFranchiseFilter}
+          onChange={setTagFranchiseFilter}
+          tags={collectMovieLibraryTags(libraryMovies)}
+          franchiseNames={collectLibraryFranchiseNames(libraryMovies)}
+        />
+      ) : null}
+      {movieLibraryUi && route === "movies" ? (
+        <MovieDiscoverySheet
+          open={movieDiscoveryOpen}
+          onClose={() => setMovieDiscoveryOpen(false)}
+          value={movieDiscoveryFilter}
+          onChange={setMovieDiscoveryFilter}
+          libraryMovies={libraryMovies}
+        />
+      ) : null}
+      {movieLibraryUi && route === "movies" ? (
+        <MovieRecommendations libraryMovies={libraryMovies} onSelect={setSelectedId} />
       ) : null}
       <div className={desktopSplit ? "grid gap-4 md:grid-cols-2 md:items-start" : undefined}>
         <div className="min-w-0">

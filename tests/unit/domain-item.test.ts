@@ -66,7 +66,12 @@ describe("statuses per type", () => {
   });
 
   it("movie statuses", () => {
-    expect([...statusesFor("movie")]).toEqual(["to_watch", "watched"]);
+    expect([...statusesFor("movie")]).toEqual([
+      "to_watch",
+      "in_progress",
+      "paused",
+      "watched",
+    ]);
   });
 
   it("shopping and recipe have no status", () => {

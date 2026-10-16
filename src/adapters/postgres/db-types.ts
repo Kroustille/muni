@@ -55,11 +55,17 @@ export interface Items {
   album: string | null;
   artist: string | null;
   author: string | null;
+  cast: Json | null;
   catalog_rating: number | null;
   checked: Generated<boolean>;
   created_at: Timestamp;
   deleted_at: Timestamp | null;
+  director: string | null;
+  episode_progress: Json | null;
   fields_updated_at: Json;
+  franchise_id: string | null;
+  franchise_name: string | null;
+  franchise_order: number | null;
   genres: Json | null;
   id: string;
   imdb_id: string | null;
@@ -73,6 +79,7 @@ export interface Items {
   pages_read: number | null;
   music_brainz_artist_id: string | null;
   music_brainz_recording_id: string | null;
+  next_episode_key: string | null;
   notes: string | null;
   page_count: number | null;
   publication_year: number | null;
@@ -89,10 +96,24 @@ export interface Items {
   status: string | null;
   soundcloud_url: string | null;
   spotify_url: string | null;
+  streaming_providers: Json | null;
   steps: Json | null;
   synopsis: string | null;
   title: string;
   type: ItemType;
+  user_id: string;
+  watched_at: Timestamp | null;
+}
+
+export interface MovieQuotes {
+  context: string | null;
+  created_at: Timestamp;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  movie_item_id: string;
+  server_updated_at: Timestamp;
+  text: string;
   user_id: string;
 }
 
@@ -128,11 +149,21 @@ export interface Users {
   id: string;
 }
 
+export interface WatchGoals {
+  fields_updated_at: Json;
+  server_updated_at: Timestamp;
+  target_count: number;
+  user_id: string;
+  year: number;
+}
+
 export interface DB {
   book_quotes: BookQuotes;
   catalog_cache: CatalogCache;
   items: Items;
+  movie_quotes: MovieQuotes;
   reading_goals: ReadingGoals;
+  watch_goals: WatchGoals;
   magic_link_tokens: MagicLinkTokens;
   sessions: Sessions;
   users: Users;

@@ -23,6 +23,17 @@ export type BookMood = (typeof BOOK_MOODS)[number];
 export const BOOK_PACES = ["lent", "modéré", "rapide", "fébrile"] as const;
 export type BookPace = (typeof BOOK_PACES)[number];
 
+export const MOVIE_MOODS = BOOK_MOODS;
+export type MovieMood = BookMood;
+export const MOVIE_PACES = BOOK_PACES;
+export type MoviePace = BookPace;
+
+export type EpisodeProgressEntry = { watchedAt?: string };
+export type EpisodeProgressMap = Record<string, EpisodeProgressEntry>;
+export type StreamingProvider = { name: string; url?: string };
+
+const EPISODE_KEY_PATTERN = /^S\d+E\d+$/;
+
 export const ITEM_TYPES = [
   "shopping",
   "book",
@@ -36,7 +47,7 @@ export type ItemType = (typeof ITEM_TYPES)[number];
 const STATUSES = {
   shopping: [],
   book: ["to_read", "reading", "read", "paused"],
-  movie: ["to_watch", "watched"],
+  movie: ["to_watch", "in_progress", "paused", "watched"],
   recipe: [],
   music_artist: [],
   music_track: ["to_listen", "listened"],
@@ -88,6 +99,15 @@ export type Item = {
   loanedAt: string | null;
   mood: BookMood | null;
   pace: BookPace | null;
+  franchiseId: string | null;
+  franchiseName: string | null;
+  franchiseOrder: number | null;
+  watchedAt: string | null;
+  episodeProgress: EpisodeProgressMap | null;
+  nextEpisodeKey: string | null;
+  streamingProviders: StreamingProvider[] | null;
+  director: string | null;
+  cast: string[] | null;
   imdbId: string | null;
   releaseYear: number | null;
   catalogRating: number | null;
@@ -129,6 +149,18 @@ const FIELDS_BY_TYPE: Record<ItemType, readonly (keyof Item)[]> = {
     "recommendedBy",
     "rating",
     "notes",
+    "tags",
+    "franchiseId",
+    "franchiseName",
+    "franchiseOrder",
+    "watchedAt",
+    "episodeProgress",
+    "nextEpisodeKey",
+    "mood",
+    "pace",
+    "streamingProviders",
+    "director",
+    "cast",
     "imdbId",
     "synopsis",
     "releaseYear",
@@ -182,6 +214,15 @@ const TYPE_SPECIFIC_FIELDS = [
   "loanedAt",
   "mood",
   "pace",
+  "franchiseId",
+  "franchiseName",
+  "franchiseOrder",
+  "watchedAt",
+  "episodeProgress",
+  "nextEpisodeKey",
+  "streamingProviders",
+  "director",
+  "cast",
   "imdbId",
   "releaseYear",
   "catalogRating",
@@ -236,6 +277,30 @@ const itemShape = {
   loanedAt: text,
   mood: z.enum(BOOK_MOODS).nullable(),
   pace: z.enum(BOOK_PACES).nullable(),
+  franchiseId: text,
+  franchiseName: text,
+  franchiseOrder: z.number().int().nullable(),
+  watchedAt: text,
+  episodeProgress: z
+    .union([
+      z.record(z.string(), z.object({ watchedAt: z.string().optional() })),
+      z.null(),
+    ])
+    .transform((value) => {
+      if (value === null || Object.keys(value).length === 0) return null;
+      return value;
+    }),
+  nextEpisodeKey: text,
+  streamingProviders: z
+    .union([
+      z.array(z.strictObject({ name: z.string().trim().min(1), url: z.string().optional() })),
+      z.null(),
+    ])
+    .transform((value) => (Array.isArray(value) && value.length === 0 ? null : value)),
+  director: text,
+  cast: z
+    .union([z.array(z.string()), z.null()])
+    .transform((value) => (Array.isArray(value) && value.length === 0 ? null : value)),
   imdbId: text,
   releaseYear: z.number().int().min(1000).max(2100).nullable(),
   catalogRating: z.number().min(0).max(10).nullable(),
@@ -327,12 +392,67 @@ function checkCrossType(value: Item, ctx: z.RefinementCtx, path: (f: string) => 
       });
     }
   }
-  if (value.type === "movie" && value.imdbId != null && !isValidImdbId(value.imdbId)) {
-    ctx.addIssue({
-      code: "custom",
-      path: [path("imdbId")],
-      message: "invalid IMDb id",
-    });
+  if (value.type === "movie") {
+    const tags = value.tags;
+    if (tags != null) {
+      if (tags.length > 50) {
+        ctx.addIssue({
+          code: "custom",
+          path: [path("tags")],
+          message: "too many tags",
+        });
+      }
+      for (const tag of tags) {
+        if (tag.length > 40) {
+          ctx.addIssue({
+            code: "custom",
+            path: [path("tags")],
+            message: "tag too long",
+          });
+          break;
+        }
+      }
+    }
+    if (value.watchedAt != null && !/^\d{4}-\d{2}-\d{2}$/.test(value.watchedAt)) {
+      ctx.addIssue({
+        code: "custom",
+        path: [path("watchedAt")],
+        message: "watchedAt must be YYYY-MM-DD",
+      });
+    }
+    if (value.mediaKind === "film" && value.status === "in_progress") {
+      ctx.addIssue({
+        code: "custom",
+        path: [path("status")],
+        message: "films cannot use in_progress status",
+      });
+    }
+    if (value.episodeProgress != null && value.mediaKind !== "series") {
+      ctx.addIssue({
+        code: "custom",
+        path: [path("episodeProgress")],
+        message: "episodeProgress only allowed for series",
+      });
+    }
+    if (value.episodeProgress) {
+      for (const key of Object.keys(value.episodeProgress)) {
+        if (!EPISODE_KEY_PATTERN.test(key)) {
+          ctx.addIssue({
+            code: "custom",
+            path: [path("episodeProgress")],
+            message: "invalid episode key",
+          });
+          break;
+        }
+      }
+    }
+    if (value.imdbId != null && !isValidImdbId(value.imdbId)) {
+      ctx.addIssue({
+        code: "custom",
+        path: [path("imdbId")],
+        message: "invalid IMDb id",
+      });
+    }
   }
   if (
     value.type === "music_artist" &&
@@ -395,6 +515,15 @@ const SNAKE: Partial<Record<keyof Item, string>> = {
   pagesRead: "pages_read",
   loanedTo: "loaned_to",
   loanedAt: "loaned_at",
+  franchiseId: "franchise_id",
+  franchiseName: "franchise_name",
+  franchiseOrder: "franchise_order",
+  watchedAt: "watched_at",
+  episodeProgress: "episode_progress",
+  nextEpisodeKey: "next_episode_key",
+  streamingProviders: "streaming_providers",
+  director: "director",
+  cast: "cast",
   imdbId: "imdb_id",
   releaseYear: "release_year",
   catalogRating: "catalog_rating",
@@ -447,6 +576,15 @@ export const itemWireSchema = z
     loaned_at: itemShape.loanedAt.optional(),
     mood: itemShape.mood.optional(),
     pace: itemShape.pace.optional(),
+    franchise_id: itemShape.franchiseId.optional(),
+    franchise_name: itemShape.franchiseName.optional(),
+    franchise_order: itemShape.franchiseOrder.optional(),
+    watched_at: itemShape.watchedAt.optional(),
+    episode_progress: itemShape.episodeProgress.optional(),
+    next_episode_key: itemShape.nextEpisodeKey.optional(),
+    streaming_providers: itemShape.streamingProviders.optional(),
+    director: itemShape.director.optional(),
+    cast: itemShape.cast.optional(),
     imdb_id: itemShape.imdbId.optional(),
     release_year: itemShape.releaseYear.optional(),
     catalog_rating: itemShape.catalogRating.optional(),
@@ -507,7 +645,17 @@ export type NewItemInput = {
     | "loanedAt"
     | "mood"
     | "pace"
+    | "franchiseId"
+    | "franchiseName"
+    | "franchiseOrder"
+    | "watchedAt"
+    | "episodeProgress"
+    | "nextEpisodeKey"
+    | "streamingProviders"
+    | "director"
+    | "cast"
     | "imdbId"
+    | "synopsis"
     | "releaseYear"
     | "catalogRating"
     | "mediaKind"
@@ -554,6 +702,15 @@ export function newItem(input: NewItemInput): Item {
     loanedAt: input.loanedAt ?? null,
     mood: input.mood ?? null,
     pace: input.pace ?? null,
+    franchiseId: input.franchiseId ?? null,
+    franchiseName: input.franchiseName ?? null,
+    franchiseOrder: input.franchiseOrder ?? null,
+    watchedAt: input.watchedAt ?? null,
+    episodeProgress: input.episodeProgress ?? null,
+    nextEpisodeKey: input.nextEpisodeKey ?? null,
+    streamingProviders: input.streamingProviders ?? null,
+    director: input.director ?? null,
+    cast: input.cast ?? null,
     imdbId: input.imdbId ?? null,
     releaseYear: input.releaseYear ?? null,
     catalogRating: input.catalogRating ?? null,
@@ -612,6 +769,15 @@ function coalesceCatalogWireFields(
     loanedAt: wire.loaned_at ?? null,
     mood: wire.mood ?? null,
     pace: wire.pace ?? null,
+    franchiseId: wire.franchise_id ?? null,
+    franchiseName: wire.franchise_name ?? null,
+    franchiseOrder: wire.franchise_order ?? null,
+    watchedAt: wire.watched_at ?? null,
+    episodeProgress: wire.episode_progress ?? null,
+    nextEpisodeKey: wire.next_episode_key ?? null,
+    streamingProviders: wire.streaming_providers ?? null,
+    director: wire.director ?? null,
+    cast: wire.cast ?? null,
     imdbId: wire.imdb_id ?? null,
     releaseYear: wire.release_year ?? null,
     catalogRating: wire.catalog_rating ?? null,
@@ -644,6 +810,15 @@ function restWithoutCatalog(
     loaned_at,
     mood,
     pace,
+    franchise_id,
+    franchise_name,
+    franchise_order,
+    watched_at,
+    episode_progress,
+    next_episode_key,
+    streaming_providers,
+    director,
+    cast,
     imdb_id,
     release_year,
     catalog_rating,

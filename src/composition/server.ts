@@ -33,6 +33,11 @@ import {
   createBookQuoteSyncService,
   type BookQuoteSyncService,
 } from "@/application/server/book-quote-sync-service";
+import {
+  createMovieQuoteSyncService,
+  type MovieQuoteSyncService,
+} from "@/application/server/movie-quote-sync-service";
+import { createPostgresMovieQuoteRepository } from "@/adapters/postgres/movie-quote-repository";
 import { createSyncService, type SyncService } from "@/application/server/sync-service";
 import { loadConfig, type ServerConfig } from "@/composition/config";
 
@@ -43,6 +48,7 @@ export interface ServerContainer {
   readonly google: GoogleUseCases | null;
   readonly sync: SyncService;
   readonly bookQuoteSync: BookQuoteSyncService;
+  readonly movieQuoteSync: MovieQuoteSyncService;
   readonly lookupBook: LookupBook;
   readonly searchBooks: SearchBooks;
   readonly searchMovies: SearchMovies;
@@ -103,6 +109,8 @@ export function createServerContainer(
   const sync = createSyncService({ repository: items, now });
   const bookQuotes = createPostgresBookQuoteRepository(db);
   const bookQuoteSync = createBookQuoteSyncService({ quotes: bookQuotes, items, now });
+  const movieQuotes = createPostgresMovieQuoteRepository(db);
+  const movieQuoteSync = createMovieQuoteSyncService({ quotes: movieQuotes, items, now });
   const catalogCache = createPostgresCatalogCacheRepository(db);
   const bookCatalog = createOpenLibraryBookCatalogLookup({ cache: catalogCache });
   const lookupBook = createLookupBook({ catalog: bookCatalog });
@@ -121,6 +129,7 @@ export function createServerContainer(
     google,
     sync,
     bookQuoteSync,
+    movieQuoteSync,
     lookupBook,
     searchBooks,
     searchMovies,
