@@ -8,12 +8,28 @@ import {
   countBooksFinishedInYear,
   heatmapForYear,
 } from "@/application/books/reading-insights";
+import { buildYearInReview, computeBookStats } from "@/application/books/book-stats";
 import { DEFAULT_READING_TIMEZONE } from "@/application/books/reading-activity";
 import { getItemUseCases, getReadingSettingsUseCases } from "@/composition/client";
 import type { Item } from "@/domain/item";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
 import { t } from "@/i18n";
+
+const MONTH_LABELS = [
+  "Jan",
+  "Fév",
+  "Mar",
+  "Avr",
+  "Mai",
+  "Juin",
+  "Juil",
+  "Aoû",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Déc",
+];
 
 export default function BookInsightsPage() {
   const year = new Date().getFullYear();
@@ -52,6 +68,10 @@ export default function BookInsightsPage() {
     day: "2-digit",
   }).format(new Date());
   const streak = computeStreak(activeDays, todayKey);
+  const stats = useMemo(() => computeBookStats(books, year), [books, year]);
+  const review = useMemo(() => buildYearInReview(books, year), [books, year]);
+  const showYearReview = new Date().getMonth() === 11;
+
   async function saveGoal() {
     const parsed = Number(targetCount);
     if (!Number.isInteger(parsed) || parsed < 1) return;
@@ -108,6 +128,67 @@ export default function BookInsightsPage() {
         </div>
       </section>
 
+      <section className="flex flex-col gap-4" data-testid="book-stats">
+        <h2 className="text-lg font-medium">{t("books.insights.stats")}</h2>
+        <div>
+          <h3 className="text-sm font-medium text-muted">Par mois</h3>
+          <table className="mt-2 w-full text-sm">
+            <tbody>
+              {stats.finishedByMonth.map((row, index) => (
+                <tr key={row.label}>
+                  <td className="py-1">{MONTH_LABELS[index]}</td>
+                  <td className="py-1 text-right">{row.count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <StatsTable title="Genres" rows={stats.genres} />
+        <StatsTable title="Tags" rows={stats.tags} />
+        <StatsTable title="Auteurs" rows={stats.authors} />
+        <p className="text-sm">
+          Pages lues : <strong>{stats.pagesReadTotal}</strong>
+        </p>
+      </section>
+
+      {showYearReview ? (
+        <section
+          className="flex flex-col gap-3 rounded-lg border border-border p-4"
+          data-testid="year-in-review"
+        >
+          <h2 className="text-lg font-medium">
+            {t("books.insights.yearReview").replace("{year}", String(year))}
+          </h2>
+          <p className="text-sm">Livres lus : {review.booksRead}</p>
+          <p className="text-sm">Pages : {review.pagesRead}</p>
+          <p className="text-sm">Plus longue série : {review.longestStreak} jours</p>
+          {review.topGenres.length > 0 ? (
+            <p className="text-sm">Genres : {review.topGenres.map((g) => g.label).join(", ")}</p>
+          ) : null}
+          {review.topTags.length > 0 ? (
+            <p className="text-sm">Tags : {review.topTags.map((g) => g.label).join(", ")}</p>
+          ) : null}
+        </section>
+      ) : null}
     </main>
+  );
+}
+
+function StatsTable({ title, rows }: { title: string; rows: { label: string; count: number }[] }) {
+  if (rows.length === 0) return null;
+  return (
+    <div>
+      <h3 className="text-sm font-medium text-muted">{title}</h3>
+      <table className="mt-2 w-full text-sm">
+        <tbody>
+          {rows.map((row) => (
+            <tr key={row.label}>
+              <td className="py-1">{row.label}</td>
+              <td className="py-1 text-right">{row.count}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 }

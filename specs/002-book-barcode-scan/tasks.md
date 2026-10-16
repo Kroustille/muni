@@ -244,7 +244,7 @@
 - [x] T333 [US11] Implement `computeStreak` and `buildActivityHeatmap` in `src/application/books/reading-insights.ts` (depends on T295, T332)
 - [x] T334 [US11] `ReadingSettings` use case + repository for annual goal in `src/application/books/reading-settings.ts` and adapters (depends on T290)
 - [x] T335 [US11] Insights section: goal editor, streak, heatmap per `contracts/book-insights-ui.md` in `src/app/(app)/books/insights/page.tsx` (depends on T333, T334)
-- [ ] T336 [US11] E2e activity day on status/`pagesRead` change in `tests/e2e/books-reading-heatmap.spec.ts`
+- [x] T336 [US11] E2e activity day on status/`pagesRead` change in `tests/e2e/books-reading-heatmap.spec.ts`
 
 ---
 
@@ -254,10 +254,10 @@
 
 **Independent Test**: Seed books across months/tags; stats and recap match fixtures.
 
-- [ ] T337 [US12] Unit tests for monthly/tag/genre/author/pages aggregations in `tests/unit/book-stats.test.ts`
-- [ ] T338 [US12] Implement `computeBookStats` and `buildYearInReview` in `src/application/books/book-stats.ts` (depends on T337)
-- [ ] T339 [US12] Stats tables/charts + year-in-review view per book-insights-ui.md in `src/app/(app)/books/insights/page.tsx` (depends on T338, T335)
-- [ ] T340 [US12] E2e stats page smoke in `tests/e2e/books-stats.spec.ts`
+- [x] T337 [US12] Unit tests for monthly/tag/genre/author/pages aggregations in `tests/unit/book-stats.test.ts`
+- [x] T338 [US12] Implement `computeBookStats` and `buildYearInReview` in `src/application/books/book-stats.ts` (depends on T337)
+- [x] T339 [US12] Stats tables/charts + year-in-review view per book-insights-ui.md in `src/app/(app)/books/insights/page.tsx` (depends on T338, T335)
+- [x] T340 [US12] E2e stats page smoke in `tests/e2e/books-stats.spec.ts`
 
 ---
 
