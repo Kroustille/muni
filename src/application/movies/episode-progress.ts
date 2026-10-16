@@ -43,3 +43,43 @@ export function markEpisodeWatched(
   const nextEpisodeKey = computeNextEpisode(progress);
   return updateItem(item, { episodeProgress: progress, nextEpisodeKey });
 }
+
+export function toggleEpisodeWatched(
+  item: Item,
+  episodeKey: string,
+  watchedAt: string,
+): Item {
+  if (item.type !== "movie" || item.mediaKind !== "series") {
+    throw new Error("episode progress only for series");
+  }
+  const progress: EpisodeProgressMap = { ...(item.episodeProgress ?? {}) };
+  if (progress[episodeKey]?.watchedAt) {
+    delete progress[episodeKey];
+  } else {
+    progress[episodeKey] = { watchedAt };
+  }
+  const nextEpisodeKey = computeNextEpisode(
+    Object.keys(progress).length > 0 ? progress : null,
+  );
+  return updateItem(item, {
+    episodeProgress: Object.keys(progress).length > 0 ? progress : null,
+    nextEpisodeKey,
+  });
+}
+
+export function episodeKeysForDisplay(
+  progress: EpisodeProgressMap | null,
+  nextEpisodeKey: string | null,
+): string[] {
+  const keys = new Set<string>();
+  if (progress) {
+    for (const key of Object.keys(progress)) keys.add(key);
+  }
+  if (nextEpisodeKey) keys.add(nextEpisodeKey);
+  if (keys.size === 0) {
+    for (let episode = 1; episode <= 10; episode += 1) {
+      keys.add(`S1E${episode}`);
+    }
+  }
+  return [...keys].sort(compareEpisodeKeys);
+}

@@ -10,32 +10,24 @@ import {
   t,
 } from "./lists.spec";
 
-test.describe("book pause and lending", () => {
-  test("pause with pages read, lend, and return", async ({ page }) => {
+test.describe("movie pause and watched date", () => {
+  test("pause film and set watched date on vu", async ({ page }) => {
     await signIn(page);
-    const title = "Le Comte de Monte-Cristo";
-    await addItem(page, "book", title);
-    await openList(page, "books");
+    const title = `Film Pause ${Date.now()}`;
+    await addItem(page, "movie", title);
+    await openList(page, "movies");
     await locators.itemLink(page, title).click();
 
     await page.getByLabel(t("field.status")).selectOption({ label: t("status.paused") });
-    await page.getByLabel(t("books.pagesRead")).fill("120");
-    await page.getByLabel(t("books.loan.to")).fill("Alex");
-    await page.getByLabel(t("books.loan.since")).fill("2026-03-10");
     await page.getByRole("button", { name: selectors.actionSave }).click();
-
     await page.reload();
     await expect(page.getByLabel(t("field.status"))).toHaveValue("paused");
-    await expect(page.getByLabel(t("books.pagesRead"))).toHaveValue("120");
-    await expect(page.getByLabel(t("books.loan.to"))).toHaveValue("Alex");
 
-    await page.getByRole("button", { name: t("books.loan.return") }).click();
-    await page.reload();
-    await expect(page.getByLabel(t("books.loan.to"))).toHaveValue("");
-
-    await page.getByLabel(t("field.status")).selectOption({ label: selectors.statusReading });
+    await page.getByLabel(t("field.status")).selectOption({ label: t("status.watched") });
+    await expect(page.getByLabel(t("movies.watchedAt"))).toBeVisible();
+    await page.getByLabel(t("movies.watchedAt")).fill("2026-03-15");
     await page.getByRole("button", { name: selectors.actionSave }).click();
     await page.reload();
-    await expect(page.getByLabel(t("field.status"))).toHaveValue("reading");
+    await expect(page.getByLabel(t("movies.watchedAt"))).toHaveValue("2026-03-15");
   });
 });

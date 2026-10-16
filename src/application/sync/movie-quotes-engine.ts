@@ -196,7 +196,7 @@ export function createMovieQuotesSyncEngine({
   }
 
   async function pullRemote(): Promise<void> {
-    let since = (await meta.get("quotePullCursor")) ?? null;
+    let since = (await meta.get("movieQuotePullCursor")) ?? null;
 
     for (;;) {
       let page;
@@ -215,7 +215,7 @@ export function createMovieQuotesSyncEngine({
       }
 
       if (page.cursor !== "") {
-        await meta.set("quotePullCursor", page.cursor);
+        await meta.set("movieQuotePullCursor", page.cursor);
       }
       since = page.cursor === "" ? since : page.cursor;
 

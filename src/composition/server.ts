@@ -22,6 +22,7 @@ import {
   type FetchMovieCatalogDetail,
   type SearchMovies,
 } from "@/application/movies/search-movies";
+import { lookupMovieStreaming as lookupMovieStreamingFn } from "@/application/movies/streaming-lookup";
 import {
   createSearchMusicArtists,
   createSearchMusicTracks,
@@ -55,6 +56,7 @@ export interface ServerContainer {
   readonly fetchMovieCatalogDetail: FetchMovieCatalogDetail;
   readonly searchMusicArtists: SearchMusicArtists;
   readonly searchMusicTracks: SearchMusicTracks;
+  readonly lookupMovieStreaming: (imdbId: string) => Promise<import("@/domain/item").StreamingProvider[]>;
   readonly destroy: () => Promise<void>;
 }
 
@@ -121,6 +123,8 @@ export function createServerContainer(
   const musicCatalog = createMusicBrainzCatalogSearch({ cache: catalogCache });
   const searchMusicArtists = createSearchMusicArtists({ catalog: musicCatalog });
   const searchMusicTracks = createSearchMusicTracks({ catalog: musicCatalog });
+  const lookupMovieStreaming = (imdbId: string) =>
+    lookupMovieStreamingFn(imdbId, { cache: catalogCache });
 
   return {
     appUrl: config.appUrl,
@@ -136,6 +140,7 @@ export function createServerContainer(
     fetchMovieCatalogDetail,
     searchMusicArtists,
     searchMusicTracks,
+    lookupMovieStreaming,
     destroy: () => pg.destroy(),
   };
 }

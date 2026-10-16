@@ -5,23 +5,26 @@ import { locators, selectors, signIn, titleFieldLabel } from "./lists.spec";
 const t = (key: keyof typeof fr): string => fr[key];
 
 test.describe("movies tags and franchise filters", () => {
-  test("assign tag and franchise then filter list", async ({ page }) => {
+  test("assign tag and franchise on detail", async ({ page }) => {
     await signIn(page);
     await page.goto("/movies");
 
-    const titleA = `Tag Franchise A ${Date.now()}`;
-    const titleB = `Tag Franchise B ${Date.now()}`;
+    const title = `Tag Franchise ${Date.now()}`;
 
     await locators.quickAddButton(page).click();
     await page.getByRole("button", { name: t("type.movie") }).click();
-    await page.getByLabel(titleFieldLabel("movie")).fill(titleA);
+    await page.getByLabel(titleFieldLabel("movie")).fill(title);
     await page.getByRole("button", { name: selectors.actionAdd }).click();
-    await expect(locators.itemLink(page, titleA)).toBeVisible({ timeout: 15_000 });
+    await expect(locators.itemLink(page, title)).toBeVisible({ timeout: 15_000 });
 
-    await locators.quickAddButton(page).click();
-    await page.getByRole("button", { name: t("type.movie") }).click();
-    await page.getByLabel(titleFieldLabel("movie")).fill(titleB);
-    await page.getByRole("button", { name: selectors.actionAdd }).click();
-    await expect(locators.itemLink(page, titleB)).toBeVisible({ timeout: 15_000 });
+    await locators.itemLink(page, title).click();
+    await page.getByLabel(t("books.tags.add")).fill("ciné-tag");
+    await page.getByRole("button", { name: t("books.tags.add") }).click();
+    await page.getByLabel(t("movies.franchise.name")).fill("Ma saga");
+    await page.getByLabel(t("movies.franchise.order")).fill("2");
+    await page.getByRole("button", { name: selectors.actionSave }).click();
+    await page.reload();
+    await expect(page.getByLabel(t("movies.franchise.name"))).toHaveValue("Ma saga");
+    await expect(page.getByLabel(t("movies.franchise.order"))).toHaveValue("2");
   });
 });

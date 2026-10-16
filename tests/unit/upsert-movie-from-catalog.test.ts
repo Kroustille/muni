@@ -64,6 +64,16 @@ describe("upsertMovieFromCatalog", () => {
     expect((await ctx.repository.query({ type: "movie" })).length).toBe(1);
   });
 
+  it("persists director and cast from catalog", async () => {
+    const saved = await ctx.useCases.upsertMovieFromCatalog({
+      ...catalog,
+      director: "Jean-Pierre Jeunet",
+      cast: ["Audrey Tautou", "Mathieu Kassovitz"],
+    });
+    expect(saved.director).toBe("Jean-Pierre Jeunet");
+    expect(saved.cast).toEqual(["Audrey Tautou", "Mathieu Kassovitz"]);
+  });
+
   it("creates a new row when multiple manual candidates would match", async () => {
     let counter = 10;
     const useCases = createItemUseCases({

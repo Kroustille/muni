@@ -11,6 +11,8 @@ export type MovieSearchHit = {
 
 export type MovieCatalogDetail = MovieSearchHit & {
   synopsis?: string;
+  director?: string;
+  cast?: string[];
 };
 
 export class MovieCatalogSearchError extends Error {

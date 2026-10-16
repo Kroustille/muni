@@ -1,4 +1,8 @@
-export type CatalogCacheProvider = "open_library" | "wikidata" | "musicbrainz";
+export type CatalogCacheProvider =
+  | "open_library"
+  | "wikidata"
+  | "musicbrainz"
+  | "movie_streaming";
 
 export interface CatalogCacheRecord {
   provider: CatalogCacheProvider;

@@ -41,6 +41,8 @@ async function saveMoviePreview(values: MovieCatalogPreviewValues): Promise<void
     releaseYear: parseOptionalInt(values.releaseYear),
     catalogRating: parseOptionalRating(values.catalogRating),
     mediaKind: values.mediaKind,
+    director: optionalText(values.director),
+    cast: values.cast.length > 0 ? values.cast : null,
   });
 }
 

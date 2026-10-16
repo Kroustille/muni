@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import type { Item } from "@/domain/item";
 import { collectLibraryTags } from "@/application/books/book-library-filters";
+import { collectLibraryTags as collectMovieLibraryTags } from "@/application/movies/movie-library-filters";
 import { getItemUseCases } from "@/composition/client";
 import { ItemDetailForm } from "@/components/items/ItemDetailForm";
 import { useUndoDelete } from "@/components/UndoToast";
@@ -35,14 +36,21 @@ export function ItemDetailPanel({ itemId, onUpdated }: ItemDetailPanelProps) {
   }, [itemId, isPendingUndo]);
 
   useEffect(() => {
-    if (item?.type !== "book") {
+    if (item?.type !== "book" && item?.type !== "movie") {
       setTagSuggestions([]);
       return;
     }
     let cancelled = false;
     void getItemUseCases().then(async (useCases) => {
-      const books = await useCases.listItems("book");
-      if (!cancelled) setTagSuggestions(collectLibraryTags(books));
+      if (item?.type === "book") {
+        const books = await useCases.listItems("book");
+        if (!cancelled) setTagSuggestions(collectLibraryTags(books));
+        return;
+      }
+      if (item?.type === "movie") {
+        const movies = await useCases.listItems("movie");
+        if (!cancelled) setTagSuggestions(collectMovieLibraryTags(movies));
+      }
     });
     return () => {
       cancelled = true;

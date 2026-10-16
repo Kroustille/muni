@@ -98,6 +98,34 @@ function readCatalogRating(entity: WikidataEntity): number | undefined {
   return undefined;
 }
 
+function readEntityLabelFromClaim(claim: WikidataClaim, entities: WikidataEntitiesResponse): string | undefined {
+  const value = claim.mainsnak?.datavalue?.value;
+  if (!value || typeof value !== "object" || !("id" in value) || typeof value.id !== "string") {
+    return undefined;
+  }
+  const entity = entities.entities?.[value.id];
+  if (!entity || "missing" in entity) return undefined;
+  return readLabel(entity as WikidataEntity);
+}
+
+function readDirector(entity: WikidataEntity, entities: WikidataEntitiesResponse): string | undefined {
+  for (const claim of entity.claims?.P57 ?? []) {
+    const label = readEntityLabelFromClaim(claim, entities);
+    if (label) return label;
+  }
+  return undefined;
+}
+
+function readCast(entity: WikidataEntity, entities: WikidataEntitiesResponse, limit = 8): string[] {
+  const names: string[] = [];
+  for (const claim of entity.claims?.P161 ?? []) {
+    const label = readEntityLabelFromClaim(claim, entities);
+    if (label && !names.includes(label)) names.push(label);
+    if (names.length >= limit) break;
+  }
+  return names;
+}
+
 function readSynopsis(entity: WikidataEntity, preferredLang = "fr"): string | undefined {
   for (const claim of entity.claims?.P1922 ?? []) {
     const value = claim.mainsnak?.datavalue?.value;
@@ -137,12 +165,20 @@ export function mapEntityToMovieHit(
 export function mapEntityToMovieDetail(
   entity: WikidataEntity,
   wikidataId: string,
+  entitiesResponse?: WikidataEntitiesResponse,
 ): MovieCatalogDetail | null {
   const hit = mapEntityToMovieHit(entity, wikidataId);
   if (hit === null) return null;
+  const detail: MovieCatalogDetail = { ...hit };
   const synopsis = readSynopsis(entity);
-  if (synopsis) return { ...hit, synopsis };
-  return hit;
+  if (synopsis) detail.synopsis = synopsis;
+  if (entitiesResponse) {
+    const director = readDirector(entity, entitiesResponse);
+    if (director) detail.director = director;
+    const cast = readCast(entity, entitiesResponse);
+    if (cast.length > 0) detail.cast = cast;
+  }
+  return detail;
 }
 
 export function mapEntitiesResponseToHits(
@@ -176,5 +212,5 @@ export function mapEntityResponseToDetail(
 ): MovieCatalogDetail | null {
   const entity = response.entities?.[wikidataId];
   if (!entity || "missing" in entity) return null;
-  return mapEntityToMovieDetail(entity as WikidataEntity, wikidataId);
+  return mapEntityToMovieDetail(entity as WikidataEntity, wikidataId, response);
 }

@@ -3,6 +3,7 @@
 import { notFound, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import type { Item } from "@/domain/item";
+import { collectLibraryTags as collectMovieLibraryTags } from "@/application/movies/movie-library-filters";
 import { getItemUseCases } from "@/composition/client";
 import { ItemDetailForm } from "@/components/items/ItemDetailForm";
 import { useUndoDelete } from "@/components/UndoToast";
@@ -12,6 +13,7 @@ export default function ItemDetailPage() {
   const id = typeof params.id === "string" ? params.id : null;
   const { deleteWithUndo, isPendingUndo } = useUndoDelete();
   const [item, setItem] = useState<Item | null | undefined>(undefined);
+  const [tagSuggestions, setTagSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
     if (id === null) return;
@@ -32,6 +34,21 @@ export default function ItemDetailPage() {
     };
   }, [id, isPendingUndo]);
 
+  useEffect(() => {
+    if (item?.type !== "movie") {
+      setTagSuggestions([]);
+      return;
+    }
+    let cancelled = false;
+    void getItemUseCases().then(async (useCases) => {
+      const movies = await useCases.listItems("movie");
+      if (!cancelled) setTagSuggestions(collectMovieLibraryTags(movies));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [item?.type, item?.id]);
+
   if (id === null) {
     notFound();
   }
@@ -49,6 +66,7 @@ export default function ItemDetailPage() {
       <ItemDetailForm
         key={item.id}
         item={item}
+        tagSuggestions={tagSuggestions}
         onSave={async (patch) => {
           const useCases = await getItemUseCases();
           const updated = await useCases.updateItem(id, patch);

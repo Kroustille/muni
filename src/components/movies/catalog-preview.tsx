@@ -19,6 +19,8 @@ export type MovieCatalogPreviewValues = {
   imdbId: string;
   mediaKind: MediaKind;
   catalogRating: string;
+  director: string;
+  cast: string[];
 };
 
 export type MovieCatalogPreviewProps = {
@@ -38,6 +40,8 @@ function detailToPreviewValues(detail: MovieCatalogDetail): MovieCatalogPreviewV
     imdbId: detail.imdbId ?? "",
     mediaKind: detail.mediaKind,
     catalogRating: detail.catalogRating !== undefined ? String(detail.catalogRating) : "",
+    director: detail.director ?? "",
+    cast: detail.cast ? [...detail.cast] : [],
   };
 }
 

@@ -4,6 +4,7 @@ import {
   pagesReadApplicable,
   validateLoanPair,
 } from "@/application/books/book-pause-lending";
+import { defaultWatchedAtForStatus } from "@/application/movies/movie-status-rules";
 import {
   bookPagesReadFromValues,
   type BookFieldValues,
@@ -99,6 +100,14 @@ export function bookLoanReturnPatch(): ItemPatch {
   return loanReturnPatch();
 }
 
+function todayIsoDate(): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
 export function itemToMovieValues(item: Item): MovieFieldValues {
   return {
     title: item.title,
@@ -106,6 +115,13 @@ export function itemToMovieValues(item: Item): MovieFieldValues {
     rating: item.rating,
     recommendedBy: item.recommendedBy ?? "",
     notes: item.notes ?? "",
+    tags: item.tags ? [...item.tags] : [],
+    franchiseName: item.franchiseName ?? "",
+    franchiseOrder:
+      item.franchiseOrder !== null && item.franchiseOrder !== undefined
+        ? String(item.franchiseOrder)
+        : "",
+    watchedAt: item.watchedAt ?? "",
   };
 }
 
@@ -118,6 +134,21 @@ export function movieValuesToPatch(values: MovieFieldValues): ItemPatch {
   };
   if (values.status === "watched") {
     patch.rating = values.rating;
+    const watchedAt = optionalText(values.watchedAt);
+    patch.watchedAt =
+      watchedAt ?? defaultWatchedAtForStatus("watched", todayIsoDate());
+  } else {
+    patch.watchedAt = null;
+  }
+  const tags = values.tags.map((tag) => tag.trim()).filter((tag) => tag !== "");
+  patch.tags = tags.length === 0 ? null : tags;
+  patch.franchiseName = optionalText(values.franchiseName);
+  const orderRaw = values.franchiseOrder.trim();
+  if (orderRaw === "") {
+    patch.franchiseOrder = null;
+  } else {
+    const order = Number(orderRaw);
+    if (!Number.isNaN(order)) patch.franchiseOrder = order;
   }
   return patch;
 }

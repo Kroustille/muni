@@ -13,6 +13,7 @@ export type MetaValues = {
   userId: string;
   pullCursor: string;
   quotePullCursor: string;
+  movieQuotePullCursor: string;
   readingGoals: ReadingGoal[];
   watchGoals: import("@/domain/watch-goal").WatchGoal[];
 };

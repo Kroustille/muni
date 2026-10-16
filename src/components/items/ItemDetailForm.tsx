@@ -26,7 +26,16 @@ import {
   type BookDiscoveryFieldValues,
 } from "@/components/books/book-discovery-fields";
 import { BookQuotesSection } from "@/components/books/book-quotes-section";
-import { getBookQuoteUseCases, getItemUseCases } from "@/composition/client";
+import { MovieEpisodesSection } from "@/components/movies/movie-episodes-section";
+import { MovieQuotesSection } from "@/components/movies/movie-quotes-section";
+import { MovieReleaseReminder } from "@/components/movies/movie-release-reminder";
+import { MovieStreamingSection } from "@/components/movies/movie-streaming-section";
+import {
+  getBookQuoteUseCases,
+  getItemUseCases,
+  getMovieQuoteUseCases,
+} from "@/composition/client";
+import type { MovieQuoteUseCases } from "@/application/movies/movie-quotes";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
 import { ExternalLinkActions } from "@/components/music/external-link-actions";
@@ -67,10 +76,21 @@ export function ItemDetailForm({
   const [artistError, setArtistError] = useState<string | undefined>();
   const [saving, setSaving] = useState(false);
   const [bookQuoteUseCases, setBookQuoteUseCases] = useState<BookQuoteUseCases | null>(null);
+  const [movieQuoteUseCases, setMovieQuoteUseCases] = useState<MovieQuoteUseCases | null>(null);
+  const [movieItem, setMovieItem] = useState(item);
+
+  useEffect(() => {
+    setMovieItem(item);
+  }, [item]);
 
   useEffect(() => {
     if (item.type !== "book") return;
     void getBookQuoteUseCases().then(setBookQuoteUseCases);
+  }, [item.type]);
+
+  useEffect(() => {
+    if (item.type !== "movie") return;
+    void getMovieQuoteUseCases().then(setMovieQuoteUseCases);
   }, [item.type]);
 
   const save = useCallback(async () => {
@@ -94,6 +114,9 @@ export function ItemDetailForm({
           : patchFromValues(item, values);
       const updated = await onSave(patch);
       setValues(valuesFromItem(updated));
+      if (updated.type === "movie") {
+        setMovieItem(updated);
+      }
       if (updated.type === "book") {
         setDiscoveryValues(itemToBookDiscoveryValues(updated));
       }
@@ -186,16 +209,42 @@ export function ItemDetailForm({
         </>
       ) : null}
       {item.type === "movie" ? (
-        <MovieFields
-          values={values as MovieFieldValues}
-          catalogRating={item.catalogRating}
-          imdbId={item.imdbId}
-          onChange={(next) => {
-            setValues(next);
-            setTitleError(undefined);
-          }}
-          titleError={titleError}
-        />
+        <>
+          <MovieFields
+            values={values as MovieFieldValues}
+            mediaKind={movieItem.mediaKind}
+            catalogRating={movieItem.catalogRating}
+            imdbId={movieItem.imdbId}
+            director={movieItem.director}
+            cast={movieItem.cast}
+            tagSuggestions={tagSuggestions}
+            onChange={(next) => {
+              setValues(next);
+              setTitleError(undefined);
+            }}
+            titleError={titleError}
+          />
+          {movieItem.mediaKind === "series" ? (
+            <>
+              <MovieEpisodesSection
+                item={movieItem as Item & { type: "movie"; mediaKind: "series" }}
+                onEpisodeChange={async (updated) => {
+                  const saved = await onSave({
+                    episodeProgress: updated.episodeProgress,
+                    nextEpisodeKey: updated.nextEpisodeKey,
+                  });
+                  setMovieItem(saved);
+                  setValues(valuesFromItem(saved));
+                }}
+              />
+              <MovieReleaseReminder movieItemId={movieItem.id} title={movieItem.title} />
+            </>
+          ) : null}
+          <MovieStreamingSection imdbId={movieItem.imdbId} />
+          {movieQuoteUseCases !== null ? (
+            <MovieQuotesSection movieItemId={movieItem.id} useCases={movieQuoteUseCases} />
+          ) : null}
+        </>
       ) : null}
       {item.type === "recipe" ? (
         <RecipeFields

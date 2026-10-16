@@ -12,6 +12,8 @@ export type UpsertMovieFromCatalogInput = {
   releaseYear?: number | null;
   catalogRating?: number | null;
   mediaKind?: MediaKind | null;
+  director?: string | null;
+  cast?: string[] | null;
 };
 
 export type UpsertMovieFromCatalogDeps = {
@@ -31,6 +33,12 @@ function catalogPatch(input: UpsertMovieFromCatalogInput): ItemPatch {
   };
   if (input.imdbId != null && input.imdbId.trim() !== "") {
     patch.imdbId = normalizeImdbId(input.imdbId);
+  }
+  if (input.director != null && input.director.trim() !== "") {
+    patch.director = input.director.trim();
+  }
+  if (input.cast != null && input.cast.length > 0) {
+    patch.cast = input.cast;
   }
   return patch;
 }
