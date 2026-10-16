@@ -157,7 +157,7 @@
 - [x] T300 [US5] Extend `src/adapters/indexeddb/item-repository.ts` and `src/adapters/postgres/server-item-repository.ts` for library columns (depends on T288, T299)
 - [x] T301 [US5] Tag chip editor + series fields on create/edit per `contracts/book-library-ui.md` in `src/components/fields/book-fields.tsx` and `src/components/items/ItemDetailForm.tsx`
 - [x] T302 [US5] Tag and series filter controls on `src/app/(app)/books/page.tsx` per book-library-ui.md (depends on T298, T301)
-- [ ] T303 [US5] E2e assign tag/series and filter in `tests/e2e/books-tags-series.spec.ts`
+- [x] T303 [US5] E2e assign tag/series and filter in `tests/e2e/books-tags-series.spec.ts`
 
 ---
 
