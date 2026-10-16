@@ -213,8 +213,8 @@
 
 **Independent Test**: Set mood on read book; discovery filter shows only matches.
 
-- [ ] T323 [US9] Unit tests for mood/pace validation and combined filters in `tests/unit/book-discovery-filters.test.ts`
-- [ ] T324 [US9] Implement `filterBooksByDiscovery` in `src/application/books/discovery-filters.ts` (depends on T323, T298)
+- [x] T323 [US9] Unit tests for mood/pace validation and combined filters in `tests/unit/book-discovery-filters.test.ts`
+- [x] T324 [US9] Implement `filterBooksByDiscovery` in `src/application/books/discovery-filters.ts` (depends on T323, T298)
 - [ ] T325 [US9] Mood/pace pickers on book detail per `contracts/book-discovery-ui.md` in `src/components/books/book-discovery-fields.tsx`
 - [ ] T326 [US9] Discovery browse sheet with mood/pace/tag filters on `src/app/(app)/books/page.tsx` per book-discovery-ui.md (depends on T324, T325)
 - [ ] T327 [US9] E2e discovery filter by mood and tag in `tests/e2e/books-discovery-filters.spec.ts`
