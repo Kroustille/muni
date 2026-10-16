@@ -20,6 +20,7 @@ export type BookMovieRowProps = {
   onRatingChange: (rating: number) => void;
   onSelect?: (id: string) => void;
   selected?: boolean;
+  shellAs?: "li" | "div";
 };
 
 function ratingVisible(status: string | null): boolean {
@@ -38,6 +39,7 @@ export function BookMovieRow({
   onRatingChange,
   onSelect,
   selected,
+  shellAs,
 }: BookMovieRowProps) {
   const status = item.status ?? statusesFor(item.type)[0];
   const statusOptions = statusesFor(item.type).map((value) => ({
@@ -46,7 +48,7 @@ export function BookMovieRow({
   }));
 
   return (
-    <ListRowShell itemType={item.type} selected={selected}>
+    <ListRowShell itemType={item.type} selected={selected} as={shellAs}>
       <div className="flex flex-col gap-2">
         <div className="flex flex-wrap items-center gap-2">
           <ListRowTitle itemId={item.id} onSelect={onSelect}>

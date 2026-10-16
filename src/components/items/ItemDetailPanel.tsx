@@ -54,6 +54,13 @@ export function ItemDetailPanel({ itemId, onUpdated }: ItemDetailPanelProps) {
           onUpdated?.();
           return updated;
         }}
+        onLibraryChange={() => {
+          void getItemUseCases().then(async (useCases) => {
+            const next = await useCases.getItem(itemId);
+            if (next) setItem(next);
+            onUpdated?.();
+          });
+        }}
         onDelete={() => void deleteWithUndo(itemId)}
       />
     </div>

@@ -103,7 +103,9 @@ describe("workSiblings and unlink rules", () => {
     const a = book(1, { workId: "OL1W" });
     const b = book(2, { workId: "OL1W" });
     const c = book(3, { workId: null });
-    expect(workSiblings([a, b, c], a).map((i) => i.id)).toEqual([b.id]);
+    expect(workSiblings([a, b, c], a as typeof a & { type: "book" }).map((i) => i.id)).toEqual([
+      b.id,
+    ]);
   });
 
   it("allows unlink only for local work keys with remaining siblings", () => {

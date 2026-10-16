@@ -125,6 +125,7 @@
   "books.loan.since": "Depuis le",
   "books.loan.return": "Marquer comme rendu",
   "books.editions.other": "Autres éditions",
+  "books.editions.count": "{count} éditions",
   "books.editions.link": "Lier à une édition…",
   "books.editions.unlink": "Dissocier",
   "books.quotes.title": "Citations",

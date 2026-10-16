@@ -16,6 +16,8 @@ import {
   ShoppingFields,
   type ShoppingFieldValues,
 } from "@/components/fields";
+import { BookEditionsSection } from "@/components/books/book-editions-section";
+import { getItemUseCases } from "@/composition/client";
 import { Button } from "@/components/ui/Button";
 import { ExternalLinkActions } from "@/components/music/external-link-actions";
 import { t } from "@/i18n";
@@ -31,9 +33,10 @@ export type ItemDetailFormProps = {
   onSave: (patch: ItemPatch) => Promise<Item>;
   onDelete?: () => void;
   compact?: boolean;
+  onLibraryChange?: () => void;
 };
 
-export function ItemDetailForm({ item, onSave, onDelete, compact }: ItemDetailFormProps) {
+export function ItemDetailForm({ item, onSave, onDelete, compact, onLibraryChange }: ItemDetailFormProps) {
   const [values, setValues] = useState<FieldValues>(() => valuesFromItem(item));
   const [titleError, setTitleError] = useState<string | undefined>();
   const [artistError, setArtistError] = useState<string | undefined>();
@@ -75,15 +78,26 @@ export function ItemDetailForm({ item, onSave, onDelete, compact }: ItemDetailFo
         />
       ) : null}
       {item.type === "book" ? (
-        <BookFields
-          values={values as BookFieldValues}
-          pageCount={item.pageCount}
-          onChange={(next) => {
-            setValues(next);
-            setTitleError(undefined);
-          }}
-          titleError={titleError}
-        />
+        <>
+          <BookFields
+            values={values as BookFieldValues}
+            pageCount={item.pageCount}
+            onChange={(next) => {
+              setValues(next);
+              setTitleError(undefined);
+            }}
+            titleError={titleError}
+          />
+          <BookEditionsSection
+            item={item as Item & { type: "book" }}
+            onChanged={async () => {
+              const useCases = await getItemUseCases();
+              const refreshed = await useCases.getItem(item.id);
+              if (refreshed) setValues(valuesFromItem(refreshed));
+              onLibraryChange?.();
+            }}
+          />
+        </>
       ) : null}
       {item.type === "movie" ? (
         <MovieFields

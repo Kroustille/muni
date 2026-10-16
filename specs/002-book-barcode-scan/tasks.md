@@ -171,7 +171,7 @@
 - [x] T305 [US6] Implement `groupBooksByWork` in `src/application/books/work-grouping.ts` (depends on T304)
 - [x] T306 [US6] Map Open Library edition `works[0].key` to `catalogWorkId` in `src/adapters/open-library/book-catalog-lookup.ts` + extend `tests/unit/open-library-adapter.test.ts`
 - [x] T307 [US6] Persist `catalogWorkId` on catalog upsert in `src/application/books/upsert-from-catalog.ts` (depends on T285, T306)
-- [ ] T308 [US6] Work-grouped list rows + edition stack on detail + manual `workKey` link UI per book-library-ui.md on `src/app/(app)/books/page.tsx` and `src/components/items/ItemDetailForm.tsx` (depends on T305, T307)
+- [x] T308 [US6] Work-grouped list rows + edition stack on detail + manual `workKey` link UI per book-library-ui.md on `src/app/(app)/books/page.tsx` and `src/components/items/ItemDetailForm.tsx` (depends on T305, T307)
 - [ ] T309 [US6] E2e second ISBN same work stays grouped in `tests/e2e/books-work-grouping.spec.ts`
 
 ---

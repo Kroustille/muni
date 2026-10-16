@@ -22,6 +22,7 @@ import {
   type ListSort,
 } from "@/domain/list-sort";
 import { useIsMobile } from "@/components/use-is-mobile";
+import { groupBooksByWork, type BookWorkGroup } from "@/application/books/work-grouping";
 import type { Item, ItemPatch, ItemStatus, ItemType } from "@/domain/item";
 import { updateItem as applyItemPatch } from "@/domain/item";
 import { t, type MessageKey } from "@/i18n";
@@ -63,9 +64,27 @@ function rowSecondaryText(item: Item): string | null {
 
 export type ListPageContentProps = {
   route: ListRoute;
+  /** When true (books list), visually group editions that share a work id. */
+  groupBooksByWork?: boolean;
 };
 
-export function ListPageContent({ route }: ListPageContentProps) {
+function editionGroupLabel(count: number): string {
+  return t("books.editions.count").replace("{count}", String(count));
+}
+
+type BookListEntry =
+  | { kind: "single"; item: Item }
+  | { kind: "group"; group: BookWorkGroup };
+
+function bookListEntries(items: Item[]): BookListEntry[] {
+  return groupBooksByWork(items).map((group) =>
+    group.items.length === 1
+      ? { kind: "single", item: group.items[0]! }
+      : { kind: "group", group },
+  );
+}
+
+export function ListPageContent({ route, groupBooksByWork: groupBooksByWorkEnabled = false }: ListPageContentProps) {
   const isMobile = useIsMobile();
   const [items, setItems] = useState<Item[]>([]);
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("all");
@@ -202,7 +221,40 @@ export function ListPageContent({ route }: ListPageContentProps) {
             <ListEmptyState itemType={itemType} />
           ) : (
             <ul className="flex flex-col gap-2">
-              {items.map((item) => {
+              {(groupBooksByWorkEnabled && route === "books"
+                ? bookListEntries(items)
+                : items.map((item) => ({ kind: "single" as const, item }))
+              ).map((entry: BookListEntry) => {
+                if (entry.kind === "group") {
+                  const { group } = entry;
+                  return (
+                    <li
+                      key={group.groupKey}
+                      className="flex flex-col gap-2 rounded-xl border border-dashed border-border bg-surface/40 p-2"
+                    >
+                      <p className="px-1 text-xs font-medium text-muted">
+                        {editionGroupLabel(group.items.length)}
+                      </p>
+                      {group.items.map((book) => (
+                        <BookMovieRow
+                          key={book.id}
+                          item={book}
+                          shellAs="div"
+                          selected={selectedId === book.id}
+                          onSelect={onSelectRow}
+                          onStatusChange={(status) => {
+                            updateBookMovieItem(book.id, { status });
+                          }}
+                          onRatingChange={(rating) => {
+                            updateBookMovieItem(book.id, { rating });
+                          }}
+                        />
+                      ))}
+                    </li>
+                  );
+                }
+
+                const item = entry.item;
                 if (item.type === "shopping") {
                   const shoppingItem = item as typeof item & { type: "shopping" };
                   return (
