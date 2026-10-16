@@ -65,6 +65,7 @@
 ### Session 2026-10-16 (clarify Q&A)
 
 - **Q:** When you add several editions of the same work (different ISBNs), how should they appear in the library? → **A:** **One library row per edition** (per item/ISBN), with editions **grouped under a shared work** in list and detail UI (catalog work id when available; manual link otherwise).
+- **Q:** How should **en pause** be represented? → **A:** Add book status **`paused`** (French UI **En pause**); optional **pages read** while paused. Distinct from `to_read`, `reading`, and `read`; no separate DNF status.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -140,7 +141,7 @@ User assigns free-form tags and optional series name + volume/order; filters lis
 User keeps **one book item per edition** (typically one ISBN each). List and detail views **group editions under the same work** (Open Library work id when present; user may link manual rows). Scanning a second ISBN for the same work adds or updates that edition’s row, not a duplicate work.
 
 **User Story 7 — En pause and lending (P1)**  
-User marks a book **en pause** (optional pages read), or records that it is **prêté à** someone, and can clear/resume later.
+User sets status to **En pause** (`paused`, optional pages read), or records that it is **prêté à** someone, and can resume to `reading` or `read` later.
 
 **User Story 8 — Notes and quotes (P2)**  
 User keeps private notes on the book and saves multiple quote/highlight passages (optional page) linked to the book (**quote model pending clarify**).
@@ -193,7 +194,7 @@ User opens stats (per month, tags/genres, authors, pages) and an optional year-i
 
 - **FR-B01**: Books MUST support user-defined **tags** (many per book); MUST NOT implement custom shelves/collections.
 - **FR-B02**: Books MAY belong to a **series** with optional volume/order.
-- **FR-B03**: Books MUST support status **`en pause`** (French UI) with optional **pages read** while paused; MUST NOT expose a separate “DNF” status.
+- **FR-B03**: Book status enum MUST include **`paused`** (UI **En pause**) alongside `to_read`, `reading`, `read`. User MAY set optional **pages read** on `paused`. MUST NOT expose a separate “DNF” status.
 - **FR-B04**: Books MUST support **lending** metadata (“prêté à…”) per **pending clarify**.
 - **FR-B05**: Books MUST support **private notes** (existing field scope may extend).
 - **FR-B06**: Books MUST support **multiple quotes/highlights** per book per **pending clarify**.
