@@ -17,6 +17,13 @@ import {
   type ShoppingFieldValues,
 } from "@/components/fields";
 import { BookEditionsSection } from "@/components/books/book-editions-section";
+import {
+  BookDiscoveryFields,
+  bookDiscoveryValuesToPatch,
+  emptyBookDiscoveryFieldValues,
+  itemToBookDiscoveryValues,
+  type BookDiscoveryFieldValues,
+} from "@/components/books/book-discovery-fields";
 import { getItemUseCases } from "@/composition/client";
 import { Button } from "@/components/ui/Button";
 import { ExternalLinkActions } from "@/components/music/external-link-actions";
@@ -46,6 +53,9 @@ export function ItemDetailForm({
   tagSuggestions,
 }: ItemDetailFormProps) {
   const [values, setValues] = useState<FieldValues>(() => valuesFromItem(item));
+  const [discoveryValues, setDiscoveryValues] = useState<BookDiscoveryFieldValues>(() =>
+    item.type === "book" ? itemToBookDiscoveryValues(item) : emptyBookDiscoveryFieldValues(),
+  );
   const [titleError, setTitleError] = useState<string | undefined>();
   const [artistError, setArtistError] = useState<string | undefined>();
   const [saving, setSaving] = useState(false);
@@ -61,12 +71,19 @@ export function ItemDetailForm({
     setTitleError(undefined);
     setArtistError(undefined);
     try {
-      const updated = await onSave(patchFromValues(item, values));
+      const patch =
+        item.type === "book"
+          ? { ...patchFromValues(item, values), ...bookDiscoveryValuesToPatch(discoveryValues) }
+          : patchFromValues(item, values);
+      const updated = await onSave(patch);
       setValues(valuesFromItem(updated));
+      if (updated.type === "book") {
+        setDiscoveryValues(itemToBookDiscoveryValues(updated));
+      }
     } finally {
       setSaving(false);
     }
-  }, [item, onSave, values]);
+  }, [item, onSave, values, discoveryValues]);
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -107,6 +124,9 @@ export function ItemDetailForm({
             }}
           />
         </>
+      ) : null}
+      {item.type === "book" ? (
+        <BookDiscoveryFields values={discoveryValues} onChange={setDiscoveryValues} />
       ) : null}
       {item.type === "movie" ? (
         <MovieFields
