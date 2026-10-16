@@ -1,14 +1,25 @@
-# Feature Specification: Book barcode scan and catalog lookup
+# Feature Specification: Books — library, catalog, and insights
+
+**Feature directory**: `specs/002-book-barcode-scan/` (historical slug; this spec covers **all** book capabilities).
 
 **Feature Branch**: `002-book-barcode-scan`
 
 **Created**: 2026-10-15
 
-**Status**: Draft
+**Status**: Draft (Phase A largely implemented on `main`; Phases B–D specified here, implementation pending)
 
-**Input**: Extend the books list so mobile users can scan an ISBN barcode, look up metadata through the server, preview and confirm, or add manually with ISBN prefilled when lookup fails. Desktop keeps manual book add only (no scan or ISBN lookup UI).
+**Input**: Personal book library in Muni: **catalog capture** (ISBN scan, title search, manual add), **library richness** (tags, series, lending, notes, quotes, **en pause**), **discovery** (mood/pace, private recommendations, filters), and **insights** (goals, streaks, heatmap, stats, year-in-review). French UI; private-by-default; offline-first with sync.
 
 **Depends on**: Muni v1 (`001-typed-lists-companion`) books list and quick-add.
+
+## Product scope (phased)
+
+| Phase | Theme | Status |
+|-------|--------|--------|
+| **A — Catalog** | Scan, title search, manual add, dedupe/merge, Open Library via server | **Shipped** (see User Stories 1–4) |
+| **B — Library** | Tags, series, editions/works grouping, **en pause** + pages read, lending, private notes, quotes | Specified; **pending clarify** on data shape for editions, quotes, lending |
+| **C — Discovery** | Mood & pace, private recommendations, filter/browse by those dimensions | Specified; pending plan |
+| **D — Insights** | Annual reading goal, streaks, activity heatmap, stats breakdowns, year-in-review | Specified; **pending clarify** on what counts as “reading activity” without session timer |
 
 ## Clarifications
 
@@ -32,7 +43,28 @@
 - **X3:** Lookup requires network; manual add/edit works offline (no offline lookup queue).
 - **X4:** Server-side cache of catalog responses (short TTL).
 
+### Session 2026-10-16 (product walkthrough — encoded decisions)
+
+**Accepted for books**
+
+- Catalog: ISBN barcode scan → catalog fill (mobile); title catalog search (all devices); manual entry offline (title-only OK); “already in library” at scan/search; multiple editions / **work grouping** (model **pending clarify**); free-form **tags** (not custom shelves); **series** (name + volume/order).
+- Lifecycle: **`en pause`** status (set aside, may resume) — not a separate “DNF” label; **pages read** when en pause; integer **1–5 star** rating only (no fractional stars).
+- Personal data: **private notes**; **quotes & highlights** as first-class citations per book (storage **pending clarify**); **lending** (“prêté à…”, shape **pending clarify**).
+- Discovery: **mood & pace** metadata; **private** personalized recommendations; **discovery filters** on mood, pace, tags.
+- Insights: **annual reading goal** (N books/year, private); **reading streaks** (optional, no guilt); **calendar heatmap** of reading activity; **year-in-review** recap; **stats breakdowns** (charts/tables).
+
+**Denied (books)**
+
+- Custom shelves/collections (use tags); physical location; format (paper/ebook/audiobook); owned vs library/borrowed flags; public/separate reviews; content-warning tags; reading **session timer**; reading speed / ETA estimates; fractional star ratings.
+
+**Later / not in this spec**
+
+- Goodreads / CSV **import** (low priority).
+- **Reading challenges** (themed goals) — **cross-list** (books + movies + …); defer to a companion-wide feature, not book-only.
+
 ## User Scenarios & Testing *(mandatory)*
+
+### Phase A — Catalog (shipped)
 
 ### User Story 1 - Scan or search by title on phone and add from catalog (Priority: P1)
 
@@ -95,6 +127,38 @@ On mobile, the user can type or paste an ISBN instead of scanning, then run the 
 
 ---
 
+### Phase B — Library (specified, not yet implemented)
+
+**User Story 5 — Organize with tags and series (P1)**  
+User assigns free-form tags and optional series name + volume/order; filters list by tag or series.
+
+**User Story 6 — Editions grouped by work (P1)**  
+User can see multiple editions (ISBNs) of the same literary work without treating them as unrelated duplicates (**grouping rules pending clarify**).
+
+**User Story 7 — En pause and lending (P1)**  
+User marks a book **en pause** (optional pages read), or records that it is **prêté à** someone, and can clear/resume later.
+
+**User Story 8 — Notes and quotes (P2)**  
+User keeps private notes on the book and saves multiple quote/highlight passages (optional page) linked to the book (**quote model pending clarify**).
+
+### Phase C — Discovery (specified, not yet implemented)
+
+**User Story 9 — Mood, pace, and filters (P2)**  
+After reading, user sets mood/pace (or tags); list and browse views filter by those dimensions.
+
+**User Story 10 — Private recommendations (P3)**  
+App suggests books from the user’s own library patterns (no social feed).
+
+### Phase D — Insights (specified, not yet implemented)
+
+**User Story 11 — Goals, streaks, and heatmap (P2)**  
+User sets an annual books-finished goal, sees optional streak and a private activity heatmap (**activity events pending clarify**).
+
+**User Story 12 — Stats and year-in-review (P3)**  
+User opens stats (per month, tags/genres, authors, pages) and an optional year-in-review recap.
+
+---
+
 ### Edge Cases
 
 - Invalid or non-ISBN barcode: keep scanning (B3); do not call lookup until ISBN-valid.
@@ -121,9 +185,31 @@ On mobile, the user can type or paste an ISBN instead of scanning, then run the 
 - **FR-013**: Search index MUST remain title-only (L2); new fields are not searched in v1.
 - **FR-014**: No cover images (L3).
 
+**Phase B — Library (draft; refine after clarify / plan)**
+
+- **FR-B01**: Books MUST support user-defined **tags** (many per book); MUST NOT implement custom shelves/collections.
+- **FR-B02**: Books MAY belong to a **series** with optional volume/order.
+- **FR-B03**: Books MUST support status **`en pause`** (French UI) with optional **pages read** while paused; MUST NOT expose a separate “DNF” status.
+- **FR-B04**: Books MUST support **lending** metadata (“prêté à…”) per **pending clarify**.
+- **FR-B05**: Books MUST support **private notes** (existing field scope may extend).
+- **FR-B06**: Books MUST support **multiple quotes/highlights** per book per **pending clarify**.
+- **FR-B07**: Multiple **editions / work grouping** MUST behave per **pending clarify** (Q1 in 2026-10-16 clarify session).
+
+**Phase C — Discovery (draft)**
+
+- **FR-C01**: User MAY set **mood** and **pace** on a book (post-read or anytime).
+- **FR-C02**: User MUST be able to **filter** books by mood, pace, and tags.
+- **FR-C03**: App MAY show **private** recommendations derived only from the user’s data.
+
+**Phase D — Insights (draft)**
+
+- **FR-D01**: User MAY set an **annual reading goal** (books finished in calendar year).
+- **FR-D02**: App MAY show **reading streak** and **activity heatmap** per **pending clarify** (no session timer).
+- **FR-D03**: App MUST provide **stats breakdowns** and optional **year-in-review** from the user’s library data.
+
 ### Key Entities
 
-- **Book item** (extends existing `book` type): adds `isbn`, `synopsis`, `genres[]`, `publicationYear`, `publisher`, `pageCount` (optional/nullable per catalog).
+- **Book item** (extends existing `book` type): Phase A adds `isbn`, `synopsis`, `genres[]`, `publicationYear`, `publisher`, `pageCount` (optional/nullable per catalog). Phases B–D add tags, series, pause/lending, notes, quotes, mood/pace, and insight aggregates — detailed in `data-model.md` after plan.
 
 ## Success Criteria *(mandatory)*
 
@@ -142,4 +228,6 @@ On mobile, the user can type or paste an ISBN instead of scanning, then run the 
 
 ## Out of Scope
 
-- Cover images; Google Books fallback; offline lookup queue (X3); desktop ISBN flows (B9).
+- Cover images; Google Books fallback; offline lookup queue (X3); desktop ISBN barcode / manual ISBN lookup (B9).
+- Custom shelves; physical shelf location; format flags; owned/borrowed library flags; public reviews; content-warning catalog; reading session timer; pages/hour or ETA; fractional ratings (see Session 2026-10-16).
+- Goodreads/CSV import (later); cross-list reading challenges (later, not book-only).
