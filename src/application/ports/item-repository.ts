@@ -1,4 +1,5 @@
 import type { Item, ItemStatus, ItemType } from "../../domain/item";
+import type { ReadingGoal } from "../../domain/reading-goal";
 
 export type ItemQuery = {
   type?: ItemType;
@@ -11,7 +12,11 @@ export type MetaValues = {
   hlcState: string;
   userId: string;
   pullCursor: string;
+<<<<<<< HEAD
   quotePullCursor: string;
+=======
+  readingGoals: ReadingGoal[];
+>>>>>>> bd5c4f0 (feat(002): T334 reading goal settings and repositories)
 };
 
 export type MetaKey = keyof MetaValues;

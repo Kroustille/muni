@@ -12,7 +12,7 @@ export class InMemoryItemRepository implements ItemRepository {
   private readonly items = new Map<string, Item>();
   private readonly pending = new Set<string>();
   private readonly listeners = new Set<() => void>();
-  private readonly metaValues = new Map<MetaKey, string>();
+  private readonly metaValues = new Map<MetaKey, MetaValues[MetaKey]>();
 
   readonly meta: MetaStore = {
     get: async <K extends MetaKey>(key: K) => this.metaValues.get(key) as MetaValues[K] | undefined,

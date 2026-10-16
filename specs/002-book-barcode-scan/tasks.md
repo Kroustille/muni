@@ -242,7 +242,7 @@
 
 - [x] T332 [US11] Unit tests for streak and heatmap aggregation in `tests/unit/reading-insights.test.ts`
 - [x] T333 [US11] Implement `computeStreak` and `buildActivityHeatmap` in `src/application/books/reading-insights.ts` (depends on T295, T332)
-- [ ] T334 [US11] `ReadingSettings` use case + repository for annual goal in `src/application/books/reading-settings.ts` and adapters (depends on T290)
+- [x] T334 [US11] `ReadingSettings` use case + repository for annual goal in `src/application/books/reading-settings.ts` and adapters (depends on T290)
 - [ ] T335 [US11] Insights section: goal editor, streak, heatmap per `contracts/book-insights-ui.md` in `src/app/(app)/books/insights/page.tsx` (depends on T333, T334)
 - [ ] T336 [US11] E2e activity day on status/`pagesRead` change in `tests/e2e/books-reading-heatmap.spec.ts`
 
