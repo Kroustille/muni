@@ -120,13 +120,13 @@ specs/002-book-barcode-scan/
 ├── data-model.md
 ├── quickstart.md
 ├── contracts/
-│   ├── book-catalog-api.md      # Phase A
-│   ├── ui-book-scan.md          # Phase A
-│   ├── book-quotes-sync.md      # Phase B
-│   ├── book-library-ui.md       # Phase B
+│   ├── book-catalog-api.md      # Phase A lookup (+ catalogWorkId in Phase B)
+│   ├── ui-book-scan.md          # Phase A scan/preview
+│   ├── book-quotes-sync.md      # Phase B quotes child sync
+│   ├── book-library-ui.md       # Phase B library UX
 │   ├── book-discovery-ui.md     # Phase C
 │   └── book-insights-ui.md      # Phase D
-└── tasks.md                     # T201–T2xx Phase A; T280+ B–D after speckit-tasks
+└── tasks.md                     # Phase A T201–T247; Phases B–D T280–T342
 ```
 
 ### Source changes (incremental)
