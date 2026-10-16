@@ -14,6 +14,8 @@ export type UpsertBookFromCatalogInput = {
   publicationYear?: number | null;
   publisher?: string | null;
   pageCount?: number | null;
+  /** Open Library work key (catalogWorkId); stored as item.workId. */
+  workId?: string | null;
 };
 
 export type UpsertBookFromCatalogDeps = {
@@ -23,7 +25,7 @@ export type UpsertBookFromCatalogDeps = {
 };
 
 function catalogPatch(input: UpsertBookFromCatalogInput): ItemPatch {
-  return {
+  const patch: ItemPatch = {
     isbn: normalizeIsbn(input.isbn),
     title: input.title.trim(),
     author: input.author ?? null,
@@ -34,6 +36,10 @@ function catalogPatch(input: UpsertBookFromCatalogInput): ItemPatch {
     pageCount: input.pageCount ?? null,
     deletedAt: null,
   };
+  if (input.workId !== undefined && input.workId !== null && input.workId.trim() !== "") {
+    patch.workId = input.workId.trim();
+  }
+  return patch;
 }
 
 function authorsMatch(stored: string | null, catalogAuthor: string | null | undefined): boolean {

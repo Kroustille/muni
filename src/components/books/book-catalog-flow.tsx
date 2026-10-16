@@ -49,6 +49,7 @@ async function saveCatalogPreview(values: CatalogPreviewValues): Promise<void> {
     publicationYear: parseOptionalInt(values.publicationYear),
     publisher: optionalText(values.publisher),
     pageCount: parseOptionalInt(values.pageCount),
+    workId: optionalText(values.workId),
   });
 }
 

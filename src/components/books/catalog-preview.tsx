@@ -18,6 +18,7 @@ export type CatalogPreviewValues = {
   publicationYear: string;
   publisher: string;
   pageCount: string;
+  workId: string;
 };
 
 export type CatalogPreviewProps = {
@@ -38,6 +39,7 @@ export function catalogHitToPreviewValues(hit: BookCatalogHit): CatalogPreviewVa
     publicationYear: hit.publicationYear !== undefined ? String(hit.publicationYear) : "",
     publisher: hit.publisher ?? "",
     pageCount: hit.pageCount !== undefined ? String(hit.pageCount) : "",
+    workId: hit.workId ?? "",
   };
 }
 

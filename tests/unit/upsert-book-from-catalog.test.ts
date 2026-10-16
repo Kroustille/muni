@@ -69,6 +69,14 @@ describe("upsertBookFromCatalog", () => {
     expect((await ctx.repository.query({ type: "book" })).length).toBe(1);
   });
 
+  it("persists catalog work id when provided", async () => {
+    const saved = await ctx.useCases.upsertBookFromCatalog({
+      ...catalog,
+      workId: "OL45804W",
+    });
+    expect(saved.workId).toBe("OL45804W");
+  });
+
   it("creates a new row when multiple manual candidates would match", async () => {
     let counter = 10;
     const useCases = createItemUseCases({
