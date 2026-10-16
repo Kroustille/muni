@@ -163,7 +163,7 @@ The home screen shows a card per list with item count and recently added items, 
 - **FR-020**: Users MUST be able to sign out from settings.
 - **FR-021**: The app MUST be installable on a mobile device home screen and usable on desktop browsers.
 - **FR-022**: The interface MUST be in French, with all user-facing text separated from the code so more languages can be added later.
-- **FR-023**: The interface MUST support light and dark themes following the system setting.
+- **FR-023**: The interface MUST support light and dark themes (ink + teal tokens). Default appearance follows the system setting; the user MAY override with **Clair**, **Sombre**, or **Système** in Réglages, persisted on device (`localStorage`).
 - **FR-024**: The system MUST NOT use analytics or third-party tracking.
 
 ### Out of Scope (v1)

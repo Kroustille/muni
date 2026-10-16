@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
+import { ThemeAppearanceSetting } from "@/components/theme/ThemeAppearanceSetting";
 import { getSessionUseCases } from "@/composition/client";
 import { t } from "@/i18n";
 
@@ -15,8 +16,9 @@ export default function SettingsPage() {
   }
 
   return (
-    <main className="mx-auto flex max-w-xl flex-col gap-6 p-4">
-      <h1 className="text-xl font-semibold">{t("settings.title")}</h1>
+    <main className="mx-auto flex max-w-xl flex-col gap-6 p-4 md:max-w-2xl">
+      <h1 className="text-[1.35rem]">{t("settings.title")}</h1>
+      <ThemeAppearanceSetting />
       <Button type="button" variant="secondary" onClick={() => void onSignOut()}>
         {t("settings.signOut")}
       </Button>

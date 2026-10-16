@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import { LIST_TYPE_VISUAL } from "@/components/list-type-visual";
 import { getItemUseCases } from "@/composition/client";
 import type { Item, ItemType } from "@/domain/item";
 import { t, type MessageKey } from "@/i18n";
@@ -52,6 +54,41 @@ const TYPE_LABEL_KEY: Record<ItemType, MessageKey> = {
   music_track: "type.music_track",
 };
 
+function HomeListCard({
+  href,
+  label,
+  count,
+  itemType,
+}: {
+  href: string;
+  label: string;
+  count: number;
+  itemType: ItemType;
+}) {
+  const { accentColor, icon: Icon } = LIST_TYPE_VISUAL[itemType];
+
+  return (
+    <section
+      aria-label={label}
+      className="flex overflow-hidden rounded-xl border border-border bg-surface"
+    >
+      <div className="w-1 shrink-0" style={{ backgroundColor: accentColor }} aria-hidden />
+      <Link href={href} className="flex flex-1 items-center gap-3 p-3">
+        <div
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full"
+          style={{ backgroundColor: `${accentColor}1a` }}
+        >
+          <Icon className="h-5 w-5" style={{ color: accentColor }} strokeWidth={1.5} aria-hidden />
+        </div>
+        <div className="min-w-0 flex-1">
+          <h2 className="text-base leading-tight">{label}</h2>
+          <p className="mt-0.5 text-2xl tabular-nums">{count}</p>
+        </div>
+      </Link>
+    </section>
+  );
+}
+
 export default function HomePage() {
   const [counts, setCounts] = useState<Record<ItemType, number> | null>(null);
   const [recent, setRecent] = useState<Item[]>([]);
@@ -95,30 +132,28 @@ export default function HomePage() {
   const showEmpty = total === 0;
 
   return (
-    <main className="p-4 pb-20">
+    <main className="mx-auto w-full max-w-4xl p-4 pb-20 md:pb-4">
       <Link
         href="/search"
-        className="mb-4 block rounded-lg border border-black/10 px-3 py-2 opacity-70 dark:border-white/10"
+        className="mb-4 flex min-h-11 items-center gap-2 rounded-xl border border-border bg-surface px-3 py-2 text-muted"
       >
-        {t("search.placeholder")}
+        <Search className="h-5 w-5 shrink-0 text-muted" strokeWidth={1.5} aria-hidden />
+        <span className="truncate">{t("search.placeholder")}</span>
       </Link>
-      {showEmpty ? <p className="mb-4 text-sm opacity-80">{t("home.empty")}</p> : null}
-      <div className="mb-6 grid grid-cols-2 gap-3">
+      {showEmpty ? <p className="mb-4 text-sm text-muted">{t("home.empty")}</p> : null}
+      <div className="mb-6 grid grid-cols-2 gap-3 md:grid-cols-3">
         {LIST_ROUTES.map((route) => {
           const type = ROUTE_TO_TYPE[route];
           const label = t(ROUTE_TITLE_KEY[route]);
           const count = counts?.[type] ?? 0;
           return (
-            <section
+            <HomeListCard
               key={route}
-              aria-label={label}
-              className="rounded-lg border border-black/10 p-3 dark:border-white/10"
-            >
-              <Link href={`/lists/${route}`} className="block">
-                <h2 className="font-semibold">{label}</h2>
-                <p className="mt-1 text-2xl tabular-nums">{count}</p>
-              </Link>
-            </section>
+              href={`/lists/${route}`}
+              label={label}
+              count={count}
+              itemType={type}
+            />
           );
         })}
         {MUSIC_ROUTES.map((route) => {
@@ -126,27 +161,24 @@ export default function HomePage() {
           const label = t(MUSIC_ROUTE_TITLE_KEY[route]);
           const count = counts?.[type] ?? 0;
           return (
-            <section
+            <HomeListCard
               key={route}
-              aria-label={label}
-              className="rounded-lg border border-black/10 p-3 dark:border-white/10"
-            >
-              <Link href={MUSIC_ROUTE_HREF[route]} className="block">
-                <h2 className="font-semibold">{label}</h2>
-                <p className="mt-1 text-2xl tabular-nums">{count}</p>
-              </Link>
-            </section>
+              href={MUSIC_ROUTE_HREF[route]}
+              label={label}
+              count={count}
+              itemType={type}
+            />
           );
         })}
       </div>
       {recent.length > 0 ? (
         <section aria-label={t("home.recent")}>
-          <h2 className="mb-2 text-lg font-semibold">{t("home.recent")}</h2>
+          <h2 className="mb-2 text-lg">{t("home.recent")}</h2>
           <ul className="flex flex-col gap-2">
             {recent.map((item) => (
               <li
                 key={item.id}
-                className="rounded-lg border border-border px-3 py-2"
+                className="rounded-xl border border-border bg-surface px-3 py-2"
               >
                 <Link
                   href={`/items/${item.id}`}

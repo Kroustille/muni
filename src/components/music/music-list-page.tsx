@@ -153,7 +153,7 @@ export function MusicListPage({ kind }: MusicListPageProps) {
   }, []);
 
   return (
-    <main className="p-4 pb-20">
+    <main className="mx-auto w-full max-w-4xl p-4 pb-20 md:pb-4">
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-semibold">{t(TITLE_KEY[kind])}</h1>
         <div className="flex flex-wrap items-center gap-2">

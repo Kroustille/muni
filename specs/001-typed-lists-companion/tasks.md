@@ -68,7 +68,7 @@
 
 - [X] T028 [P] Create unit tests for the i18n helper (typed keys resolve, every key referenced exists in `fr.json`, no empty values) in `tests/unit/i18n.test.ts`
 - [X] T029 [P] Implement the French message catalog `src/i18n/fr.json` and typed `t(key)` helper in `src/i18n/index.ts` (all user-facing strings go through it, FR-022) (depends on T028)
-- [X] T030 [P] Implement light/dark theme following `prefers-color-scheme` (system only, no toggle) with Tailwind dark variant in `src/app/globals.css` (FR-023, verified by the e2e in T100)
+- [X] T030 [P] Implement light/dark ink+teal tokens with system default and Réglages override (Clair / Sombre / Système, `localStorage`) in `src/app/globals.css` and `src/components/theme/` (FR-023, verified by the e2e in T100)
 - [X] T031 [P] Build base hand-made Tailwind components (`Button`, `TextField`, `Select`, `Toast`, `BottomSheet`) in `src/components/ui/`
 - [X] T032 Create the client composition root in `src/composition/client.ts` wiring the IndexedDB `ItemRepository` and uuid `IdGenerator` into the item use cases, exposing them to the UI (depends on T021, T025, T027)
 - [X] T033 Build the app shell layout with `(app)` route group and bottom navigation in `src/app/(app)/layout.tsx` (depends on T029, T030, T031, T032)

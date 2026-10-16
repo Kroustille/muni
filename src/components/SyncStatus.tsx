@@ -33,7 +33,7 @@ export function SyncStatus() {
 
   return (
     <p
-      className="pointer-events-none fixed top-2 right-2 z-50 rounded-full border border-black/10 bg-surface/95 px-3 py-1 text-xs text-muted shadow-sm backdrop-blur-sm dark:border-white/10"
+      className="pointer-events-none fixed top-2 right-2 z-50 rounded-full border border-border bg-surface/95 px-3 py-1 text-xs text-muted shadow-sm backdrop-blur-sm md:left-60 md:right-auto"
       role="status"
       aria-live="polite"
     >

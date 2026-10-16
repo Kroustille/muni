@@ -39,7 +39,7 @@ export function SessionGate({ children }: { children: ReactNode }) {
     <>
       {state.reauthRequired ? (
         <div
-          className="border-b border-black/10 bg-surface px-4 py-2 text-sm dark:border-white/10"
+          className="border-b border-border bg-surface px-4 py-2 text-sm"
           role="status"
         >
           <p className="mx-auto flex max-w-xl flex-wrap items-center gap-x-2 gap-y-1">

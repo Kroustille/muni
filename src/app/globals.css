@@ -1,28 +1,52 @@
 @import "tailwindcss";
 
-/* Theme follows the system preference only (FR-023): Tailwind's default `dark:`
-   variant is the `prefers-color-scheme: dark` media query, so no toggle or class. */
-:root {
-  color-scheme: light dark;
-  --background: #ffffff;
-  --foreground: #171717;
-  --surface: #f4f4f5;
-  --border: #d4d4d8;
-  --muted: #52525b;
-  --accent: #4f46e5;
-  --accent-foreground: #ffffff;
+@custom-variant dark {
+  &:where(.dark, .dark *) {
+    @slot;
+  }
+  @media (prefers-color-scheme: dark) {
+    &:where(:root:not(.light):not(.dark), :root:not(.light):not(.dark) *) {
+      @slot;
+    }
+  }
+}
+
+/* Ink + teal tokens (design spec §4.2). Light is default on :root; dark via .dark or system media. */
+:root,
+:root.light {
+  color-scheme: light;
+  --background: #f4f6f8;
+  --foreground: #0f172a;
+  --surface: #ffffff;
+  --border: #e2e8f0;
+  --muted: #64748b;
+  --accent: #0d9488;
+  --accent-foreground: #f0fdfa;
   --danger: #b91c1c;
 }
 
+:root.dark {
+  color-scheme: dark;
+  --background: #020617;
+  --foreground: #f1f5f9;
+  --surface: #0f172a;
+  --border: #334155;
+  --muted: #94a3b8;
+  --accent: #14b8a6;
+  --accent-foreground: #042f2e;
+  --danger: #f87171;
+}
+
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --surface: #18181b;
-    --border: #3f3f46;
-    --muted: #a1a1aa;
-    --accent: #818cf8;
-    --accent-foreground: #0a0a0a;
+  :root:not(.light):not(.dark) {
+    color-scheme: dark;
+    --background: #020617;
+    --foreground: #f1f5f9;
+    --surface: #0f172a;
+    --border: #334155;
+    --muted: #94a3b8;
+    --accent: #14b8a6;
+    --accent-foreground: #042f2e;
     --danger: #f87171;
   }
 }
@@ -36,15 +60,24 @@
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-danger: var(--danger);
+  --font-sans: var(--font-body), system-ui, sans-serif;
+  --font-serif: var(--font-display), Georgia, serif;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
+  font-family: var(--font-sans);
 }
 
-/* Tailwind preflight sets `cursor: default` on buttons; links already feel clickable. */
 @layer base {
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-serif);
+    font-weight: 600;
+  }
+
   a[href],
   button:not(:disabled),
   select:not(:disabled),

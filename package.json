@@ -52,6 +52,7 @@
     "idb": "^8.0.4",
     "jose": "^6.2.12",
     "kysely": "^0.29.6",
+    "lucide-react": "^1.58.0",
     "next": "^15.5.28",
     "nodemailer": "^10.1.1",
     "openid-client": "^6.8.8",

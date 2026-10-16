@@ -51,7 +51,7 @@ export function SignInForm({ linkExpired, googleSignInEnabled }: SignInFormProps
 
   return (
     <div className="flex w-full max-w-sm flex-col gap-4">
-      <h1 className="text-xl font-semibold text-foreground">{t("signIn.title")}</h1>
+      <h1 className="text-[1.35rem] text-foreground">{t("signIn.title")}</h1>
 
       {linkExpired ? (
         <p className="text-sm text-danger" role="status">{t("signIn.linkExpired")}</p>

@@ -73,14 +73,32 @@ test("shows per-list counts and recent items newest first on home", async ({ pag
   await expect(recent.nth(3)).toContainText(t("type.shopping"));
 });
 
+const INK_TEAL_LIGHT_BG = "rgb(244, 246, 248)";
+const INK_TEAL_DARK_BG = "rgb(2, 6, 23)";
+
 test("follows the system color scheme for light and dark theme", async ({ page }) => {
   await page.emulateMedia({ colorScheme: "dark" });
   await signIn(page);
-  await expect(await bodyBackground(page)).toBe("rgb(10, 10, 10)");
+  await expect(await bodyBackground(page)).toBe(INK_TEAL_DARK_BG);
 
   await page.emulateMedia({ colorScheme: "light" });
   await page.reload();
-  await expect(await bodyBackground(page)).toBe("rgb(255, 255, 255)");
+  await expect(await bodyBackground(page)).toBe(INK_TEAL_LIGHT_BG);
+});
+
+test("applies forced light and dark themes from settings", async ({ page }) => {
+  await page.emulateMedia({ colorScheme: "dark" });
+  await signIn(page);
+  await page.goto("/settings");
+
+  await page.getByRole("button", { name: fr["settings.theme.light"], pressed: false }).click();
+  await expect(await bodyBackground(page)).toBe(INK_TEAL_LIGHT_BG);
+
+  await page.getByRole("button", { name: fr["settings.theme.dark"], pressed: false }).click();
+  await expect(await bodyBackground(page)).toBe(INK_TEAL_DARK_BG);
+
+  await page.getByRole("button", { name: fr["settings.theme.system"], pressed: false }).click();
+  await expect(await bodyBackground(page)).toBe(INK_TEAL_DARK_BG);
 });
 
 test("serves a standalone French PWA manifest", async ({ page, request }) => {
