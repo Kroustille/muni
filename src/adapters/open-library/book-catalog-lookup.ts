@@ -6,7 +6,7 @@ import {
 } from "@/application/ports/book-catalog-lookup";
 import type { CatalogCacheRepository } from "@/application/ports/catalog-cache-repository";
 
-import { normalizeOpenLibraryWorkKey } from "@/application/books/work-grouping";
+import { normalizeOpenLibraryWorkKey } from "@/domain/open-library-work";
 
 import {
   mapSearchResponseToHits,

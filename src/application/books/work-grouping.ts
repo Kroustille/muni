@@ -38,10 +38,6 @@ export function groupBooksByWork(items: Item[]): BookWorkGroup[] {
   return groups;
 }
 
-export function normalizeOpenLibraryWorkKey(raw: string): string {
-  return raw.replace(/^\/works\//, "").trim();
-}
-
 export function resolveWorkIdForLink(
   ...workIds: Array<string | null | undefined>
 ): string | null {
