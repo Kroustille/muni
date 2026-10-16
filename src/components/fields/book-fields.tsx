@@ -8,6 +8,7 @@ import { t, type MessageKey } from "@/i18n";
 
 import { StarRating } from "@/components/StarRating";
 import { RecommendedByInput } from "@/components/RecommendedByInput";
+import { TagChipEditor } from "@/components/books/tag-chip-editor";
 import { MultilineField } from "./multiline-field";
 
 function ratingVisible(status: BookStatus): boolean {
@@ -21,6 +22,9 @@ export type BookFieldValues = {
   rating: number | null;
   recommendedBy: string;
   notes: string;
+  tags: string[];
+  seriesName: string;
+  seriesPosition: string;
 };
 
 export const emptyBookFieldValues = (): BookFieldValues => ({
@@ -30,6 +34,9 @@ export const emptyBookFieldValues = (): BookFieldValues => ({
   rating: null,
   recommendedBy: "",
   notes: "",
+  tags: [],
+  seriesName: "",
+  seriesPosition: "",
 });
 
 export type BookFieldsProps = {
@@ -38,6 +45,7 @@ export type BookFieldsProps = {
   titleError?: string;
   /** Read-only catalog metadata (N1). */
   pageCount?: number | null;
+  tagSuggestions?: readonly string[];
 };
 
 function optionalText(value: string): string | null {
@@ -61,10 +69,25 @@ export function bookFieldValuesToExtra(values: BookFieldValues): CreateItemExtra
   if (ratingVisible(values.status) && values.rating !== null) {
     extra.rating = values.rating;
   }
+  const tags = values.tags.map((tag) => tag.trim()).filter((tag) => tag !== "");
+  extra.tags = tags.length === 0 ? null : tags;
+  const seriesName = optionalText(values.seriesName);
+  if (seriesName) extra.seriesName = seriesName;
+  const positionRaw = values.seriesPosition.trim();
+  if (positionRaw !== "") {
+    const position = Number(positionRaw);
+    if (!Number.isNaN(position)) extra.seriesPosition = position;
+  }
   return extra;
 }
 
-export function BookFields({ values, onChange, titleError, pageCount }: BookFieldsProps) {
+export function BookFields({
+  values,
+  onChange,
+  titleError,
+  pageCount,
+  tagSuggestions = [],
+}: BookFieldsProps) {
   return (
     <div className="flex flex-col gap-4">
       {pageCount != null ? (
@@ -105,6 +128,24 @@ export function BookFields({ values, onChange, titleError, pageCount }: BookFiel
       <RecommendedByInput
         value={values.recommendedBy}
         onChange={(recommendedBy) => onChange({ ...values, recommendedBy })}
+      />
+      <TagChipEditor
+        tags={values.tags}
+        suggestions={tagSuggestions}
+        onChange={(tags) => onChange({ ...values, tags })}
+      />
+      <TextField
+        label={t("books.series.name")}
+        value={values.seriesName}
+        onChange={(event) => onChange({ ...values, seriesName: event.target.value })}
+        autoComplete="off"
+      />
+      <TextField
+        label={t("books.series.position")}
+        value={values.seriesPosition}
+        onChange={(event) => onChange({ ...values, seriesPosition: event.target.value })}
+        inputMode="numeric"
+        autoComplete="off"
       />
       <MultilineField
         label={t("field.notes")}

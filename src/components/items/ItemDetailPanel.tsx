@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { Item } from "@/domain/item";
+import { collectLibraryTags } from "@/application/books/book-library-filters";
 import { getItemUseCases } from "@/composition/client";
 import { ItemDetailForm } from "@/components/items/ItemDetailForm";
 import { useUndoDelete } from "@/components/UndoToast";
@@ -15,6 +16,7 @@ export type ItemDetailPanelProps = {
 export function ItemDetailPanel({ itemId, onUpdated }: ItemDetailPanelProps) {
   const { deleteWithUndo, isPendingUndo } = useUndoDelete();
   const [item, setItem] = useState<Item | null | undefined>(undefined);
+  const [tagSuggestions, setTagSuggestions] = useState<string[]>([]);
 
   useEffect(() => {
     let cancelled = false;
@@ -32,6 +34,21 @@ export function ItemDetailPanel({ itemId, onUpdated }: ItemDetailPanelProps) {
     };
   }, [itemId, isPendingUndo]);
 
+  useEffect(() => {
+    if (item?.type !== "book") {
+      setTagSuggestions([]);
+      return;
+    }
+    let cancelled = false;
+    void getItemUseCases().then(async (useCases) => {
+      const books = await useCases.listItems("book");
+      if (!cancelled) setTagSuggestions(collectLibraryTags(books));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [item?.type, item?.id]);
+
   if (item === undefined) {
     return <div className="p-4 text-sm text-muted" aria-busy="true">{t("action.loading")}</div>;
   }
@@ -47,6 +64,7 @@ export function ItemDetailPanel({ itemId, onUpdated }: ItemDetailPanelProps) {
         key={item.id}
         compact
         item={item}
+        tagSuggestions={tagSuggestions}
         onSave={async (patch) => {
           const useCases = await getItemUseCases();
           const updated = await useCases.updateItem(itemId, patch);

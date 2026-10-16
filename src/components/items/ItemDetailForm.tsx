@@ -33,10 +33,17 @@ export type ItemDetailFormProps = {
   onSave: (patch: ItemPatch) => Promise<Item>;
   onDelete?: () => void;
   compact?: boolean;
+<<<<<<< HEAD
   onLibraryChange?: () => void;
 };
 
 export function ItemDetailForm({ item, onSave, onDelete, compact, onLibraryChange }: ItemDetailFormProps) {
+=======
+  tagSuggestions?: readonly string[];
+};
+
+export function ItemDetailForm({ item, onSave, onDelete, compact, tagSuggestions }: ItemDetailFormProps) {
+>>>>>>> 219c6b2 (feat(002): T301 tag and series fields on book detail)
   const [values, setValues] = useState<FieldValues>(() => valuesFromItem(item));
   const [titleError, setTitleError] = useState<string | undefined>();
   const [artistError, setArtistError] = useState<string | undefined>();
@@ -78,6 +85,7 @@ export function ItemDetailForm({ item, onSave, onDelete, compact, onLibraryChang
         />
       ) : null}
       {item.type === "book" ? (
+<<<<<<< HEAD
         <>
           <BookFields
             values={values as BookFieldValues}
@@ -98,6 +106,18 @@ export function ItemDetailForm({ item, onSave, onDelete, compact, onLibraryChang
             }}
           />
         </>
+=======
+        <BookFields
+          values={values as BookFieldValues}
+          pageCount={item.pageCount}
+          tagSuggestions={tagSuggestions}
+          onChange={(next) => {
+            setValues(next);
+            setTitleError(undefined);
+          }}
+          titleError={titleError}
+        />
+>>>>>>> 219c6b2 (feat(002): T301 tag and series fields on book detail)
       ) : null}
       {item.type === "movie" ? (
         <MovieFields

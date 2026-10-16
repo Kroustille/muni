@@ -38,6 +38,12 @@ export function itemToBookValues(item: Item): BookFieldValues {
     rating: item.rating,
     recommendedBy: item.recommendedBy ?? "",
     notes: item.notes ?? "",
+    tags: item.tags ? [...item.tags] : [],
+    seriesName: item.seriesName ?? "",
+    seriesPosition:
+      item.seriesPosition !== null && item.seriesPosition !== undefined
+        ? String(item.seriesPosition)
+        : "",
   };
 }
 
@@ -51,6 +57,16 @@ export function bookValuesToPatch(values: BookFieldValues): ItemPatch {
   };
   if (values.status === "read") {
     patch.rating = values.rating;
+  }
+  const tags = values.tags.map((tag) => tag.trim()).filter((tag) => tag !== "");
+  patch.tags = tags.length === 0 ? null : tags;
+  patch.seriesName = optionalText(values.seriesName);
+  const positionRaw = values.seriesPosition.trim();
+  if (positionRaw === "") {
+    patch.seriesPosition = null;
+  } else {
+    const position = Number(positionRaw);
+    if (!Number.isNaN(position)) patch.seriesPosition = position;
   }
   return patch;
 }
