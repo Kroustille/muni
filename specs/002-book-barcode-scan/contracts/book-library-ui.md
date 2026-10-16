@@ -30,3 +30,14 @@
 ## Desktop / mobile
 
 - Full parity for Phase B (unlike Phase A scan boundary).
+
+## FR mapping
+
+| UI area | Requirements |
+|---------|----------------|
+| Tags, series filters | FR-B01, FR-B02 |
+| Work grouping / link edition | FR-B07 |
+| En pause, pages lues | FR-B03 |
+| Prêt | FR-B04 |
+| Notes privées | FR-B05 |
+| Citations (list UI) | FR-B06 |

@@ -124,7 +124,7 @@
 **Prerequisite**: Phase A complete (**T238** done).
 
 - [x] T280 Extend `specs/002-book-barcode-scan/data-model.md` with Phase B–D fields (tags, series, `catalogWorkId`/`workKey`, `pagesRead`, lending, mood/pace, `book_quotes` child, reading settings) per spec FR-B*–FR-D*
-- [ ] T281 [P] Author `specs/002-book-barcode-scan/contracts/book-library-ui.md` (tags, series, work grouping, **En pause**, lending, notes scope) mapping FR-B01–B07
+- [x] T281 [P] Author `specs/002-book-barcode-scan/contracts/book-library-ui.md` (tags, series, work grouping, **En pause**, lending, notes scope) mapping FR-B01–B07
 - [ ] T282 [P] Author `specs/002-book-barcode-scan/contracts/book-quotes-sync.md` (quote wire, push/pull, per-field LWW, soft delete, isolation)
 - [ ] T283 [P] Author `specs/002-book-barcode-scan/contracts/book-discovery-ui.md` (mood/pace editors, discovery filters, recommendations surface)
 - [ ] T284 [P] Author `specs/002-book-barcode-scan/contracts/book-insights-ui.md` (annual goal, streak, heatmap, stats, year-in-review)
