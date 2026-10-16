@@ -1,6 +1,6 @@
-# Research: Book barcode scan (002)
+# Research: Books feature 002
 
-All Technical Context items resolved.
+Phase A decisions (§1–7) unchanged from 2026-10-15. Below: **new** decisions for Phases B–D (2026-10-16 planning).
 
 ## 1. Catalog provider
 
@@ -38,3 +38,60 @@ All Technical Context items resolved.
 
 - **Decision**: Feature-detect mobile viewport + touch OR explicit `useIsMobile` hook used only to show scan/ISBN UI; desktop routes unchanged.
 - **Rationale**: Clear product boundary.
+
+---
+
+## 8. Open Library work id (Phase B, FR-B07)
+
+- **Decision**: On ISBN lookup, read `edition.works[0].key` (already fetched in adapter for synopsis). Normalize to **`workId`** string: strip leading `/works/` → e.g. `OL45804W`. Store on book item at catalog upsert. Title search hits **omit** work id until user runs ISBN lookup or full edition fetch (acceptable v1).
+- **Rationale**: Matches “one row per edition, grouped by work”; no extra API for grouping when adding by scan.
+- **Alternatives**: Separate `catalogWorkId` + `manualWorkGroupId` (rejected — one grouping key is enough); collapse editions into one row (denied in spec).
+
+## 9. Manual work grouping (Phase B)
+
+- **Decision**: User action **« Lier à une édition »** picks another book item in library; both items receive the same `workId` — prefer non-null OL id if either has one, else generate `local:{uuid}` shared by both. Unlink clears `workId` only on selected item if it was `local:*` and siblings remain grouped.
+- **Rationale**: No opaque id typing for users; satisfies “manual link otherwise”.
+- **Alternatives**: User types work id (rejected — error-prone).
+
+## 10. Tags storage (Phase B)
+
+- **Decision**: `tags: string[]` on item (jsonb), normalized trim + case-fold for dedupe display; max 50 tags per book, max 40 chars each (domain validation).
+- **Rationale**: FR-B01; same pattern as `genres` without catalog semantics.
+- **Alternatives**: Tag entity table (rejected — YAGNI at scale).
+
+## 11. Series fields (Phase B)
+
+- **Decision**: `seriesName` (text) + `seriesPosition` (numeric, nullable) — allows `2.5` for novellas via decimal; sort by name then position.
+- **Rationale**: FR-B02 volume/order without separate series entity.
+
+## 12. Book quotes sync (Phase B, FR-B06)
+
+- **Decision**: Table `book_quotes` with own `fields_updated_at` + soft delete; client sync via **`GET/POST /api/sync/quotes`** with same LWW merge as items (`merge()` reuse). Parent `bookItemId` must reference existing non-deleted book owned by user (server validate on push).
+- **Rationale**: Child records sync individually per clarify Q&A; avoids embedding unbounded arrays on `items`.
+- **Alternatives**: Quotes embedded in item jsonb (rejected — LWW whole-field conflict); CRDT (denied by constitution).
+
+## 13. Reading activity derivation (Phase D, FR-D02)
+
+- **Decision**: **No `activity_events` table in v1.** A calendar day is active if, for any book item, `fieldsUpdatedAt` for `status`, `pagesRead`, or transition into `read` falls on that day **in the user’s local timezone** (default `Europe/Paris` until user timezone preference exists). Recompute on read for heatmap/streak/goal progress.
+- **Rationale**: Clarify session — progress/completion without session timer; constitution simplicity.
+- **Alternatives**: Append-only event log (deferred — OD if perf regresses); UTC-only days (rejected — poor UX for French user).
+
+## 14. Reading goals (Phase D)
+
+- **Decision**: Table `reading_goals`: `(user_id, year)` unique, `target_count` integer ≥ 1. Progress = count of books whose **first** transition to `read` in that calendar year (detected via `fieldsUpdatedAt.read` crossing into read status during year, or status `read` with `fieldsUpdatedAt.read` in year).
+- **Rationale**: FR-D01 private annual goal; avoids double-counting re-reads if user toggles status (only first finish in year counts unless we add `finishedAt` later).
+- **Alternatives**: Store goal on user profile json (rejected — needs sync + validation).
+
+## 15. Private recommendations v1 (Phase C, FR-C03)
+
+- **Decision**: **Rule-based, offline**, no ML: candidate pool = books with status `to_read` or null; score +1 per shared tag with any book marked `read` in last 12 months; +1 per shared genre; +2 if mood matches most recent `read` book with mood set; return top 5, shuffle ties. Hide section when &lt; 3 candidates.
+- **Rationale**: “Private” and portable; no external API.
+- **Alternatives**: Embeddings / LLM (out of scope v1); collaborative filtering (no multi-user data).
+
+## 16. Mood & pace vocabularies (Phase C)
+
+- **Decision** (proposed — **OD-002-10**): Optional enums stored as string keys, labels in `fr.json`:
+  - **Mood**: `joyeux`, `melancolique`, `intense`, `apaisant`, `inspirant`, `sombre`, `drôle`, `romantique`
+  - **Pace**: `lent`, `modéré`, `rapide`, `fébrile`
+- **Rationale**: Enables FR-C02 filters without unbounded tag chaos.
+- **Alternatives**: Free text (harder to filter); single combined “vibe” field (rejected — spec separates mood & pace).
