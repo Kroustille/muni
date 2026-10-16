@@ -19,7 +19,7 @@
 | **A — Catalog** | Scan, title search, manual add, dedupe/merge, Open Library via server | **Shipped** (see User Stories 1–4) |
 | **B — Library** | Tags, series, editions/works grouping, **en pause** + pages read, lending, private notes, quotes | Specified; Phase B data shape **clarified** (see Q&A session) |
 | **C — Discovery** | Mood & pace, private recommendations, filter/browse by those dimensions | Specified; pending plan |
-| **D — Insights** | Annual reading goal, streaks, activity heatmap, stats breakdowns, year-in-review | Specified; **pending clarify** on what counts as “reading activity” without session timer |
+| **D — Insights** | Annual reading goal, streaks, activity heatmap, stats breakdowns, year-in-review | Specified; activity rules **clarified** (see Q&A session) |
 
 ## Clarifications
 
@@ -68,6 +68,7 @@
 - **Q:** How should **en pause** be represented? → **A:** Add book status **`paused`** (French UI **En pause**); optional **pages read** while paused. Distinct from `to_read`, `reading`, and `read`; no separate DNF status.
 - **Q:** How should **quotes & highlights** be stored? → **A:** **Child records** per quote (passage text, optional page, created-at), synced individually; linked to parent book item.
 - **Q:** How should **lending** (“prêté à…”) work? → **A:** **One active loan** per book (borrower name, optional loan date); clearing the loan means returned. **No loan history in v1.**
+- **Q:** What counts as **reading activity** for heatmap and streaks (no session timer)? → **A:** A calendar day counts if the user logs **any book progress or completion** that day: status change (e.g. to/from `reading` or `read` or `paused`), **pages read** update, or marking **read**.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -159,7 +160,7 @@ App suggests books from the user’s own library patterns (no social feed).
 ### Phase D — Insights (specified, not yet implemented)
 
 **User Story 11 — Goals, streaks, and heatmap (P2)**  
-User sets an annual books-finished goal, sees optional streak and a private activity heatmap (**activity events pending clarify**).
+User sets an annual books-finished goal, sees optional streak and a private activity heatmap driven by **progress or completion events** (status, pages read, or finished) per calendar day—no session timer.
 
 **User Story 12 — Stats and year-in-review (P3)**  
 User opens stats (per month, tags/genres, authors, pages) and an optional year-in-review recap.
@@ -211,7 +212,7 @@ User opens stats (per month, tags/genres, authors, pages) and an optional year-i
 **Phase D — Insights (draft)**
 
 - **FR-D01**: User MAY set an **annual reading goal** (books finished in calendar year).
-- **FR-D02**: App MAY show **reading streak** and **activity heatmap** per **pending clarify** (no session timer).
+- **FR-D02**: App MUST derive **reading streak** and **activity heatmap** from **activity days**: a UTC/local calendar day (user locale TBD in plan) counts when the user records book **progress or completion**—status change among book statuses, **pages read** change, or transition to **`read`**. Session timer MUST NOT be required.
 - **FR-D03**: App MUST provide **stats breakdowns** and optional **year-in-review** from the user’s library data.
 
 ### Key Entities
