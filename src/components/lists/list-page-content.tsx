@@ -21,6 +21,13 @@ import {
   normalizeListSort,
   type ListSort,
 } from "@/domain/list-sort";
+import {
+  collectLibrarySeriesNames,
+  collectLibraryTags,
+  filterBooksByTagOrSeries,
+  type BookTagSeriesFilter,
+} from "@/application/books/book-library-filters";
+import { BookTagSeriesFilters } from "@/components/books/book-tag-series-filters";
 import { useIsMobile } from "@/components/use-is-mobile";
 import { groupBooksByWork, type BookWorkGroup } from "@/application/books/work-grouping";
 import type { Item, ItemPatch, ItemStatus, ItemType } from "@/domain/item";
@@ -66,6 +73,8 @@ export type ListPageContentProps = {
   route: ListRoute;
   /** When true (books list), visually group editions that share a work id. */
   groupBooksByWork?: boolean;
+  /** Enables tag/series filters and discovery UI on the books list. */
+  bookLibraryUi?: boolean;
 };
 
 function editionGroupLabel(count: number): string {
@@ -84,11 +93,17 @@ function bookListEntries(items: Item[]): BookListEntry[] {
   );
 }
 
-export function ListPageContent({ route, groupBooksByWork: groupBooksByWorkEnabled = false }: ListPageContentProps) {
+export function ListPageContent({
+  route,
+  groupBooksByWork: groupBooksByWorkEnabled = false,
+  bookLibraryUi = false,
+}: ListPageContentProps) {
   const isMobile = useIsMobile();
   const [items, setItems] = useState<Item[]>([]);
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("all");
   const [listSort, setListSort] = useState<ListSort>(DEFAULT_LIST_SORT);
+  const [tagSeriesFilter, setTagSeriesFilter] = useState<BookTagSeriesFilter>({});
+  const [libraryBooks, setLibraryBooks] = useState<Item[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const refreshRef = useRef<(() => Promise<void>) | null>(null);
   const desktopSplit = !isMobile;
@@ -100,6 +115,7 @@ export function ListPageContent({ route, groupBooksByWork: groupBooksByWorkEnabl
   useEffect(() => {
     setStatusFilter("all");
     setListSort(DEFAULT_LIST_SORT);
+    setTagSeriesFilter({});
     setSelectedId(null);
   }, [itemType]);
 
@@ -118,7 +134,14 @@ export function ListPageContent({ route, groupBooksByWork: groupBooksByWorkEnabl
           listOptions.status = statusFilter;
         }
         const next = await useCases.listItems(itemType, listOptions);
-        if (!cancelled) setItems(next);
+        if (!cancelled) {
+          if (bookLibraryUi && itemType === "book") {
+            setLibraryBooks(next);
+            setItems(filterBooksByTagOrSeries(next, tagSeriesFilter));
+          } else {
+            setItems(next);
+          }
+        }
       };
       refreshRef.current = refresh;
       await refresh();
@@ -146,7 +169,20 @@ export function ListPageContent({ route, groupBooksByWork: groupBooksByWorkEnabl
       unsubscribeSync?.();
       refreshRef.current = null;
     };
-  }, [itemType, showStatusFilter, statusFilter, allowRatingSortField, listSort]);
+  }, [
+    itemType,
+    showStatusFilter,
+    statusFilter,
+    allowRatingSortField,
+    listSort,
+    bookLibraryUi,
+    tagSeriesFilter,
+  ]);
+
+  useEffect(() => {
+    if (!bookLibraryUi || itemType !== "book") return;
+    setItems(filterBooksByTagOrSeries(libraryBooks, tagSeriesFilter));
+  }, [bookLibraryUi, itemType, libraryBooks, tagSeriesFilter]);
 
   const listOptionsForFilter = useCallback(
     () => (showStatusFilter && statusFilter !== "all" ? { status: statusFilter } : {}),
@@ -208,6 +244,14 @@ export function ListPageContent({ route, groupBooksByWork: groupBooksByWorkEnabl
           itemType={itemType}
           value={statusFilter}
           onChange={setStatusFilter}
+        />
+      ) : null}
+      {bookLibraryUi && route === "books" ? (
+        <BookTagSeriesFilters
+          value={tagSeriesFilter}
+          onChange={setTagSeriesFilter}
+          tags={collectLibraryTags(libraryBooks)}
+          seriesNames={collectLibrarySeriesNames(libraryBooks)}
         />
       ) : null}
       <ListSortFilter
