@@ -42,7 +42,7 @@ This spec defines **character** (what Muni should feel like) and **system** (how
 1. **Capture stays sacred** — primary actions stay thumb-reachable; visual flair never costs a tap or a field.
 2. **Type is identity** — each list type has a recognizable color/icon treatment; the brain learns “green = courses” without reading.
 3. **Offline feels solid** — empty states and sync status feel reliable, not anxious (no red panic unless real errors).
-4. **System theme only** — light/dark follow OS; both modes must feel *intentional*, not inverted leftovers.
+4. **Light and dark** — both themes are first-class (ink + teal in each). User picks **Clair**, **Sombre**, or **Système** in Réglages; preference persists on device. Default **Système** matches OS until the user overrides.
 5. **Accessible first** — contrast, 44px targets, visible focus; beauty includes low-vision and outdoor use.
 
 ---
@@ -169,12 +169,36 @@ Keep **rating tier colors** as today; they already encode meaning.
 
 ## 5. Information architecture (visual)
 
-Unchanged routes; **visual hierarchy** should reinforce:
+Routes stay the same; **layout and chrome** differ by breakpoint (see §5.1). Hierarchy:
 
 1. **Home** — overview + recent (memory feed), not a spreadsheet of counts.
 2. **List** — title + filters + content; catalog actions grouped in header.
 3. **Detail** — edit in place; type-specific fields grouped with subtle section labels.
 4. **Search** — global, type label per row (already started).
+
+### 5.1 Mobile vs desktop (locked intent)
+
+| | **Mobile** (&lt; `md`, ~768px) | **Desktop** (`md+`) |
+|---|-------------------------------|---------------------|
+| **Primary job** | **Capture** — quick add, scan, catalog in context | **Browse & curate** — scan lists, search, edit detail |
+| **Navigation** | Bottom bar: Accueil, Recherche, **+**, Réglages | **Left sidebar**: list types + Accueil + Recherche + Réglages |
+| **Quick add** | Center **+** FAB (thumb reach) | **No FAB** — “Ajouter” in list header / toolbar; global add in sidebar footer or `⌘K` later |
+| **Home** | 2-column card grid + recent | **Wider**: 3-column grid or list+detail teaser; recent as table-like rows with type |
+| **Lists** | Full-width rows, bottom sheets for filters | **Max width ~`4xl`** content column; filters inline; optional **split**: list left, detail right when an item selected (phase later) |
+| **Sheets** | Bottom sheets for quick-add / catalog | **Centered modal** or **right drawer** (same flows, desktop-appropriate surface) |
+| **Density** | Airy (44px targets) | Airy but **more horizontal space** for metadata (author, status, rating on one line) |
+
+**Breakpoint:** Tailwind `md` (768px). Use `useIsMobile()` / CSS consistently — desktop is not “stretched phone UI.”
+
+**Constitution note:** Mobile capture speed (SC-002) unchanged; desktop may use more clicks if browse is faster (e.g. click list type in sidebar).
+
+### 5.2 Theme control
+
+- **Settings → Apparence:** segmented control **Clair | Sombre | Système**.
+- Persist in `localStorage` key `muni-theme` (or `host.kv` when available).
+- Apply `class="light"` / `class="dark"` on `<html>`; **Système** = `prefers-color-scheme` only (remove class or `data-theme="system"` + script).
+- Tailwind: extend dark variant to support class-based dark **and** system fallback when theme is system.
+- Both palettes use §4.2 tokens; audit contrast in each.
 
 ---
 
@@ -200,12 +224,26 @@ Unchanged routes; **visual hierarchy** should reinforce:
 - [ ] Bottom sheet header typography (Fraunces).
 - [ ] Empty states per list type (one illustration pattern).
 
-### Phase D — Polish
+### Phase D — Theme picker
+
+- [ ] `ThemeProvider` + Settings appearance control (Clair / Sombre / Système).
+- [ ] Class-based dark + system; update `globals.css` / Tailwind dark variant.
+- [ ] Amend **FR-023** in `specs/001` (system default + user override).
+- [ ] E2E: forced light and forced dark via settings (not only emulate OS).
+
+### Phase E — Desktop shell
+
+- [ ] `AppShell` with `SidebarNav` (desktop) vs `BottomNav` (mobile).
+- [ ] Hide center FAB on `md+`; expose Ajouter on list headers + sidebar action.
+- [ ] Desktop home layout (wider grid / recent list).
+- [ ] Quick-add / catalog: modal or drawer on desktop instead of full-width bottom sheet only.
+
+### Phase F — Polish
 
 - [ ] Motion tokens; reduced-motion.
-- [ ] Desktop max-width column (~`max-w-xl` already) — optional wider reading on detail only.
+- [ ] Optional list+detail split on desktop (later).
 
-**Out of scope for design v1:** custom themes, user-chosen colors, cover art grids, social sharing cards.
+**Out of scope:** user-chosen accent colors, cover art grids, social sharing cards.
 
 ---
 
@@ -227,6 +265,8 @@ Unchanged routes; **visual hierarchy** should reinforce:
 | 4 | Home cards | **Type color stripe + icons** (table §4.2) |
 | 1 | Accent mood | **B — cool ink + teal** (§4.2) |
 | 5 | Density | **Airy** |
+| 6 | Themes | **Light + dark** first-class; **Clair / Sombre / Système** in settings |
+| 7 | Desktop | **Browse-first** shell (sidebar, no FAB, wider layouts) per §5.1 |
 
 ### 8.1 Accent options explained
 
