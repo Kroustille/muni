@@ -62,7 +62,7 @@ describe("item types", () => {
 
 describe("statuses per type", () => {
   it("book statuses", () => {
-    expect([...statusesFor("book")]).toEqual(["to_read", "reading", "read"]);
+    expect([...statusesFor("book")]).toEqual(["to_read", "reading", "read", "paused"]);
   });
 
   it("movie statuses", () => {
