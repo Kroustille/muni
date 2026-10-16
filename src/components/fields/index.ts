@@ -1,6 +1,7 @@
 export {
   BookFields,
   bookFieldValuesToExtra,
+  bookPagesReadFromValues,
   emptyBookFieldValues,
   type BookFieldValues,
   type BookFieldsProps,

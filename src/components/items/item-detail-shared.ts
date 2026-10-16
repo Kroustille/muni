@@ -1,5 +1,11 @@
 import type { Item, ItemPatch } from "@/domain/item";
 import {
+  loanReturnPatch,
+  pagesReadApplicable,
+  validateLoanPair,
+} from "@/application/books/book-pause-lending";
+import {
+  bookPagesReadFromValues,
   type BookFieldValues,
   type MovieFieldValues,
   type MusicArtistFieldValues,
@@ -44,10 +50,20 @@ export function itemToBookValues(item: Item): BookFieldValues {
       item.seriesPosition !== null && item.seriesPosition !== undefined
         ? String(item.seriesPosition)
         : "",
+    pagesRead:
+      item.pagesRead != null &&
+      pagesReadApplicable(item.status as BookFieldValues["status"])
+        ? String(item.pagesRead)
+        : "",
+    loanedTo: item.loanedTo ?? "",
+    loanedAt: item.loanedAt ?? "",
   };
 }
 
-export function bookValuesToPatch(values: BookFieldValues): ItemPatch {
+export function bookValuesToPatch(
+  values: BookFieldValues,
+  pageCount: number | null = null,
+): ItemPatch {
   const patch: ItemPatch = {
     title: values.title.trim(),
     author: optionalText(values.author),
@@ -68,7 +84,19 @@ export function bookValuesToPatch(values: BookFieldValues): ItemPatch {
     const position = Number(positionRaw);
     if (!Number.isNaN(position)) patch.seriesPosition = position;
   }
+  const { pagesRead } = bookPagesReadFromValues(values, pageCount);
+  patch.pagesRead = pagesRead;
+  patch.loanedTo = optionalText(values.loanedTo);
+  patch.loanedAt = optionalText(values.loanedAt);
   return patch;
+}
+
+export function clearBookLoanInValues(values: BookFieldValues): BookFieldValues {
+  return { ...values, loanedTo: "", loanedAt: "" };
+}
+
+export function bookLoanReturnPatch(): ItemPatch {
+  return loanReturnPatch();
 }
 
 export function itemToMovieValues(item: Item): MovieFieldValues {
@@ -183,7 +211,7 @@ export function patchFromValues(item: Item, values: FieldValues): ItemPatch {
     case "shopping":
       return shoppingValuesToPatch(values as ShoppingFieldValues);
     case "book":
-      return bookValuesToPatch(values as BookFieldValues);
+      return bookValuesToPatch(values as BookFieldValues, item.pageCount);
     case "movie":
       return movieValuesToPatch(values as MovieFieldValues);
     case "recipe":
@@ -201,10 +229,29 @@ export function patchFromValues(item: Item, values: FieldValues): ItemPatch {
 export function validateFieldValues(
   item: Item,
   values: FieldValues,
-): { titleError?: string; artistError?: string } {
+): {
+  titleError?: string;
+  artistError?: string;
+  pagesReadError?: string;
+  loanError?: string;
+} {
   const trimmedTitle = values.title.trim();
   if (!trimmedTitle) {
     return { titleError: t("validation.titleRequired") };
+  }
+  if (item.type === "book") {
+    const book = values as BookFieldValues;
+    const { error } = bookPagesReadFromValues(book, item.pageCount);
+    if (error) {
+      return { pagesReadError: error };
+    }
+    const loanError = validateLoanPair(
+      optionalText(book.loanedTo),
+      optionalText(book.loanedAt),
+    );
+    if (loanError) {
+      return { loanError: t("validation.loanInvalid") };
+    }
   }
   if (item.type === "music_track") {
     const artist = (values as MusicTrackFieldValues).artist.trim();

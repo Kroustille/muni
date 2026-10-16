@@ -1,6 +1,12 @@
 "use client";
 
 import type { CreateItemExtra } from "@/application/items";
+import {
+  normalizePagesReadForStatus,
+  pagesReadApplicable,
+  parsePagesReadInput,
+  validatePagesRead,
+} from "@/application/books/book-pause-lending";
 import { defaultStatus, statusesFor, type BookStatus } from "@/domain/item";
 import { Select } from "@/components/ui/Select";
 import { TextField } from "@/components/ui/TextField";
@@ -25,6 +31,9 @@ export type BookFieldValues = {
   tags: string[];
   seriesName: string;
   seriesPosition: string;
+  pagesRead: string;
+  loanedTo: string;
+  loanedAt: string;
 };
 
 export const emptyBookFieldValues = (): BookFieldValues => ({
@@ -37,12 +46,16 @@ export const emptyBookFieldValues = (): BookFieldValues => ({
   tags: [],
   seriesName: "",
   seriesPosition: "",
+  pagesRead: "",
+  loanedTo: "",
+  loanedAt: "",
 });
 
 export type BookFieldsProps = {
   values: BookFieldValues;
   onChange: (values: BookFieldValues) => void;
   titleError?: string;
+  pagesReadError?: string;
   /** Read-only catalog metadata (N1). */
   pageCount?: number | null;
   tagSuggestions?: readonly string[];
@@ -78,13 +91,34 @@ export function bookFieldValuesToExtra(values: BookFieldValues): CreateItemExtra
     const position = Number(positionRaw);
     if (!Number.isNaN(position)) extra.seriesPosition = position;
   }
+  const pages = parsePagesReadInput(values.pagesRead);
+  if (pagesReadApplicable(values.status) && pages !== null) {
+    extra.pagesRead = pages;
+  }
   return extra;
+}
+
+export function bookPagesReadFromValues(
+  values: BookFieldValues,
+  pageCount: number | null,
+): { pagesRead: number | null; error?: string } {
+  const parsed = parsePagesReadInput(values.pagesRead);
+  if (values.pagesRead.trim() !== "" && parsed === null) {
+    return { pagesRead: null, error: t("validation.pagesReadInvalid") };
+  }
+  const pagesRead = normalizePagesReadForStatus(values.status, parsed);
+  const ruleError = validatePagesRead(values.status, pagesRead, pageCount);
+  if (ruleError) {
+    return { pagesRead, error: t("validation.pagesReadInvalid") };
+  }
+  return { pagesRead };
 }
 
 export function BookFields({
   values,
   onChange,
   titleError,
+  pagesReadError,
   pageCount,
   tagSuggestions = [],
 }: BookFieldsProps) {
@@ -112,10 +146,25 @@ export function BookFields({
         label={t("field.status")}
         options={statusOptions}
         value={values.status}
-        onChange={(event) =>
-          onChange({ ...values, status: event.target.value as BookStatus })
-        }
+        onChange={(event) => {
+          const status = event.target.value as BookStatus;
+          const next = { ...values, status };
+          if (!pagesReadApplicable(status)) {
+            next.pagesRead = "";
+          }
+          onChange(next);
+        }}
       />
+      {pagesReadApplicable(values.status) ? (
+        <TextField
+          label={t("books.pagesRead")}
+          value={values.pagesRead}
+          onChange={(event) => onChange({ ...values, pagesRead: event.target.value })}
+          error={pagesReadError}
+          inputMode="numeric"
+          autoComplete="off"
+        />
+      ) : null}
       {ratingVisible(values.status) ? (
         <div className="flex flex-col gap-1">
           <span className="text-sm text-muted">{t("field.rating")}</span>

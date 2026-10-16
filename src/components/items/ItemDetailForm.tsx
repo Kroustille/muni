@@ -59,6 +59,7 @@ export function ItemDetailForm({
     item.type === "book" ? itemToBookDiscoveryValues(item) : emptyBookDiscoveryFieldValues(),
   );
   const [titleError, setTitleError] = useState<string | undefined>();
+  const [pagesReadError, setPagesReadError] = useState<string | undefined>();
   const [artistError, setArtistError] = useState<string | undefined>();
   const [saving, setSaving] = useState(false);
   const [bookQuoteUseCases, setBookQuoteUseCases] = useState<BookQuoteUseCases | null>(null);
@@ -70,13 +71,15 @@ export function ItemDetailForm({
 
   const save = useCallback(async () => {
     const errors = validateFieldValues(item, values);
-    if (errors.titleError || errors.artistError) {
+    if (errors.titleError || errors.artistError || errors.pagesReadError) {
       setTitleError(errors.titleError);
+      setPagesReadError(errors.pagesReadError);
       setArtistError(errors.artistError);
       return;
     }
     setSaving(true);
     setTitleError(undefined);
+    setPagesReadError(undefined);
     setArtistError(undefined);
     try {
       const patch =
@@ -111,6 +114,7 @@ export function ItemDetailForm({
         />
       ) : null}
       {item.type === "book" ? (
+<<<<<<< HEAD
         <>
           <BookFields
             values={values as BookFieldValues}
@@ -138,6 +142,19 @@ export function ItemDetailForm({
       ) : null}
       {item.type === "book" ? (
         <BookDiscoveryFields values={discoveryValues} onChange={setDiscoveryValues} />
+=======
+        <BookFields
+          values={values as BookFieldValues}
+          pageCount={item.pageCount}
+          onChange={(next) => {
+            setValues(next);
+            setTitleError(undefined);
+            setPagesReadError(undefined);
+          }}
+          titleError={titleError}
+          pagesReadError={pagesReadError}
+        />
+>>>>>>> 79b13ae (feat(002): T311 book detail paused status and pages read)
       ) : null}
       {item.type === "movie" ? (
         <MovieFields
