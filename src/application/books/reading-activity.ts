@@ -47,3 +47,24 @@ export function deriveReadingActivityDays(
 
   return days;
 }
+
+/**
+ * Extra `fieldsUpdatedAt` keys for book patches that drive insights (FR-D02).
+ * The `read` key records the first mark-as-read timestamp in the calendar year rules.
+ */
+export function readingActivityFieldStamps(
+  item: Item,
+  patch: ItemPatch,
+  stamp: string,
+): Record<string, string> {
+  if (item.type !== "book") return {};
+  const extra: Record<string, string> = {};
+  if (patch.status !== undefined && patch.status !== item.status) {
+    if (patch.status === "read") {
+      extra.read = stamp;
+    }
+  }
+  return extra;
+}
+
+export type ItemPatch = import("@/domain/item").ItemPatch;

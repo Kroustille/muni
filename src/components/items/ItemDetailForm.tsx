@@ -28,9 +28,12 @@ import {
 import { BookQuotesSection } from "@/components/books/book-quotes-section";
 import { getBookQuoteUseCases, getItemUseCases } from "@/composition/client";
 import { Button } from "@/components/ui/Button";
+import { TextField } from "@/components/ui/TextField";
 import { ExternalLinkActions } from "@/components/music/external-link-actions";
 import { t } from "@/i18n";
 import {
+  bookLoanReturnPatch,
+  clearBookLoanInValues,
   type FieldValues,
   patchFromValues,
   validateFieldValues,
@@ -60,6 +63,7 @@ export function ItemDetailForm({
   );
   const [titleError, setTitleError] = useState<string | undefined>();
   const [pagesReadError, setPagesReadError] = useState<string | undefined>();
+  const [loanError, setLoanError] = useState<string | undefined>();
   const [artistError, setArtistError] = useState<string | undefined>();
   const [saving, setSaving] = useState(false);
   const [bookQuoteUseCases, setBookQuoteUseCases] = useState<BookQuoteUseCases | null>(null);
@@ -71,15 +75,17 @@ export function ItemDetailForm({
 
   const save = useCallback(async () => {
     const errors = validateFieldValues(item, values);
-    if (errors.titleError || errors.artistError || errors.pagesReadError) {
+    if (errors.titleError || errors.artistError || errors.pagesReadError || errors.loanError) {
       setTitleError(errors.titleError);
       setPagesReadError(errors.pagesReadError);
+      setLoanError(errors.loanError);
       setArtistError(errors.artistError);
       return;
     }
     setSaving(true);
     setTitleError(undefined);
     setPagesReadError(undefined);
+    setLoanError(undefined);
     setArtistError(undefined);
     try {
       const patch =
@@ -114,7 +120,6 @@ export function ItemDetailForm({
         />
       ) : null}
       {item.type === "book" ? (
-<<<<<<< HEAD
         <>
           <BookFields
             values={values as BookFieldValues}
@@ -123,9 +128,48 @@ export function ItemDetailForm({
             onChange={(next) => {
               setValues(next);
               setTitleError(undefined);
+              setPagesReadError(undefined);
             }}
             titleError={titleError}
+            pagesReadError={pagesReadError}
           />
+          <section className="flex flex-col gap-4 border-t border-border pt-4">
+            <h2 className="text-base font-medium">{t("books.loan.title")}</h2>
+            <TextField
+              label={t("books.loan.to")}
+              value={(values as BookFieldValues).loanedTo}
+              onChange={(event) => {
+                setValues({ ...(values as BookFieldValues), loanedTo: event.target.value });
+                setLoanError(undefined);
+              }}
+              error={loanError}
+              autoComplete="off"
+            />
+            <TextField
+              label={t("books.loan.since")}
+              type="date"
+              value={(values as BookFieldValues).loanedAt}
+              onChange={(event) => {
+                setValues({ ...(values as BookFieldValues), loanedAt: event.target.value });
+                setLoanError(undefined);
+              }}
+              autoComplete="off"
+            />
+            {(values as BookFieldValues).loanedTo.trim() !== "" ? (
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => {
+                  setValues(clearBookLoanInValues(values as BookFieldValues));
+                  void onSave(bookLoanReturnPatch()).then((updated) => {
+                    setValues(valuesFromItem(updated));
+                  });
+                }}
+              >
+                {t("books.loan.return")}
+              </Button>
+            ) : null}
+          </section>
           <BookEditionsSection
             item={item as Item & { type: "book" }}
             onChanged={async () => {
@@ -138,23 +182,8 @@ export function ItemDetailForm({
           {bookQuoteUseCases !== null ? (
             <BookQuotesSection bookItemId={item.id} useCases={bookQuoteUseCases} />
           ) : null}
+          <BookDiscoveryFields values={discoveryValues} onChange={setDiscoveryValues} />
         </>
-      ) : null}
-      {item.type === "book" ? (
-        <BookDiscoveryFields values={discoveryValues} onChange={setDiscoveryValues} />
-=======
-        <BookFields
-          values={values as BookFieldValues}
-          pageCount={item.pageCount}
-          onChange={(next) => {
-            setValues(next);
-            setTitleError(undefined);
-            setPagesReadError(undefined);
-          }}
-          titleError={titleError}
-          pagesReadError={pagesReadError}
-        />
->>>>>>> 79b13ae (feat(002): T311 book detail paused status and pages read)
       ) : null}
       {item.type === "movie" ? (
         <MovieFields

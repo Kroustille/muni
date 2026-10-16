@@ -92,6 +92,7 @@
   "field.recommendedBy": "Recommandé par",
   "validation.titleRequired": "Le titre est obligatoire.",
   "validation.pagesReadInvalid": "Nombre de pages invalide.",
+  "validation.loanInvalid": "Renseignez à qui le livre est prêté.",
   "field.isbn": "ISBN",
   "field.synopsis": "Résumé",
   "field.genres": "Genres",
