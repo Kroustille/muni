@@ -17,7 +17,7 @@
 | Phase | Theme | Status |
 |-------|--------|--------|
 | **A — Catalog** | Scan, title search, manual add, dedupe/merge, Open Library via server | **Shipped** (see User Stories 1–4) |
-| **B — Library** | Tags, series, editions/works grouping, **en pause** + pages read, lending, private notes, quotes | Specified; editions **clarified**; quotes & lending **pending clarify** |
+| **B — Library** | Tags, series, editions/works grouping, **en pause** + pages read, lending, private notes, quotes | Specified; editions, pause, quotes **clarified**; **lending pending clarify** |
 | **C — Discovery** | Mood & pace, private recommendations, filter/browse by those dimensions | Specified; pending plan |
 | **D — Insights** | Annual reading goal, streaks, activity heatmap, stats breakdowns, year-in-review | Specified; **pending clarify** on what counts as “reading activity” without session timer |
 
@@ -49,7 +49,7 @@
 
 - Catalog: ISBN barcode scan → catalog fill (mobile); title catalog search (all devices); manual entry offline (title-only OK); “already in library” at scan/search; multiple editions / **work grouping** (one row per edition, grouped by work); free-form **tags** (not custom shelves); **series** (name + volume/order).
 - Lifecycle: **`en pause`** status (set aside, may resume) — not a separate “DNF” label; **pages read** when en pause; integer **1–5 star** rating only (no fractional stars).
-- Personal data: **private notes**; **quotes & highlights** as first-class citations per book (storage **pending clarify**); **lending** (“prêté à…”, shape **pending clarify**).
+- Personal data: **private notes**; **quotes & highlights** as synced **child records** per book; **lending** (“prêté à…”, shape **pending clarify**).
 - Discovery: **mood & pace** metadata; **private** personalized recommendations; **discovery filters** on mood, pace, tags.
 - Insights: **annual reading goal** (N books/year, private); **reading streaks** (optional, no guilt); **calendar heatmap** of reading activity; **year-in-review** recap; **stats breakdowns** (charts/tables).
 
@@ -66,6 +66,7 @@
 
 - **Q:** When you add several editions of the same work (different ISBNs), how should they appear in the library? → **A:** **One library row per edition** (per item/ISBN), with editions **grouped under a shared work** in list and detail UI (catalog work id when available; manual link otherwise).
 - **Q:** How should **en pause** be represented? → **A:** Add book status **`paused`** (French UI **En pause**); optional **pages read** while paused. Distinct from `to_read`, `reading`, and `read`; no separate DNF status.
+- **Q:** How should **quotes & highlights** be stored? → **A:** **Child records** per quote (passage text, optional page, created-at), synced individually; linked to parent book item.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -144,7 +145,7 @@ User keeps **one book item per edition** (typically one ISBN each). List and det
 User sets status to **En pause** (`paused`, optional pages read), or records that it is **prêté à** someone, and can resume to `reading` or `read` later.
 
 **User Story 8 — Notes and quotes (P2)**  
-User keeps private notes on the book and saves multiple quote/highlight passages (optional page) linked to the book (**quote model pending clarify**).
+User keeps private notes on the book and adds multiple **quote** records (passage text, optional page), each synced as its own child of the book item.
 
 ### Phase C — Discovery (specified, not yet implemented)
 
@@ -197,7 +198,7 @@ User opens stats (per month, tags/genres, authors, pages) and an optional year-i
 - **FR-B03**: Book status enum MUST include **`paused`** (UI **En pause**) alongside `to_read`, `reading`, `read`. User MAY set optional **pages read** on `paused`. MUST NOT expose a separate “DNF” status.
 - **FR-B04**: Books MUST support **lending** metadata (“prêté à…”) per **pending clarify**.
 - **FR-B05**: Books MUST support **private notes** (existing field scope may extend).
-- **FR-B06**: Books MUST support **multiple quotes/highlights** per book per **pending clarify**.
+- **FR-B06**: Each quote MUST be a **child entity** of a book item (`text` required, `page` optional, `createdAt`); MUST sync independently; book detail MUST list/add/edit/delete quotes.
 - **FR-B07**: Each **edition** MUST be a distinct book **item** (ISBN dedupe unchanged). Items MUST be linkable to a shared **work** (catalog work id or user-defined work key). UI MUST **group editions by work** in browse/detail; MUST NOT collapse editions into a single row.
 
 **Phase C — Discovery (draft)**
