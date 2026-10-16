@@ -186,7 +186,7 @@
 - [x] T311 [US7] Extend `BookFields` / detail for `paused` + `pagesRead` per book-library-ui.md in `src/components/fields/book-fields.tsx` (depends on T287, T310)
 - [x] T312 [US7] Lending inputs + clear-loan action in `src/components/items/ItemDetailForm.tsx` per FR-B04 (depends on T311)
 - [x] T313 [US7] Emit reading-activity events on book status/`pagesRead` writes via `src/application/items.ts` for insights (depends on T295, T312)
-- [ ] T314 [US7] E2e pause, pages read, lend/return in `tests/e2e/books-pause-lending.spec.ts`
+- [x] T314 [US7] E2e pause, pages read, lend/return in `tests/e2e/books-pause-lending.spec.ts`
 
 ---
 
@@ -240,8 +240,8 @@
 
 **Independent Test**: Mark book read; heatmap day lights up; goal progress increments.
 
-- [ ] T332 [US11] Unit tests for streak and heatmap aggregation in `tests/unit/reading-insights.test.ts`
-- [ ] T333 [US11] Implement `computeStreak` and `buildActivityHeatmap` in `src/application/books/reading-insights.ts` (depends on T295, T332)
+- [x] T332 [US11] Unit tests for streak and heatmap aggregation in `tests/unit/reading-insights.test.ts`
+- [x] T333 [US11] Implement `computeStreak` and `buildActivityHeatmap` in `src/application/books/reading-insights.ts` (depends on T295, T332)
 - [ ] T334 [US11] `ReadingSettings` use case + repository for annual goal in `src/application/books/reading-settings.ts` and adapters (depends on T290)
 - [ ] T335 [US11] Insights section: goal editor, streak, heatmap per `contracts/book-insights-ui.md` in `src/app/(app)/books/insights/page.tsx` (depends on T333, T334)
 - [ ] T336 [US11] E2e activity day on status/`pagesRead` change in `tests/e2e/books-reading-heatmap.spec.ts`
