@@ -167,7 +167,7 @@
 
 **Independent Test**: Two ISBNs same work → two rows, grouped; manual link merges group.
 
-- [ ] T304 [US6] Unit tests for `groupBooksByWork` (`catalogWorkId`, `workKey`, orphan editions) in `tests/unit/book-work-grouping.test.ts`
+- [x] T304 [US6] Unit tests for `groupBooksByWork` (`catalogWorkId`, `workKey`, orphan editions) in `tests/unit/book-work-grouping.test.ts`
 - [ ] T305 [US6] Implement `groupBooksByWork` in `src/application/books/work-grouping.ts` (depends on T304)
 - [ ] T306 [US6] Map Open Library edition `works[0].key` to `catalogWorkId` in `src/adapters/open-library/book-catalog-lookup.ts` + extend `tests/unit/open-library-adapter.test.ts`
 - [ ] T307 [US6] Persist `catalogWorkId` on catalog upsert in `src/application/books/upsert-from-catalog.ts` (depends on T285, T306)
