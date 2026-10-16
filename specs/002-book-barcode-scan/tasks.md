@@ -136,7 +136,7 @@
 - [x] T290 [P] Write Kysely migration `db/migrations/0010_user_reading_settings.ts` for private annual goal (calendar year + target count) per book-insights-ui.md
 - [x] T291 Regenerate and commit `src/adapters/postgres/db-types.ts` via `yarn run db:codegen` after T288–T290
 - [x] T292 [P] Create `BookQuote` domain type + zod in `src/domain/book-quote.ts` with unit tests in `tests/unit/domain-book-quote.test.ts`
-- [ ] T293 Define `BookQuoteRepository` port in `src/application/ports/book-quote-repository.ts` per book-quotes-sync.md
+- [x] T293 Define `BookQuoteRepository` port in `src/application/ports/book-quote-repository.ts` per book-quotes-sync.md
 - [ ] T294 Create unit tests for reading activity day rules (FR-D02: status change among book statuses, `pagesRead` update, transition to `read`) in `tests/unit/reading-activity.test.ts`
 - [ ] T295 Implement `deriveReadingActivityDays` in `src/application/books/reading-activity.ts` (depends on T294)
 - [ ] T296 [P] Add i18n keys for library, discovery, insights, quotes, pause, lending in `src/i18n/fr.json`
