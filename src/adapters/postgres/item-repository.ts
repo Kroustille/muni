@@ -89,7 +89,10 @@ function toRow(userId: string, wire: ItemWire): Insertable<Items> {
     work_id: wire.work_id ?? null,
     tags: wire.tags ?? null,
     series_name: wire.series_name ?? null,
-    series_position: wire.series_position ?? null,
+    series_position:
+      wire.series_position === null || wire.series_position === undefined
+        ? null
+        : String(wire.series_position),
     pages_read: wire.pages_read ?? null,
     loaned_to: wire.loaned_to ?? null,
     loaned_at: wire.loaned_at ?? null,
