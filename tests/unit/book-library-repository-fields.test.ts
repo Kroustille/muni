@@ -79,7 +79,10 @@ describe("PostgreSQL library columns", () => {
   });
 
   it("persists library columns on upsert", async (ctx) => {
-    if (!testDb) ctx.skip();
+    if (testDb === null) {
+      ctx.skip();
+      return;
+    }
     const items = createPostgresItemRepository(testDb.db);
     const wire = {
       ...makeServerItemWire({
