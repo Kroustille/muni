@@ -32,6 +32,15 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND music_brainz_recording_id IS NULL
         AND spotify_url IS NULL
         AND soundcloud_url IS NULL
+        AND work_id IS NULL
+        AND tags IS NULL
+        AND series_name IS NULL
+        AND series_position IS NULL
+        AND pages_read IS NULL
+        AND loaned_to IS NULL
+        AND loaned_at IS NULL
+        AND mood IS NULL
+        AND pace IS NULL
       WHEN 'book' THEN
         quantity IS NULL
         AND ingredients IS NULL
