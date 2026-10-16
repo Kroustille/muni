@@ -131,7 +131,7 @@
 - [x] T285 Extend `BookCatalogHit` + `specs/002-book-barcode-scan/contracts/book-catalog-api.md` with `catalogWorkId` (Open Library work key); update `src/application/ports/book-catalog-lookup.ts`
 - [x] T286 Create unit tests for extended book item validation (`paused` status, tags, series, `pagesRead` ≥ 0 when set, loan fields, mood/pace) in `tests/unit/domain-item-book-library.test.ts`
 - [x] T287 Extend book zod schema and `FIELDS_BY_TYPE.book` in `src/domain/item.ts` per updated data-model.md (depends on T286)
-- [ ] T288 Write Kysely migration `db/migrations/0008_book_library_fields.ts` (tags jsonb, series, work ids, pages_read, loaned_to, loaned_at, mood, pace)
+- [x] T288 Write Kysely migration `db/migrations/0008_book_library_fields.ts` (tags jsonb, series, work ids, pages_read, loaned_to, loaned_at, mood, pace)
 - [ ] T289 Write Kysely migration `db/migrations/0009_book_quotes.ts` for `book_quotes` child table per book-quotes-sync.md
 - [ ] T290 [P] Write Kysely migration `db/migrations/0010_user_reading_settings.ts` for private annual goal (calendar year + target count) per book-insights-ui.md
 - [ ] T291 Regenerate and commit `src/adapters/postgres/db-types.ts` via `yarn run db:codegen` after T288–T290
