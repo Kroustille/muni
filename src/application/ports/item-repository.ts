@@ -11,6 +11,7 @@ export type MetaValues = {
   hlcState: string;
   userId: string;
   pullCursor: string;
+  quotePullCursor: string;
 };
 
 export type MetaKey = keyof MetaValues;
