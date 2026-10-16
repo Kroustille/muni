@@ -7,6 +7,8 @@ export type BookCatalogHit = {
   publicationYear?: number;
   publisher?: string;
   pageCount?: number;
+  /** Open Library work key (e.g. OL45804W); tasks refer to this as catalogWorkId. */
+  workId?: string;
 };
 
 export class CatalogLookupError extends Error {

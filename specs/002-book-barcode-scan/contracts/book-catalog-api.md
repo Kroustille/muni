@@ -10,7 +10,7 @@ searchByTitle(query: string, limit?: number): Promise<BookCatalogHit[]>;
 - `lookupByIsbn` input: normalized ISBN-13.
 - `searchByTitle` input: free-text title query; optional `limit` (default 20, max 20). Each hit includes `isbn` when Open Library provides one.
 - Output: `null` if not found; otherwise `BookCatalogHit` (see data-model.md).
-- **Phase B**: `lookupByIsbn` SHOULD include `workId` when Open Library edition exposes `works[0].key` (normalized without `/works/` prefix). Title search hits MAY omit `workId` until a full ISBN lookup.
+- **Phase B**: `lookupByIsbn` SHOULD include `workId` (alias **catalogWorkId** in task IDs) when Open Library edition exposes `works[0].key` (normalized without `/works/` prefix). Title search hits MAY omit `workId` until a full ISBN lookup.
 - Errors: network/provider errors propagate as typed `CatalogLookupError` for route mapping.
 
 ## HTTP: `GET /api/books/lookup`
