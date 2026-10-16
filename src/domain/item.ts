@@ -8,6 +8,21 @@ import { isValidMusicBrainzId } from "./musicbrainz";
 export const MEDIA_KINDS = ["film", "series"] as const;
 export type MediaKind = (typeof MEDIA_KINDS)[number];
 
+export const BOOK_MOODS = [
+  "joyeux",
+  "melancolique",
+  "intense",
+  "apaisant",
+  "inspirant",
+  "sombre",
+  "drôle",
+  "romantique",
+] as const;
+export type BookMood = (typeof BOOK_MOODS)[number];
+
+export const BOOK_PACES = ["lent", "modéré", "rapide", "fébrile"] as const;
+export type BookPace = (typeof BOOK_PACES)[number];
+
 export const ITEM_TYPES = [
   "shopping",
   "book",
@@ -20,7 +35,7 @@ export type ItemType = (typeof ITEM_TYPES)[number];
 
 const STATUSES = {
   shopping: [],
-  book: ["to_read", "reading", "read"],
+  book: ["to_read", "reading", "read", "paused"],
   movie: ["to_watch", "watched"],
   recipe: [],
   music_artist: [],
@@ -64,6 +79,15 @@ export type Item = {
   publicationYear: number | null;
   publisher: string | null;
   pageCount: number | null;
+  workId: string | null;
+  tags: string[] | null;
+  seriesName: string | null;
+  seriesPosition: number | null;
+  pagesRead: number | null;
+  loanedTo: string | null;
+  loanedAt: string | null;
+  mood: BookMood | null;
+  pace: BookPace | null;
   imdbId: string | null;
   releaseYear: number | null;
   catalogRating: number | null;
@@ -90,6 +114,15 @@ const FIELDS_BY_TYPE: Record<ItemType, readonly (keyof Item)[]> = {
     "publicationYear",
     "publisher",
     "pageCount",
+    "workId",
+    "tags",
+    "seriesName",
+    "seriesPosition",
+    "pagesRead",
+    "loanedTo",
+    "loanedAt",
+    "mood",
+    "pace",
   ],
   movie: [
     "status",
@@ -140,6 +173,15 @@ const TYPE_SPECIFIC_FIELDS = [
   "publicationYear",
   "publisher",
   "pageCount",
+  "workId",
+  "tags",
+  "seriesName",
+  "seriesPosition",
+  "pagesRead",
+  "loanedTo",
+  "loanedAt",
+  "mood",
+  "pace",
   "imdbId",
   "releaseYear",
   "catalogRating",
@@ -179,6 +221,21 @@ const itemShape = {
   publicationYear: z.number().int().min(1000).max(2100).nullable(),
   publisher: text,
   pageCount: z.number().int().min(1).nullable(),
+  workId: text,
+  tags: z
+    .union([z.array(z.string()), z.null()])
+    .transform((value) => {
+      if (!Array.isArray(value) || value.length === 0) return null;
+      const trimmed = value.map((tag) => tag.trim()).filter((tag) => tag.length > 0);
+      return trimmed.length === 0 ? null : trimmed;
+    }),
+  seriesName: text,
+  seriesPosition: z.number().nullable(),
+  pagesRead: z.number().int().min(0).nullable(),
+  loanedTo: text,
+  loanedAt: text,
+  mood: z.enum(BOOK_MOODS).nullable(),
+  pace: z.enum(BOOK_PACES).nullable(),
   imdbId: text,
   releaseYear: z.number().int().min(1000).max(2100).nullable(),
   catalogRating: z.number().min(0).max(10).nullable(),
@@ -222,6 +279,53 @@ function checkCrossType(value: Item, ctx: z.RefinementCtx, path: (f: string) => 
       path: [path("isbn")],
       message: "invalid ISBN",
     });
+  }
+  if (value.type === "book") {
+    const tags = value.tags;
+    if (tags != null) {
+      if (tags.length > 50) {
+        ctx.addIssue({
+          code: "custom",
+          path: [path("tags")],
+          message: "too many tags",
+        });
+      }
+      for (const tag of tags) {
+        if (tag.length > 40) {
+          ctx.addIssue({
+            code: "custom",
+            path: [path("tags")],
+            message: "tag too long",
+          });
+          break;
+        }
+      }
+    }
+    if (
+      value.pagesRead != null &&
+      value.pageCount != null &&
+      value.pagesRead > value.pageCount
+    ) {
+      ctx.addIssue({
+        code: "custom",
+        path: [path("pagesRead")],
+        message: "pagesRead cannot exceed pageCount",
+      });
+    }
+    if (value.loanedTo == null && value.loanedAt != null) {
+      ctx.addIssue({
+        code: "custom",
+        path: [path("loanedAt")],
+        message: "loanedAt requires loanedTo",
+      });
+    }
+    if (value.loanedAt != null && !/^\d{4}-\d{2}-\d{2}$/.test(value.loanedAt)) {
+      ctx.addIssue({
+        code: "custom",
+        path: [path("loanedAt")],
+        message: "loanedAt must be YYYY-MM-DD",
+      });
+    }
   }
   if (value.type === "movie" && value.imdbId != null && !isValidImdbId(value.imdbId)) {
     ctx.addIssue({
@@ -285,6 +389,12 @@ const SNAKE: Partial<Record<keyof Item, string>> = {
   fieldsUpdatedAt: "fields_updated_at",
   publicationYear: "publication_year",
   pageCount: "page_count",
+  workId: "work_id",
+  seriesName: "series_name",
+  seriesPosition: "series_position",
+  pagesRead: "pages_read",
+  loanedTo: "loaned_to",
+  loanedAt: "loaned_at",
   imdbId: "imdb_id",
   releaseYear: "release_year",
   catalogRating: "catalog_rating",
@@ -328,6 +438,15 @@ export const itemWireSchema = z
     publication_year: itemShape.publicationYear.optional(),
     publisher: itemShape.publisher.optional(),
     page_count: itemShape.pageCount.optional(),
+    work_id: itemShape.workId.optional(),
+    tags: itemShape.tags.optional(),
+    series_name: itemShape.seriesName.optional(),
+    series_position: itemShape.seriesPosition.optional(),
+    pages_read: itemShape.pagesRead.optional(),
+    loaned_to: itemShape.loanedTo.optional(),
+    loaned_at: itemShape.loanedAt.optional(),
+    mood: itemShape.mood.optional(),
+    pace: itemShape.pace.optional(),
     imdb_id: itemShape.imdbId.optional(),
     release_year: itemShape.releaseYear.optional(),
     catalog_rating: itemShape.catalogRating.optional(),
@@ -379,6 +498,15 @@ export type NewItemInput = {
     | "publicationYear"
     | "publisher"
     | "pageCount"
+    | "workId"
+    | "tags"
+    | "seriesName"
+    | "seriesPosition"
+    | "pagesRead"
+    | "loanedTo"
+    | "loanedAt"
+    | "mood"
+    | "pace"
     | "imdbId"
     | "releaseYear"
     | "catalogRating"
@@ -417,6 +545,15 @@ export function newItem(input: NewItemInput): Item {
     publicationYear: input.publicationYear ?? null,
     publisher: input.publisher ?? null,
     pageCount: input.pageCount ?? null,
+    workId: input.workId ?? null,
+    tags: input.tags ?? null,
+    seriesName: input.seriesName ?? null,
+    seriesPosition: input.seriesPosition ?? null,
+    pagesRead: input.pagesRead ?? null,
+    loanedTo: input.loanedTo ?? null,
+    loanedAt: input.loanedAt ?? null,
+    mood: input.mood ?? null,
+    pace: input.pace ?? null,
     imdbId: input.imdbId ?? null,
     releaseYear: input.releaseYear ?? null,
     catalogRating: input.catalogRating ?? null,
@@ -466,6 +603,15 @@ function coalesceCatalogWireFields(
     publicationYear: wire.publication_year ?? null,
     publisher: wire.publisher ?? null,
     pageCount: wire.page_count ?? null,
+    workId: wire.work_id ?? null,
+    tags: wire.tags ?? null,
+    seriesName: wire.series_name ?? null,
+    seriesPosition: wire.series_position ?? null,
+    pagesRead: wire.pages_read ?? null,
+    loanedTo: wire.loaned_to ?? null,
+    loanedAt: wire.loaned_at ?? null,
+    mood: wire.mood ?? null,
+    pace: wire.pace ?? null,
     imdbId: wire.imdb_id ?? null,
     releaseYear: wire.release_year ?? null,
     catalogRating: wire.catalog_rating ?? null,
@@ -489,6 +635,15 @@ function restWithoutCatalog(
     publication_year,
     publisher,
     page_count,
+    work_id,
+    tags,
+    series_name,
+    series_position,
+    pages_read,
+    loaned_to,
+    loaned_at,
+    mood,
+    pace,
     imdb_id,
     release_year,
     catalog_rating,
