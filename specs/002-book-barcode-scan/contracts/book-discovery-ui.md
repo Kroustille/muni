@@ -21,3 +21,11 @@
 ## Offline
 
 - Filters and recs use local store only; no network required.
+
+## FR mapping
+
+| UI area | Requirements |
+|---------|----------------|
+| Mood & pace editors | FR-C01 |
+| Discovery filters | FR-C02 |
+| Pour vous recommendations | FR-C03 |
