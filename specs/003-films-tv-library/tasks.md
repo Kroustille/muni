@@ -64,3 +64,130 @@
 - [x] T320 Local quality gate (no GitHub CI): `yarn typecheck`, `yarn test` / vitest; e2e when Docker stack available; update quickstart.md if needed
 
 **Cross-feature**: Do not start 004 until T320 complete.
+
+---
+
+## Phase 8: Foundational — Phases B–D (library, discovery, insights)
+
+**Purpose**: Contracts, data model, migrations, domain, ports, watch-activity rules before US5–US12.
+
+**Prerequisite**: Phase A complete (**T320** done).
+
+- [ ] T343 Extend `specs/003-films-tv-library/data-model.md` with Phase B–D fields per spec FR-B*–FR-D*
+- [ ] T344 [P] Author `contracts/movie-library-ui.md` (tags, franchise, statuses, episodes, watch date)
+- [ ] T345 [P] Author `contracts/movie-quotes-sync.md`
+- [ ] T346 [P] Author `contracts/movie-discovery-ui.md`
+- [ ] T347 [P] Author `contracts/movie-insights-ui.md`
+- [ ] T348 Unit tests for extended movie item validation (statuses, tags, franchise, episodeProgress) in `tests/unit/domain-item-movie-library.test.ts`
+- [ ] T349 Extend movie zod schema in `src/domain/item.ts` per data-model.md (depends on T348)
+- [ ] T350 Migration `db/migrations/0011_movie_library_fields.ts` (tags, franchise, watchedAt, episodeProgress, mood, pace, streamingProviders)
+- [ ] T351 Migration `db/migrations/0012_movie_quotes.ts` per movie-quotes-sync.md
+- [ ] T352 [P] Migration `db/migrations/0013_user_watch_settings.ts` for annual watch goal
+- [ ] T353 Regenerate `src/adapters/postgres/db-types.ts` after T350–T352
+- [ ] T354 [P] `MovieQuote` domain + tests in `src/domain/movie-quote.ts`, `tests/unit/domain-movie-quote.test.ts`
+- [ ] T355 `MovieQuoteRepository` port in `src/application/ports/movie-quote-repository.ts`
+- [ ] T356 Unit tests for watch activity rules in `tests/unit/watch-activity.test.ts`
+- [ ] T357 Implement `deriveWatchActivityDays` in `src/application/movies/watch-activity.ts` (depends on T356)
+- [ ] T358 Extend catalog upsert/detail for cast persistence if missing from Phase A
+- [ ] T359 [P] i18n keys for library, discovery, insights, episodes, franchise in `src/i18n/fr.json`
+
+---
+
+## Phase 9: User Story 5 — Tags and franchise (P1)
+
+- [ ] T360 [US5] Unit tests `filterMoviesByTagOrFranchise` in `tests/unit/movie-library-filters.test.ts`
+- [ ] T361 [US5] Implement filters in `src/application/movies/movie-library-filters.ts`
+- [ ] T362 [US5] Repository mapping for library columns in IndexedDB + Postgres
+- [ ] T363 [US5] Tag + franchise UI on movie detail per movie-library-ui.md
+- [ ] T364 [US5] Filters on movies list page
+- [ ] T365 [US5] E2e tags + franchise filter in `tests/e2e/movies-tags-franchise.spec.ts`
+
+---
+
+## Phase 10: User Story 6 — En cours, en pause, vu (P1)
+
+- [ ] T366 [US6] Unit tests status rules (no en cours on films) in `tests/unit/movie-status-rules.test.ts`
+- [ ] T367 [US6] Status picker + watch date in `src/components/fields/movie-fields.tsx`
+- [ ] T368 [US6] Wire activity derivation on status/`watchedAt` writes
+- [ ] T369 [US6] E2e série en cours + film en pause in `tests/e2e/movies-status-pause.spec.ts`
+
+---
+
+## Phase 11: User Story 7 — Episodes and next episode (P1)
+
+- [ ] T370 [US7] Unit tests episode progress + next key in `tests/unit/movie-episode-progress.test.ts`
+- [ ] T371 [US7] Implement `markEpisodeWatched` / `computeNextEpisode` in `src/application/movies/episode-progress.ts`
+- [ ] T372 [US7] Episode grid UI on série detail per movie-library-ui.md
+- [ ] T373 [US7] Optional release reminder scheduling (PWA)
+- [ ] T374 [US7] E2e mark épisode vu updates next episode in `tests/e2e/movies-episodes.spec.ts`
+
+---
+
+## Phase 12: User Story 8 — Notes and quotes (P2)
+
+- [ ] T375 [US8] Unit tests movie quote use cases in `tests/unit/movie-quotes.test.ts`
+- [ ] T376 [US8] Implement `src/application/movies/movie-quotes.ts`
+- [ ] T377 [US8] IndexedDB + Postgres quote repositories
+- [ ] T378 [US8] Sync push/pull routes + engine per movie-quotes-sync.md
+- [ ] T379 [US8] `MovieQuotesSection` on detail
+- [ ] T380 [US8] Integration isolation tests + e2e quote offline sync
+
+---
+
+## Phase 13: User Story 9 — Mood, filters, where to watch (P2)
+
+- [ ] T381 [US9] Unit tests discovery filters in `tests/unit/movie-discovery-filters.test.ts`
+- [ ] T382 [US9] Implement `filterMoviesByDiscovery` in `src/application/movies/discovery-filters.ts`
+- [ ] T383 [US9] Mood/pace fields + discovery sheet per movie-discovery-ui.md
+- [ ] T384 [US9] Server streaming lookup route + cache (stub OK initially)
+- [ ] T385 [US9] E2e discovery filter + empty streaming state
+
+---
+
+## Phase 14: User Story 10 — Private recommendations (P3)
+
+- [ ] T386 [US10] Unit tests `suggestMovies` in `tests/unit/movie-recommendations.test.ts`
+- [ ] T387 [US10] Implement `src/application/movies/recommendations.ts`
+- [ ] T388 [US10] Recommendations panel on movies list
+- [ ] T389 [US10] E2e recommendations smoke
+
+---
+
+## Phase 15: User Story 11 — Goals, streak, heatmap (P2)
+
+- [ ] T390 [US11] Unit tests streak/heatmap in `tests/unit/watch-insights.test.ts`
+- [ ] T391 [US11] Implement `computeWatchStreak` / `buildWatchHeatmap` in `src/application/movies/watch-insights.ts`
+- [ ] T392 [US11] Watch goal use case + repository
+- [ ] T393 [US11] Insights page per movie-insights-ui.md
+- [ ] T394 [US11] E2e heatmap on status/episode change
+
+---
+
+## Phase 16: User Story 12 — Stats and year-in-review (P3)
+
+- [ ] T395 [US12] Unit tests `computeMovieStats` in `tests/unit/movie-stats.test.ts`
+- [ ] T396 [US12] Implement stats + year-in-review in `src/application/movies/movie-stats.ts`
+- [ ] T397 [US12] Stats views on insights page
+- [ ] T398 [US12] E2e stats smoke
+
+---
+
+## Phase 17: Polish — Phases B–D
+
+- [ ] T399 [P] Extend `quickstart.md` with Phase B–D manual validation
+- [ ] T400 Local quality gate: typecheck, vitest, e2e for US5–US12
+
+---
+
+## Dependencies (Phases B–D)
+
+**Gate**: T343+ after **T320** complete.
+
+```text
+T320 → Phase 8 (T343–T359)
+  → US5 (T360–T365) → US9 (T381–T385) → US10 (T386–T389)
+  → US6 (T366–T369) → US7 (T370–T374)
+  → US8 (T375–T380) after T355
+  → US11 (T390–T394) → US12 (T395–T398)
+  → T399–T400
+```
