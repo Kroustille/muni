@@ -1,8 +1,8 @@
 # Implementation Plan: Books — library, catalog, and insights
 
-**Branch**: `002-book-barcode-scan` (work continues on `main`) | **Date**: 2026-10-16 | **Spec**: [spec.md](spec.md)
+**Branch**: `002-books-library` (work continues on `main`) | **Date**: 2026-10-16 | **Spec**: [spec.md](spec.md)
 
-**Input**: Feature specification from `/specs/002-book-barcode-scan/spec.md`
+**Input**: Feature specification from `/specs/002-books-library/spec.md`
 
 **Build order (X1)**: Phase **A** is **shipped** on `main`. Implement **Phases B → C → D** (this plan) before feature **003** (movies). Feature **004** (music) follows **003**.
 
@@ -114,7 +114,7 @@ Delivered on `main`: scan, title search, lookup routes, catalog fields, dedupe/m
 ### Documentation (this feature)
 
 ```text
-specs/002-book-barcode-scan/
+specs/002-books-library/
 ├── plan.md
 ├── research.md
 ├── data-model.md

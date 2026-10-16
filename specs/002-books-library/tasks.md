@@ -1,10 +1,10 @@
 # Tasks: Book barcode scan (002)
 
-**Input**: Design documents from `/specs/002-book-barcode-scan/`
+**Input**: Design documents from `/specs/002-books-library/`
 
 **Prerequisites**: Muni v1 (`001`) merged or available on `main`; plan.md, spec.md, research.md, data-model.md, contracts/, quickstart.md
 
-**Build order (X1)**: Complete **all tasks in this file** before starting feature **003** (`specs/003-movie-imdb-search/tasks.md`). Feature **004** follows **003**.
+**Build order (X1)**: Complete **all tasks in this file** before starting feature **003** (`specs/003-films-tv-library/tasks.md`). Feature **004** follows **003**.
 
 **Architecture**: Hexagonal — domain extensions, `BookCatalogLookup` and `BarcodeScanner` ports, Open Library adapter, route handler, mobile UI driving adapters. TDD per constitution.
 
@@ -96,7 +96,7 @@
 ## Phase 7: Polish
 
 - [x] T236 [P] Show `pageCount` on book detail when present (N1) in book detail component
-- [x] T237 Update `specs/002-book-barcode-scan/quickstart.md` with any command fixes after implementation
+- [x] T237 Update `specs/002-books-library/quickstart.md` with any command fixes after implementation
 - [x] T238 Local quality gate (no GitHub CI): `yarn typecheck`, `yarn test` / vitest; e2e when Docker stack available — and fix regressions
 
 ---
@@ -123,12 +123,12 @@
 
 **Prerequisite**: Phase A complete (**T238** done).
 
-- [x] T280 Extend `specs/002-book-barcode-scan/data-model.md` with Phase B–D fields (tags, series, `catalogWorkId`/`workKey`, `pagesRead`, lending, mood/pace, `book_quotes` child, reading settings) per spec FR-B*–FR-D*
-- [x] T281 [P] Author `specs/002-book-barcode-scan/contracts/book-library-ui.md` (tags, series, work grouping, **En pause**, lending, notes scope) mapping FR-B01–B07
-- [x] T282 [P] Author `specs/002-book-barcode-scan/contracts/book-quotes-sync.md` (quote wire, push/pull, per-field LWW, soft delete, isolation)
-- [x] T283 [P] Author `specs/002-book-barcode-scan/contracts/book-discovery-ui.md` (mood/pace editors, discovery filters, recommendations surface)
-- [x] T284 [P] Author `specs/002-book-barcode-scan/contracts/book-insights-ui.md` (annual goal, streak, heatmap, stats, year-in-review)
-- [x] T285 Extend `BookCatalogHit` + `specs/002-book-barcode-scan/contracts/book-catalog-api.md` with `catalogWorkId` (Open Library work key); update `src/application/ports/book-catalog-lookup.ts`
+- [x] T280 Extend `specs/002-books-library/data-model.md` with Phase B–D fields (tags, series, `catalogWorkId`/`workKey`, `pagesRead`, lending, mood/pace, `book_quotes` child, reading settings) per spec FR-B*–FR-D*
+- [x] T281 [P] Author `specs/002-books-library/contracts/book-library-ui.md` (tags, series, work grouping, **En pause**, lending, notes scope) mapping FR-B01–B07
+- [x] T282 [P] Author `specs/002-books-library/contracts/book-quotes-sync.md` (quote wire, push/pull, per-field LWW, soft delete, isolation)
+- [x] T283 [P] Author `specs/002-books-library/contracts/book-discovery-ui.md` (mood/pace editors, discovery filters, recommendations surface)
+- [x] T284 [P] Author `specs/002-books-library/contracts/book-insights-ui.md` (annual goal, streak, heatmap, stats, year-in-review)
+- [x] T285 Extend `BookCatalogHit` + `specs/002-books-library/contracts/book-catalog-api.md` with `catalogWorkId` (Open Library work key); update `src/application/ports/book-catalog-lookup.ts`
 - [x] T286 Create unit tests for extended book item validation (`paused` status, tags, series, `pagesRead` ≥ 0 when set, loan fields, mood/pace) in `tests/unit/domain-item-book-library.test.ts`
 - [x] T287 Extend book zod schema and `FIELDS_BY_TYPE.book` in `src/domain/item.ts` per updated data-model.md (depends on T286)
 - [x] T288 Write Kysely migration `db/migrations/0008_book_library_fields.ts` (tags jsonb, series, work ids, pages_read, loaned_to, loaned_at, mood, pace)
@@ -263,7 +263,7 @@
 
 ## Phase 18: Polish — Phases B–D
 
-- [x] T341 [P] Extend `specs/002-book-barcode-scan/quickstart.md` with Phase B–D manual validation steps
+- [x] T341 [P] Extend `specs/002-books-library/quickstart.md` with Phase B–D manual validation steps
 - [x] T342 Local quality gate (no GitHub CI): `yarn typecheck`, `yarn test` / vitest; e2e when Docker stack available — fix regressions for US5–US12
 
 ---

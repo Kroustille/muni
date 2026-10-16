@@ -1,6 +1,8 @@
 # Implementation Plan: Movie catalog search
 
-**Branch**: `003-movie-imdb-search` | **Date**: 2026-10-15 | **Spec**: [spec.md](spec.md)
+> **Note (2026-10-16):** `spec.md` was expanded to the full Films & TV library/catalog/insights scope. This plan and `tasks.md` are **stale** until a fresh speckit-plan run.
+
+**Branch**: `003-films-tv-library` | **Date**: 2026-10-15 | **Spec**: [spec.md](spec.md)
 
 **Build order (X1)**: Start **only after feature 002** is implemented end-to-end. Feature **004** (music) follows **this feature (003)**.
 
@@ -35,7 +37,7 @@ Server-proxied Wikidata SPARQL/entity search for films and TV series with French
 ## Project Structure
 
 ```text
-specs/003-movie-imdb-search/
+specs/003-films-tv-library/
 ├── plan.md, research.md, data-model.md, quickstart.md
 ├── contracts/movie-catalog-api.md, contracts/ui-movie-search.md
 └── tasks.md

@@ -4,7 +4,7 @@
 
 **Prerequisites**: Features **002** and **003** fully implemented (X1). All design docs present.
 
-**Build order (X1)**: Third in sequence — start only after `specs/003-movie-imdb-search/tasks.md` is complete.
+**Build order (X1)**: Third in sequence — start only after `specs/003-films-tv-library/tasks.md` is complete.
 
 **Task IDs**: **T401–T4xx** (feature 004 band).
 

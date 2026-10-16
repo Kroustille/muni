@@ -1,8 +1,8 @@
 # Tasks: Movie catalog search (003)
 
-**Input**: `/specs/003-movie-imdb-search/`
+**Input**: `/specs/003-films-tv-library/`
 
-**Prerequisites**: Feature **002** fully implemented (`specs/002-book-barcode-scan/tasks.md` complete, X1). Design docs: plan.md, spec.md, research.md, data-model.md, contracts/, quickstart.md.
+**Prerequisites**: Feature **002** fully implemented (`specs/002-books-library/tasks.md` complete, X1). Design docs: plan.md, spec.md, research.md, data-model.md, contracts/, quickstart.md.
 
 **Build order (X1)**: Complete this file before starting **004** (`specs/004-music-artists-tracks/tasks.md`).
 

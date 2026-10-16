@@ -1,8 +1,8 @@
 # Feature Specification: Books — library, catalog, and insights
 
-**Feature directory**: `specs/002-book-barcode-scan/` (historical slug; this spec covers **all** book capabilities).
+**Feature directory**: `specs/002-books-library/`
 
-**Feature Branch**: `002-book-barcode-scan`
+**Feature Branch**: `002-books-library` (historical: `002-book-barcode-scan`)
 
 **Created**: 2026-10-15
 

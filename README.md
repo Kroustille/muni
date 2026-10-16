@@ -23,8 +23,8 @@ Capture books, films, recipes, and shopping in a few taps; browse and update the
 
 **Catalog extensions** (spec-driven; see [`specs/`](specs/)):
 
-- **Books** — mobile ISBN barcode scan + Open Library lookup via the server ([`002-book-barcode-scan`](specs/002-book-barcode-scan/spec.md))
-- **Movies** — title search against a keyless catalog (Wikidata / IMDb id), planned ([`003-movie-imdb-search`](specs/003-movie-imdb-search/spec.md))
+- **Books** — library, catalog, and insights ([`002-books-library`](specs/002-books-library/spec.md))
+- **Films & TV** — library, catalog, and insights (Wikidata / IMDb id), planned ([`003-films-tv-library`](specs/003-films-tv-library/spec.md))
 - **Music** — artists and tracks lists with optional MusicBrainz search + Spotify/SoundCloud links, planned ([`004-music-artists-tracks`](specs/004-music-artists-tracks/spec.md))
 
 Sign-in: Google or email magic link (SMTP). First use needs a network connection; after that the app works fully offline and an expired session never blocks local data.
@@ -43,7 +43,7 @@ Details: [`specs/001-typed-lists-companion/plan.md`](specs/001-typed-lists-compa
 
 Clone, prerequisites, `.env.local`, Docker, migrations, and Mailpit sign-in: **[docs/GETTING-STARTED.md](docs/GETTING-STARTED.md)**.
 
-**Checks:** `yarn typecheck`, `yarn test`, `yarn test:coverage`, `yarn test:e2e`. Manual scenarios: [v1 quickstart](specs/001-typed-lists-companion/quickstart.md); catalog features add [002](specs/002-book-barcode-scan/quickstart.md), [003](specs/003-movie-imdb-search/quickstart.md), [004](specs/004-music-artists-tracks/quickstart.md) when relevant.
+**Checks:** `yarn typecheck`, `yarn test`, `yarn test:coverage`, `yarn test:e2e`. Manual scenarios: [v1 quickstart](specs/001-typed-lists-companion/quickstart.md); catalog features add [002](specs/002-books-library/quickstart.md), [003](specs/003-films-tv-library/quickstart.md), [004](specs/004-music-artists-tracks/quickstart.md) when relevant.
 
 ## Specifications
 

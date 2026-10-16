@@ -65,8 +65,8 @@ yarn test:e2e
 ## Manual validation
 
 - **[Muni v1 — validation guide](../specs/001-typed-lists-companion/quickstart.md)** — core smoke scenarios (auth, offline, sync, search, PWA).
-- **[Book barcode scan (002)](../specs/002-book-barcode-scan/quickstart.md)** — Open Library lookup, mobile scan, desktop boundaries (after 002 is implemented).
-- **[Movie catalog search (003)](../specs/003-movie-imdb-search/quickstart.md)** — title search and dedupe (after 002 and 003 are implemented).
+- **[Books library (002)](../specs/002-books-library/quickstart.md)** — Open Library lookup, mobile scan, desktop boundaries (after 002 is implemented).
+- **[Films & TV library (003)](../specs/003-films-tv-library/quickstart.md)** — title search and dedupe (after 002 and 003 are implemented).
 - **[Music artists & tracks (004)](../specs/004-music-artists-tracks/quickstart.md)** — manual quick-add and catalog search on list pages (after prior features per spec order).
 
 ## New features (Spec Kit)
