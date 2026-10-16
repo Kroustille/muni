@@ -153,7 +153,7 @@
 
 - [x] T297 [US5] Create unit tests for tag/series list filtering in `tests/unit/book-library-filters.test.ts`
 - [x] T298 [US5] Implement `filterBooksByTagOrSeries` in `src/application/books/book-library-filters.ts` (depends on T297)
-- [ ] T299 [P] [US5] Unit tests for IndexedDB/Postgres mapping of library fields in `tests/unit/book-library-repository-fields.test.ts`
+- [x] T299 [P] [US5] Unit tests for IndexedDB/Postgres mapping of library fields in `tests/unit/book-library-repository-fields.test.ts`
 - [ ] T300 [US5] Extend `src/adapters/indexeddb/item-repository.ts` and `src/adapters/postgres/server-item-repository.ts` for library columns (depends on T288, T299)
 - [ ] T301 [US5] Tag chip editor + series fields on create/edit per `contracts/book-library-ui.md` in `src/components/fields/book-fields.tsx` and `src/components/items/ItemDetailForm.tsx`
 - [ ] T302 [US5] Tag and series filter controls on `src/app/(app)/books/page.tsx` per book-library-ui.md (depends on T298, T301)
