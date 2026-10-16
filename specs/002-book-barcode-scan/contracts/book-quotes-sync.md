@@ -55,3 +55,10 @@ Validation: `text` trimmed length 1–4000; `page` null or integer ≥ 1; `book_
 ## Parent lifecycle
 
 When a book item is soft-deleted, client SHOULD soft-delete all quotes for that `book_item_id` in the same session (server MAY reject quotes for deleted parents on push).
+
+## FR mapping
+
+| Area | Requirement |
+|------|-------------|
+| Child quote entity + sync | FR-B06 |
+| Per-field LWW, soft delete, book isolation | FR-B06, constitution IV |
