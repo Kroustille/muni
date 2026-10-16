@@ -2,7 +2,7 @@ import type { ItemQuery, ItemRepository, MetaStore } from "../../application/por
 import type { Item } from "../../domain/item";
 import type { MuniDb } from "./db";
 
-/** Persists full domain `Item` documents; book catalog fields ride on the stored object. */
+/** Persists full domain `Item` documents; book catalog and library fields ride on the stored object. */
 export function createIndexedDbItemRepository(db: MuniDb): ItemRepository {
   const listeners = new Set<() => void>();
   const notify = (): void => {
