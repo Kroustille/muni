@@ -28,6 +28,11 @@ import {
   type SearchMusicArtists,
   type SearchMusicTracks,
 } from "@/application/music/search-music";
+import { createPostgresBookQuoteRepository } from "@/adapters/postgres/book-quote-repository";
+import {
+  createBookQuoteSyncService,
+  type BookQuoteSyncService,
+} from "@/application/server/book-quote-sync-service";
 import { createSyncService, type SyncService } from "@/application/server/sync-service";
 import { loadConfig, type ServerConfig } from "@/composition/config";
 
@@ -37,6 +42,7 @@ export interface ServerContainer {
   readonly sessions: SessionUseCases;
   readonly google: GoogleUseCases | null;
   readonly sync: SyncService;
+  readonly bookQuoteSync: BookQuoteSyncService;
   readonly lookupBook: LookupBook;
   readonly searchBooks: SearchBooks;
   readonly searchMovies: SearchMovies;
@@ -95,6 +101,8 @@ export function createServerContainer(
 
   const items = createPostgresItemRepository(db);
   const sync = createSyncService({ repository: items, now });
+  const bookQuotes = createPostgresBookQuoteRepository(db);
+  const bookQuoteSync = createBookQuoteSyncService({ quotes: bookQuotes, items, now });
   const catalogCache = createPostgresCatalogCacheRepository(db);
   const bookCatalog = createOpenLibraryBookCatalogLookup({ cache: catalogCache });
   const lookupBook = createLookupBook({ catalog: bookCatalog });
@@ -112,6 +120,7 @@ export function createServerContainer(
     sessions,
     google,
     sync,
+    bookQuoteSync,
     lookupBook,
     searchBooks,
     searchMovies,

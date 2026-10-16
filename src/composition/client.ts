@@ -6,8 +6,12 @@ import { createHttpAuthGateway } from "../adapters/http/auth-gateway";
 import { createHttpRemoteStore } from "../adapters/http/remote-store";
 import { createUuidIdGenerator } from "../adapters/browser/id-generator";
 import { openMuniDb } from "../adapters/indexeddb/db";
+import { createIndexedDbBookQuoteRepository } from "../adapters/indexeddb/book-quote-repository";
 import { createIndexedDbItemRepository } from "../adapters/indexeddb/item-repository";
+import { createHttpBookQuoteRemoteStore } from "../adapters/http/book-quote-remote-store";
+import { createBookQuoteUseCases, type BookQuoteUseCases } from "../application/books/book-quotes";
 import { createItemUseCases, type ItemUseCases } from "../application/items";
+import { createBookQuotesSyncEngine } from "../application/sync/book-quotes-engine";
 import { createSearchUseCase, type SearchUseCase } from "../application/search";
 import type { AuthGateway } from "../application/ports/auth-gateway";
 import type { Unsubscribe } from "../application/ports/item-repository";
@@ -22,6 +26,7 @@ export type SyncStatusState = "idle" | "syncing" | "offline" | "paused";
 
 export type ClientContext = {
   itemUseCases: ItemUseCases;
+  bookQuoteUseCases: BookQuoteUseCases;
   searchUseCase: SearchUseCase;
   sessionUseCases: SessionUseCases;
   authGateway: AuthGateway;
@@ -33,6 +38,7 @@ let syncStatus: SyncStatusState = "idle";
 const syncStatusListeners = new Set<(state: SyncStatusState) => void>();
 let syncScheduler: ReturnType<typeof createSyncScheduler> | undefined;
 let syncEngine: ReturnType<typeof createSyncEngine> | undefined;
+let bookQuotesSyncEngine: ReturnType<typeof createBookQuotesSyncEngine> | undefined;
 let syncStarted = false;
 
 function publishSyncStatus(next: SyncStatusState): void {
@@ -63,8 +69,13 @@ function wrapLocalWrites(items: ItemUseCases, onLocalWrite: () => void): ItemUse
 function buildClientContext(): Promise<ClientContext> {
   return openMuniDb(MUNI_DB_NAME).then((db) => {
     const repository = createIndexedDbItemRepository(db);
+    const quoteRepository = createIndexedDbBookQuoteRepository(db);
     const connectivity = createBrowserConnectivity();
     const remote = createHttpRemoteStore({
+      fetch: globalThis.fetch.bind(globalThis),
+      baseUrl: "",
+    });
+    const quoteRemote = createHttpBookQuoteRemoteStore({
       fetch: globalThis.fetch.bind(globalThis),
       baseUrl: "",
     });
@@ -84,6 +95,13 @@ function buildClientContext(): Promise<ClientContext> {
       now: () => Date.now(),
     });
 
+    const baseBookQuoteUseCases = createBookQuoteUseCases({
+      quotes: quoteRepository,
+      items: repository,
+      idGenerator: createUuidIdGenerator(),
+      now: () => Date.now(),
+    });
+
     syncEngine = createSyncEngine({
       repository,
       remote,
@@ -93,9 +111,19 @@ function buildClientContext(): Promise<ClientContext> {
       sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
     });
 
+    bookQuotesSyncEngine = createBookQuotesSyncEngine({
+      repository: quoteRepository,
+      meta: repository.meta,
+      remote: quoteRemote,
+      quotes: baseBookQuoteUseCases,
+      pullLimit: SYNC_PULL_LIMIT,
+      sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+    });
+
     async function runSync(): Promise<void> {
       const engine = syncEngine;
-      if (engine === undefined) return;
+      const quoteEngine = bookQuotesSyncEngine;
+      if (engine === undefined || quoteEngine === undefined) return;
       if (!connectivity.isOnline()) {
         publishSyncStatus("offline");
         return;
@@ -103,7 +131,8 @@ function buildClientContext(): Promise<ClientContext> {
       publishSyncStatus("syncing");
       try {
         await engine.run();
-        if (engine.paused) {
+        await quoteEngine.run();
+        if (engine.paused || quoteEngine.paused) {
           syncScheduler?.pause();
           publishSyncStatus("paused");
         } else {
@@ -131,6 +160,21 @@ function buildClientContext(): Promise<ClientContext> {
       syncScheduler?.notifyLocalWrite();
     });
 
+    const afterQuoteWrite =
+      <A extends unknown[], R>(fn: (...args: A) => Promise<R>) =>
+      async (...args: A): Promise<R> => {
+        const result = await fn(...args);
+        syncScheduler?.notifyLocalWrite();
+        return result;
+      };
+
+    const bookQuoteUseCases: BookQuoteUseCases = {
+      ...baseBookQuoteUseCases,
+      addQuote: afterQuoteWrite(baseBookQuoteUseCases.addQuote),
+      updateQuote: afterQuoteWrite(baseBookQuoteUseCases.updateQuote),
+      deleteQuote: afterQuoteWrite(baseBookQuoteUseCases.deleteQuote),
+    };
+
     const searchUseCase = createSearchUseCase({ repository });
 
     const sessionUseCases = createSessionUseCases({
@@ -149,6 +193,7 @@ function buildClientContext(): Promise<ClientContext> {
 
     return {
       itemUseCases,
+      bookQuoteUseCases,
       searchUseCase,
       sessionUseCases: wrappedSession,
       authGateway,
@@ -175,6 +220,10 @@ export function getItemUseCases(): Promise<ItemUseCases> {
   return getClientContext().then((ctx) => ctx.itemUseCases);
 }
 
+export function getBookQuoteUseCases(): Promise<BookQuoteUseCases> {
+  return getClientContext().then((ctx) => ctx.bookQuoteUseCases);
+}
+
 export function getSearchUseCase(): Promise<SearchUseCase> {
   return getClientContext().then((ctx) => ctx.searchUseCase);
 }
@@ -196,6 +245,7 @@ export function subscribeSyncStatus(
 export function startClientSync(): Promise<void> {
   return getClientContext().then(() => {
     syncEngine?.resume();
+    bookQuotesSyncEngine?.resume();
     syncScheduler?.resume();
     if (!syncStarted) {
       syncStarted = true;
