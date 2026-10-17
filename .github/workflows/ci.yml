@@ -67,6 +67,7 @@ jobs:
           path: |
             .next
             public
+          include-hidden-files: true
           retention-days: 1
 
   unit:
@@ -87,9 +88,17 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
+      mailpit:
+        image: axllent/mailpit
+        ports:
+          - 1025:1025
+          - 8025:8025
     env:
       DATABASE_URL: postgres://muni:muni@localhost:5432/muni
       TEST_DATABASE_URL: postgres://muni:muni@localhost:5432/muni_test
+      SMTP_HOST: localhost
+      SMTP_PORT: 1025
+      SMTP_FROM: Muni <ci@example.com>
       CI: true
     steps:
       - uses: actions/checkout@v4
@@ -174,6 +183,9 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: next-build
+
+      - name: Verify Next.js build artifact
+        run: test -f .next/BUILD_ID
 
       - name: Build and run migrations
         run: yarn migrate:up
