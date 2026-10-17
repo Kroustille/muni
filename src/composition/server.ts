@@ -30,6 +30,7 @@ import {
   type SearchMusicTracks,
 } from "@/application/music/search-music";
 import { createPostgresBookQuoteRepository } from "@/adapters/postgres/book-quote-repository";
+import { createPostgresMovieQuoteRepository } from "@/adapters/postgres/movie-quote-repository";
 import {
   createBookQuoteSyncService,
   type BookQuoteSyncService,
@@ -38,7 +39,7 @@ import {
   createMovieQuoteSyncService,
   type MovieQuoteSyncService,
 } from "@/application/server/movie-quote-sync-service";
-import { createPostgresMovieQuoteRepository } from "@/adapters/postgres/movie-quote-repository";
+import type { ServerItemRepository } from "@/application/ports/server-item-repository";
 import { createSyncService, type SyncService } from "@/application/server/sync-service";
 import { loadConfig, type ServerConfig } from "@/composition/config";
 
@@ -109,10 +110,7 @@ export function createServerContainer(
 
   const items = createPostgresItemRepository(db);
   const sync = createSyncService({ repository: items, now });
-  const bookQuotes = createPostgresBookQuoteRepository(db);
-  const bookQuoteSync = createBookQuoteSyncService({ quotes: bookQuotes, items, now });
-  const movieQuotes = createPostgresMovieQuoteRepository(db);
-  const movieQuoteSync = createMovieQuoteSyncService({ quotes: movieQuotes, items, now });
+  const { bookQuoteSync, movieQuoteSync } = wireServerQuoteSync(db, items, now);
   const catalogCache = createPostgresCatalogCacheRepository(db);
   const bookCatalog = createOpenLibraryBookCatalogLookup({ cache: catalogCache });
   const lookupBook = createLookupBook({ catalog: bookCatalog });
@@ -142,5 +140,18 @@ export function createServerContainer(
     searchMusicTracks,
     lookupMovieStreaming,
     destroy: () => pg.destroy(),
+  };
+}
+
+function wireServerQuoteSync(
+  db: PostgresDatabase["db"],
+  items: ServerItemRepository,
+  now: () => Date,
+): { bookQuoteSync: BookQuoteSyncService; movieQuoteSync: MovieQuoteSyncService } {
+  const bookQuotes = createPostgresBookQuoteRepository(db);
+  const movieQuotes = createPostgresMovieQuoteRepository(db);
+  return {
+    bookQuoteSync: createBookQuoteSyncService({ quotes: bookQuotes, items, now }),
+    movieQuoteSync: createMovieQuoteSyncService({ quotes: movieQuotes, items, now }),
   };
 }

@@ -1,38 +1,58 @@
 import { z } from "zod";
 
 import { isValidHttpsUrl } from "./external-url";
-import { isValidImdbId } from "./imdb";
-import { isValidIsbn } from "./isbn";
 import { isValidMusicBrainzId } from "./musicbrainz";
+import {
+  BOOK_ITEM_FIELD_KEYS,
+  BOOK_MOODS,
+  BOOK_PACES,
+  BOOK_STATUSES,
+  bookItemShapeFields,
+  refineBookItem,
+  type BookMood,
+  type BookPace,
+  type BookStatus,
+} from "./item-book";
+import {
+  EPISODE_KEY_PATTERN,
+  MEDIA_KINDS,
+  MOVIE_ITEM_FIELD_KEYS,
+  MOVIE_MOODS,
+  MOVIE_PACES,
+  MOVIE_STATUSES,
+  movieItemShapeFields,
+  refineMovieItem,
+  type EpisodeProgressEntry,
+  type EpisodeProgressMap,
+  type MediaKind,
+  type MovieMood,
+  type MoviePace,
+  type MovieStatus,
+  type StreamingProvider,
+} from "./item-movie";
 
-export const MEDIA_KINDS = ["film", "series"] as const;
-export type MediaKind = (typeof MEDIA_KINDS)[number];
-
-export const BOOK_MOODS = [
-  "joyeux",
-  "melancolique",
-  "intense",
-  "apaisant",
-  "inspirant",
-  "sombre",
-  "drôle",
-  "romantique",
-] as const;
-export type BookMood = (typeof BOOK_MOODS)[number];
-
-export const BOOK_PACES = ["lent", "modéré", "rapide", "fébrile"] as const;
-export type BookPace = (typeof BOOK_PACES)[number];
-
-export const MOVIE_MOODS = BOOK_MOODS;
-export type MovieMood = BookMood;
-export const MOVIE_PACES = BOOK_PACES;
-export type MoviePace = BookPace;
-
-export type EpisodeProgressEntry = { watchedAt?: string };
-export type EpisodeProgressMap = Record<string, EpisodeProgressEntry>;
-export type StreamingProvider = { name: string; url?: string };
-
-const EPISODE_KEY_PATTERN = /^S\d+E\d+$/;
+export {
+  BOOK_MOODS,
+  BOOK_PACES,
+  BOOK_STATUSES,
+  type BookMood,
+  type BookPace,
+  type BookStatus,
+};
+export {
+  EPISODE_KEY_PATTERN,
+  MEDIA_KINDS,
+  MOVIE_MOODS,
+  MOVIE_PACES,
+  MOVIE_STATUSES,
+  type EpisodeProgressEntry,
+  type EpisodeProgressMap,
+  type MediaKind,
+  type MovieMood,
+  type MoviePace,
+  type MovieStatus,
+  type StreamingProvider,
+};
 
 export const ITEM_TYPES = [
   "shopping",
@@ -46,15 +66,13 @@ export type ItemType = (typeof ITEM_TYPES)[number];
 
 const STATUSES = {
   shopping: [],
-  book: ["to_read", "reading", "read", "paused"],
-  movie: ["to_watch", "in_progress", "paused", "watched"],
+  book: BOOK_STATUSES,
+  movie: MOVIE_STATUSES,
   recipe: [],
   music_artist: [],
   music_track: ["to_listen", "listened"],
 } as const satisfies Record<ItemType, readonly string[]>;
 
-export type BookStatus = (typeof STATUSES.book)[number];
-export type MovieStatus = (typeof STATUSES.movie)[number];
 export type MusicTrackStatus = (typeof STATUSES.music_track)[number];
 export type ItemStatus = BookStatus | MovieStatus | MusicTrackStatus;
 
@@ -122,51 +140,8 @@ export type Item = {
 
 const FIELDS_BY_TYPE: Record<ItemType, readonly (keyof Item)[]> = {
   shopping: ["quantity", "checked"],
-  book: [
-    "author",
-    "status",
-    "recommendedBy",
-    "rating",
-    "notes",
-    "isbn",
-    "synopsis",
-    "genres",
-    "publicationYear",
-    "publisher",
-    "pageCount",
-    "workId",
-    "tags",
-    "seriesName",
-    "seriesPosition",
-    "pagesRead",
-    "loanedTo",
-    "loanedAt",
-    "mood",
-    "pace",
-  ],
-  movie: [
-    "status",
-    "recommendedBy",
-    "rating",
-    "notes",
-    "tags",
-    "franchiseId",
-    "franchiseName",
-    "franchiseOrder",
-    "watchedAt",
-    "episodeProgress",
-    "nextEpisodeKey",
-    "mood",
-    "pace",
-    "streamingProviders",
-    "director",
-    "cast",
-    "imdbId",
-    "synopsis",
-    "releaseYear",
-    "catalogRating",
-    "mediaKind",
-  ],
+  book: BOOK_ITEM_FIELD_KEYS,
+  movie: MOVIE_ITEM_FIELD_KEYS,
   recipe: ["notes", "ingredients", "steps"],
   music_artist: [
     "recommendedBy",
@@ -243,7 +218,6 @@ const itemShape = {
   type: z.enum(ITEM_TYPES),
   title: z.string().trim().min(1),
   createdAt: timestamp,
-  author: text,
   status: z.string().nullable(),
   recommendedBy: text,
   rating: z.number().int().min(1).max(5).nullable(),
@@ -254,15 +228,6 @@ const itemShape = {
   steps: z.array(z.string()).nullable(),
   deletedAt: timestamp.nullable(),
   fieldsUpdatedAt: z.record(z.string(), z.string()),
-  isbn: text,
-  synopsis: text,
-  genres: z
-    .union([z.array(z.string()), z.null()])
-    .transform((value) => (Array.isArray(value) && value.length === 0 ? null : value)),
-  publicationYear: z.number().int().min(1000).max(2100).nullable(),
-  publisher: text,
-  pageCount: z.number().int().min(1).nullable(),
-  workId: text,
   tags: z
     .union([z.array(z.string()), z.null()])
     .transform((value) => {
@@ -270,41 +235,8 @@ const itemShape = {
       const trimmed = value.map((tag) => tag.trim()).filter((tag) => tag.length > 0);
       return trimmed.length === 0 ? null : trimmed;
     }),
-  seriesName: text,
-  seriesPosition: z.number().nullable(),
-  pagesRead: z.number().int().min(0).nullable(),
-  loanedTo: text,
-  loanedAt: text,
-  mood: z.enum(BOOK_MOODS).nullable(),
-  pace: z.enum(BOOK_PACES).nullable(),
-  franchiseId: text,
-  franchiseName: text,
-  franchiseOrder: z.number().int().nullable(),
-  watchedAt: text,
-  episodeProgress: z
-    .union([
-      z.record(z.string(), z.object({ watchedAt: z.string().optional() })),
-      z.null(),
-    ])
-    .transform((value) => {
-      if (value === null || Object.keys(value).length === 0) return null;
-      return value;
-    }),
-  nextEpisodeKey: text,
-  streamingProviders: z
-    .union([
-      z.array(z.strictObject({ name: z.string().trim().min(1), url: z.string().optional() })),
-      z.null(),
-    ])
-    .transform((value) => (Array.isArray(value) && value.length === 0 ? null : value)),
-  director: text,
-  cast: z
-    .union([z.array(z.string()), z.null()])
-    .transform((value) => (Array.isArray(value) && value.length === 0 ? null : value)),
-  imdbId: text,
-  releaseYear: z.number().int().min(1000).max(2100).nullable(),
-  catalogRating: z.number().min(0).max(10).nullable(),
-  mediaKind: z.enum(MEDIA_KINDS).nullable(),
+  ...bookItemShapeFields,
+  ...movieItemShapeFields,
   artist: text,
   album: text,
   musicBrainzArtistId: text,
@@ -338,122 +270,10 @@ function checkCrossType(value: Item, ctx: z.RefinementCtx, path: (f: string) => 
       message: `invalid status for type ${value.type}`,
     });
   }
-  if (value.type === "book" && value.isbn != null && !isValidIsbn(value.isbn)) {
-    ctx.addIssue({
-      code: "custom",
-      path: [path("isbn")],
-      message: "invalid ISBN",
-    });
-  }
-  if (value.type === "book") {
-    const tags = value.tags;
-    if (tags != null) {
-      if (tags.length > 50) {
-        ctx.addIssue({
-          code: "custom",
-          path: [path("tags")],
-          message: "too many tags",
-        });
-      }
-      for (const tag of tags) {
-        if (tag.length > 40) {
-          ctx.addIssue({
-            code: "custom",
-            path: [path("tags")],
-            message: "tag too long",
-          });
-          break;
-        }
-      }
-    }
-    if (
-      value.pagesRead != null &&
-      value.pageCount != null &&
-      value.pagesRead > value.pageCount
-    ) {
-      ctx.addIssue({
-        code: "custom",
-        path: [path("pagesRead")],
-        message: "pagesRead cannot exceed pageCount",
-      });
-    }
-    if (value.loanedTo == null && value.loanedAt != null) {
-      ctx.addIssue({
-        code: "custom",
-        path: [path("loanedAt")],
-        message: "loanedAt requires loanedTo",
-      });
-    }
-    if (value.loanedAt != null && !/^\d{4}-\d{2}-\d{2}$/.test(value.loanedAt)) {
-      ctx.addIssue({
-        code: "custom",
-        path: [path("loanedAt")],
-        message: "loanedAt must be YYYY-MM-DD",
-      });
-    }
-  }
-  if (value.type === "movie") {
-    const tags = value.tags;
-    if (tags != null) {
-      if (tags.length > 50) {
-        ctx.addIssue({
-          code: "custom",
-          path: [path("tags")],
-          message: "too many tags",
-        });
-      }
-      for (const tag of tags) {
-        if (tag.length > 40) {
-          ctx.addIssue({
-            code: "custom",
-            path: [path("tags")],
-            message: "tag too long",
-          });
-          break;
-        }
-      }
-    }
-    if (value.watchedAt != null && !/^\d{4}-\d{2}-\d{2}$/.test(value.watchedAt)) {
-      ctx.addIssue({
-        code: "custom",
-        path: [path("watchedAt")],
-        message: "watchedAt must be YYYY-MM-DD",
-      });
-    }
-    if (value.mediaKind === "film" && value.status === "in_progress") {
-      ctx.addIssue({
-        code: "custom",
-        path: [path("status")],
-        message: "films cannot use in_progress status",
-      });
-    }
-    if (value.episodeProgress != null && value.mediaKind !== "series") {
-      ctx.addIssue({
-        code: "custom",
-        path: [path("episodeProgress")],
-        message: "episodeProgress only allowed for series",
-      });
-    }
-    if (value.episodeProgress) {
-      for (const key of Object.keys(value.episodeProgress)) {
-        if (!EPISODE_KEY_PATTERN.test(key)) {
-          ctx.addIssue({
-            code: "custom",
-            path: [path("episodeProgress")],
-            message: "invalid episode key",
-          });
-          break;
-        }
-      }
-    }
-    if (value.imdbId != null && !isValidImdbId(value.imdbId)) {
-      ctx.addIssue({
-        code: "custom",
-        path: [path("imdbId")],
-        message: "invalid IMDb id",
-      });
-    }
-  }
+
+  refineBookItem(value, ctx, path);
+  refineMovieItem(value, ctx, path);
+
   if (
     value.type === "music_artist" &&
     value.musicBrainzArtistId != null &&

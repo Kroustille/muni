@@ -6,18 +6,14 @@ import { createHttpAuthGateway } from "../adapters/http/auth-gateway";
 import { createHttpRemoteStore } from "../adapters/http/remote-store";
 import { createUuidIdGenerator } from "../adapters/browser/id-generator";
 import { openMuniDb } from "../adapters/indexeddb/db";
-import { createIndexedDbBookQuoteRepository } from "../adapters/indexeddb/book-quote-repository";
-import { createIndexedDbMovieQuoteRepository } from "../adapters/indexeddb/movie-quote-repository";
 import { createIndexedDbItemRepository } from "../adapters/indexeddb/item-repository";
-import { createHttpBookQuoteRemoteStore } from "../adapters/http/book-quote-remote-store";
-import { createHttpMovieQuoteRemoteStore } from "../adapters/http/movie-quote-remote-store";
-import { createBookQuoteUseCases, type BookQuoteUseCases } from "../application/books/book-quotes";
-import { createMovieQuoteUseCases, type MovieQuoteUseCases } from "../application/movies/movie-quotes";
+import { wireClientQuoteSync } from "./client-quote-sync";
+import { runSyncEngines, type PausableSyncEngine } from "./sync-run";
+import type { BookQuoteUseCases } from "../application/books/book-quotes";
+import type { MovieQuoteUseCases } from "../application/movies/movie-quotes";
 import { createReadingSettings, type ReadingSettingsUseCases } from "../application/books/reading-settings";
 import { createItemUseCases, type ItemUseCases } from "../application/items";
 import { createIndexedDbReadingGoalRepository } from "../adapters/indexeddb/reading-goal-repository";
-import { createBookQuotesSyncEngine } from "../application/sync/book-quotes-engine";
-import { createMovieQuotesSyncEngine } from "../application/sync/movie-quotes-engine";
 import { createSearchUseCase, type SearchUseCase } from "../application/search";
 import type { AuthGateway } from "../application/ports/auth-gateway";
 import type { Unsubscribe } from "../application/ports/item-repository";
@@ -46,8 +42,8 @@ let syncStatus: SyncStatusState = "idle";
 const syncStatusListeners = new Set<(state: SyncStatusState) => void>();
 let syncScheduler: ReturnType<typeof createSyncScheduler> | undefined;
 let syncEngine: ReturnType<typeof createSyncEngine> | undefined;
-let bookQuotesSyncEngine: ReturnType<typeof createBookQuotesSyncEngine> | undefined;
-let movieQuotesSyncEngine: ReturnType<typeof createMovieQuotesSyncEngine> | undefined;
+let bookQuotesSyncEngine: PausableSyncEngine | undefined;
+let movieQuotesSyncEngine: PausableSyncEngine | undefined;
 let syncStarted = false;
 
 function publishSyncStatus(next: SyncStatusState): void {
@@ -78,18 +74,8 @@ function wrapLocalWrites(items: ItemUseCases, onLocalWrite: () => void): ItemUse
 function buildClientContext(): Promise<ClientContext> {
   return openMuniDb(MUNI_DB_NAME).then((db) => {
     const repository = createIndexedDbItemRepository(db);
-    const quoteRepository = createIndexedDbBookQuoteRepository(db);
-    const movieQuoteRepository = createIndexedDbMovieQuoteRepository(db);
     const connectivity = createBrowserConnectivity();
     const remote = createHttpRemoteStore({
-      fetch: globalThis.fetch.bind(globalThis),
-      baseUrl: "",
-    });
-    const quoteRemote = createHttpBookQuoteRemoteStore({
-      fetch: globalThis.fetch.bind(globalThis),
-      baseUrl: "",
-    });
-    const movieQuoteRemote = createHttpMovieQuoteRemoteStore({
       fetch: globalThis.fetch.bind(globalThis),
       baseUrl: "",
     });
@@ -109,20 +95,6 @@ function buildClientContext(): Promise<ClientContext> {
       now: () => Date.now(),
     });
 
-    const baseBookQuoteUseCases = createBookQuoteUseCases({
-      quotes: quoteRepository,
-      items: repository,
-      idGenerator: createUuidIdGenerator(),
-      now: () => Date.now(),
-    });
-
-    const baseMovieQuoteUseCases = createMovieQuoteUseCases({
-      quotes: movieQuoteRepository,
-      items: repository,
-      idGenerator: createUuidIdGenerator(),
-      now: () => Date.now(),
-    });
-
     syncEngine = createSyncEngine({
       repository,
       remote,
@@ -132,23 +104,16 @@ function buildClientContext(): Promise<ClientContext> {
       sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
     });
 
-    bookQuotesSyncEngine = createBookQuotesSyncEngine({
-      repository: quoteRepository,
-      meta: repository.meta,
-      remote: quoteRemote,
-      quotes: baseBookQuoteUseCases,
-      pullLimit: SYNC_PULL_LIMIT,
-      sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
-    });
+    const notifyLocalWrite = () => syncScheduler?.notifyLocalWrite();
 
-    movieQuotesSyncEngine = createMovieQuotesSyncEngine({
-      repository: movieQuoteRepository,
-      meta: repository.meta,
-      remote: movieQuoteRemote,
-      quotes: baseMovieQuoteUseCases,
+    const quoteSync = wireClientQuoteSync({
+      db,
+      items: repository,
       pullLimit: SYNC_PULL_LIMIT,
-      sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
+      onLocalWrite: notifyLocalWrite,
     });
+    bookQuotesSyncEngine = quoteSync.bookQuotesEngine;
+    movieQuotesSyncEngine = quoteSync.movieQuotesEngine;
 
     async function runSync(): Promise<void> {
       const engine = syncEngine;
@@ -157,24 +122,12 @@ function buildClientContext(): Promise<ClientContext> {
       if (engine === undefined || quoteEngine === undefined || movieQuoteEngine === undefined) {
         return;
       }
-      if (!connectivity.isOnline()) {
-        publishSyncStatus("offline");
-        return;
-      }
-      publishSyncStatus("syncing");
-      try {
-        await engine.run();
-        await quoteEngine.run();
-        await movieQuoteEngine.run();
-        if (engine.paused || quoteEngine.paused || movieQuoteEngine.paused) {
-          syncScheduler?.pause();
-          publishSyncStatus("paused");
-        } else {
-          publishSyncStatus("idle");
-        }
-      } catch {
-        publishSyncStatus(connectivity.isOnline() ? "idle" : "offline");
-      }
+      await runSyncEngines({
+        engines: [engine, quoteEngine, movieQuoteEngine],
+        connectivity,
+        onStatus: publishSyncStatus,
+        onPauseScheduler: () => syncScheduler?.pause(),
+      });
     }
 
     syncScheduler = createSyncScheduler({ connectivity, runSync });
@@ -190,31 +143,8 @@ function buildClientContext(): Promise<ClientContext> {
       }
     });
 
-    const itemUseCases = wrapLocalWrites(baseItemUseCases, () => {
-      syncScheduler?.notifyLocalWrite();
-    });
-
-    const afterQuoteWrite =
-      <A extends unknown[], R>(fn: (...args: A) => Promise<R>) =>
-      async (...args: A): Promise<R> => {
-        const result = await fn(...args);
-        syncScheduler?.notifyLocalWrite();
-        return result;
-      };
-
-    const bookQuoteUseCases: BookQuoteUseCases = {
-      ...baseBookQuoteUseCases,
-      addQuote: afterQuoteWrite(baseBookQuoteUseCases.addQuote),
-      updateQuote: afterQuoteWrite(baseBookQuoteUseCases.updateQuote),
-      deleteQuote: afterQuoteWrite(baseBookQuoteUseCases.deleteQuote),
-    };
-
-    const movieQuoteUseCases: MovieQuoteUseCases = {
-      ...baseMovieQuoteUseCases,
-      addQuote: afterQuoteWrite(baseMovieQuoteUseCases.addQuote),
-      updateQuote: afterQuoteWrite(baseMovieQuoteUseCases.updateQuote),
-      deleteQuote: afterQuoteWrite(baseMovieQuoteUseCases.deleteQuote),
-    };
+    const itemUseCases = wrapLocalWrites(baseItemUseCases, notifyLocalWrite);
+    const { bookQuoteUseCases, movieQuoteUseCases } = quoteSync;
 
     const searchUseCase = createSearchUseCase({ repository });
 

@@ -1,13 +1,8 @@
 "use client";
 
 import { useCallback, useEffect, useState, type FormEvent } from "react";
-import type { BookQuoteUseCases } from "@/application/books/book-quotes";
 import type { Item, ItemPatch } from "@/domain/item";
 import {
-  BookFields,
-  type BookFieldValues,
-  MovieFields,
-  type MovieFieldValues,
   MusicArtistFields,
   type MusicArtistFieldValues,
   MusicTrackFields,
@@ -17,32 +12,18 @@ import {
   ShoppingFields,
   type ShoppingFieldValues,
 } from "@/components/fields";
-import { BookEditionsSection } from "@/components/books/book-editions-section";
 import {
-  BookDiscoveryFields,
-  bookDiscoveryValuesToPatch,
+  BookDetailSections,
   emptyBookDiscoveryFieldValues,
   itemToBookDiscoveryValues,
-  type BookDiscoveryFieldValues,
-} from "@/components/books/book-discovery-fields";
-import { BookQuotesSection } from "@/components/books/book-quotes-section";
-import { MovieEpisodesSection } from "@/components/movies/movie-episodes-section";
-import { MovieQuotesSection } from "@/components/movies/movie-quotes-section";
-import { MovieReleaseReminder } from "@/components/movies/movie-release-reminder";
-import { MovieStreamingSection } from "@/components/movies/movie-streaming-section";
-import {
-  getBookQuoteUseCases,
-  getItemUseCases,
-  getMovieQuoteUseCases,
-} from "@/composition/client";
-import type { MovieQuoteUseCases } from "@/application/movies/movie-quotes";
+} from "@/components/items/BookDetailSections";
+import { MovieDetailSections } from "@/components/items/MovieDetailSections";
+import { bookDiscoveryValuesToPatch } from "@/components/books/book-discovery-fields";
+import type { BookDiscoveryFieldValues } from "@/components/books/book-discovery-fields";
 import { Button } from "@/components/ui/Button";
-import { TextField } from "@/components/ui/TextField";
 import { ExternalLinkActions } from "@/components/music/external-link-actions";
 import { t } from "@/i18n";
 import {
-  bookLoanReturnPatch,
-  clearBookLoanInValues,
   type FieldValues,
   patchFromValues,
   validateFieldValues,
@@ -75,23 +56,11 @@ export function ItemDetailForm({
   const [loanError, setLoanError] = useState<string | undefined>();
   const [artistError, setArtistError] = useState<string | undefined>();
   const [saving, setSaving] = useState(false);
-  const [bookQuoteUseCases, setBookQuoteUseCases] = useState<BookQuoteUseCases | null>(null);
-  const [movieQuoteUseCases, setMovieQuoteUseCases] = useState<MovieQuoteUseCases | null>(null);
   const [movieItem, setMovieItem] = useState(item);
 
   useEffect(() => {
     setMovieItem(item);
   }, [item]);
-
-  useEffect(() => {
-    if (item.type !== "book") return;
-    void getBookQuoteUseCases().then(setBookQuoteUseCases);
-  }, [item.type]);
-
-  useEffect(() => {
-    if (item.type !== "movie") return;
-    void getMovieQuoteUseCases().then(setMovieQuoteUseCases);
-  }, [item.type]);
 
   const save = useCallback(async () => {
     const errors = validateFieldValues(item, values);
@@ -143,108 +112,34 @@ export function ItemDetailForm({
         />
       ) : null}
       {item.type === "book" ? (
-        <>
-          <BookFields
-            values={values as BookFieldValues}
-            pageCount={item.pageCount}
-            tagSuggestions={tagSuggestions}
-            onChange={(next) => {
-              setValues(next);
-              setTitleError(undefined);
-              setPagesReadError(undefined);
-            }}
-            titleError={titleError}
-            pagesReadError={pagesReadError}
-          />
-          <section className="flex flex-col gap-4 border-t border-border pt-4">
-            <h2 className="text-base font-medium">{t("books.loan.title")}</h2>
-            <TextField
-              label={t("books.loan.to")}
-              value={(values as BookFieldValues).loanedTo}
-              onChange={(event) => {
-                setValues({ ...(values as BookFieldValues), loanedTo: event.target.value });
-                setLoanError(undefined);
-              }}
-              error={loanError}
-              autoComplete="off"
-            />
-            <TextField
-              label={t("books.loan.since")}
-              type="date"
-              value={(values as BookFieldValues).loanedAt}
-              onChange={(event) => {
-                setValues({ ...(values as BookFieldValues), loanedAt: event.target.value });
-                setLoanError(undefined);
-              }}
-              autoComplete="off"
-            />
-            {(values as BookFieldValues).loanedTo.trim() !== "" ? (
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => {
-                  setValues(clearBookLoanInValues(values as BookFieldValues));
-                  void onSave(bookLoanReturnPatch()).then((updated) => {
-                    setValues(valuesFromItem(updated));
-                  });
-                }}
-              >
-                {t("books.loan.return")}
-              </Button>
-            ) : null}
-          </section>
-          <BookEditionsSection
-            item={item as Item & { type: "book" }}
-            onChanged={async () => {
-              const useCases = await getItemUseCases();
-              const refreshed = await useCases.getItem(item.id);
-              if (refreshed) setValues(valuesFromItem(refreshed));
-              onLibraryChange?.();
-            }}
-          />
-          {bookQuoteUseCases !== null ? (
-            <BookQuotesSection bookItemId={item.id} useCases={bookQuoteUseCases} />
-          ) : null}
-          <BookDiscoveryFields values={discoveryValues} onChange={setDiscoveryValues} />
-        </>
+        <BookDetailSections
+          item={item as Item & { type: "book" }}
+          values={values}
+          discoveryValues={discoveryValues}
+          onValuesChange={setValues}
+          onDiscoveryChange={setDiscoveryValues}
+          onSave={onSave}
+          onLibraryChange={onLibraryChange}
+          tagSuggestions={tagSuggestions}
+          titleError={titleError}
+          pagesReadError={pagesReadError}
+          loanError={loanError}
+          onClearTitleError={() => setTitleError(undefined)}
+          onClearPagesReadError={() => setPagesReadError(undefined)}
+          onClearLoanError={() => setLoanError(undefined)}
+        />
       ) : null}
       {item.type === "movie" ? (
-        <>
-          <MovieFields
-            values={values as MovieFieldValues}
-            mediaKind={movieItem.mediaKind}
-            catalogRating={movieItem.catalogRating}
-            imdbId={movieItem.imdbId}
-            director={movieItem.director}
-            cast={movieItem.cast}
-            tagSuggestions={tagSuggestions}
-            onChange={(next) => {
-              setValues(next);
-              setTitleError(undefined);
-            }}
-            titleError={titleError}
-          />
-          {movieItem.mediaKind === "series" ? (
-            <>
-              <MovieEpisodesSection
-                item={movieItem as Item & { type: "movie"; mediaKind: "series" }}
-                onEpisodeChange={async (updated) => {
-                  const saved = await onSave({
-                    episodeProgress: updated.episodeProgress,
-                    nextEpisodeKey: updated.nextEpisodeKey,
-                  });
-                  setMovieItem(saved);
-                  setValues(valuesFromItem(saved));
-                }}
-              />
-              <MovieReleaseReminder movieItemId={movieItem.id} title={movieItem.title} />
-            </>
-          ) : null}
-          <MovieStreamingSection imdbId={movieItem.imdbId} />
-          {movieQuoteUseCases !== null ? (
-            <MovieQuotesSection movieItemId={movieItem.id} useCases={movieQuoteUseCases} />
-          ) : null}
-        </>
+        <MovieDetailSections
+          movieItem={movieItem as Item & { type: "movie" }}
+          values={values}
+          onValuesChange={setValues}
+          onMovieItemChange={setMovieItem}
+          onSave={onSave}
+          tagSuggestions={tagSuggestions}
+          titleError={titleError}
+          onClearTitleError={() => setTitleError(undefined)}
+        />
       ) : null}
       {item.type === "recipe" ? (
         <RecipeFields
