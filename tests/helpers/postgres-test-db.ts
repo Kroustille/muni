@@ -6,20 +6,6 @@ import { migrationProvider } from "../../db/migrations";
 
 const DEFAULT_TEST_DATABASE_URL = "postgres://muni:muni@localhost:5432/muni_test";
 
-/** Vitest runs files in parallel; concurrent Kysely migrators race on lock DDL. */
-let migrationChain: Promise<unknown> = Promise.resolve();
-
-function migrateToLatestSerialized(db: Kysely<unknown>): Promise<{ error?: unknown }> {
-  const run = migrationChain.then(() =>
-    new Migrator({ db, provider: migrationProvider }).migrateToLatest(),
-  );
-  migrationChain = run.then(
-    () => undefined,
-    () => undefined,
-  );
-  return run;
-}
-
 export interface TestDatabase {
   // Untyped on purpose: the generated db-types.ts belongs to the adapters under test.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -47,7 +33,11 @@ export async function createTestDatabase(): Promise<TestDatabase> {
     }),
   });
 
-  const { error } = await migrateToLatestSerialized(db);
+  const { error } = await new Migrator({
+    db,
+    provider: migrationProvider,
+    migrationTableSchema: schema,
+  }).migrateToLatest();
   if (error) {
     await dropSchema(db, connectionString, schema);
     throw error;
