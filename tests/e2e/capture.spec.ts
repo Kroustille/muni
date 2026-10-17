@@ -50,7 +50,7 @@ export const selectors = {
 };
 
 export const locators = {
-  quickAddButton: (page: Page) => page.getByRole("button", { name: selectors.quickAdd }),
+  quickAddButton: (page: Page) => page.locator("[data-testid=nav-quick-add]:visible"),
   typeButton: (page: Page, kind: ItemKind) =>
     page.getByRole("button", { name: quickAddTypeLabel(kind) }),
   titleField: (page: Page, kind: ItemKind) => page.getByLabel(titleFieldLabel(kind)),
@@ -58,7 +58,8 @@ export const locators = {
   quantityField: (page: Page) => page.getByLabel(selectors.fieldQuantity),
   recommendedByField: (page: Page) => page.getByLabel(selectors.fieldRecommendedBy),
   notesField: (page: Page) => page.getByLabel(selectors.fieldNotes),
-  submitButton: (page: Page) => page.getByRole("button", { name: selectors.actionAdd }),
+  submitButton: (page: Page) =>
+    page.getByRole("dialog").getByRole("button", { name: selectors.actionAdd, exact: true }),
   validationError: (page: Page) => page.getByText(selectors.validationTitleRequired),
   suggestion: (page: Page, name: string) => page.getByRole("option", { name }),
   itemLink: (page: Page, title: string) => page.getByRole("link", { name: title }),

@@ -18,13 +18,13 @@ test.describe("books tags and series filters", () => {
     await page.getByLabel(t("books.tags.add")).fill("e2e-tag");
     await page.getByRole("button", { name: t("books.tags.add") }).click();
     await page.getByLabel(t("books.series.name")).fill("e2e-series");
-    await page.getByRole("button", { name: selectors.actionAdd }).click();
+    await locators.quickAddSubmit(page).click();
     await expect(locators.itemLink(page, titleA)).toBeVisible({ timeout: 15_000 });
 
     await locators.quickAddButton(page).click();
     await page.getByRole("button", { name: t("type.book") }).click();
     await page.getByLabel(titleFieldLabel("book")).fill(titleB);
-    await page.getByRole("button", { name: selectors.actionAdd }).click();
+    await locators.quickAddSubmit(page).click();
     await expect(locators.itemLink(page, titleB)).toBeVisible({ timeout: 15_000 });
 
     await page.getByRole("button", { name: "e2e-tag" }).click();

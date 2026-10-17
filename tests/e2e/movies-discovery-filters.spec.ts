@@ -17,13 +17,13 @@ test.describe("movies discovery filters", () => {
     await page.getByLabel(titleFieldLabel("movie")).fill(tagged);
     await page.getByLabel(t("books.tags.add")).fill("movie-disc-tag");
     await page.getByRole("button", { name: t("books.tags.add") }).click();
-    await page.getByRole("button", { name: selectors.actionAdd }).click();
+    await locators.quickAddSubmit(page).click();
     await expect(locators.itemLink(page, tagged)).toBeVisible({ timeout: 15_000 });
 
     await locators.quickAddButton(page).click();
     await page.getByRole("button", { name: t("type.movie") }).click();
     await page.getByLabel(titleFieldLabel("movie")).fill(other);
-    await page.getByRole("button", { name: selectors.actionAdd }).click();
+    await locators.quickAddSubmit(page).click();
     await expect(locators.itemLink(page, other)).toBeVisible({ timeout: 15_000 });
 
     await page.getByRole("button", { name: tagged }).click();

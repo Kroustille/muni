@@ -68,6 +68,9 @@ export const locators = {
   ratingStar: (page: Page, stars: 1 | 2 | 3 | 4 | 5) =>
     locators.ratingGroup(page).getByRole("button", { name: String(stars) }),
   undoButton: (page: Page) => page.getByRole("button", { name: selectors.actionUndo }),
+  /** Quick-add sheet submit — scoped to dialog so it does not match nav.quickAdd ("Ajouter"). */
+  quickAddSubmit: (page: Page) =>
+    page.getByRole("dialog").getByRole("button", { name: selectors.actionAdd, exact: true }),
 };
 
 async function readMagicLink(email: string): Promise<string> {
@@ -106,8 +109,9 @@ export async function signIn(page: Page): Promise<void> {
 export async function addItem(page: Page, kind: ItemKind, title: string): Promise<void> {
   await locators.quickAddButton(page).click();
   await page.getByRole("button", { name: quickAddTypeLabel(kind) }).click();
-  await page.getByLabel(titleFieldLabel(kind)).fill(title);
-  await page.getByRole("button", { name: selectors.actionAdd }).click();
+  const dialog = page.getByRole("dialog");
+  await dialog.getByLabel(titleFieldLabel(kind)).fill(title);
+  await locators.quickAddSubmit(page).click();
   await expect(page.getByText(title)).toBeVisible();
 }
 

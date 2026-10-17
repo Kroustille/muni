@@ -19,7 +19,7 @@ test.describe("books recommendations", () => {
     await page.getByLabel(titleFieldLabel("book")).fill(readTitle);
     await page.getByLabel(t("books.tags.add")).fill("rec-pick");
     await page.getByRole("button", { name: t("books.tags.add") }).click();
-    await page.getByRole("button", { name: selectors.actionAdd }).click();
+    await locators.quickAddSubmit(page).click();
     await expect(locators.itemLink(page, readTitle)).toBeVisible({ timeout: 15_000 });
 
     await page.getByRole("button", { name: readTitle }).click();
@@ -32,7 +32,7 @@ test.describe("books recommendations", () => {
       await page.getByLabel(titleFieldLabel("book")).fill(title);
       await page.getByLabel(t("books.tags.add")).fill("rec-pick");
       await page.getByRole("button", { name: t("books.tags.add") }).click();
-      await page.getByRole("button", { name: selectors.actionAdd }).click();
+      await locators.quickAddSubmit(page).click();
       await expect(locators.itemLink(page, title)).toBeVisible({ timeout: 15_000 });
     }
 
