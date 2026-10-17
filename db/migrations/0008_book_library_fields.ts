@@ -61,7 +61,8 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND soundcloud_url IS NULL
       
         AND (pages_read IS NULL OR pages_read >= 0)
-        AND (loaned_at IS NULL OR loaned_to IS NOT NULL)WHEN 'movie' THEN
+        AND (loaned_at IS NULL OR loaned_to IS NOT NULL)
+      WHEN 'movie' THEN
         author IS NULL
         AND quantity IS NULL
         AND ingredients IS NULL

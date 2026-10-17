@@ -1,6 +1,7 @@
 import { type Kysely, sql } from "kysely";
 
 const ITEM_TYPE_FIELDS_CHECK = sql`
+
   (
     rating IS NULL
     OR (rating >= 1 AND rating <= 5)
@@ -9,15 +10,6 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
   AND (
     CASE type::text
       WHEN 'shopping' THEN
-        AND franchise_id IS NULL
-        AND franchise_name IS NULL
-        AND franchise_order IS NULL
-        AND watched_at IS NULL
-        AND episode_progress IS NULL
-        AND next_episode_key IS NULL
-        AND streaming_providers IS NULL
-        AND director IS NULL
-        AND cast IS NULL
         author IS NULL
         AND status IS NULL
         AND recommended_by IS NULL
@@ -41,6 +33,16 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND music_brainz_recording_id IS NULL
         AND spotify_url IS NULL
         AND soundcloud_url IS NULL
+
+        AND franchise_id IS NULL
+        AND franchise_name IS NULL
+        AND franchise_order IS NULL
+        AND watched_at IS NULL
+        AND episode_progress IS NULL
+        AND next_episode_key IS NULL
+        AND streaming_providers IS NULL
+        AND director IS NULL
+        AND cast IS NULL
         AND work_id IS NULL
         AND tags IS NULL
         AND series_name IS NULL
@@ -51,15 +53,6 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND mood IS NULL
         AND pace IS NULL
       WHEN 'book' THEN
-        AND franchise_id IS NULL
-        AND franchise_name IS NULL
-        AND franchise_order IS NULL
-        AND watched_at IS NULL
-        AND episode_progress IS NULL
-        AND next_episode_key IS NULL
-        AND streaming_providers IS NULL
-        AND director IS NULL
-        AND cast IS NULL
         quantity IS NULL
         AND ingredients IS NULL
         AND steps IS NULL
@@ -77,9 +70,18 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND music_brainz_recording_id IS NULL
         AND spotify_url IS NULL
         AND soundcloud_url IS NULL
-      
+        AND franchise_id IS NULL
+        AND franchise_name IS NULL
+        AND franchise_order IS NULL
+        AND watched_at IS NULL
+        AND episode_progress IS NULL
+        AND next_episode_key IS NULL
+        AND streaming_providers IS NULL
+        AND director IS NULL
+        AND cast IS NULL
         AND (pages_read IS NULL OR pages_read >= 0)
-        AND (loaned_at IS NULL OR loaned_to IS NOT NULL)WHEN 'movie' THEN
+        AND (loaned_at IS NULL OR loaned_to IS NOT NULL)
+      WHEN 'movie' THEN
         author IS NULL
         AND quantity IS NULL
         AND ingredients IS NULL
@@ -101,7 +103,6 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND music_brainz_recording_id IS NULL
         AND spotify_url IS NULL
         AND soundcloud_url IS NULL
-      
         AND work_id IS NULL
         AND series_name IS NULL
         AND series_position IS NULL
@@ -109,15 +110,6 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND loaned_to IS NULL
         AND loaned_at IS NULL
       WHEN 'recipe' THEN
-        AND franchise_id IS NULL
-        AND franchise_name IS NULL
-        AND franchise_order IS NULL
-        AND watched_at IS NULL
-        AND episode_progress IS NULL
-        AND next_episode_key IS NULL
-        AND streaming_providers IS NULL
-        AND director IS NULL
-        AND cast IS NULL
         author IS NULL
         AND status IS NULL
         AND recommended_by IS NULL
@@ -141,6 +133,16 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND spotify_url IS NULL
         AND soundcloud_url IS NULL
       
+
+        AND franchise_id IS NULL
+        AND franchise_name IS NULL
+        AND franchise_order IS NULL
+        AND watched_at IS NULL
+        AND episode_progress IS NULL
+        AND next_episode_key IS NULL
+        AND streaming_providers IS NULL
+        AND director IS NULL
+        AND cast IS NULL
         AND work_id IS NULL
         AND tags IS NULL
         AND series_name IS NULL
@@ -151,15 +153,6 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND mood IS NULL
         AND pace IS NULL
       WHEN 'music_artist' THEN
-        AND franchise_id IS NULL
-        AND franchise_name IS NULL
-        AND franchise_order IS NULL
-        AND watched_at IS NULL
-        AND episode_progress IS NULL
-        AND next_episode_key IS NULL
-        AND streaming_providers IS NULL
-        AND director IS NULL
-        AND cast IS NULL
         author IS NULL
         AND status IS NULL
         AND quantity IS NULL
@@ -183,6 +176,16 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND (spotify_url IS NULL OR spotify_url ~* '^https://')
         AND (soundcloud_url IS NULL OR soundcloud_url ~* '^https://')
       
+
+        AND franchise_id IS NULL
+        AND franchise_name IS NULL
+        AND franchise_order IS NULL
+        AND watched_at IS NULL
+        AND episode_progress IS NULL
+        AND next_episode_key IS NULL
+        AND streaming_providers IS NULL
+        AND director IS NULL
+        AND cast IS NULL
         AND work_id IS NULL
         AND tags IS NULL
         AND series_name IS NULL
@@ -193,15 +196,6 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND mood IS NULL
         AND pace IS NULL
       WHEN 'music_track' THEN
-        AND franchise_id IS NULL
-        AND franchise_name IS NULL
-        AND franchise_order IS NULL
-        AND watched_at IS NULL
-        AND episode_progress IS NULL
-        AND next_episode_key IS NULL
-        AND streaming_providers IS NULL
-        AND director IS NULL
-        AND cast IS NULL
         author IS NULL
         AND quantity IS NULL
         AND ingredients IS NULL
@@ -224,6 +218,16 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND (spotify_url IS NULL OR spotify_url ~* '^https://')
         AND (soundcloud_url IS NULL OR soundcloud_url ~* '^https://')
       
+
+        AND franchise_id IS NULL
+        AND franchise_name IS NULL
+        AND franchise_order IS NULL
+        AND watched_at IS NULL
+        AND episode_progress IS NULL
+        AND next_episode_key IS NULL
+        AND streaming_providers IS NULL
+        AND director IS NULL
+        AND cast IS NULL
         AND work_id IS NULL
         AND tags IS NULL
         AND series_name IS NULL
@@ -241,6 +245,7 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
 `;
 
 const PREVIOUS_CHECK_FROM_0008 = sql`
+
   (
     rating IS NULL
     OR (rating >= 1 AND rating <= 5)
@@ -301,7 +306,8 @@ const PREVIOUS_CHECK_FROM_0008 = sql`
         AND soundcloud_url IS NULL
       
         AND (pages_read IS NULL OR pages_read >= 0)
-        AND (loaned_at IS NULL OR loaned_to IS NOT NULL)WHEN 'movie' THEN
+        AND (loaned_at IS NULL OR loaned_to IS NOT NULL)
+      WHEN 'movie' THEN
         author IS NULL
         AND quantity IS NULL
         AND ingredients IS NULL
