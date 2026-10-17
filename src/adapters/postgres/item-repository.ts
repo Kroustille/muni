@@ -56,7 +56,10 @@ function toWire(row: Selectable<Items>): ItemWire {
     cast: row.cast as ItemWire["cast"],
     imdb_id: row.imdb_id,
     release_year: row.release_year,
-    catalog_rating: row.catalog_rating,
+    catalog_rating:
+      row.catalog_rating === null || row.catalog_rating === undefined
+        ? null
+        : Number(row.catalog_rating),
     media_kind: row.media_kind as ItemWire["media_kind"],
     artist: row.artist,
     album: row.album,

@@ -30,6 +30,8 @@ export type JsonPrimitive = boolean | number | string | null;
 
 export type JsonValue = JsonArray | JsonObject | JsonPrimitive;
 
+export type Numeric = ColumnType<string, number | string, number | string>;
+
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
 export interface BookQuotes {
@@ -56,7 +58,7 @@ export interface Items {
   artist: string | null;
   author: string | null;
   cast: Json | null;
-  catalog_rating: number | null;
+  catalog_rating: Numeric | null;
   checked: Generated<boolean>;
   created_at: Timestamp;
   deleted_at: Timestamp | null;
@@ -75,34 +77,42 @@ export interface Items {
   loaned_to: string | null;
   media_kind: string | null;
   mood: string | null;
-  pace: string | null;
-  pages_read: number | null;
   music_brainz_artist_id: string | null;
   music_brainz_recording_id: string | null;
   next_episode_key: string | null;
   notes: string | null;
+  pace: string | null;
   page_count: number | null;
+  pages_read: number | null;
   publication_year: number | null;
   publisher: string | null;
-  release_year: number | null;
-  series_name: string | null;
-  series_position: string | null;
-  tags: Json | null;
-  work_id: string | null;
   quantity: string | null;
   rating: number | null;
   recommended_by: string | null;
+  release_year: number | null;
+  series_name: string | null;
+  series_position: Numeric | null;
   server_updated_at: Timestamp;
-  status: string | null;
   soundcloud_url: string | null;
   spotify_url: string | null;
-  streaming_providers: Json | null;
+  status: string | null;
   steps: Json | null;
+  streaming_providers: Json | null;
   synopsis: string | null;
+  tags: Json | null;
   title: string;
   type: ItemType;
   user_id: string;
   watched_at: Timestamp | null;
+  work_id: string | null;
+}
+
+export interface MagicLinkTokens {
+  consumed_at: Timestamp | null;
+  email: string;
+  expires_at: Timestamp;
+  id: string;
+  token_hash: string;
 }
 
 export interface MovieQuotes {
@@ -123,14 +133,6 @@ export interface ReadingGoals {
   target_count: number;
   user_id: string;
   year: number;
-}
-
-export interface MagicLinkTokens {
-  consumed_at: Timestamp | null;
-  email: string;
-  expires_at: Timestamp;
-  id: string;
-  token_hash: string;
 }
 
 export interface Sessions {
@@ -161,10 +163,10 @@ export interface DB {
   book_quotes: BookQuotes;
   catalog_cache: CatalogCache;
   items: Items;
+  magic_link_tokens: MagicLinkTokens;
   movie_quotes: MovieQuotes;
   reading_goals: ReadingGoals;
-  watch_goals: WatchGoals;
-  magic_link_tokens: MagicLinkTokens;
   sessions: Sessions;
   users: Users;
+  watch_goals: WatchGoals;
 }
