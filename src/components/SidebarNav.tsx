@@ -76,6 +76,7 @@ export function SidebarNav() {
       <div className="border-t border-border p-3">
         <button
           type="button"
+          data-testid="nav-quick-add"
           className="flex min-h-11 w-full items-center justify-center gap-2 rounded-xl bg-accent text-sm font-medium text-accent-foreground"
           onClick={() => openQuickAdd(presetType ?? undefined)}
         >

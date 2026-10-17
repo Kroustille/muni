@@ -42,6 +42,7 @@ export function BottomNav() {
         <li className="flex flex-1 items-center justify-center">
           <button
             type="button"
+            data-testid="nav-quick-add"
             aria-label={t("nav.quickAdd")}
             className="flex min-h-11 min-w-11 items-center justify-center rounded-full bg-accent text-accent-foreground shadow-lg"
             onClick={() => openQuickAdd(presetType ?? undefined)}
