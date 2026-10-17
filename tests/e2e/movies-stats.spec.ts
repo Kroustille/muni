@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { addItem, signIn, t } from "./lists.spec";
+import { addItem, signIn, t } from "./list-helpers";
 
 test.describe("book stats page", () => {
   test("smoke: insights stats section renders", async ({ page }) => {

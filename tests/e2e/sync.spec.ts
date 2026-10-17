@@ -12,7 +12,7 @@ import {
   selectors,
   signIn,
   t,
-} from "./lists.spec";
+} from "./list-helpers";
 
 const mailpit = process.env.MAILPIT_URL ?? "http://localhost:8025";
 

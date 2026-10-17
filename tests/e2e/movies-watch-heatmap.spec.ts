@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { addItem, locators, openList, selectors, signIn, t } from "./lists.spec";
+import { addItem, locators, openList, selectors, signIn, t } from "./list-helpers";
 
 test.describe("book reading heatmap", () => {
   test("lights activity after pages read update", async ({ page }) => {

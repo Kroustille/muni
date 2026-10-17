@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { addItem, openList, signIn, t } from "./lists.spec";
+import { addItem, openList, signIn, t } from "./list-helpers";
 
 test("assigns selected books to a series", async ({ page }) => {
   await signIn(page);

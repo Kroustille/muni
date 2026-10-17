@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
-import { addItem, locators, openList, selectors, signIn, t } from "./lists.spec";
-import { openSearch, searchFor, searchLocators } from "./search.spec";
+import { addItem, locators, openList, selectors, signIn, t } from "./list-helpers";
+import { openSearch, searchFor, searchLocators } from "./search-helpers";
 
 test("global search matches book author metadata", async ({ page, context }) => {
   await signIn(page);

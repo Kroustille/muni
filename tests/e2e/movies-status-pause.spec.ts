@@ -8,7 +8,7 @@ import {
   selectors,
   signIn,
   t,
-} from "./lists.spec";
+} from "./list-helpers";
 
 test.describe("movie pause and watched date", () => {
   test("pause film and set watched date on vu", async ({ page }) => {

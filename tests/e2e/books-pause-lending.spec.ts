@@ -8,7 +8,7 @@ import {
   selectors,
   signIn,
   t,
-} from "./lists.spec";
+} from "./list-helpers";
 
 test.describe("book pause and lending", () => {
   test("pause with pages read, lend, and return", async ({ page }) => {

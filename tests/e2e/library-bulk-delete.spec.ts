@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { addItem, locators, openList, selectors, signIn, t } from "./lists.spec";
+import { addItem, locators, openList, selectors, signIn, t } from "./list-helpers";
 
 test("bulk deletes shopping items with one undo", async ({ page }) => {
   await signIn(page);

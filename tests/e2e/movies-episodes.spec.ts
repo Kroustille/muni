@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import fr from "../../src/i18n/fr.json";
-import { listPath, locators, signIn } from "./lists.spec";
+import { listPath, locators, signIn } from "./list-helpers";
 
 const t = (key: keyof typeof fr): string => fr[key];
 

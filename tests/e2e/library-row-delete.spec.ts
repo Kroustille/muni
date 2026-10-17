@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { addItem, locators, openList, selectors, signIn } from "./lists.spec";
+import { addItem, locators, openList, selectors, signIn } from "./list-helpers";
 
 test("deletes a recipe row with undo", async ({ page }) => {
   await signIn(page);

@@ -6,7 +6,7 @@ import {
   signIn,
   t,
   type ListRoute,
-} from "./lists.spec";
+} from "./list-helpers";
 
 const listRoutes: ListRoute[] = ["shopping", "books", "movies", "recipes"];
 
