@@ -37,7 +37,7 @@ function migrationCoversStatuses(sql: string, statuses: readonly string[]): bool
 
 describe("ITEM_TYPE_FIELDS_CHECK status enums", () => {
   it("documents book statuses aligned with domain", () => {
-    expect(migrationStatusInList(BOOK_STATUSES)).toBe(
+    expect(migrationStatusInList([...BOOK_STATUSES])).toBe(
       "'to_read', 'reading', 'read', 'paused'",
     );
     expect(BOOK_STATUSES).toEqual(["to_read", "reading", "read", "paused"]);
