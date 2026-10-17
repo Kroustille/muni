@@ -56,4 +56,9 @@ describe("ITEM_TYPE_FIELDS_CHECK status enums", () => {
     expect(migrationCoversStatuses(latestItemsMigration, BOOK_STATUSES)).toBe(true);
     expect(migrationCoversStatuses(latestItemsMigration, MOVIE_STATUSES)).toBe(true);
   });
+
+  it("latest items migration CHECK has valid CASE branch SQL (no glued tokens)", () => {
+    expect(latestItemsMigration).not.toMatch(/THEN\n        AND /);
+    expect(latestItemsMigration).not.toMatch(/\)[ \t]*WHEN '/);
+  });
 });
