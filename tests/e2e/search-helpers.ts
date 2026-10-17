@@ -8,7 +8,7 @@ export const searchSelectors = {
 };
 
 export const searchLocators = {
-  navLink: (page: Page) => page.getByRole("link", { name: searchSelectors.navSearch }),
+  navLink: (page: Page) => page.locator('a[href="/search"]:visible').first(),
   input: (page: Page) => page.getByPlaceholder(searchSelectors.placeholder),
   emptyState: (page: Page) => page.getByText(searchSelectors.empty),
   resultRow: (page: Page, title: string) =>

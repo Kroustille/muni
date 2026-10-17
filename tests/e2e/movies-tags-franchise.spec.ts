@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import fr from "../../src/i18n/fr.json";
-import { locators, selectors, signIn, titleFieldLabel } from "./list-helpers";
+import { locators, openQuickAddType, selectors, signIn, titleFieldLabel } from "./list-helpers";
 
 const t = (key: keyof typeof fr): string => fr[key];
 
@@ -11,9 +11,8 @@ test.describe("movies tags and franchise filters", () => {
 
     const title = `Tag Franchise ${Date.now()}`;
 
-    await locators.quickAddButton(page).click();
-    await page.getByRole("button", { name: t("type.movie") }).click();
-    await page.getByLabel(titleFieldLabel("movie")).fill(title);
+    await openQuickAddType(page, "movie");
+    await page.getByRole("dialog").getByLabel(titleFieldLabel("movie")).fill(title);
     await locators.quickAddSubmit(page).click();
     await expect(locators.itemLink(page, title)).toBeVisible({ timeout: 15_000 });
 

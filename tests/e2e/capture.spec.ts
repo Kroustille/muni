@@ -52,7 +52,7 @@ export const selectors = {
 export const locators = {
   quickAddButton: (page: Page) => page.locator("[data-testid=nav-quick-add]:visible"),
   typeButton: (page: Page, kind: ItemKind) =>
-    page.getByRole("button", { name: quickAddTypeLabel(kind) }),
+    page.getByRole("dialog").getByRole("button", { name: quickAddTypeLabel(kind) }),
   titleField: (page: Page, kind: ItemKind) => page.getByLabel(titleFieldLabel(kind)),
   authorField: (page: Page) => page.getByLabel(selectors.fieldAuthor),
   quantityField: (page: Page) => page.getByLabel(selectors.fieldQuantity),

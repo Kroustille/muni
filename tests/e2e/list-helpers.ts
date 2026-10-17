@@ -106,9 +106,15 @@ export async function signIn(page: Page): Promise<void> {
   await expect(page).toHaveURL("/");
 }
 
-export async function addItem(page: Page, kind: ItemKind, title: string): Promise<void> {
+export async function openQuickAddType(page: Page, kind: ItemKind): Promise<void> {
   await locators.quickAddButton(page).click();
-  await page.getByRole("button", { name: quickAddTypeLabel(kind) }).click();
+  const picker = page.getByRole("dialog");
+  await expect(picker).toBeVisible();
+  await picker.getByRole("button", { name: quickAddTypeLabel(kind) }).click();
+}
+
+export async function addItem(page: Page, kind: ItemKind, title: string): Promise<void> {
+  await openQuickAddType(page, kind);
   const dialog = page.getByRole("dialog");
   await dialog.getByLabel(titleFieldLabel(kind)).fill(title);
   await locators.quickAddSubmit(page).click();

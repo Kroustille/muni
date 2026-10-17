@@ -39,9 +39,10 @@ test.describe("books title catalog search (desktop)", () => {
     await openList(page, "books");
     await page.getByRole("button", { name: t("books.catalog.search") }).click();
     await page.getByLabel(t("books.catalog.search.placeholder")).fill("1984");
-    await page
-      .getByRole("button", { name: t("books.lookup.search"), exact: true })
-      .click();
+    await page.waitForResponse(
+      (res) => res.url().includes("/api/books/search") && res.ok(),
+      { timeout: 15_000 },
+    );
 
     const result = page.getByRole("listitem").filter({ hasText: "1984" });
     await expect(result).toBeVisible({ timeout: 10_000 });
