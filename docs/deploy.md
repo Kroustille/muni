@@ -129,8 +129,7 @@ Test restore on a staging instance before relying on it in production.
 
 | Where | What |
 |-------|------|
-| GitHub Actions (`ci.yml`) | Typecheck, lint, build, migrations against CI Postgres, unit/integration tests, Dockerfile build validation |
-| GitHub Actions (`ci.yml`, `docker` job after `verify`) | Build and push `ghcr.io/kroustille/muni` on push to `main` |
+| GitHub Actions (`ci.yml`) | `verify`: typecheck, lint, build, migrations against CI Postgres, unit/integration tests. `docker` (after `verify`): build the production image on every run; push `ghcr.io/kroustille/muni` (`:latest` and `:<git-sha>`) only on push to `main` (PRs build only, no push) |
 | VPS | `docker compose pull`, `.env`, TLS proxy, SMTP, backups, firewall |
 
 End-to-end Playwright tests and the 80% coverage gate are defined in spec task T111; run them in CI when that workflow is extended, or locally before releases.
