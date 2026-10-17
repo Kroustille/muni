@@ -87,3 +87,15 @@
 
 - **Decision**: `watch_goals` table analogous to `reading_goals`; count finishes in calendar year using `watchedAt` on films and série-level `watched` status.
 - **Rationale**: FR-D01 private goal.
+
+---
+
+## Deferred / v1 limits (2026-10-17 audit)
+
+Honest boundaries for implementers and follow-on work. **Do not** treat completed `tasks.md` rows as implying these are shipped.
+
+| Area | v1 reality |
+|------|------------|
+| **Streaming availability** | `lookupMovieStreaming` is a **stub**: cache miss writes and returns an **empty** `streamingProviders` array. `GET /api/movies/streaming` exists; UI **Où regarder** shows the honest empty state until a real provider adapter is wired (OD-003-3). |
+| **Watch goals sync** | Same pattern as books: goals live in **IndexedDB**; `watch_goals` on Postgres is not on sync push/pull yet — **local-only goals v1**. |
+| **Episode progress e2e** | Episode mark/next-key logic is covered by **unit** tests (`movie-episode-progress.test.ts`, domain validation). There is **no** Playwright scenario for série detail → mark **épisode vu** → next episode (gap vs FR-B09 manual quickstart). |

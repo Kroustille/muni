@@ -95,3 +95,15 @@ Phase A decisions (§1–7) unchanged from 2026-10-15. Below: **new** decisions 
   - **Pace**: `lent`, `modéré`, `rapide`, `fébrile`
 - **Rationale**: Enables FR-C02 filters without unbounded tag chaos.
 - **Alternatives**: Free text (harder to filter); single combined “vibe” field (rejected — spec separates mood & pace).
+
+---
+
+## Deferred / v1 limits (2026-10-17 audit)
+
+Honest boundaries for implementers and follow-on work. **Do not** treat completed `tasks.md` rows as implying these are shipped.
+
+| Area | v1 reality |
+|------|------------|
+| **Reading goals sync** | Annual goals are read/written via **IndexedDB** (`reading-goal-repository`). PostgreSQL `reading_goals` exists (migration `0010`) but goals are **not** included in item/quote sync push/pull yet — **local-only goals v1**; a second device will not converge goal targets until dedicated routes land. |
+| **Activity events** | Heatmap/streak derive from `fieldsUpdatedAt` / status (§13); no append-only `activity_events` table. |
+| **Work id on title search** | Title-search catalog hits may omit `workId` until ISBN/edition fetch (§8). |
