@@ -1,0 +1,29 @@
+# Dependencies and build outputs (rebuilt in the image)
+node_modules
+.next
+dist
+coverage
+
+# Git and editor
+.git
+.github
+.cursor
+.specify
+specs
+**/*.md
+!README.md
+
+# Local env and secrets (injected at runtime)
+.env
+.env.*
+!.env.example
+
+# Tests and dev tooling
+tests
+playwright-report
+test-results
+*.log
+
+# Dev compose only
+docker-compose.yml
+docker/postgres

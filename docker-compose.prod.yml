@@ -1,0 +1,56 @@
+# Production stack: pull the app image from GHCR (built in CI). Do not build on the VPS.
+#
+# Set MUNI_IMAGE to the tag you pulled, for example:
+#   MUNI_IMAGE=ghcr.io/kroustille/muni:latest
+#   MUNI_IMAGE=ghcr.io/kroustille/muni:<git-sha>
+
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-muni}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-muni}
+    volumes:
+      - muni-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-muni} -d ${POSTGRES_DB:-muni}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    # No host ports: Postgres stays on the Compose network only.
+
+  migrate:
+    image: ${MUNI_IMAGE:-ghcr.io/kroustille/muni:latest}
+    restart: "no"
+    env_file: .env
+    command: ["node", "dist/db/migrate.js", "up"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  app:
+    image: ${MUNI_IMAGE:-ghcr.io/kroustille/muni:latest}
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      migrate:
+        condition: service_completed_successfully
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "node -e \"fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))\"",
+        ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+volumes:
+  muni-pgdata:

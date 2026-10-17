@@ -7,8 +7,12 @@ const withSerwist = withSerwistInit({
 });
 
 const nextConfig: NextConfig = {
+<<<<<<< HEAD
   // Serwist injects webpack config; Next 16 defaults to Turbopack for `next build`.
   turbopack: {},
+=======
+  output: "standalone",
+>>>>>>> 8d4ded8 (feat(deploy): production Docker image, Compose, and GHCR CI)
 };
 
 export default withSerwist(nextConfig);

@@ -1,0 +1,79 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: muni
+          POSTGRES_PASSWORD: muni
+          POSTGRES_DB: muni
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U muni -d muni"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://muni:muni@localhost:5432/muni
+      TEST_DATABASE_URL: postgres://muni:muni@localhost:5432/muni_test
+      APP_URL: http://localhost:3000
+      SMTP_HOST: localhost
+      SMTP_PORT: 1025
+      SMTP_FROM: Muni <ci@example.com>
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: yarn
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Create test database
+        run: |
+          PGPASSWORD=muni psql -h localhost -U muni -d muni -c "CREATE DATABASE muni_test;" \
+            || true
+
+      - name: Typecheck
+        run: yarn typecheck
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Build Next.js app
+        run: yarn build
+
+      - name: Build and run migrations
+        run: yarn migrate:up
+
+      - name: Unit and integration tests
+        run: yarn test
+
+      # Full gate from T111 (coverage 80%, e2e, lint:tracking, db:codegen:check) is not enabled yet.
+      # E2E needs Playwright browsers + Mailpit; run locally or extend this workflow with service containers.
+
+  dockerfile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate production image build
+        run: docker build -t muni:ci-verify .
