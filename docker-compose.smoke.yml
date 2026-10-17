@@ -1,0 +1,17 @@
+# Local smoke overlay: Mailpit on the Compose network (scripts/smoke-compose.sh only).
+services:
+  mailpit:
+    image: axllent/mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
+
+  migrate:
+    environment:
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025
+
+  app:
+    environment:
+      SMTP_HOST: mailpit
+      SMTP_PORT: 1025

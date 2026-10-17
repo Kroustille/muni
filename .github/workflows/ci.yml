@@ -30,6 +30,11 @@ jobs:
           --health-interval 5s
           --health-timeout 5s
           --health-retries 10
+      mailpit:
+        image: axllent/mailpit
+        ports:
+          - 1025:1025
+          - 8025:8025
     env:
       DATABASE_URL: postgres://muni:muni@localhost:5432/muni
       TEST_DATABASE_URL: postgres://muni:muni@localhost:5432/muni_test
@@ -37,6 +42,7 @@ jobs:
       SMTP_HOST: localhost
       SMTP_PORT: 1025
       SMTP_FROM: Muni <ci@example.com>
+      CI: true
     steps:
       - uses: actions/checkout@v4
 
@@ -62,17 +68,26 @@ jobs:
       - name: Lint
         run: yarn lint
 
+      - name: Tracking dependency check
+        run: yarn run lint:tracking
+
       - name: Build Next.js app
         run: yarn build
 
       - name: Build and run migrations
         run: yarn migrate:up
 
-      - name: Unit and integration tests
-        run: yarn test
+      - name: Generated DB types up to date
+        run: yarn run db:codegen:check
 
-      # Full gate from T111 (coverage 80%, e2e, lint:tracking, db:codegen:check) is not enabled yet.
-      # E2E needs Playwright browsers + Mailpit; run locally or extend this workflow with service containers.
+      - name: Test coverage (80% gate)
+        run: yarn run test:coverage
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: End-to-end tests
+        run: yarn run test:e2e
 
   docker:
     needs: verify

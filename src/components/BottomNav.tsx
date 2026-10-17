@@ -18,7 +18,7 @@ export function BottomNav() {
 
   return (
     <nav
-      aria-label="Navigation"
+      aria-label={t("nav.bottom")}
       className="fixed inset-x-0 bottom-0 border-t border-border bg-surface md:hidden"
     >
       <ul className="mx-auto flex max-w-xl items-stretch">

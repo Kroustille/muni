@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Fraunces, Source_Sans_3 } from "next/font/google";
 import { ThemeProvider } from "@/components/theme/ThemeProvider";
 import { themeInitScript } from "@/components/theme/theme-preference";
+import fr from "@/i18n/fr.json";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -17,7 +18,7 @@ const sourceSans3 = Source_Sans_3({
 });
 
 export const metadata = {
-  title: "Muni",
+  title: fr["app.name"],
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
     apple: "/icons/icon-192.png",

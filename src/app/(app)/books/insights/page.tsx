@@ -16,20 +16,20 @@ import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
 import { t } from "@/i18n";
 
-const MONTH_LABELS = [
-  "Jan",
-  "Fév",
-  "Mar",
-  "Avr",
-  "Mai",
-  "Juin",
-  "Juil",
-  "Aoû",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Déc",
-];
+const MONTH_KEYS = [
+  "books.insights.month.0",
+  "books.insights.month.1",
+  "books.insights.month.2",
+  "books.insights.month.3",
+  "books.insights.month.4",
+  "books.insights.month.5",
+  "books.insights.month.6",
+  "books.insights.month.7",
+  "books.insights.month.8",
+  "books.insights.month.9",
+  "books.insights.month.10",
+  "books.insights.month.11",
+] as const;
 
 export default function BookInsightsPage() {
   const year = new Date().getFullYear();
@@ -131,23 +131,23 @@ export default function BookInsightsPage() {
       <section className="flex flex-col gap-4" data-testid="book-stats">
         <h2 className="text-lg font-medium">{t("books.insights.stats")}</h2>
         <div>
-          <h3 className="text-sm font-medium text-muted">Par mois</h3>
+          <h3 className="text-sm font-medium text-muted">{t("books.insights.byMonth")}</h3>
           <table className="mt-2 w-full text-sm">
             <tbody>
               {stats.finishedByMonth.map((row, index) => (
                 <tr key={row.label}>
-                  <td className="py-1">{MONTH_LABELS[index]}</td>
+                  <td className="py-1">{t(MONTH_KEYS[index])}</td>
                   <td className="py-1 text-right">{row.count}</td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
-        <StatsTable title="Genres" rows={stats.genres} />
-        <StatsTable title="Tags" rows={stats.tags} />
-        <StatsTable title="Auteurs" rows={stats.authors} />
+        <StatsTable title={t("books.insights.table.genres")} rows={stats.genres} />
+        <StatsTable title={t("books.insights.table.tags")} rows={stats.tags} />
+        <StatsTable title={t("books.insights.table.authors")} rows={stats.authors} />
         <p className="text-sm">
-          Pages lues : <strong>{stats.pagesReadTotal}</strong>
+          {t("books.insights.pagesReadTotal").replace("{count}", String(stats.pagesReadTotal))}
         </p>
       </section>
 
@@ -159,14 +159,33 @@ export default function BookInsightsPage() {
           <h2 className="text-lg font-medium">
             {t("books.insights.yearReview").replace("{year}", String(year))}
           </h2>
-          <p className="text-sm">Livres lus : {review.booksRead}</p>
-          <p className="text-sm">Pages : {review.pagesRead}</p>
-          <p className="text-sm">Plus longue série : {review.longestStreak} jours</p>
+          <p className="text-sm">
+            {t("books.insights.review.booksRead").replace("{count}", String(review.booksRead))}
+          </p>
+          <p className="text-sm">
+            {t("books.insights.review.pages").replace("{count}", String(review.pagesRead))}
+          </p>
+          <p className="text-sm">
+            {t("books.insights.review.longestStreak").replace(
+              "{count}",
+              String(review.longestStreak),
+            )}
+          </p>
           {review.topGenres.length > 0 ? (
-            <p className="text-sm">Genres : {review.topGenres.map((g) => g.label).join(", ")}</p>
+            <p className="text-sm">
+              {t("books.insights.review.topGenres").replace(
+                "{labels}",
+                review.topGenres.map((g) => g.label).join(", "),
+              )}
+            </p>
           ) : null}
           {review.topTags.length > 0 ? (
-            <p className="text-sm">Tags : {review.topTags.map((g) => g.label).join(", ")}</p>
+            <p className="text-sm">
+              {t("books.insights.review.topTags").replace(
+                "{labels}",
+                review.topTags.map((g) => g.label).join(", "),
+              )}
+            </p>
           ) : null}
         </section>
       ) : null}

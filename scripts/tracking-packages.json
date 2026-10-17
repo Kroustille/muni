@@ -1,0 +1,23 @@
+[
+  "@amplitude/analytics-browser",
+  "@amplitude/analytics-node",
+  "@google-analytics/data",
+  "@hotjar/browser",
+  "@next/third-parties",
+  "@segment/analytics-node",
+  "@segment/analytics.js",
+  "@vercel/analytics",
+  "@vercel/speed-insights",
+  "amplitude-js",
+  "analytics",
+  "clarity-js",
+  "fathom-client",
+  "gtag",
+  "heap-js",
+  "mixpanel",
+  "mixpanel-browser",
+  "plausible-tracker",
+  "posthog-js",
+  "react-ga",
+  "react-ga4"
+]

@@ -58,7 +58,11 @@ export default function MovieInsightsPage() {
         </Link>
       </div>
 
-      <p className="text-sm text-muted">{finished} vus en {year}</p>
+      <p className="text-sm text-muted">
+        {t("movies.insights.finishedInYear")
+          .replace("{count}", String(finished))
+          .replace("{year}", String(year))}
+      </p>
 
       {streak > 0 ? (
         <p className="text-sm">{t("movies.insights.streak").replace("{count}", String(streak))}</p>
@@ -82,10 +86,16 @@ export default function MovieInsightsPage() {
 
       <section className="flex flex-col gap-4" data-testid="movie-stats">
         <h2 className="text-lg font-medium">{t("movies.insights.stats")}</h2>
-        <p className="text-sm">Bilan : {review.moviesWatched} titres</p>
-        <p className="text-sm">Série max : {review.longestStreak} jours</p>
+        <p className="text-sm">
+          {t("movies.insights.review.summary").replace("{count}", String(review.moviesWatched))}
+        </p>
+        <p className="text-sm">
+          {t("movies.insights.review.maxStreak").replace("{count}", String(review.longestStreak))}
+        </p>
         {stats.tags[0] ? (
-          <p className="text-sm">Tag populaire : {stats.tags[0].label}</p>
+          <p className="text-sm">
+            {t("movies.insights.popularTag").replace("{label}", stats.tags[0].label)}
+          </p>
         ) : null}
       </section>
     </main>

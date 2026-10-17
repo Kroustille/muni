@@ -14,6 +14,8 @@
     "test:e2e": "playwright test",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
+    "lint:tracking": "node scripts/check-no-tracking.mjs",
+    "smoke:compose": "bash scripts/smoke-compose.sh",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:up": "docker compose up -d --wait",
