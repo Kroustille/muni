@@ -1,8 +1,10 @@
 import type { StreamingProvider } from "@/domain/item";
 import type { CatalogCacheRepository } from "@/application/ports/catalog-cache-repository";
+import type { StreamingAvailabilityLookup } from "@/application/ports/streaming-availability-lookup";
 
 export type StreamingLookupDeps = {
   cache: CatalogCacheRepository;
+  lookup: StreamingAvailabilityLookup;
   now?: () => Date;
 };
 
@@ -17,12 +19,12 @@ export async function lookupMovieStreaming(
   if (cached !== null) {
     return Array.isArray(cached) ? (cached as StreamingProvider[]) : [];
   }
-  const empty: StreamingProvider[] = [];
+  const providers = await deps.lookup.lookupByImdbId(trimmed);
   await deps.cache.upsert({
     provider: "movie_streaming",
     cacheKey: trimmed,
-    payload: empty,
+    payload: providers,
     fetchedAt: now(),
   });
-  return empty;
+  return providers;
 }

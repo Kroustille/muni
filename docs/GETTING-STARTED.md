@@ -72,6 +72,24 @@ yarn test:coverage
 yarn test:e2e
 ```
 
+### E2E smoke matrix (library richness)
+
+Playwright specs under `tests/e2e/` — one list smoke per type plus “library richness” paths where the feature exists:
+
+| Area | Spec | What it covers |
+|------|------|----------------|
+| Lists (all types) | `lists.spec.ts` | Quick-add, filters, recipe edit, movie delete/undo |
+| Books — pause + lend | `books-pause-lending.spec.ts` | Pause, pages read, loan/return |
+| Books — catalog | `books-catalog-title-search.spec.ts` | Mocked Open Library flow |
+| Movies — pause + vu | `movies-status-pause.spec.ts` | Pause, watched date |
+| Movies — franchise/tags | `movies-tags-franchise.spec.ts` | Library metadata |
+| Movies — épisodes | `movies-episodes.spec.ts` | Mocked Wikidata série → mark **S1E1** vu |
+| Movies — streaming stub | `movies-discovery-filters.spec.ts` (detail empty state) | Filters; streaming panel honest empty |
+| Music | `music-no-playback.spec.ts` | No in-app playback boundary |
+| Sync / auth / PWA | `sync.spec.ts`, `auth.spec.ts`, `home-pwa.spec.ts` | Core platform |
+
+Episode progress logic is also covered in unit tests (`movie-episode-progress.test.ts`). Annual reading/watch goals remain **local-only** in v1 — see `specs/002-books-library/research.md` and `specs/003-films-tv-library/research.md`.
+
 ## Manual validation
 
 - **[Muni v1 — validation guide](../specs/001-typed-lists-companion/quickstart.md)** — core smoke scenarios (auth, offline, sync, search, PWA).

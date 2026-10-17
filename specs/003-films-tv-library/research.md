@@ -96,6 +96,6 @@ Honest boundaries for implementers and follow-on work. **Do not** treat complete
 
 | Area | v1 reality |
 |------|------------|
-| **Streaming availability** | `lookupMovieStreaming` is a **stub**: cache miss writes and returns an **empty** `streamingProviders` array. `GET /api/movies/streaming` exists; UI **Où regarder** shows the honest empty state until a real provider adapter is wired (OD-003-3). |
+| **Streaming availability** | Port `StreamingAvailabilityLookup` with **no-op adapter** v1; `lookupMovieStreaming` caches adapter results (empty until a real provider is wired). `GET /api/movies/streaming` exists; UI **Où regarder** shows the honest empty state (OD-003-3). |
 | **Watch goals sync** | Same pattern as books: goals live in **IndexedDB**; `watch_goals` on Postgres is not on sync push/pull yet — **local-only goals v1**. |
 | **Episode progress e2e** | Episode mark/next-key logic is covered by **unit** tests (`movie-episode-progress.test.ts`, domain validation). There is **no** Playwright scenario for série detail → mark **épisode vu** → next episode (gap vs FR-B09 manual quickstart). |

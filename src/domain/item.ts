@@ -356,6 +356,19 @@ const SNAKE: Partial<Record<keyof Item, string>> = {
 
 const snakeOf = (field: string): string => SNAKE[field as keyof Item] ?? field;
 
+/** Postgres / ItemWire column name for a domain field (library field lists use this). */
+export function itemFieldWireName(field: keyof Item): string {
+  return snakeOf(field);
+}
+
+export const BOOK_LIBRARY_WIRE_COLUMNS = BOOK_ITEM_FIELD_KEYS.map((field) =>
+  itemFieldWireName(field),
+);
+
+export const MOVIE_LIBRARY_WIRE_COLUMNS = MOVIE_ITEM_FIELD_KEYS.map((field) =>
+  itemFieldWireName(field),
+);
+
 const CAMEL = Object.fromEntries(Object.entries(SNAKE).map(([camel, snake]) => [snake, camel]));
 
 const camelOf = (field: string): string => CAMEL[field] ?? field;

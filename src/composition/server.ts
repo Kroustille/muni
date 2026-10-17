@@ -22,6 +22,7 @@ import {
   type FetchMovieCatalogDetail,
   type SearchMovies,
 } from "@/application/movies/search-movies";
+import { createNoOpStreamingAvailabilityLookup } from "@/adapters/streaming/no-op-streaming-availability-lookup";
 import { lookupMovieStreaming as lookupMovieStreamingFn } from "@/application/movies/streaming-lookup";
 import {
   createSearchMusicArtists,
@@ -121,8 +122,9 @@ export function createServerContainer(
   const musicCatalog = createMusicBrainzCatalogSearch({ cache: catalogCache });
   const searchMusicArtists = createSearchMusicArtists({ catalog: musicCatalog });
   const searchMusicTracks = createSearchMusicTracks({ catalog: musicCatalog });
+  const streamingAvailability = createNoOpStreamingAvailabilityLookup();
   const lookupMovieStreaming = (imdbId: string) =>
-    lookupMovieStreamingFn(imdbId, { cache: catalogCache });
+    lookupMovieStreamingFn(imdbId, { cache: catalogCache, lookup: streamingAvailability });
 
   return {
     appUrl: config.appUrl,
