@@ -39,7 +39,9 @@ test.describe("books title catalog search (desktop)", () => {
     await page.goto("/lists/books");
     await page.getByRole("button", { name: t("books.catalog.search") }).click();
     await page.getByLabel(t("books.catalog.search.placeholder")).fill("1984");
-    await page.getByRole("button", { name: t("books.lookup.search") }).click();
+    await page
+      .getByRole("button", { name: t("books.lookup.search"), exact: true })
+      .click();
     await page.getByRole("button", { name: "1984" }).click();
     await expect(page.getByText("Dans un monde totalitaire.")).toBeVisible({
       timeout: 10_000,
