@@ -12,8 +12,6 @@ concurrency:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ghcr.io/kroustille/muni
-  E2E_SHARD_TOTAL: 4
-
 jobs:
   checks:
     name: Static checks
@@ -122,13 +120,14 @@ jobs:
         run: yarn run test:coverage
 
   e2e:
-    name: E2E (shard ${{ matrix.shard }}/${{ env.E2E_SHARD_TOTAL }})
+    name: E2E (shard ${{ matrix.shard }}/${{ matrix.total }})
     runs-on: ubuntu-latest
     needs: build
     strategy:
       fail-fast: false
       matrix:
         shard: [1, 2, 3, 4]
+        total: [4]
     services:
       postgres:
         image: postgres:16
@@ -183,7 +182,7 @@ jobs:
         run: npx playwright install --with-deps chromium
 
       - name: End-to-end tests (shard)
-        run: yarn playwright test --shard=${{ matrix.shard }}/${{ env.E2E_SHARD_TOTAL }}
+        run: yarn playwright test --shard=${{ matrix.shard }}/${{ matrix.total }}
 
   docker:
     needs: [checks, build, unit, e2e]
