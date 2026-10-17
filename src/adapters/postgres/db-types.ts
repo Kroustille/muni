@@ -10,13 +10,7 @@ export type Generated<T> =
     ? ColumnType<S, I | undefined, U>
     : ColumnType<T, T | undefined, T>;
 
-export type ItemType =
-  | "book"
-  | "movie"
-  | "music_artist"
-  | "music_track"
-  | "recipe"
-  | "shopping";
+export type ItemType = "book" | "movie" | "music_artist" | "music_track" | "recipe" | "shopping";
 
 export type Json = JsonValue;
 
