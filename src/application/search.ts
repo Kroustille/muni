@@ -12,8 +12,19 @@ export type SearchUseCase = {
 
 type IndexedItem = {
   item: Item;
-  normalizedTitle: string;
+  normalizedFields: string[];
 };
+
+function indexedFieldsForItem(item: Item): string[] {
+  const fields = [normalizeText(item.title)];
+  if (item.type === "book" && item.author) {
+    fields.push(normalizeText(item.author));
+  }
+  if (item.type === "movie" && item.director) {
+    fields.push(normalizeText(item.director));
+  }
+  return fields;
+}
 
 export function createSearchUseCase({ repository }: SearchUseCaseDeps): SearchUseCase {
   let entries: IndexedItem[] = [];
@@ -23,7 +34,7 @@ export function createSearchUseCase({ repository }: SearchUseCaseDeps): SearchUs
     const items = await repository.query();
     entries = items.map((item) => ({
       item,
-      normalizedTitle: normalizeText(item.title),
+      normalizedFields: indexedFieldsForItem(item),
     }));
   };
 
@@ -38,7 +49,9 @@ export function createSearchUseCase({ repository }: SearchUseCaseDeps): SearchUs
       const normalizedQuery = normalizeText(query);
       if (normalizedQuery.length === 0) return [];
       return entries
-        .filter((entry) => entry.normalizedTitle.includes(normalizedQuery))
+        .filter((entry) =>
+          entry.normalizedFields.some((field) => field.includes(normalizedQuery)),
+        )
         .map((entry) => entry.item);
     },
   };

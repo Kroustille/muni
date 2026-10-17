@@ -59,17 +59,20 @@ describe("createSearchUseCase", () => {
     );
   });
 
-  it("matches title only, not author, recommendedBy or notes", async () => {
-    await ctx.useCases.createItem("book", "Quiet title", {
+  it("matches book author and movie director but not unrelated fields", async () => {
+    const book = await ctx.useCases.createItem("book", "Quiet title", {
       author: "elephant",
-      recommendedBy: "elephant",
-      notes: "elephant",
+      recommendedBy: "giraffe",
+      notes: "giraffe",
     });
-    await ctx.useCases.createItem("movie", "Another quiet title", {
-      recommendedBy: "elephant",
-      notes: "elephant",
+    const movie = await ctx.useCases.createItem("movie", "Another quiet title", {
+      director: "elephant",
+      recommendedBy: "giraffe",
+      notes: "giraffe",
     });
-    expect(await ctx.search.search("elephant")).toEqual([]);
+    expect((await ctx.search.search("elephant")).map((i) => i.id).sort()).toEqual(
+      [book.id, movie.id].sort(),
+    );
   });
 
   it("returns an empty array when nothing matches", async () => {

@@ -10,7 +10,7 @@
 
 ## Phase 1: Setup
 
-- [ ] T701 [P] Add i18n keys for list search, sort select/toggle, selection bar, bulk actions, catalog multi-add in `src/i18n/fr.json`
+- [x] T701 [P] Add i18n keys for list search, sort select/toggle, selection bar, bulk actions, catalog multi-add in `src/i18n/fr.json`
 
 ---
 
@@ -18,12 +18,12 @@
 
 **Purpose**: Shared domain and undo infrastructure before list UI stories.
 
-- [ ] T702 Unit tests for `filterItemsForListLocalSearch` per type in `tests/unit/list-local-search.test.ts`
-- [ ] T703 Implement `src/domain/list-local-search.ts` per [contracts/list-local-search.md](contracts/list-local-search.md) (depends on T702)
-- [ ] T704 Unit tests for batch undo state transitions in `tests/unit/undo-delete-batch.test.ts`
-- [ ] T705 Extend `src/components/UndoToast.tsx` with `deleteManyWithUndo(ids: string[])` and batch restore (depends on T704)
-- [ ] T706 [P] Create `src/components/lists/ListSearchField.tsx` (controlled query input)
-- [ ] T707 [P] Create `src/components/lists/ListSelectionBar.tsx` shell (props for actions; wired later)
+- [x] T702 Unit tests for `filterItemsForListLocalSearch` per type in `tests/unit/list-local-search.test.ts`
+- [x] T703 Implement `src/domain/list-local-search.ts` per [contracts/list-local-search.md](contracts/list-local-search.md) (depends on T702)
+- [x] T704 Unit tests for batch undo state transitions in `tests/unit/undo-delete-batch.test.ts`
+- [x] T705 Extend `src/components/UndoToast.tsx` with `deleteManyWithUndo(ids: string[])` and batch restore (depends on T704)
+- [x] T706 [P] Create `src/components/lists/ListSearchField.tsx` (controlled query input)
+- [x] T707 [P] Create `src/components/lists/ListSelectionBar.tsx` shell (props for actions; wired later)
 
 **Checkpoint**: Domain search tests green; undo provider supports batch API.
 
@@ -35,10 +35,10 @@
 
 **Independent Test**: [quickstart.md](quickstart.md) § List-local search.
 
-- [ ] T708 [US1] Wire `ListSearchField` + `filterItemsForListLocalSearch` into `src/components/lists/list-page-content.tsx`
-- [ ] T709 [US1] Wire same search into `src/components/music/music-list-page.tsx` for artists and tracks
-- [ ] T710 [US1] French empty state when search has no matches in `src/components/lists/ListEmptyState.tsx` or list pages
-- [ ] T711 [US1] E2e smoke list-local search in `tests/e2e/library-list-local-search.spec.ts`
+- [x] T708 [US1] Wire `ListSearchField` + `filterItemsForListLocalSearch` into `src/components/lists/list-page-content.tsx`
+- [x] T709 [US1] Wire same search into `src/components/music/music-list-page.tsx` for artists and tracks
+- [x] T710 [US1] French empty state when search has no matches in `src/components/lists/ListEmptyState.tsx` or list pages
+- [x] T711 [US1] E2e smoke list-local search in `tests/e2e/library-list-local-search.spec.ts`
 
 **Checkpoint**: US1 independently testable on all six routes.
 
@@ -50,10 +50,10 @@
 
 **Independent Test**: [quickstart.md](quickstart.md) § Sort UI.
 
-- [ ] T712 [US2] Refactor `src/components/ListSortFilter.tsx` per [contracts/list-sort-ui.md](contracts/list-sort-ui.md)
-- [ ] T713 [US2] Verify sort persistence unchanged on books/movies/shopping/recipes list pages using `list-page-content.tsx`
-- [ ] T714 [US2] Verify sort on `src/components/music/music-list-page.tsx`
-- [ ] T715 [P] [US2] Unit or component test for `ListSortFilter` direction toggle `aria-label` in `tests/unit/list-sort-filter.test.tsx`
+- [x] T712 [US2] Refactor `src/components/ListSortFilter.tsx` per [contracts/list-sort-ui.md](contracts/list-sort-ui.md)
+- [x] T713 [US2] Verify sort persistence unchanged on books/movies/shopping/recipes list pages using `list-page-content.tsx`
+- [x] T714 [US2] Verify sort on `src/components/music/music-list-page.tsx`
+- [x] T715 [P] [US2] Unit or component test for `ListSortFilter` direction toggle `aria-label` in `tests/unit/list-sort-filter.test.tsx`
 
 **Checkpoint**: US2 complete without regressing `src/domain/list-sort.ts`.
 
@@ -65,9 +65,9 @@
 
 **Independent Test**: [quickstart.md](quickstart.md) § Row delete.
 
-- [ ] T716 [US3] Add `DeleteWithUndoButton` to shopping/recipe rows in `src/components/lists/list-page-content.tsx`
-- [ ] T717 [US3] Add row delete to `BookMovieRow` / music rows as needed in `src/components/rows/`
-- [ ] T718 [US3] E2e row delete + undo in `tests/e2e/library-row-delete.spec.ts`
+- [x] T716 [US3] Add `DeleteWithUndoButton` to shopping/recipe rows in `src/components/lists/list-page-content.tsx`
+- [x] T717 [US3] Add row delete to `BookMovieRow` / music rows as needed in `src/components/rows/`
+- [x] T718 [US3] E2e row delete + undo in `tests/e2e/library-row-delete.spec.ts`
 
 ---
 
@@ -77,10 +77,10 @@
 
 **Independent Test**: [quickstart.md](quickstart.md) § Bulk delete.
 
-- [ ] T719 [US4] Add selection mode toggle and row checkboxes in `src/components/lists/list-page-content.tsx`
-- [ ] T720 [US4] Add selection mode to `src/components/music/music-list-page.tsx`
-- [ ] T721 [US4] Wire bulk delete action on `ListSelectionBar` using `deleteManyWithUndo` per [contracts/list-selection-bulk.md](contracts/list-selection-bulk.md)
-- [ ] T722 [US4] E2e bulk delete 3 items + single undo in `tests/e2e/library-bulk-delete.spec.ts`
+- [x] T719 [US4] Add selection mode toggle and row checkboxes in `src/components/lists/list-page-content.tsx`
+- [x] T720 [US4] Add selection mode to `src/components/music/music-list-page.tsx`
+- [x] T721 [US4] Wire bulk delete action on `ListSelectionBar` using `deleteManyWithUndo` per [contracts/list-selection-bulk.md](contracts/list-selection-bulk.md)
+- [x] T722 [US4] E2e bulk delete 3 items + single undo in `tests/e2e/library-bulk-delete.spec.ts`
 
 ---
 
@@ -90,11 +90,11 @@
 
 **Independent Test**: [quickstart.md](quickstart.md) § Bulk series.
 
-- [ ] T723 [US5] Unit tests `assignBooksToSeries` in `tests/unit/assign-books-series-bulk.test.ts`
-- [ ] T724 [US5] Implement `src/application/books/assign-series-bulk.ts` (patches `seriesName`, `seriesPosition` on each id)
-- [ ] T725 [P] [US5] Implement `src/components/fields/GroupCombobox.tsx` using `collectLibrarySeriesNames` from `src/application/books/book-library-filters.ts`
-- [ ] T726 [US5] Bulk série sheet on books list + validation (order required) in `src/components/lists/list-page-content.tsx`
-- [ ] T727 [US5] E2e bulk series assign in `tests/e2e/library-bulk-series.spec.ts`
+- [x] T723 [US5] Unit tests `assignBooksToSeries` in `tests/unit/assign-books-series-bulk.test.ts`
+- [x] T724 [US5] Implement `src/application/books/assign-series-bulk.ts` (patches `seriesName`, `seriesPosition` on each id)
+- [x] T725 [P] [US5] Implement `src/components/fields/GroupCombobox.tsx` using `collectLibrarySeriesNames` from `src/application/books/book-library-filters.ts`
+- [x] T726 [US5] Bulk série sheet on books list + validation (order required) in `src/components/lists/list-page-content.tsx`
+- [x] T727 [US5] E2e bulk series assign in `tests/e2e/library-bulk-series.spec.ts`
 
 ---
 
@@ -104,11 +104,11 @@
 
 **Independent Test**: [quickstart.md](quickstart.md) § Bulk saga.
 
-- [ ] T728 [US6] Unit tests `assignMoviesToFranchise` in `tests/unit/assign-movies-franchise-bulk.test.ts`
-- [ ] T729 [US6] Implement `src/application/movies/assign-franchise-bulk.ts` (new saga → `crypto.randomUUID()` for `franchiseId`)
-- [ ] T730 [US6] Reuse `GroupCombobox` with `collectLibraryFranchiseNames` from `src/application/movies/movie-library-filters.ts`
-- [ ] T731 [US6] Bulk Saga action on movies list in `src/components/lists/list-page-content.tsx`
-- [ ] T732 [US6] E2e bulk saga in `tests/e2e/library-bulk-saga.spec.ts`
+- [x] T728 [US6] Unit tests `assignMoviesToFranchise` in `tests/unit/assign-movies-franchise-bulk.test.ts`
+- [x] T729 [US6] Implement `src/application/movies/assign-franchise-bulk.ts` (new saga → `crypto.randomUUID()` for `franchiseId`)
+- [x] T730 [US6] Reuse `GroupCombobox` with `collectLibraryFranchiseNames` from `src/application/movies/movie-library-filters.ts`
+- [x] T731 [US6] Bulk Saga action on movies list in `src/components/lists/list-page-content.tsx`
+- [x] T732 [US6] E2e bulk saga in `tests/e2e/library-bulk-saga.spec.ts`
 
 ---
 
@@ -118,9 +118,9 @@
 
 **Independent Test**: [quickstart.md](quickstart.md) § Global search.
 
-- [ ] T733 [US7] Unit tests extended `createSearchUseCase` in `tests/unit/search-use-case.test.ts`
-- [ ] T734 [US7] Implement author/director indexing in `src/application/search.ts` per [contracts/global-search-extension.md](contracts/global-search-extension.md)
-- [ ] T735 [US7] E2e global search author/director in `tests/e2e/global-search-metadata.spec.ts`
+- [x] T733 [US7] Unit tests extended `createSearchUseCase` in `tests/unit/search-use-case.test.ts`
+- [x] T734 [US7] Implement author/director indexing in `src/application/search.ts` per [contracts/global-search-extension.md](contracts/global-search-extension.md)
+- [x] T735 [US7] E2e global search author/director in `tests/e2e/global-search-metadata.spec.ts`
 
 ---
 
@@ -130,21 +130,21 @@
 
 **Independent Test**: [quickstart.md](quickstart.md) § Catalog multi-add.
 
-- [ ] T736 [US8] Unit tests batch catalog add orchestration in `tests/unit/catalog-multi-add.test.ts`
-- [ ] T737 [US8] Multi-select UI + batch action in `src/components/books/book-catalog-flow.tsx` per [contracts/catalog-multi-add.md](contracts/catalog-multi-add.md)
-- [ ] T738 [US8] Multi-select UI + batch action in `src/components/movies/movie-catalog-flow.tsx`
-- [ ] T739 [US8] French partial-failure messaging for batch add in catalog flows
-- [ ] T740 [US8] E2e catalog multi-add books in `tests/e2e/catalog-multi-add-books.spec.ts`
-- [ ] T741 [US8] E2e catalog multi-add movies in `tests/e2e/catalog-multi-add-movies.spec.ts`
+- [x] T736 [US8] Unit tests batch catalog add orchestration in `tests/unit/catalog-multi-add.test.ts`
+- [x] T737 [US8] Multi-select UI + batch action in `src/components/books/book-catalog-flow.tsx` per [contracts/catalog-multi-add.md](contracts/catalog-multi-add.md)
+- [x] T738 [US8] Multi-select UI + batch action in `src/components/movies/movie-catalog-flow.tsx`
+- [x] T739 [US8] French partial-failure messaging for batch add in catalog flows
+- [x] T740 [US8] E2e catalog multi-add books in `tests/e2e/catalog-multi-add-books.spec.ts`
+- [x] T741 [US8] E2e catalog multi-add movies in `tests/e2e/catalog-multi-add-movies.spec.ts`
 
 ---
 
 ## Phase 11: Polish & cross-cutting
 
-- [ ] T742 Run [quickstart.md](quickstart.md) manual checklist; fix gaps
-- [ ] T743 [P] Update `specs/007-library-list-bulk/quickstart.md` if flows differ from implementation
-- [ ] T744 Quality gate: `yarn typecheck`, `yarn test`, `yarn build`
-- [ ] T745 Verify no regression to offline/sync tests from **001** (`tests/` isolation/offline suites)
+- [x] T742 Run [quickstart.md](quickstart.md) manual checklist; fix gaps
+- [x] T743 [P] Update `specs/007-library-list-bulk/quickstart.md` if flows differ from implementation
+- [x] T744 Quality gate: `yarn typecheck`, `yarn test`, `yarn build`
+- [x] T745 Verify no regression to offline/sync tests from **001** (`tests/` isolation/offline suites)
 
 ---
 

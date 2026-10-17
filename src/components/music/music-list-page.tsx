@@ -1,10 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { getItemUseCases, subscribeSyncStatus } from "@/composition/client";
 import { ItemDetailPanel } from "@/components/items/ItemDetailPanel";
 import { ListEmptyState } from "@/components/lists/ListEmptyState";
+import { ListSearchField } from "@/components/lists/ListSearchField";
+import { ListSelectionBar } from "@/components/lists/ListSelectionBar";
+import { useUndoDelete } from "@/components/UndoToast";
+import { Button } from "@/components/ui/Button";
+import { filterItemsForListLocalSearch } from "@/domain/list-local-search";
 import { BookMovieRow } from "@/components/rows/BookMovieRow";
 import { MusicArtistRow } from "@/components/rows/MusicArtistRow";
 import { useIsMobile } from "@/components/use-is-mobile";
@@ -50,6 +55,10 @@ export function MusicListPage({ kind }: MusicListPageProps) {
   const [statusFilter, setStatusFilter] = useState<StatusFilterValue>("all");
   const [listSort, setListSort] = useState<ListSort>(DEFAULT_LIST_SORT);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+  const { deleteManyWithUndo } = useUndoDelete();
   const refreshRef = useRef<(() => Promise<void>) | null>(null);
   const desktopSplit = !isMobile;
 
@@ -57,6 +66,9 @@ export function MusicListPage({ kind }: MusicListPageProps) {
     setStatusFilter("all");
     setListSort(DEFAULT_LIST_SORT);
     setSelectedId(null);
+    setSearchQuery("");
+    setSelectionMode(false);
+    setSelectedIds(new Set());
   }, [kind]);
 
   useEffect(() => {
@@ -159,7 +171,33 @@ export function MusicListPage({ kind }: MusicListPageProps) {
     void refreshRef.current?.();
   }, []);
 
-  const onSelectRow = desktopSplit ? setSelectedId : undefined;
+  const onSelectRow = desktopSplit && !selectionMode ? setSelectedId : undefined;
+
+  const displayedItems = useMemo(
+    () => filterItemsForListLocalSearch(items, searchQuery),
+    [items, searchQuery],
+  );
+
+  const toggleBulkSelected = useCallback((id: string) => {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const exitSelectionMode = useCallback(() => {
+    setSelectionMode(false);
+    setSelectedIds(new Set());
+  }, []);
+
+  const rowSelectionProps = (id: string) => ({
+    selectionMode,
+    bulkSelected: selectedIds.has(id),
+    onBulkToggle: () => toggleBulkSelected(id),
+    showDelete: !selectionMode,
+  });
 
   return (
     <main
@@ -168,6 +206,16 @@ export function MusicListPage({ kind }: MusicListPageProps) {
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-xl font-semibold">{t(TITLE_KEY[kind])}</h1>
         <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              if (selectionMode) exitSelectionMode();
+              else setSelectionMode(true);
+            }}
+          >
+            {selectionMode ? t("list.selection.done") : t("list.selection.toggle")}
+          </Button>
           <ListQuickAddButton itemType={kind} />
           {kind === "music_artist" ? (
             <MusicArtistCatalogFlow onSaved={refreshList} />
@@ -184,13 +232,18 @@ export function MusicListPage({ kind }: MusicListPageProps) {
         onChange={setListSort}
         allowRatingField={allowRatingSortField}
       />
+      <div className="mb-4">
+        <ListSearchField value={searchQuery} onChange={setSearchQuery} />
+      </div>
       <div className={desktopSplit ? "grid gap-4 md:grid-cols-2 md:items-start" : undefined}>
         <div className="min-w-0">
           {items.length === 0 ? (
             <ListEmptyState itemType={itemType} />
+          ) : displayedItems.length === 0 ? (
+            <ListEmptyState itemType={itemType} messageKey="list.search.empty" showRaven={false} />
           ) : (
             <ul className="flex flex-col gap-2">
-              {items.map((item) => {
+              {displayedItems.map((item) => {
                 if (item.type === "music_track") {
                   const trackItem = item as Item & { type: "music_track" };
                   return (
@@ -199,6 +252,7 @@ export function MusicListPage({ kind }: MusicListPageProps) {
                       item={trackItem}
                       selected={selectedId === item.id}
                       onSelect={onSelectRow}
+                      {...rowSelectionProps(item.id)}
                       onStatusChange={(status) => updateTrackItem(item.id, { status })}
                       onRatingChange={(rating) => updateTrackItem(item.id, { rating })}
                     />
@@ -211,6 +265,7 @@ export function MusicListPage({ kind }: MusicListPageProps) {
                     item={artistItem}
                     selected={selectedId === item.id}
                     onSelect={onSelectRow}
+                    {...rowSelectionProps(item.id)}
                     onRatingChange={(rating) => updateArtistItem(item.id, { rating })}
                   />
                 );
@@ -232,6 +287,14 @@ export function MusicListPage({ kind }: MusicListPageProps) {
           </aside>
         ) : null}
       </div>
+      <ListSelectionBar
+        selectedCount={selectedIds.size}
+        onClearSelection={exitSelectionMode}
+        onBulkDelete={() => {
+          const ids = [...selectedIds];
+          void deleteManyWithUndo(ids).then(() => exitSelectionMode());
+        }}
+      />
     </main>
   );
 }

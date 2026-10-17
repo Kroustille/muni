@@ -15,7 +15,9 @@ import { useDebouncedSearch } from "@/components/use-debounced-search";
 import { useOnline } from "@/components/use-online";
 import { t } from "@/i18n";
 
-import { CatalogPreview, type CatalogPreviewValues } from "./catalog-preview";
+import { runCatalogMultiAdd } from "@/application/catalog/catalog-multi-add";
+
+import { CatalogPreview, catalogHitToPreviewValues, type CatalogPreviewValues } from "./catalog-preview";
 
 export type BookCatalogSearchSheetProps = {
   open: boolean;
@@ -46,6 +48,8 @@ export function BookCatalogSearchSheet({
   const [previewOpen, setPreviewOpen] = useState(false);
   const [hit, setHit] = useState<BookCatalogHit | null>(null);
   const [saving, setSaving] = useState(false);
+  const [selectedIsbns, setSelectedIsbns] = useState<Set<string>>(() => new Set());
+  const [batchError, setBatchError] = useState<string | null>(null);
 
   const reset = useCallback(() => {
     setQuery("");
@@ -56,6 +60,8 @@ export function BookCatalogSearchSheet({
     setPreviewOpen(false);
     setHit(null);
     setSaving(false);
+    setSelectedIsbns(new Set());
+    setBatchError(null);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -115,6 +121,48 @@ export function BookCatalogSearchSheet({
     }
   }, []);
 
+  const toggleSelected = useCallback((isbn: string) => {
+    setSelectedIsbns((current) => {
+      const next = new Set(current);
+      if (next.has(isbn)) next.delete(isbn);
+      else next.add(isbn);
+      return next;
+    });
+  }, []);
+
+  const runBatchAdd = useCallback(async () => {
+    const selected = results.filter((hit) => selectedIsbns.has(hit.isbn));
+    if (selected.length === 0) return;
+    setSaving(true);
+    setBatchError(null);
+    try {
+      const { failures } = await runCatalogMultiAdd(
+        selected.map((hit) => ({ key: hit.isbn, title: hit.title, hit })),
+        async ({ hit: searchHit }) => {
+          let loaded = searchHit;
+          try {
+            loaded = await fetchBookCatalogHit(searchHit.isbn);
+          } catch (error) {
+            if (
+              !(error instanceof BookCatalogLookupClientError && error.code === "not_found")
+            ) {
+              throw error;
+            }
+          }
+          await onConfirmSave(catalogHitToPreviewValues(loaded));
+        },
+      );
+      if (failures.length > 0) {
+        setBatchError(t("books.catalog.addManyPartial"));
+      } else {
+        handleClose();
+        onSaved?.();
+      }
+    } finally {
+      setSaving(false);
+    }
+  }, [handleClose, onConfirmSave, onSaved, results, selectedIsbns]);
+
   const confirmSave = useCallback(
     async (values: CatalogPreviewValues) => {
       setSaving(true);
@@ -163,21 +211,40 @@ export function BookCatalogSearchSheet({
                 {error}
               </p>
             ) : null}
+            {batchError !== null ? (
+              <p className="text-sm text-danger" role="alert">{batchError}</p>
+            ) : null}
             {results.length > 0 ? (
-              <ul className="flex flex-col gap-2">
-                {results.map((result) => (
-                  <li key={result.isbn}>
-                    <button
-                      type="button"
-                      className="w-full rounded-lg border border-border px-3 py-2 text-left hover:bg-muted/40"
-                      onClick={() => void pickHit(result)}
-                    >
-                      <span className="font-medium">{result.title}</span>
-                      <span className="mt-1 block text-sm text-muted">{formatHitSubtitle(result)}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              <>
+                <Button
+                  type="button"
+                  disabled={selectedIsbns.size === 0 || saving}
+                  onClick={() => void runBatchAdd()}
+                >
+                  {t("books.catalog.addMany").replace("{count}", String(selectedIsbns.size))}
+                </Button>
+                <ul className="flex flex-col gap-2">
+                  {results.map((result) => (
+                    <li key={result.isbn} className="flex items-start gap-2 rounded-lg border border-border px-3 py-2">
+                      <input
+                        type="checkbox"
+                        className="mt-1 size-5 shrink-0 accent-primary"
+                        checked={selectedIsbns.has(result.isbn)}
+                        onChange={() => toggleSelected(result.isbn)}
+                        aria-label={result.title}
+                      />
+                      <button
+                        type="button"
+                        className="min-w-0 flex-1 text-left hover:opacity-90"
+                        onClick={() => void pickHit(result)}
+                      >
+                        <span className="font-medium">{result.title}</span>
+                        <span className="mt-1 block text-sm text-muted">{formatHitSubtitle(result)}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </>
             ) : null}
           </form>
         )}

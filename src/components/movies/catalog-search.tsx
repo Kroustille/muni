@@ -15,7 +15,9 @@ import { useDebouncedSearch } from "@/components/use-debounced-search";
 import { useOnline } from "@/components/use-online";
 import { t, type MessageKey } from "@/i18n";
 
-import { MovieCatalogPreview, type MovieCatalogPreviewValues } from "./catalog-preview";
+import { runCatalogMultiAdd } from "@/application/catalog/catalog-multi-add";
+
+import { MovieCatalogPreview, movieDetailToPreviewValues, type MovieCatalogPreviewValues } from "./catalog-preview";
 
 export type MovieCatalogSearchProps = {
   open: boolean;
@@ -51,6 +53,8 @@ export function MovieCatalogSearchSheet({
     null,
   );
   const [saving, setSaving] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+  const [batchError, setBatchError] = useState<string | null>(null);
 
   const reset = useCallback(() => {
     setQuery("");
@@ -61,6 +65,8 @@ export function MovieCatalogSearchSheet({
     setPreviewOpen(false);
     setDetail(null);
     setSaving(false);
+    setSelectedIds(new Set());
+    setBatchError(null);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -113,6 +119,39 @@ export function MovieCatalogSearchSheet({
     }
   }, []);
 
+  const toggleSelected = useCallback((wikidataId: string) => {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(wikidataId)) next.delete(wikidataId);
+      else next.add(wikidataId);
+      return next;
+    });
+  }, []);
+
+  const runBatchAdd = useCallback(async () => {
+    const selected = results.filter((hit) => selectedIds.has(hit.wikidataId));
+    if (selected.length === 0) return;
+    setSaving(true);
+    setBatchError(null);
+    try {
+      const { failures } = await runCatalogMultiAdd(
+        selected.map((hit) => ({ key: hit.wikidataId, title: hit.title, hit })),
+        async ({ hit }) => {
+          const loaded = await fetchMovieCatalogDetail(hit.wikidataId);
+          await onConfirmSave(movieDetailToPreviewValues(loaded));
+        },
+      );
+      if (failures.length > 0) {
+        setBatchError(t("movies.catalog.addManyPartial"));
+      } else {
+        handleClose();
+        onSaved?.();
+      }
+    } finally {
+      setSaving(false);
+    }
+  }, [handleClose, onConfirmSave, onSaved, results, selectedIds]);
+
   const confirmSave = useCallback(
     async (values: MovieCatalogPreviewValues) => {
       setSaving(true);
@@ -161,21 +200,40 @@ export function MovieCatalogSearchSheet({
                 {error}
               </p>
             ) : null}
+            {batchError !== null ? (
+              <p className="text-sm text-danger" role="alert">{batchError}</p>
+            ) : null}
             {results.length > 0 ? (
-              <ul className="flex flex-col gap-2">
-                {results.map((hit) => (
-                  <li key={hit.wikidataId}>
-                    <button
-                      type="button"
-                      className="w-full rounded-lg border border-border px-3 py-2 text-left hover:bg-muted/40"
-                      onClick={() => void pickHit(hit)}
-                    >
-                      <span className="font-medium">{hit.title}</span>
-                      <span className="mt-1 block text-sm text-muted">{formatHitSubtitle(hit)}</span>
-                    </button>
-                  </li>
-                ))}
-              </ul>
+              <>
+                <Button
+                  type="button"
+                  disabled={selectedIds.size === 0 || saving}
+                  onClick={() => void runBatchAdd()}
+                >
+                  {t("movies.catalog.addMany").replace("{count}", String(selectedIds.size))}
+                </Button>
+                <ul className="flex flex-col gap-2">
+                  {results.map((hit) => (
+                    <li key={hit.wikidataId} className="flex items-start gap-2 rounded-lg border border-border px-3 py-2">
+                      <input
+                        type="checkbox"
+                        className="mt-1 size-5 shrink-0 accent-primary"
+                        checked={selectedIds.has(hit.wikidataId)}
+                        onChange={() => toggleSelected(hit.wikidataId)}
+                        aria-label={hit.title}
+                      />
+                      <button
+                        type="button"
+                        className="min-w-0 flex-1 text-left hover:opacity-90"
+                        onClick={() => void pickHit(hit)}
+                      >
+                        <span className="font-medium">{hit.title}</span>
+                        <span className="mt-1 block text-sm text-muted">{formatHitSubtitle(hit)}</span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              </>
             ) : null}
           </form>
         )}

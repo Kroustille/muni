@@ -1,14 +1,23 @@
 "use client";
 
 import { notFound } from "next/navigation";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getItemUseCases, subscribeSyncStatus } from "@/composition/client";
 import { ListQuickAddButton } from "@/components/quick-add/list-quick-add-button";
 import { BookCatalogFlow } from "@/components/books/book-catalog-flow";
 import { BookTitleCatalogFlow } from "@/components/books/book-title-catalog-flow";
 import { MovieCatalogFlow } from "@/components/movies/movie-catalog-flow";
 import { ItemDetailPanel } from "@/components/items/ItemDetailPanel";
+import { BulkSagaSheet } from "@/components/lists/bulk-saga-sheet";
+import { BulkSeriesSheet } from "@/components/lists/bulk-series-sheet";
 import { ListEmptyState } from "@/components/lists/ListEmptyState";
+import { ListSearchField } from "@/components/lists/ListSearchField";
+import { ListSelectionBar } from "@/components/lists/ListSelectionBar";
+import { useUndoDelete } from "@/components/UndoToast";
+import { Button } from "@/components/ui/Button";
+import { assignBooksToSeries } from "@/application/books/assign-series-bulk";
+import { assignMoviesToFranchise } from "@/application/movies/assign-franchise-bulk";
+import { filterItemsForListLocalSearch } from "@/domain/list-local-search";
 import { ListRowShell } from "@/components/rows/ListRowShell";
 import { ListRowTitle } from "@/components/rows/ListRowTitle";
 import { BookMovieRow } from "@/components/rows/BookMovieRow";
@@ -132,6 +141,12 @@ export function ListPageContent({
   const [movieDiscoveryOpen, setMovieDiscoveryOpen] = useState(false);
   const [libraryMovies, setLibraryMovies] = useState<Item[]>([]);
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+  const [bulkSeriesOpen, setBulkSeriesOpen] = useState(false);
+  const [bulkSagaOpen, setBulkSagaOpen] = useState(false);
+  const { deleteManyWithUndo } = useUndoDelete();
   const refreshRef = useRef<(() => Promise<void>) | null>(null);
   const desktopSplit = !isMobile;
 
@@ -147,6 +162,9 @@ export function ListPageContent({
     setTagFranchiseFilter({});
     setMovieDiscoveryFilter({});
     setSelectedId(null);
+    setSearchQuery("");
+    setSelectionMode(false);
+    setSelectedIds(new Set());
   }, [itemType]);
 
   useEffect(() => {
@@ -280,7 +298,33 @@ export function ListPageContent({
     void refreshRef.current?.();
   }, []);
 
-  const onSelectRow = desktopSplit ? setSelectedId : undefined;
+  const onSelectRow = desktopSplit && !selectionMode ? setSelectedId : undefined;
+
+  const displayedItems = useMemo(
+    () => filterItemsForListLocalSearch(items, searchQuery),
+    [items, searchQuery],
+  );
+
+  const toggleBulkSelected = useCallback((id: string) => {
+    setSelectedIds((current) => {
+      const next = new Set(current);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const exitSelectionMode = useCallback(() => {
+    setSelectionMode(false);
+    setSelectedIds(new Set());
+  }, []);
+
+  const rowSelectionProps = (id: string) => ({
+    selectionMode,
+    bulkSelected: selectedIds.has(id),
+    onBulkToggle: () => toggleBulkSelected(id),
+    showDelete: !selectionMode,
+  });
 
   return (
     <main
@@ -289,6 +333,16 @@ export function ListPageContent({
       <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h1 className="text-[1.35rem]">{t(ROUTE_TITLE_KEY[route])}</h1>
         <div className="flex flex-wrap items-center gap-2">
+          <Button
+            type="button"
+            variant="secondary"
+            onClick={() => {
+              if (selectionMode) exitSelectionMode();
+              else setSelectionMode(true);
+            }}
+          >
+            {selectionMode ? t("list.selection.done") : t("list.selection.toggle")}
+          </Button>
           <ListQuickAddButton itemType={itemType} />
           {route === "books" ? (
             <>
@@ -352,6 +406,9 @@ export function ListPageContent({
         onChange={setListSort}
         allowRatingField={allowRatingSortField}
       />
+      <div className="mb-4">
+        <ListSearchField value={searchQuery} onChange={setSearchQuery} />
+      </div>
       {bookLibraryUi && route === "books" ? (
         <BookRecommendations libraryBooks={libraryBooks} onSelect={setSelectedId} />
       ) : null}
@@ -379,11 +436,13 @@ export function ListPageContent({
         <div className="min-w-0">
           {items.length === 0 ? (
             <ListEmptyState itemType={itemType} />
+          ) : displayedItems.length === 0 ? (
+            <ListEmptyState itemType={itemType} messageKey="list.search.empty" showRaven={false} />
           ) : (
             <ul className="flex flex-col gap-2">
               {(groupBooksByWorkEnabled && route === "books"
-                ? bookListEntries(items)
-                : items.map((item) => ({ kind: "single" as const, item }))
+                ? bookListEntries(displayedItems)
+                : displayedItems.map((item) => ({ kind: "single" as const, item }))
               ).map((entry: BookListEntry) => {
                 if (entry.kind === "group") {
                   const { group } = entry;
@@ -402,6 +461,7 @@ export function ListPageContent({
                           shellAs="div"
                           selected={selectedId === book.id}
                           onSelect={onSelectRow}
+                          {...rowSelectionProps(book.id)}
                           onStatusChange={(status) => {
                             updateBookMovieItem(book.id, { status });
                           }}
@@ -423,6 +483,7 @@ export function ListPageContent({
                       item={shoppingItem}
                       selected={selectedId === item.id}
                       onSelect={onSelectRow}
+                      {...rowSelectionProps(item.id)}
                       onCheckedChange={(checked) => {
                         void getItemUseCases().then((useCases) =>
                           useCases.updateItem(item.id, { checked }),
@@ -439,6 +500,7 @@ export function ListPageContent({
                       item={mediaItem}
                       selected={selectedId === item.id}
                       onSelect={onSelectRow}
+                      {...rowSelectionProps(item.id)}
                       onStatusChange={(status) => {
                         updateBookMovieItem(item.id, { status });
                       }}
@@ -450,11 +512,38 @@ export function ListPageContent({
                 }
                 const secondary = rowSecondaryText(item);
                 return (
-                  <ListRowShell key={item.id} itemType={item.type} selected={selectedId === item.id}>
-                    <ListRowTitle itemId={item.id} onSelect={onSelectRow}>
-                      {item.title}
-                    </ListRowTitle>
-                    {secondary ? <p className="text-sm text-muted">{secondary}</p> : null}
+                  <ListRowShell
+                    key={item.id}
+                    itemType={item.type}
+                    selected={selectedId === item.id || selectedIds.has(item.id)}
+                  >
+                    <div className="flex items-start gap-2">
+                      {selectionMode ? (
+                        <input
+                          type="checkbox"
+                          className="mt-1 size-5 shrink-0 cursor-pointer accent-primary"
+                          checked={selectedIds.has(item.id)}
+                          onChange={() => toggleBulkSelected(item.id)}
+                          aria-label={item.title}
+                        />
+                      ) : null}
+                      <div className="min-w-0 flex-1">
+                        <ListRowTitle itemId={item.id} onSelect={onSelectRow}>
+                          {item.title}
+                        </ListRowTitle>
+                        {secondary ? <p className="text-sm text-muted">{secondary}</p> : null}
+                      </div>
+                      {!selectionMode ? (
+                        <Button
+                          type="button"
+                          variant="danger"
+                          className="shrink-0"
+                          onClick={() => void deleteManyWithUndo([item.id])}
+                        >
+                          {t("action.delete")}
+                        </Button>
+                      ) : null}
+                    </div>
                   </ListRowShell>
                 );
               })}
@@ -475,6 +564,81 @@ export function ListPageContent({
           </aside>
         ) : null}
       </div>
+      <ListSelectionBar
+        selectedCount={selectedIds.size}
+        onClearSelection={exitSelectionMode}
+        onBulkDelete={() => {
+          const ids = [...selectedIds];
+          void deleteManyWithUndo(ids).then(() => exitSelectionMode());
+        }}
+        extraActions={
+          <>
+            {route === "books" ? (
+              <Button type="button" variant="secondary" onClick={() => setBulkSeriesOpen(true)}>
+                {t("list.selection.assignSeries")}
+              </Button>
+            ) : null}
+            {route === "movies" ? (
+              <Button type="button" variant="secondary" onClick={() => setBulkSagaOpen(true)}>
+                {t("list.selection.assignSaga")}
+              </Button>
+            ) : null}
+          </>
+        }
+      />
+      {route === "books" ? (
+        <BulkSeriesSheet
+          open={bulkSeriesOpen}
+          onClose={() => setBulkSeriesOpen(false)}
+          seriesSuggestions={collectLibrarySeriesNames(libraryBooks.length ? libraryBooks : items)}
+          onConfirm={async (seriesName, seriesPosition) => {
+            const ids = [...selectedIds];
+            const { patches } = assignBooksToSeries({
+              books: items,
+              ids,
+              seriesName,
+              seriesPosition,
+            });
+            const useCases = await getItemUseCases();
+            for (const patch of patches) {
+              await useCases.updateItem(patch.id, {
+                seriesName: patch.seriesName,
+                seriesPosition: patch.seriesPosition,
+              });
+            }
+            exitSelectionMode();
+            refreshList();
+          }}
+        />
+      ) : null}
+      {route === "movies" ? (
+        <BulkSagaSheet
+          open={bulkSagaOpen}
+          onClose={() => setBulkSagaOpen(false)}
+          franchiseSuggestions={collectLibraryFranchiseNames(
+            libraryMovies.length ? libraryMovies : items,
+          )}
+          onConfirm={async (franchiseName, franchiseOrder) => {
+            const ids = [...selectedIds];
+            const { patches } = assignMoviesToFranchise({
+              movies: items,
+              ids,
+              franchiseName,
+              franchiseOrder,
+            });
+            const useCases = await getItemUseCases();
+            for (const patch of patches) {
+              await useCases.updateItem(patch.id, {
+                franchiseName: patch.franchiseName,
+                franchiseOrder: patch.franchiseOrder,
+                franchiseId: patch.franchiseId,
+              });
+            }
+            exitSelectionMode();
+            refreshList();
+          }}
+        />
+      ) : null}
     </main>
   );
 }

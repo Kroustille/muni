@@ -31,7 +31,7 @@ export type MovieCatalogPreviewProps = {
   saving?: boolean;
 };
 
-function detailToPreviewValues(detail: MovieCatalogDetail): MovieCatalogPreviewValues {
+export function movieDetailToPreviewValues(detail: MovieCatalogDetail): MovieCatalogPreviewValues {
   return {
     wikidataId: detail.wikidataId,
     title: detail.title,
@@ -58,11 +58,11 @@ export function MovieCatalogPreview({
   saving = false,
 }: MovieCatalogPreviewProps) {
   const [values, setValues] = useState<MovieCatalogPreviewValues>(() =>
-    detailToPreviewValues(detail),
+    movieDetailToPreviewValues(detail),
   );
 
   useEffect(() => {
-    if (open) setValues(detailToPreviewValues(detail));
+    if (open) setValues(movieDetailToPreviewValues(detail));
   }, [detail, open]);
 
   const submit = async () => {

@@ -17,16 +17,22 @@ const EMPTY_MESSAGE_KEY: Record<ItemType, MessageKey> = {
 export type ListEmptyStateProps = {
   itemType: ItemType;
   showRaven?: boolean;
+  /** Override default empty-list copy (e.g. no search matches). */
+  messageKey?: MessageKey;
 };
 
-export function ListEmptyState({ itemType, showRaven = true }: ListEmptyStateProps) {
+export function ListEmptyState({
+  itemType,
+  showRaven = true,
+  messageKey,
+}: ListEmptyStateProps) {
   const { accentColor, icon: Icon } = LIST_TYPE_VISUAL[itemType];
 
   return (
     <div
       className="flex flex-col items-center gap-4 py-12 text-center"
       role="status"
-      aria-label={t(EMPTY_MESSAGE_KEY[itemType])}
+      aria-label={t(messageKey ?? EMPTY_MESSAGE_KEY[itemType])}
     >
       {showRaven ? <RavenIllustration className="h-14 w-14 text-muted" /> : null}
       <div
@@ -35,7 +41,7 @@ export function ListEmptyState({ itemType, showRaven = true }: ListEmptyStatePro
       >
         <Icon className="h-6 w-6" style={{ color: accentColor }} strokeWidth={1.5} aria-hidden />
       </div>
-      <p className="max-w-sm text-base text-foreground">{t(EMPTY_MESSAGE_KEY[itemType])}</p>
+      <p className="max-w-sm text-base text-foreground">{t(messageKey ?? EMPTY_MESSAGE_KEY[itemType])}</p>
       <p className="max-w-sm text-sm text-muted">{t("list.empty.hint")}</p>
     </div>
   );

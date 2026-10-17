@@ -1,6 +1,7 @@
 "use client";
 
 import type { Item } from "@/domain/item";
+import { DeleteWithUndoButton } from "@/components/UndoToast";
 import { t } from "@/i18n";
 import { ListRowShell } from "./ListRowShell";
 import { ListRowTitle } from "./ListRowTitle";
@@ -10,19 +11,42 @@ export type ShoppingRowProps = {
   onCheckedChange: (checked: boolean) => void;
   onSelect?: (id: string) => void;
   selected?: boolean;
+  selectionMode?: boolean;
+  bulkSelected?: boolean;
+  onBulkToggle?: () => void;
+  showDelete?: boolean;
 };
 
-export function ShoppingRow({ item, onCheckedChange, onSelect, selected }: ShoppingRowProps) {
+export function ShoppingRow({
+  item,
+  onCheckedChange,
+  onSelect,
+  selected,
+  selectionMode = false,
+  bulkSelected = false,
+  onBulkToggle,
+  showDelete = false,
+}: ShoppingRowProps) {
   return (
-    <ListRowShell itemType="shopping" selected={selected}>
+    <ListRowShell itemType="shopping" selected={selected || bulkSelected}>
       <div className="flex items-start gap-3">
-        <input
-          type="checkbox"
-          className="mt-1 size-5 shrink-0 cursor-pointer accent-primary"
-          aria-label={item.title}
-          checked={item.checked}
-          onChange={(event) => onCheckedChange(event.target.checked)}
-        />
+        {selectionMode ? (
+          <input
+            type="checkbox"
+            className="mt-1 size-5 shrink-0 cursor-pointer accent-primary"
+            checked={bulkSelected}
+            onChange={() => onBulkToggle?.()}
+            aria-label={item.title}
+          />
+        ) : (
+          <input
+            type="checkbox"
+            className="mt-1 size-5 shrink-0 cursor-pointer accent-primary"
+            aria-label={item.title}
+            checked={item.checked}
+            onChange={(event) => onCheckedChange(event.target.checked)}
+          />
+        )}
         <div className="min-w-0 flex-1">
           <ListRowTitle
             itemId={item.id}
@@ -38,6 +62,9 @@ export function ShoppingRow({ item, onCheckedChange, onSelect, selected }: Shopp
             </p>
           ) : null}
         </div>
+        {showDelete && !selectionMode ? (
+          <DeleteWithUndoButton itemId={item.id} className="shrink-0" />
+        ) : null}
       </div>
     </ListRowShell>
   );

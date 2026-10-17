@@ -19,13 +19,14 @@ const UNDO_MS = 5000;
 
 type UndoDeleteContextValue = {
   deleteWithUndo: (itemId: string) => Promise<void>;
+  deleteManyWithUndo: (itemIds: string[]) => Promise<void>;
   isPendingUndo: (itemId: string) => boolean;
 };
 
 const UndoDeleteContext = createContext<UndoDeleteContextValue | null>(null);
 
 export function UndoDeleteProvider({ children }: { children: ReactNode }) {
-  const [pendingId, setPendingId] = useState<string | null>(null);
+  const [pendingIds, setPendingIds] = useState<string[] | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const clearTimer = useCallback(() => {
@@ -37,42 +38,67 @@ export function UndoDeleteProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => () => clearTimer(), [clearTimer]);
 
-  const deleteWithUndo = useCallback(
-    async (itemId: string) => {
+  const startPending = useCallback(
+    (ids: string[]) => {
       clearTimer();
-      const useCases = await getItemUseCases();
-      await useCases.deleteItem(itemId);
-      setPendingId(itemId);
+      setPendingIds(ids);
       timerRef.current = setTimeout(() => {
-        setPendingId(null);
+        setPendingIds(null);
         timerRef.current = undefined;
       }, UNDO_MS);
     },
     [clearTimer],
   );
 
+  const deleteManyWithUndo = useCallback(
+    async (itemIds: string[]) => {
+      if (itemIds.length === 0) return;
+      const useCases = await getItemUseCases();
+      for (const id of itemIds) {
+        await useCases.deleteItem(id);
+      }
+      startPending(itemIds);
+    },
+    [startPending],
+  );
+
+  const deleteWithUndo = useCallback(
+    async (itemId: string) => {
+      await deleteManyWithUndo([itemId]);
+    },
+    [deleteManyWithUndo],
+  );
+
   const undo = useCallback(async () => {
-    if (pendingId === null) return;
+    if (pendingIds === null || pendingIds.length === 0) return;
     clearTimer();
     const useCases = await getItemUseCases();
-    await useCases.restoreItem(pendingId);
-    setPendingId(null);
-  }, [clearTimer, pendingId]);
+    for (const id of pendingIds) {
+      await useCases.restoreItem(id);
+    }
+    setPendingIds(null);
+  }, [clearTimer, pendingIds]);
 
   const value = useMemo(
     () => ({
       deleteWithUndo,
-      isPendingUndo: (itemId: string) => pendingId === itemId,
+      deleteManyWithUndo,
+      isPendingUndo: (itemId: string) => pendingIds?.includes(itemId) ?? false,
     }),
-    [deleteWithUndo, pendingId],
+    [deleteManyWithUndo, deleteWithUndo, pendingIds],
   );
+
+  const toastMessage =
+    pendingIds !== null && pendingIds.length > 1
+      ? t("item.deletedMany").replace("{count}", String(pendingIds.length))
+      : t("item.deleted");
 
   return (
     <UndoDeleteContext.Provider value={value}>
       {children}
-      {pendingId !== null ? (
+      {pendingIds !== null && pendingIds.length > 0 ? (
         <Toast
-          message={t("item.deleted")}
+          message={toastMessage}
           action={
             <Button type="button" variant="secondary" onClick={() => void undo()}>
               {t("action.undo")}
