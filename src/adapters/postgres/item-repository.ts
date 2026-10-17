@@ -2,7 +2,16 @@ import type { Insertable, Kysely, Selectable, Transaction } from "kysely";
 
 import type { ServerItemRepository } from "../../application/ports/server-item-repository";
 import type { ItemWire } from "../../domain/item";
-import type { DB, Items } from "./db-types";
+import type { DB, Items, Json } from "./db-types";
+
+/** node-pg encodes JS arrays as PostgreSQL arrays; jsonb columns need JSON text. */
+function toJsonbColumn(value: unknown): Json | null {
+  if (value === null || value === undefined) return null;
+  if (Array.isArray(value)) {
+    return JSON.stringify(value) as unknown as Json;
+  }
+  return value as Json;
+}
 
 type DbOrTrx = Kysely<DB> | Transaction<DB>;
 
@@ -88,18 +97,18 @@ function toRow(userId: string, wire: ItemWire): Insertable<Items> {
     notes: wire.notes,
     quantity: wire.quantity,
     checked: wire.checked,
-    ingredients: wire.ingredients,
-    steps: wire.steps,
+    ingredients: toJsonbColumn(wire.ingredients),
+    steps: toJsonbColumn(wire.steps),
     deleted_at: wire.deleted_at,
-    fields_updated_at: wire.fields_updated_at,
+    fields_updated_at: toJsonbColumn(wire.fields_updated_at) as ItemWire["fields_updated_at"],
     isbn: wire.isbn ?? null,
     synopsis: wire.synopsis ?? null,
-    genres: wire.genres ?? null,
+    genres: toJsonbColumn(wire.genres ?? null),
     publication_year: wire.publication_year ?? null,
     publisher: wire.publisher ?? null,
     page_count: wire.page_count ?? null,
     work_id: wire.work_id ?? null,
-    tags: wire.tags ?? null,
+    tags: toJsonbColumn(wire.tags ?? null),
     series_name: wire.series_name ?? null,
     series_position:
       wire.series_position === null || wire.series_position === undefined
@@ -114,11 +123,11 @@ function toRow(userId: string, wire: ItemWire): Insertable<Items> {
     franchise_name: wire.franchise_name ?? null,
     franchise_order: wire.franchise_order ?? null,
     watched_at: wire.watched_at ?? null,
-    episode_progress: wire.episode_progress ?? null,
+    episode_progress: toJsonbColumn(wire.episode_progress ?? null),
     next_episode_key: wire.next_episode_key ?? null,
-    streaming_providers: wire.streaming_providers ?? null,
+    streaming_providers: toJsonbColumn(wire.streaming_providers ?? null),
     director: wire.director ?? null,
-    cast: wire.cast ?? null,
+    cast: toJsonbColumn(wire.cast ?? null),
     imdb_id: wire.imdb_id ?? null,
     release_year: wire.release_year ?? null,
     catalog_rating: wire.catalog_rating ?? null,
