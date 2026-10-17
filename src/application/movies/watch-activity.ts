@@ -1,35 +1,24 @@
 import type { Item, ItemPatch } from "@/domain/item";
 import { statusesFor } from "@/domain/item";
+import {
+  activityStatusTransitionStamp,
+  DEFAULT_ACTIVITY_TIMEZONE,
+  deriveActivityDays,
+  toLocalDateKey,
+  type ActivityDayRules,
+} from "@/application/shared/activity-days";
 
 const MOVIE_STATUSES = new Set(statusesFor("movie"));
 
-export const DEFAULT_WATCH_TIMEZONE = "Europe/Paris";
-
-function toLocalDateKey(iso: string, timeZone: string): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(iso));
-}
+export const DEFAULT_WATCH_TIMEZONE = DEFAULT_ACTIVITY_TIMEZONE;
 
 function isMovieStatus(value: string | null | undefined): boolean {
   return value != null && MOVIE_STATUSES.has(value);
 }
 
-/**
- * Returns calendar days (YYYY-MM-DD in `timeZone`) with qualifying watch activity (FR-D02).
- */
-export function deriveWatchActivityDays(
-  items: readonly Item[],
-  timeZone: string = DEFAULT_WATCH_TIMEZONE,
-): Set<string> {
-  const days = new Set<string>();
-
-  for (const item of items) {
-    if (item.type !== "movie" || item.deletedAt != null) continue;
-
+const watchActivityRules: ActivityDayRules<"movie"> = {
+  itemType: "movie",
+  collectActivityDays(item, days, timeZone) {
     const statusAt = item.fieldsUpdatedAt.status;
     if (statusAt && isMovieStatus(item.status)) {
       days.add(toLocalDateKey(statusAt, timeZone));
@@ -58,9 +47,17 @@ export function deriveWatchActivityDays(
     if (watchedStamp) {
       days.add(toLocalDateKey(watchedStamp, timeZone));
     }
-  }
+  },
+};
 
-  return days;
+/**
+ * Returns calendar days (YYYY-MM-DD in `timeZone`) with qualifying watch activity (FR-D02).
+ */
+export function deriveWatchActivityDays(
+  items: readonly Item[],
+  timeZone: string = DEFAULT_WATCH_TIMEZONE,
+): Set<string> {
+  return deriveActivityDays(items, watchActivityRules, timeZone);
 }
 
 /**
@@ -72,12 +69,7 @@ export function watchActivityFieldStamps(
   stamp: string,
 ): Record<string, string> {
   if (item.type !== "movie") return {};
-  const extra: Record<string, string> = {};
-  if (patch.status !== undefined && patch.status !== item.status) {
-    if (patch.status === "watched") {
-      extra.watched = stamp;
-    }
-  }
+  const extra = activityStatusTransitionStamp(item, "movie", patch, stamp, "watched", "watched");
   if (patch.episodeProgress !== undefined) {
     extra.episodeProgress = stamp;
   }

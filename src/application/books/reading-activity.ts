@@ -1,35 +1,24 @@
 import type { Item, ItemPatch } from "@/domain/item";
 import { statusesFor } from "@/domain/item";
+import {
+  activityStatusTransitionStamp,
+  DEFAULT_ACTIVITY_TIMEZONE,
+  deriveActivityDays,
+  toLocalDateKey,
+  type ActivityDayRules,
+} from "@/application/shared/activity-days";
 
 const BOOK_STATUSES = new Set(statusesFor("book"));
 
-export const DEFAULT_READING_TIMEZONE = "Europe/Paris";
-
-function toLocalDateKey(iso: string, timeZone: string): string {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(iso));
-}
+export const DEFAULT_READING_TIMEZONE = DEFAULT_ACTIVITY_TIMEZONE;
 
 function isBookStatus(value: string | null | undefined): boolean {
   return value != null && BOOK_STATUSES.has(value);
 }
 
-/**
- * Returns calendar days (YYYY-MM-DD in `timeZone`) with qualifying reading activity (FR-D02).
- */
-export function deriveReadingActivityDays(
-  items: readonly Item[],
-  timeZone: string = DEFAULT_READING_TIMEZONE,
-): Set<string> {
-  const days = new Set<string>();
-
-  for (const item of items) {
-    if (item.type !== "book" || item.deletedAt != null) continue;
-
+const readingActivityRules: ActivityDayRules<"book"> = {
+  itemType: "book",
+  collectActivityDays(item, days, timeZone) {
     const statusAt = item.fieldsUpdatedAt.status;
     if (statusAt && isBookStatus(item.status)) {
       days.add(toLocalDateKey(statusAt, timeZone));
@@ -48,9 +37,17 @@ export function deriveReadingActivityDays(
     if (readAt) {
       days.add(toLocalDateKey(readAt, timeZone));
     }
-  }
+  },
+};
 
-  return days;
+/**
+ * Returns calendar days (YYYY-MM-DD in `timeZone`) with qualifying reading activity (FR-D02).
+ */
+export function deriveReadingActivityDays(
+  items: readonly Item[],
+  timeZone: string = DEFAULT_READING_TIMEZONE,
+): Set<string> {
+  return deriveActivityDays(items, readingActivityRules, timeZone);
 }
 
 /**
@@ -62,12 +59,5 @@ export function readingActivityFieldStamps(
   patch: ItemPatch,
   stamp: string,
 ): Record<string, string> {
-  if (item.type !== "book") return {};
-  const extra: Record<string, string> = {};
-  if (patch.status !== undefined && patch.status !== item.status) {
-    if (patch.status === "read") {
-      extra.read = stamp;
-    }
-  }
-  return extra;
+  return activityStatusTransitionStamp(item, "book", patch, stamp, "read", "read");
 }
