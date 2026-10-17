@@ -57,7 +57,10 @@ export const selectors = {
 };
 
 export const locators = {
-  quickAddButton: (page: Page) => page.getByRole("button", { name: selectors.quickAdd }),
+  quickAddButton: (page: Page) =>
+    page
+      .getByRole("complementary", { name: t("nav.sidebar") })
+      .getByRole("button", { name: selectors.quickAdd }),
   statusFilter: (page: Page, label: string) => page.getByRole("button", { name: label }),
   shoppingCheck: (page: Page, itemName: string) =>
     page.getByRole("checkbox", { name: itemName }),

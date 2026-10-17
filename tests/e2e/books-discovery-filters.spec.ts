@@ -1,13 +1,13 @@
 import { expect, test } from "@playwright/test";
 import fr from "../../src/i18n/fr.json";
-import { listPath, locators, selectors, signIn, titleFieldLabel } from "./list-helpers";
+import { locators, openList, selectors, signIn, titleFieldLabel } from "./list-helpers";
 
 const t = (key: keyof typeof fr): string => fr[key];
 
 test.describe("books discovery filters", () => {
   test("filter by mood and tag", async ({ page }) => {
     await signIn(page);
-    await page.goto(listPath("books"));
+    await openList(page, "books");
 
     const tagged = `Discovery Mood ${Date.now()}`;
     const other = `Discovery Other ${Date.now()}`;
