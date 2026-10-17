@@ -130,19 +130,23 @@ describe("createSearchUseCase", () => {
     expect((await ctx.search.search("elephant")).map((i) => i.id)).toEqual([remote.id]);
   });
 
-  it("returns search results within 1 s for 5,000 items (SC-006)", async () => {
-    for (let i = 0; i < 5000; i += 1) {
-      ctx.advance(1);
-      await ctx.useCases.createItem("shopping", `Item ${i}`);
-    }
-    await ctx.useCases.createItem("book", "Target elephant");
+  it(
+    "returns search results within 1 s for 5,000 items (SC-006)",
+    async () => {
+      for (let i = 0; i < 5000; i += 1) {
+        ctx.advance(1);
+        await ctx.useCases.createItem("shopping", `Item ${i}`);
+      }
+      await ctx.useCases.createItem("book", "Target elephant");
 
-    const start = performance.now();
-    const results = await ctx.search.search("elephant");
-    const elapsed = performance.now() - start;
+      const start = performance.now();
+      const results = await ctx.search.search("elephant");
+      const elapsed = performance.now() - start;
 
-    expect(results).toHaveLength(1);
-    expect(results[0]?.title).toBe("Target elephant");
-    expect(elapsed).toBeLessThan(1000);
-  });
+      expect(results).toHaveLength(1);
+      expect(results[0]?.title).toBe("Target elephant");
+      expect(elapsed).toBeLessThan(1000);
+    },
+    30_000,
+  );
 });

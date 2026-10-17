@@ -19,6 +19,15 @@ function toIso(value: Date | string): string {
   return value instanceof Date ? value.toISOString() : new Date(value).toISOString();
 }
 
+/** PostgreSQL `date` columns round-trip as YYYY-MM-DD on ItemWire (same as domain validation). */
+function toDateOnly(value: Date | string): string {
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}$/.test(value)) {
+    return value;
+  }
+  const date = value instanceof Date ? value : new Date(value);
+  return date.toISOString().slice(0, 10);
+}
+
 function toWire(row: Selectable<Items>): ItemWire {
   return {
     id: row.id,
@@ -51,13 +60,13 @@ function toWire(row: Selectable<Items>): ItemWire {
         : Number(row.series_position),
     pages_read: row.pages_read,
     loaned_to: row.loaned_to,
-    loaned_at: row.loaned_at === null ? null : toIso(row.loaned_at),
+    loaned_at: row.loaned_at === null ? null : toDateOnly(row.loaned_at),
     mood: row.mood as ItemWire["mood"],
     pace: row.pace as ItemWire["pace"],
     franchise_id: row.franchise_id,
     franchise_name: row.franchise_name,
     franchise_order: row.franchise_order,
-    watched_at: row.watched_at === null ? null : toIso(row.watched_at),
+    watched_at: row.watched_at === null ? null : toDateOnly(row.watched_at),
     episode_progress: row.episode_progress as ItemWire["episode_progress"],
     next_episode_key: row.next_episode_key,
     streaming_providers: row.streaming_providers as ItemWire["streaming_providers"],
