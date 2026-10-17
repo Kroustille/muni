@@ -17,7 +17,7 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND next_episode_key IS NULL
         AND streaming_providers IS NULL
         AND director IS NULL
-        AND cast IS NULL
+        AND "cast" IS NULL
         AND author IS NULL
         AND status IS NULL
         AND recommended_by IS NULL
@@ -59,7 +59,7 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND next_episode_key IS NULL
         AND streaming_providers IS NULL
         AND director IS NULL
-        AND cast IS NULL
+        AND "cast" IS NULL
         AND quantity IS NULL
         AND ingredients IS NULL
         AND steps IS NULL
@@ -118,7 +118,7 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND next_episode_key IS NULL
         AND streaming_providers IS NULL
         AND director IS NULL
-        AND cast IS NULL
+        AND "cast" IS NULL
         AND author IS NULL
         AND status IS NULL
         AND recommended_by IS NULL
@@ -160,7 +160,7 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND next_episode_key IS NULL
         AND streaming_providers IS NULL
         AND director IS NULL
-        AND cast IS NULL
+        AND "cast" IS NULL
         AND author IS NULL
         AND status IS NULL
         AND quantity IS NULL
@@ -202,7 +202,7 @@ const ITEM_TYPE_FIELDS_CHECK = sql`
         AND next_episode_key IS NULL
         AND streaming_providers IS NULL
         AND director IS NULL
-        AND cast IS NULL
+        AND "cast" IS NULL
         AND author IS NULL
         AND quantity IS NULL
         AND ingredients IS NULL

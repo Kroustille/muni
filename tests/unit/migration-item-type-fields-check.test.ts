@@ -61,4 +61,9 @@ describe("ITEM_TYPE_FIELDS_CHECK status enums", () => {
     expect(latestItemsMigration).not.toMatch(/THEN\n        AND /);
     expect(latestItemsMigration).not.toMatch(/\)[ \t]*WHEN '/);
   });
+
+  it("quotes reserved column name cast in CHECK SQL", () => {
+    expect(latestItemsMigration).not.toMatch(/\bcast IS NULL/);
+    expect(latestItemsMigration).toMatch(/"cast" IS NULL/);
+  });
 });
