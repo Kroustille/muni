@@ -12,10 +12,123 @@ concurrency:
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ghcr.io/kroustille/muni
+  E2E_SHARD_TOTAL: 4
 
 jobs:
-  verify:
+  checks:
+    name: Static checks
     runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: yarn
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Typecheck
+        run: yarn typecheck
+
+      - name: Lint
+        run: yarn lint
+
+      - name: Tracking dependency check
+        run: yarn run lint:tracking
+
+  build:
+    name: Build app
+    runs-on: ubuntu-latest
+    needs: checks
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: yarn
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Build Next.js app
+        run: yarn build
+
+      - name: Upload Next.js build
+        uses: actions/upload-artifact@v4
+        with:
+          name: next-build
+          path: |
+            .next
+            public
+          retention-days: 1
+
+  unit:
+    name: Unit & integration (coverage)
+    runs-on: ubuntu-latest
+    needs: checks
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: muni
+          POSTGRES_PASSWORD: muni
+          POSTGRES_DB: muni
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U muni -d muni"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://muni:muni@localhost:5432/muni
+      TEST_DATABASE_URL: postgres://muni:muni@localhost:5432/muni_test
+      CI: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: yarn
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Create test database
+        run: |
+          PGPASSWORD=muni psql -h localhost -U muni -d muni -c "CREATE DATABASE muni_test;" \
+            || true
+
+      - name: Build and run migrations
+        run: yarn migrate:up
+
+      - name: Generated DB types up to date
+        run: yarn run db:codegen:check
+
+      - name: Test coverage
+        run: yarn run test:coverage
+
+  e2e:
+    name: E2E (shard ${{ matrix.shard }}/${{ env.E2E_SHARD_TOTAL }})
+    runs-on: ubuntu-latest
+    needs: build
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
     services:
       postgres:
         image: postgres:16
@@ -43,6 +156,7 @@ jobs:
       SMTP_PORT: 1025
       SMTP_FROM: Muni <ci@example.com>
       CI: true
+      PLAYWRIGHT_SKIP_WEBSERVER_BUILD: "1"
     steps:
       - uses: actions/checkout@v4
 
@@ -57,40 +171,22 @@ jobs:
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
-      - name: Create test database
-        run: |
-          PGPASSWORD=muni psql -h localhost -U muni -d muni -c "CREATE DATABASE muni_test;" \
-            || true
-
-      - name: Typecheck
-        run: yarn typecheck
-
-      - name: Lint
-        run: yarn lint
-
-      - name: Tracking dependency check
-        run: yarn run lint:tracking
-
-      - name: Build Next.js app
-        run: yarn build
+      - name: Download Next.js build
+        uses: actions/download-artifact@v4
+        with:
+          name: next-build
 
       - name: Build and run migrations
         run: yarn migrate:up
 
-      - name: Generated DB types up to date
-        run: yarn run db:codegen:check
-
-      - name: Test coverage (80% gate)
-        run: yarn run test:coverage
-
       - name: Install Playwright browsers
         run: npx playwright install --with-deps chromium
 
-      - name: End-to-end tests
-        run: yarn run test:e2e
+      - name: End-to-end tests (shard)
+        run: yarn playwright test --shard=${{ matrix.shard }}/${{ env.E2E_SHARD_TOTAL }}
 
   docker:
-    needs: verify
+    needs: [checks, build, unit, e2e]
     runs-on: ubuntu-latest
     permissions:
       contents: read

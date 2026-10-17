@@ -62,7 +62,11 @@ Google sign-in requires valid `GOOGLE_CLIENT_ID` and `GOOGLE_CLIENT_SECRET` in `
 | **Unit** | `yarn vitest run tests/unit` | Node + `yarn install` only |
 | **Integration** | `yarn vitest run tests/integration` | Docker: Postgres (`yarn db:up`) and Mailpit for SMTP/auth route tests; set `TEST_DATABASE_URL` in `.env.local` (see [Setup](#setup)) |
 | **E2E** | `yarn test:e2e` | Docker stack up; Playwright browsers (`npx playwright install` on first run); app reachable at `APP_URL` (default `http://localhost:3000`) — start with `yarn dev` or CI equivalent |
-| **CI parity** | `yarn verify:ci` | Same steps as GitHub Actions `verify` job — run before pushing to `main` (`yarn db:up` first) |
+| **CI parity** | `yarn verify:ci` | Same checks as GitHub Actions, run sequentially — use before pushing to `main` (`yarn db:up` first) |
+
+GitHub Actions splits work into parallel jobs: **static checks** (typecheck, lint), **build** (uploads `.next` for e2e), **unit** (migrations, codegen check, Vitest coverage), and **four e2e shards** (`playwright test --shard=k/4`). The **docker** job runs after all of those pass.
+
+To run one e2e shard locally (after `yarn build`): `PLAYWRIGHT_SKIP_WEBSERVER_BUILD=1 yarn playwright test --shard=1/4`.
 
 `yarn test` runs **all** Vitest suites (unit + integration). CI-style quick gate on a clean VM: `yarn typecheck` then `yarn vitest run tests/unit`.
 

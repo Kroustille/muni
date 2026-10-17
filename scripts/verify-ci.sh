@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Mirrors `.github/workflows/ci.yml` job `verify` (run before pushing to main).
+# Mirrors `.github/workflows/ci.yml` locally (sequential; CI runs checks, unit, and sharded e2e in parallel).
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
