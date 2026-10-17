@@ -11,11 +11,7 @@ import {
   type RowError,
 } from "@/application/server/sync-service";
 
-<<<<<<< HEAD
 /** Must match `SYNC_PUSH_MAX_ITEMS` in `tests/integration/sync-routes.test.ts`. */
-=======
-/** Must match `SYNC_PUSH_MAX_ITEMS` (500) in `tests/integration/sync-routes.test.ts`. */
->>>>>>> 8d4ded8 (feat(deploy): production Docker image, Compose, and GHCR CI)
 const SYNC_PUSH_MAX_ITEMS = 500;
 
 const bodySchema = z.object({
