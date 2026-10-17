@@ -47,3 +47,29 @@
 - **Decision**: Land **006** on `main` before **007** UI bulk work when possible; if parallel branches, rebase **007** onto **006** before merge.
 - **Rationale**: Spec P5 and roadmap — reduces dual-risk merges.
 - **Alternatives**: Merge 007 first (rejected for recommended flow).
+
+## 5 (expanded). Breaking-change checklist with links
+
+| Area | Official notes | Muni impact (006) |
+|------|----------------|-------------------|
+| App Router / RSC | [Next 16 upgrade](https://nextjs.org/docs/app/guides/upgrading/version-16) | No route changes required |
+| `next/image` | Same guide | Not used in breaking ways |
+| Middleware | Same guide | No `src/middleware.ts` in repo |
+| Route Handlers | [Route handlers](https://nextjs.org/docs/app/api-reference/file-conventions/route) | Non-handler `export const` removed from sync push routes |
+| Turbopack default | Next 16 release notes | `next build --webpack` + `turbopack: {}` for Serwist |
+| `next dev` | Same | `next dev --webpack` until Serwist Turbopack is stable |
+| TypeScript | `next-env.d.ts` | Regenerated on `yarn build` |
+
+## 5b. Pre-upgrade baseline (T602)
+
+| Package | Before | After |
+|---------|--------|-------|
+| `next` | `^15.5.28` | `^16.4.2` |
+| `eslint-config-next` | `^15.5.28` | `^16.4.2` |
+| Production build | `next build` (Next 15) | `next build --webpack` (~17–23s on agent) |
+
+## 9. Resolved breaking-change IDs (T619)
+
+- **BC-006-1**: Route handler type error — sync push `SYNC_*_MAX` exports made module-private.
+- **BC-006-2**: Turbopack vs Serwist webpack — `--webpack` scripts; empty `turbopack` config key.
+- **BC-006-3**: ESLint — native `eslint-config-next` flat config; experimental react-hooks rules disabled for legacy patterns.

@@ -1,8 +1,6 @@
-import { FlatCompat } from "@eslint/eslintrc";
+import nextConfig from "eslint-config-next";
 
-const compat = new FlatCompat({ baseDirectory: import.meta.dirname });
-
-const config = [
+export default [
   {
     ignores: [
       ".next/**",
@@ -13,7 +11,12 @@ const config = [
       "public/sw.js",
     ],
   },
-  ...compat.extends("next/core-web-vitals", "next/typescript"),
+  ...nextConfig,
+  {
+    rules: {
+      // Next 16 / react-hooks v7: too strict for existing data-fetch-on-mount patterns (006).
+      "react-hooks/set-state-in-effect": "off",
+      "react-hooks/refs": "off",
+    },
+  },
 ];
-
-export default config;

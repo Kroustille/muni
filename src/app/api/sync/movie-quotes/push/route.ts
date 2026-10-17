@@ -11,7 +11,7 @@ import {
   type RowError,
 } from "@/application/server/sync-service";
 
-export const SYNC_MOVIE_QUOTES_PUSH_MAX = 500;
+const SYNC_MOVIE_QUOTES_PUSH_MAX = 500;
 
 const bodySchema = z.object({
   quotes: z.array(z.unknown()),

@@ -6,6 +6,9 @@ const withSerwist = withSerwistInit({
   swDest: "public/sw.js",
 });
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  // Serwist injects webpack config; Next 16 defaults to Turbopack for `next build`.
+  turbopack: {},
+};
 
 export default withSerwist(nextConfig);

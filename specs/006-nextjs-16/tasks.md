@@ -14,8 +14,8 @@
 
 **Purpose**: Audit and baseline before dependency bump.
 
-- [ ] T601 Document Next.js 16 breaking-change checklist (App Router, image, middleware, Turbopack) in `specs/006-nextjs-16/research.md` §5 with links to official migration notes
-- [ ] T602 Record pre-upgrade baseline (`next` / `eslint-config-next` versions, CI build time note) in `specs/006-nextjs-16/research.md`
+- [x] T601 Document Next.js 16 breaking-change checklist (App Router, image, middleware, Turbopack) in `specs/006-nextjs-16/research.md` §5 with links to official migration notes
+- [x] T602 Record pre-upgrade baseline (`next` / `eslint-config-next` versions, CI build time note) in `specs/006-nextjs-16/research.md`
 
 ---
 
@@ -23,12 +23,12 @@
 
 **Purpose**: Atomic framework upgrade — **blocks all user-story validation**.
 
-- [ ] T603 Bump `next` to `^16.0.x` and `eslint-config-next` to matching 16.x in `package.json`
-- [ ] T604 Regenerate lockfile via `yarn install` and align `@types/react` / `@types/react-dom` peers if Next 16 requires
-- [ ] T605 Verify `@serwist/next` compatibility; bump `serwist` / `@serwist/next` in `package.json` if needed for Next 16 build
-- [ ] T606 Fix `next.config.ts` and `src/app/sw.ts` compile or build warnings per Next 16 + Serwist docs
-- [ ] T607 Resolve `yarn typecheck` failures across `src/` and `tests/` after upgrade
-- [ ] T608 Resolve `yarn lint` failures (including `eslint-config-next` rule changes) across repository
+- [x] T603 Bump `next` to `^16.0.x` and `eslint-config-next` to matching 16.x in `package.json`
+- [x] T604 Regenerate lockfile via `yarn install` and align `@types/react` / `@types/react-dom` peers if Next 16 requires
+- [x] T605 Verify `@serwist/next` compatibility; bump `serwist` / `@serwist/next` in `package.json` if needed for Next 16 build
+- [x] T606 Fix `next.config.ts` and `src/app/sw.ts` compile or build warnings per Next 16 + Serwist docs
+- [x] T607 Resolve `yarn typecheck` failures across `src/` and `tests/` after upgrade
+- [x] T608 Resolve `yarn lint` failures (including `eslint-config-next` rule changes) across repository
 
 **Checkpoint**: `yarn typecheck` and `yarn lint` clean.
 
@@ -40,9 +40,9 @@
 
 **Independent Test**: [contracts/smoke-regression.md](contracts/smoke-regression.md) SM-001–SM-007.
 
-- [ ] T609 [US1] Fix App Router / RSC regressions affecting list pages under `src/app/(app)/` and `src/components/lists/list-page-content.tsx`
-- [ ] T610 [US1] Verify offline IndexedDB reads after upgrade; fix any client composition breakages in `src/composition/client.ts`
-- [ ] T611 [US1] Validate PWA precache and offline shell per `quickstart.md` §4; adjust Serwist config only if required
+- [x] T609 [US1] Fix App Router / RSC regressions affecting list pages under `src/app/(app)/` and `src/components/lists/list-page-content.tsx`
+- [x] T610 [US1] Verify offline IndexedDB reads after upgrade; fix any client composition breakages in `src/composition/client.ts`
+- [x] T611 [US1] Validate PWA precache and offline shell per `quickstart.md` §4; adjust Serwist config only if required
 
 **Checkpoint**: SM-001–SM-007 pass on `yarn build && yarn start`.
 
@@ -54,8 +54,8 @@
 
 **Independent Test**: SM-008–SM-009; existing auth-related tests green.
 
-- [ ] T612 [US2] Fix auth route handlers under `src/app/api/` (session, magic link, OAuth) if Next 16 request/cookie APIs changed
-- [ ] T613 [US2] Run and fix failing auth/session unit or integration tests under `tests/` tied to auth adapters
+- [x] T612 [US2] Fix auth route handlers under `src/app/api/` (session, magic link, OAuth) if Next 16 request/cookie APIs changed
+- [x] T613 [US2] Run and fix failing auth/session unit or integration tests under `tests/` tied to auth adapters
 
 ---
 
@@ -65,18 +65,18 @@
 
 **Independent Test**: [contracts/quality-gates.md](contracts/quality-gates.md) QG-001–QG-006.
 
-- [ ] T614 [US3] Fix unit/integration test failures in `tests/` until `yarn test` passes without disabled tests
-- [ ] T615 [US3] Ensure `yarn build` succeeds (production bundle including Serwist `public/sw.js`)
-- [ ] T616 [US3] Run `yarn build:migrations` and `yarn migrate:up`; fix any tooling breakages in `db/` scripts
-- [ ] T617 [US3] Run Playwright suite `yarn test:e2e` when Docker stack available; fix framework-related flakes only (no 007 features)
+- [x] T614 [US3] Fix unit/integration test failures in `tests/` until `yarn test` passes without disabled tests
+- [x] T615 [US3] Ensure `yarn build` succeeds (production bundle including Serwist `public/sw.js`)
+- [x] T616 [US3] Run `yarn build:migrations` and `yarn migrate:up`; fix any tooling breakages in `db/` scripts
+- [x] T617 [US3] Run Playwright suite `yarn test:e2e` when Docker stack available; fix framework-related flakes only (no 007 features)
 
 ---
 
 ## Phase 6: Polish
 
-- [ ] T618 Execute [contracts/smoke-regression.md](contracts/smoke-regression.md) SM-010–SM-011 (PWA launch + sync) and note results in PR/commit body
-- [ ] T619 Update `specs/006-nextjs-16/research.md` with resolved breaking-change IDs from implementation
-- [ ] T620 Final gate: `yarn typecheck`, `yarn lint`, `yarn test`, `yarn build` per [quickstart.md](quickstart.md)
+- [x] T618 Execute [contracts/smoke-regression.md](contracts/smoke-regression.md) SM-010–SM-011 (PWA launch + sync) and note results in PR/commit body
+- [x] T619 Update `specs/006-nextjs-16/research.md` with resolved breaking-change IDs from implementation
+- [x] T620 Final gate: `yarn typecheck`, `yarn lint`, `yarn test`, `yarn build` per [quickstart.md](quickstart.md)
 
 ---
 

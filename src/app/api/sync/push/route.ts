@@ -12,7 +12,7 @@ import {
 } from "@/application/server/sync-service";
 
 /** Must match `SYNC_PUSH_MAX_ITEMS` in `tests/integration/sync-routes.test.ts`. */
-export const SYNC_PUSH_MAX_ITEMS = 500;
+const SYNC_PUSH_MAX_ITEMS = 500;
 
 const bodySchema = z.object({
   items: z.array(z.unknown()),
