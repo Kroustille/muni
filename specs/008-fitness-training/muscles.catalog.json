@@ -1,0 +1,147 @@
+{
+  "version": 1,
+  "updated": "2026-10-19",
+  "attribution": {
+    "license": "CC BY-SA 4.0",
+    "note": "Muscle groupings align with common strength-training anatomy maps and French Wikipedia muscle articles (e.g. Liste des muscles du corps humain, groupes musculaires). Exercise-to-muscle mappings in exercises.catalog.json follow standard kinesiology references (compound lift primaries/secondaries).",
+    "sources": [
+      {
+        "title": "Liste des muscles du corps humain",
+        "publisher": "Wikipédia",
+        "url": "https://fr.wikipedia.org/wiki/Liste_des_muscles_du_corps_humain"
+      },
+      {
+        "title": "Muscle",
+        "publisher": "Wikipédia (anatomie fonctionnelle)",
+        "url": "https://fr.wikipedia.org/wiki/Muscle"
+      },
+      {
+        "title": "Human muscle map (strength training groupings)",
+        "publisher": "ExRx.net (exercise taxonomy reference)",
+        "url": "https://exrx.net/Lists/Muscle"
+      }
+    ]
+  },
+  "muscles": [
+    {
+      "id": "pectoraux",
+      "nameFr": "Pectoraux",
+      "nameEn": "Pectorals",
+      "region": "upper"
+    },
+    {
+      "id": "grand-dorsal",
+      "nameFr": "Grand dorsal",
+      "nameEn": "Latissimus dorsi",
+      "region": "upper"
+    },
+    {
+      "id": "trapèzes",
+      "nameFr": "Trapèzes",
+      "nameEn": "Trapezius",
+      "region": "upper"
+    },
+    {
+      "id": "rhomboïdes",
+      "nameFr": "Rhomboïdes",
+      "nameEn": "Rhomboids",
+      "region": "upper"
+    },
+    {
+      "id": "deltoide-anterieur",
+      "nameFr": "Deltoïde antérieur",
+      "nameEn": "Anterior deltoid",
+      "region": "upper"
+    },
+    {
+      "id": "deltoide-lateral",
+      "nameFr": "Deltoïde latéral",
+      "nameEn": "Lateral deltoid",
+      "region": "upper"
+    },
+    {
+      "id": "deltoide-posterieur",
+      "nameFr": "Deltoïde postérieur",
+      "nameEn": "Posterior deltoid",
+      "region": "upper"
+    },
+    {
+      "id": "biceps",
+      "nameFr": "Biceps",
+      "nameEn": "Biceps brachii",
+      "region": "upper"
+    },
+    {
+      "id": "triceps",
+      "nameFr": "Triceps",
+      "nameEn": "Triceps brachii",
+      "region": "upper"
+    },
+    {
+      "id": "avant-bras",
+      "nameFr": "Avant-bras",
+      "nameEn": "Forearms",
+      "region": "upper"
+    },
+    {
+      "id": "abdominaux",
+      "nameFr": "Abdominaux",
+      "nameEn": "Abdominals",
+      "region": "core"
+    },
+    {
+      "id": "obliques",
+      "nameFr": "Obliques",
+      "nameEn": "Obliques",
+      "region": "core"
+    },
+    {
+      "id": "lombaires",
+      "nameFr": "Lombaires",
+      "nameEn": "Erector spinae / lower back",
+      "region": "core"
+    },
+    {
+      "id": "fessiers",
+      "nameFr": "Fessiers",
+      "nameEn": "Glutes",
+      "region": "lower"
+    },
+    {
+      "id": "quadriceps",
+      "nameFr": "Quadriceps",
+      "nameEn": "Quadriceps",
+      "region": "lower"
+    },
+    {
+      "id": "ischio-jambiers",
+      "nameFr": "Ischio-jambiers",
+      "nameEn": "Hamstrings",
+      "region": "lower"
+    },
+    {
+      "id": "mollets",
+      "nameFr": "Mollets",
+      "nameEn": "Calves",
+      "region": "lower"
+    },
+    {
+      "id": "flechisseurs-hanche",
+      "nameFr": "Fléchisseurs de hanche",
+      "nameEn": "Hip flexors",
+      "region": "lower"
+    },
+    {
+      "id": "adducteurs",
+      "nameFr": "Adducteurs",
+      "nameEn": "Adductors",
+      "region": "lower"
+    },
+    {
+      "id": "abducteurs",
+      "nameFr": "Abducteurs",
+      "nameEn": "Abductors",
+      "region": "lower"
+    }
+  ]
+}

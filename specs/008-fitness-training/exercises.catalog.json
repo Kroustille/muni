@@ -2,139 +2,2340 @@
   "version": 1,
   "locale": "fr",
   "exercises": [
-    {"id": "developpe-couche-barre", "nameFr": "Développé couché à la barre", "nameEn": "Barbell bench press", "category": "pectoraux", "equipment": ["barre", "banc"], "modality": "strength", "tags": ["push"]},
-    {"id": "developpe-couche-halteres", "nameFr": "Développé couché aux haltères", "nameEn": "Dumbbell bench press", "category": "pectoraux", "equipment": ["haltères", "banc"], "modality": "strength", "tags": ["push"]},
-    {"id": "developpe-incline-barre", "nameFr": "Développé incliné à la barre", "nameEn": "Incline barbell bench press", "category": "pectoraux", "equipment": ["barre", "banc"], "modality": "strength", "tags": ["push"]},
-    {"id": "developpe-incline-halteres", "nameFr": "Développé incliné aux haltères", "nameEn": "Incline dumbbell bench press", "category": "pectoraux", "equipment": ["haltères", "banc"], "modality": "strength", "tags": ["push"]},
-    {"id": "developpe-decline", "nameFr": "Développé décliné", "nameEn": "Decline bench press", "category": "pectoraux", "equipment": ["barre", "banc"], "modality": "strength", "tags": ["push"]},
-    {"id": "pompes", "nameFr": "Pompes", "nameEn": "Push-up", "category": "pectoraux", "equipment": ["poids du corps"], "modality": "strength", "tags": ["push"]},
-    {"id": "pompes-inclinees", "nameFr": "Pompes inclinées", "nameEn": "Incline push-up", "category": "pectoraux", "equipment": ["poids du corps"], "modality": "strength", "tags": ["push"]},
-    {"id": "pompes-declivees", "nameFr": "Pompes déclinées", "nameEn": "Decline push-up", "category": "pectoraux", "equipment": ["poids du corps"], "modality": "strength", "tags": ["push"]},
-    {"id": "dips-pectoraux", "nameFr": "Dips (pectoraux)", "nameEn": "Chest dip", "category": "pectoraux", "equipment": ["poids du corps"], "modality": "strength", "tags": ["push"]},
-    {"id": "ecarte-cable", "nameFr": "Écarté à la poulie", "nameEn": "Cable fly", "category": "pectoraux", "equipment": ["câble"], "modality": "strength", "tags": ["push"]},
-    {"id": "ecarte-halteres", "nameFr": "Écarté aux haltères", "nameEn": "Dumbbell fly", "category": "pectoraux", "equipment": ["haltères", "banc"], "modality": "strength", "tags": ["push"]},
-    {"id": "ecarte-machine", "nameFr": "Écarté à la machine", "nameEn": "Pec deck fly", "category": "pectoraux", "equipment": ["machine"], "modality": "strength", "tags": ["push"]},
-    {"id": "pullover-haltere", "nameFr": "Pullover à l'haltère", "nameEn": "Dumbbell pullover", "category": "pectoraux", "equipment": ["haltères", "banc"], "modality": "strength", "tags": ["push"]},
-
-    {"id": "traction-pronation", "nameFr": "Tractions (prise pronation)", "nameEn": "Pull-up", "category": "dos", "equipment": ["poids du corps"], "modality": "strength", "tags": ["pull"]},
-    {"id": "traction-supination", "nameFr": "Tractions (prise supination)", "nameEn": "Chin-up", "category": "dos", "equipment": ["poids du corps"], "modality": "strength", "tags": ["pull"]},
-    {"id": "traction-neutre", "nameFr": "Tractions (prise neutre)", "nameEn": "Neutral-grip pull-up", "category": "dos", "equipment": ["poids du corps"], "modality": "strength", "tags": ["pull"]},
-    {"id": "tractions-assistees", "nameFr": "Tractions assistées", "nameEn": "Assisted pull-up", "category": "dos", "equipment": ["machine"], "modality": "strength", "tags": ["pull"]},
-    {"id": "tirage-vertical-poulie", "nameFr": "Tirage vertical à la poulie", "nameEn": "Lat pulldown", "category": "dos", "equipment": ["câble"], "modality": "strength", "tags": ["pull"]},
-    {"id": "rowing-barre", "nameFr": "Rowing barre buste penché", "nameEn": "Barbell bent-over row", "category": "dos", "equipment": ["barre"], "modality": "strength", "tags": ["pull"]},
-    {"id": "rowing-haltere-un-bras", "nameFr": "Rowing haltère un bras", "nameEn": "One-arm dumbbell row", "category": "dos", "equipment": ["haltères", "banc"], "modality": "strength", "tags": ["pull"]},
-    {"id": "rowing-poulie-basse", "nameFr": "Rowing à la poulie basse", "nameEn": "Seated cable row", "category": "dos", "equipment": ["câble"], "modality": "strength", "tags": ["pull"]},
-    {"id": "rowing-machine", "nameFr": "Rowing à la machine", "nameEn": "Machine row", "category": "dos", "equipment": ["machine"], "modality": "strength", "tags": ["pull"]},
-    {"id": "t-bar-row", "nameFr": "Rowing T-bar", "nameEn": "T-bar row", "category": "dos", "equipment": ["barre"], "modality": "strength", "tags": ["pull"]},
-    {"id": "souleve-de-terre", "nameFr": "Soulevé de terre", "nameEn": "Conventional deadlift", "category": "dos", "equipment": ["barre"], "modality": "strength", "tags": ["hinge", "pull"]},
-    {"id": "souleve-de-terre-roumain", "nameFr": "Soulevé de terre roumain", "nameEn": "Romanian deadlift", "category": "ischio-jambiers", "equipment": ["barre"], "modality": "strength", "tags": ["hinge"]},
-    {"id": "souleve-de-terre-sumo", "nameFr": "Soulevé de terre sumo", "nameEn": "Sumo deadlift", "category": "dos", "equipment": ["barre"], "modality": "strength", "tags": ["hinge", "pull"]},
-    {"id": "hyperextension", "nameFr": "Hyperextension lombaire", "nameEn": "Back extension", "category": "dos", "equipment": ["banc"], "modality": "strength", "tags": ["hinge"]},
-    {"id": "face-pull", "nameFr": "Face pull", "nameEn": "Face pull", "category": "dos", "equipment": ["câble"], "modality": "strength", "tags": ["pull"]},
-    {"id": "shrugs", "nameFr": "Haussements d'épaules", "nameEn": "Barbell shrug", "category": "dos", "equipment": ["barre"], "modality": "strength", "tags": ["pull"]},
-
-    {"id": "developpe-militaire-barre", "nameFr": "Développé militaire à la barre", "nameEn": "Barbell overhead press", "category": "épaules", "equipment": ["barre"], "modality": "strength", "tags": ["push"]},
-    {"id": "developpe-epaules-halteres", "nameFr": "Développé épaules aux haltères", "nameEn": "Dumbbell shoulder press", "category": "épaules", "equipment": ["haltères"], "modality": "strength", "tags": ["push"]},
-    {"id": "developpe-arnold", "nameFr": "Développé Arnold", "nameEn": "Arnold press", "category": "épaules", "equipment": ["haltères"], "modality": "strength", "tags": ["push"]},
-    {"id": "elevations-laterales", "nameFr": "Élévations latérales", "nameEn": "Lateral raise", "category": "épaules", "equipment": ["haltères"], "modality": "strength", "tags": ["push"]},
-    {"id": "elevations-frontales", "nameFr": "Élévations frontales", "nameEn": "Front raise", "category": "épaules", "equipment": ["haltères"], "modality": "strength", "tags": ["push"]},
-    {"id": "oiseau-halteres", "nameFr": "Oiseau aux haltères", "nameEn": "Rear delt fly", "category": "épaules", "equipment": ["haltères"], "modality": "strength", "tags": ["pull"]},
-    {"id": "developpe-epaules-machine", "nameFr": "Développé épaules à la machine", "nameEn": "Machine shoulder press", "category": "épaules", "equipment": ["machine"], "modality": "strength", "tags": ["push"]},
-    {"id": "upright-row", "nameFr": "Rowing vertical", "nameEn": "Upright row", "category": "épaules", "equipment": ["barre"], "modality": "strength", "tags": ["pull"]},
-
-    {"id": "curl-barre", "nameFr": "Curl biceps à la barre", "nameEn": "Barbell biceps curl", "category": "biceps", "equipment": ["barre"], "modality": "strength", "tags": ["pull"]},
-    {"id": "curl-halteres", "nameFr": "Curl biceps aux haltères", "nameEn": "Dumbbell biceps curl", "category": "biceps", "equipment": ["haltères"], "modality": "strength", "tags": ["pull"]},
-    {"id": "curl-marteau", "nameFr": "Curl marteau", "nameEn": "Hammer curl", "category": "biceps", "equipment": ["haltères"], "modality": "strength", "tags": ["pull"]},
-    {"id": "curl-incline", "nameFr": "Curl biceps incliné", "nameEn": "Incline dumbbell curl", "category": "biceps", "equipment": ["haltères", "banc"], "modality": "strength", "tags": ["pull"]},
-    {"id": "curl-pupitre", "nameFr": "Curl au pupitre", "nameEn": "Preacher curl", "category": "biceps", "equipment": ["barre", "banc"], "modality": "strength", "tags": ["pull"]},
-    {"id": "curl-cable", "nameFr": "Curl biceps à la poulie", "nameEn": "Cable biceps curl", "category": "biceps", "equipment": ["câble"], "modality": "strength", "tags": ["pull"]},
-    {"id": "curl-concentration", "nameFr": "Curl concentration", "nameEn": "Concentration curl", "category": "biceps", "equipment": ["haltères"], "modality": "strength", "tags": ["pull"]},
-
-    {"id": "extension-triceps-poulie", "nameFr": "Extension triceps à la poulie", "nameEn": "Triceps pushdown", "category": "triceps", "equipment": ["câble"], "modality": "strength", "tags": ["push"]},
-    {"id": "extension-triceps-barre", "nameFr": "Barre au front (skull crusher)", "nameEn": "Lying triceps extension", "category": "triceps", "equipment": ["barre", "banc"], "modality": "strength", "tags": ["push"]},
-    {"id": "extension-triceps-haltere", "nameFr": "Extension triceps haltère au-dessus de la tête", "nameEn": "Overhead triceps extension", "category": "triceps", "equipment": ["haltères"], "modality": "strength", "tags": ["push"]},
-    {"id": "dips-triceps", "nameFr": "Dips (triceps)", "nameEn": "Triceps dip", "category": "triceps", "equipment": ["poids du corps"], "modality": "strength", "tags": ["push"]},
-    {"id": "kickback-triceps", "nameFr": "Kickback triceps", "nameEn": "Triceps kickback", "category": "triceps", "equipment": ["haltères"], "modality": "strength", "tags": ["push"]},
-    {"id": "developpe-couche-prise-serree", "nameFr": "Développé couché prise serrée", "nameEn": "Close-grip bench press", "category": "triceps", "equipment": ["barre", "banc"], "modality": "strength", "tags": ["push"]},
-
-    {"id": "curl-poignet", "nameFr": "Curl poignet", "nameEn": "Wrist curl", "category": "avant-bras", "equipment": ["barre"], "modality": "strength", "tags": ["pull"]},
-    {"id": "curl-poignet-inverse", "nameFr": "Curl poignet inversé", "nameEn": "Reverse wrist curl", "category": "avant-bras", "equipment": ["barre"], "modality": "strength", "tags": ["pull"]},
-    {"id": "farmer-walk", "nameFr": "Farmer walk", "nameEn": "Farmer's walk", "category": "avant-bras", "equipment": ["haltères"], "modality": "strength", "tags": ["carry"]},
-
-    {"id": "squat-barre", "nameFr": "Squat à la barre", "nameEn": "Barbell back squat", "category": "quadriceps", "equipment": ["barre"], "modality": "strength", "tags": ["squat"]},
-    {"id": "squat-avant", "nameFr": "Squat avant", "nameEn": "Front squat", "category": "quadriceps", "equipment": ["barre"], "modality": "strength", "tags": ["squat"]},
-    {"id": "squat-goblet", "nameFr": "Squat goblet", "nameEn": "Goblet squat", "category": "quadriceps", "equipment": ["haltères"], "modality": "strength", "tags": ["squat"]},
-    {"id": "squat-poids-du-corps", "nameFr": "Squat au poids du corps", "nameEn": "Bodyweight squat", "category": "quadriceps", "equipment": ["poids du corps"], "modality": "strength", "tags": ["squat"]},
-    {"id": "squat-bulgare", "nameFr": "Squat bulgare", "nameEn": "Bulgarian split squat", "category": "quadriceps", "equipment": ["haltères"], "modality": "strength", "tags": ["squat"]},
-    {"id": "fentes-marchees", "nameFr": "Fentes marchées", "nameEn": "Walking lunge", "category": "quadriceps", "equipment": ["haltères"], "modality": "strength", "tags": ["squat"]},
-    {"id": "fentes-statiques", "nameFr": "Fentes statiques", "nameEn": "Stationary lunge", "category": "quadriceps", "equipment": ["haltères"], "modality": "strength", "tags": ["squat"]},
-    {"id": "fentes-arriere", "nameFr": "Fentes arrière", "nameEn": "Reverse lunge", "category": "quadriceps", "equipment": ["haltères"], "modality": "strength", "tags": ["squat"]},
-    {"id": "presse-a-cuisses", "nameFr": "Presse à cuisses", "nameEn": "Leg press", "category": "quadriceps", "equipment": ["machine"], "modality": "strength", "tags": ["squat"]},
-    {"id": "leg-extension", "nameFr": "Leg extension", "nameEn": "Leg extension", "category": "quadriceps", "equipment": ["machine"], "modality": "strength", "tags": ["squat"]},
-    {"id": "hack-squat", "nameFr": "Hack squat", "nameEn": "Hack squat", "category": "quadriceps", "equipment": ["machine"], "modality": "strength", "tags": ["squat"]},
-    {"id": "step-up", "nameFr": "Step-up", "nameEn": "Step-up", "category": "quadriceps", "equipment": ["haltères"], "modality": "strength", "tags": ["squat"]},
-    {"id": "pistol-squat", "nameFr": "Pistol squat", "nameEn": "Pistol squat", "category": "quadriceps", "equipment": ["poids du corps"], "modality": "strength", "tags": ["squat"]},
-
-    {"id": "leg-curl-allonge", "nameFr": "Leg curl allongé", "nameEn": "Lying leg curl", "category": "ischio-jambiers", "equipment": ["machine"], "modality": "strength", "tags": ["hinge"]},
-    {"id": "leg-curl-assis", "nameFr": "Leg curl assis", "nameEn": "Seated leg curl", "category": "ischio-jambiers", "equipment": ["machine"], "modality": "strength", "tags": ["hinge"]},
-    {"id": "good-morning", "nameFr": "Good morning", "nameEn": "Good morning", "category": "ischio-jambiers", "equipment": ["barre"], "modality": "strength", "tags": ["hinge"]},
-    {"id": "nordic-curl", "nameFr": "Nordic curl", "nameEn": "Nordic hamstring curl", "category": "ischio-jambiers", "equipment": ["poids du corps"], "modality": "strength", "tags": ["hinge"]},
-
-    {"id": "hip-thrust-barre", "nameFr": "Hip thrust à la barre", "nameEn": "Barbell hip thrust", "category": "fessiers", "equipment": ["barre", "banc"], "modality": "strength", "tags": ["hinge"]},
-    {"id": "pont-fessier", "nameFr": "Pont fessier", "nameEn": "Glute bridge", "category": "fessiers", "equipment": ["poids du corps"], "modality": "strength", "tags": ["hinge"]},
-    {"id": "abduction-hanche-machine", "nameFr": "Abduction de hanche à la machine", "nameEn": "Hip abduction machine", "category": "fessiers", "equipment": ["machine"], "modality": "strength", "tags": ["squat"]},
-    {"id": "kickback-poulie", "nameFr": "Kickback fessier à la poulie", "nameEn": "Cable glute kickback", "category": "fessiers", "equipment": ["câble"], "modality": "strength", "tags": ["hinge"]},
-
-    {"id": "mollets-debout", "nameFr": "Mollets debout", "nameEn": "Standing calf raise", "category": "mollets", "equipment": ["machine"], "modality": "strength", "tags": ["squat"]},
-    {"id": "mollets-assis", "nameFr": "Mollets assis", "nameEn": "Seated calf raise", "category": "mollets", "equipment": ["machine"], "modality": "strength", "tags": ["squat"]},
-    {"id": "mollets-presse", "nameFr": "Mollets à la presse", "nameEn": "Leg press calf raise", "category": "mollets", "equipment": ["machine"], "modality": "strength", "tags": ["squat"]},
-
-    {"id": "crunch", "nameFr": "Crunch", "nameEn": "Crunch", "category": "abdominaux", "equipment": ["poids du corps"], "modality": "strength", "tags": ["core"]},
-    {"id": "crunch-inverse", "nameFr": "Crunch inversé", "nameEn": "Reverse crunch", "category": "abdominaux", "equipment": ["poids du corps"], "modality": "strength", "tags": ["core"]},
-    {"id": "releve-de-jambes", "nameFr": "Relevé de jambes", "nameEn": "Leg raise", "category": "abdominaux", "equipment": ["poids du corps"], "modality": "strength", "tags": ["core"]},
-    {"id": "releve-de-jambes-suspendu", "nameFr": "Relevé de jambes suspendu", "nameEn": "Hanging leg raise", "category": "abdominaux", "equipment": ["poids du corps"], "modality": "strength", "tags": ["core"]},
-    {"id": "planche", "nameFr": "Planche", "nameEn": "Plank", "category": "abdominaux", "equipment": ["poids du corps"], "modality": "strength", "tags": ["core"]},
-    {"id": "planche-laterale", "nameFr": "Planche latérale", "nameEn": "Side plank", "category": "abdominaux", "equipment": ["poids du corps"], "modality": "strength", "tags": ["core"]},
-    {"id": "russian-twist", "nameFr": "Russian twist", "nameEn": "Russian twist", "category": "abdominaux", "equipment": ["poids du corps"], "modality": "strength", "tags": ["core"]},
-    {"id": "ab-wheel", "nameFr": "Roue abdominale", "nameEn": "Ab wheel rollout", "category": "abdominaux", "equipment": ["accessoire"], "modality": "strength", "tags": ["core"]},
-    {"id": "gainage-dead-bug", "nameFr": "Dead bug", "nameEn": "Dead bug", "category": "abdominaux", "equipment": ["poids du corps"], "modality": "strength", "tags": ["core"]},
-    {"id": "gainage-bird-dog", "nameFr": "Bird dog", "nameEn": "Bird dog", "category": "abdominaux", "equipment": ["poids du corps"], "modality": "strength", "tags": ["core"]},
-    {"id": "crunch-cable", "nameFr": "Crunch à la poulie", "nameEn": "Cable crunch", "category": "abdominaux", "equipment": ["câble"], "modality": "strength", "tags": ["core"]},
-    {"id": "woodchopper", "nameFr": "Woodchopper à la poulie", "nameEn": "Cable woodchopper", "category": "abdominaux", "equipment": ["câble"], "modality": "strength", "tags": ["core"]},
-
-    {"id": "burpees", "nameFr": "Burpees", "nameEn": "Burpee", "category": "corps entier", "equipment": ["poids du corps"], "modality": "strength", "tags": ["full_body"]},
-    {"id": "thruster", "nameFr": "Thruster", "nameEn": "Thruster", "category": "corps entier", "equipment": ["haltères"], "modality": "strength", "tags": ["full_body"]},
-    {"id": "clean-and-press", "nameFr": "Épaulé-jeté (haltères)", "nameEn": "Dumbbell clean and press", "category": "corps entier", "equipment": ["haltères"], "modality": "strength", "tags": ["full_body"]},
-    {"id": "kettlebell-swing", "nameFr": "Swing kettlebell", "nameEn": "Kettlebell swing", "category": "corps entier", "equipment": ["kettlebell"], "modality": "strength", "tags": ["hinge", "full_body"]},
-    {"id": "snatch-kettlebell", "nameFr": "Arraché kettlebell", "nameEn": "Kettlebell snatch", "category": "corps entier", "equipment": ["kettlebell"], "modality": "strength", "tags": ["full_body"]},
-    {"id": "rowing-ergometre", "nameFr": "Rameur", "nameEn": "Rowing machine", "category": "corps entier", "equipment": ["rameur"], "modality": "cardio", "tags": ["cardio"]},
-    {"id": "battle-ropes", "nameFr": "Cordes ondulatoires", "nameEn": "Battle ropes", "category": "corps entier", "equipment": ["câble"], "modality": "cardio", "tags": ["cardio"]},
-    {"id": "sled-push", "nameFr": "Poussée de traîneau", "nameEn": "Sled push", "category": "corps entier", "equipment": ["machine"], "modality": "strength", "tags": ["full_body"]},
-
-    {"id": "marche-rapide", "nameFr": "Marche rapide", "nameEn": "Brisk walking", "category": "cardio", "equipment": ["aucun"], "modality": "cardio", "tags": ["cardio"]},
-    {"id": "course-footing", "nameFr": "Course à pied", "nameEn": "Running", "category": "cardio", "equipment": ["aucun"], "modality": "cardio", "tags": ["cardio"]},
-    {"id": "course-intervalles", "nameFr": "Course par intervalles", "nameEn": "Interval running", "category": "cardio", "equipment": ["aucun"], "modality": "cardio", "tags": ["cardio"]},
-    {"id": "velo-stationnaire", "nameFr": "Vélo d'appartement", "nameEn": "Stationary bike", "category": "cardio", "equipment": ["vélo"], "modality": "cardio", "tags": ["cardio"]},
-    {"id": "velo-route", "nameFr": "Vélo", "nameEn": "Cycling", "category": "cardio", "equipment": ["vélo"], "modality": "cardio", "tags": ["cardio"]},
-    {"id": "elliptique", "nameFr": "Elliptique", "nameEn": "Elliptical trainer", "category": "cardio", "equipment": ["machine"], "modality": "cardio", "tags": ["cardio"]},
-    {"id": "stepper", "nameFr": "Stepper", "nameEn": "Stair climber", "category": "cardio", "equipment": ["machine"], "modality": "cardio", "tags": ["cardio"]},
-    {"id": "natation", "nameFr": "Natation", "nameEn": "Swimming", "category": "cardio", "equipment": ["aucun"], "modality": "cardio", "tags": ["cardio"]},
-    {"id": "aquabike", "nameFr": "Aquabike", "nameEn": "Water cycling", "category": "cardio", "equipment": ["machine"], "modality": "cardio", "tags": ["cardio"]},
-    {"id": "corde-a-sauter", "nameFr": "Corde à sauter", "nameEn": "Jump rope", "category": "cardio", "equipment": ["accessoire"], "modality": "cardio", "tags": ["cardio"]},
-    {"id": "rameur-cardio", "nameFr": "Rameur (cardio)", "nameEn": "Indoor rowing", "category": "cardio", "equipment": ["rameur"], "modality": "cardio", "tags": ["cardio"]},
-    {"id": "hiit-general", "nameFr": "HIIT (circuit)", "nameEn": "HIIT circuit", "category": "cardio", "equipment": ["poids du corps"], "modality": "cardio", "tags": ["cardio"]},
-    {"id": "escalade", "nameFr": "Escalade", "nameEn": "Climbing", "category": "cardio", "equipment": ["aucun"], "modality": "cardio", "tags": ["cardio"]},
-    {"id": "ski-erg", "nameFr": "Ski erg", "nameEn": "Ski ergometer", "category": "cardio", "equipment": ["machine"], "modality": "cardio", "tags": ["cardio"]},
-
-    {"id": "etirements-generaux", "nameFr": "Étirements généraux", "nameEn": "General stretching", "category": "mobilité", "equipment": ["aucun"], "modality": "mobility", "tags": ["mobility"]},
-    {"id": "yoga-flow", "nameFr": "Yoga (flow)", "nameEn": "Yoga flow", "category": "mobilité", "equipment": ["tapis"], "modality": "mobility", "tags": ["mobility"]},
-    {"id": "mobilite-hanche", "nameFr": "Mobilité des hanches", "nameEn": "Hip mobility", "category": "mobilité", "equipment": ["aucun"], "modality": "mobility", "tags": ["mobility"]},
-    {"id": "mobilite-epaules", "nameFr": "Mobilité des épaules", "nameEn": "Shoulder mobility", "category": "mobilité", "equipment": ["aucun"], "modality": "mobility", "tags": ["mobility"]},
-    {"id": "mobilite-thoracique", "nameFr": "Mobilité thoracique", "nameEn": "Thoracic mobility", "category": "mobilité", "equipment": ["aucun"], "modality": "mobility", "tags": ["mobility"]},
-    {"id": "foam-rolling", "nameFr": "Auto-massage (foam roller)", "nameEn": "Foam rolling", "category": "mobilité", "equipment": ["accessoire"], "modality": "mobility", "tags": ["mobility"]},
-    {"id": "worlds-greatest-stretch", "nameFr": "World's greatest stretch", "nameEn": "World's greatest stretch", "category": "mobilité", "equipment": ["aucun"], "modality": "mobility", "tags": ["mobility"]},
-    {"id": "chat-vache", "nameFr": "Posture chat-vache", "nameEn": "Cat-cow stretch", "category": "mobilité", "equipment": ["aucun"], "modality": "mobility", "tags": ["mobility"]},
-    {"id": "rotation-thoracique-quadrupedie", "nameFr": "Rotation thoracique à quatre pattes", "nameEn": "Quadruped thoracic rotation", "category": "mobilité", "equipment": ["aucun"], "modality": "mobility", "tags": ["mobility"]},
-    {"id": "etirement-ischios", "nameFr": "Étirement des ischio-jambiers", "nameEn": "Hamstring stretch", "category": "mobilité", "equipment": ["aucun"], "modality": "mobility", "tags": ["mobility"]}
-  ]
+    {
+      "id": "developpe-couche-barre",
+      "nameFr": "Développé couché à la barre",
+      "nameEn": "Barbell bench press",
+      "category": "pectoraux",
+      "equipment": [
+        "barre",
+        "banc"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "pectoraux"
+      ],
+      "secondaryMuscles": [
+        "triceps",
+        "deltoide-anterieur"
+      ]
+    },
+    {
+      "id": "developpe-couche-halteres",
+      "nameFr": "Développé couché aux haltères",
+      "nameEn": "Dumbbell bench press",
+      "category": "pectoraux",
+      "equipment": [
+        "haltères",
+        "banc"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "pectoraux"
+      ],
+      "secondaryMuscles": [
+        "triceps",
+        "deltoide-anterieur"
+      ]
+    },
+    {
+      "id": "developpe-incline-barre",
+      "nameFr": "Développé incliné à la barre",
+      "nameEn": "Incline barbell bench press",
+      "category": "pectoraux",
+      "equipment": [
+        "barre",
+        "banc"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "pectoraux"
+      ],
+      "secondaryMuscles": [
+        "deltoide-anterieur",
+        "triceps"
+      ]
+    },
+    {
+      "id": "developpe-incline-halteres",
+      "nameFr": "Développé incliné aux haltères",
+      "nameEn": "Incline dumbbell bench press",
+      "category": "pectoraux",
+      "equipment": [
+        "haltères",
+        "banc"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "pectoraux"
+      ],
+      "secondaryMuscles": [
+        "deltoide-anterieur",
+        "triceps"
+      ]
+    },
+    {
+      "id": "developpe-decline",
+      "nameFr": "Développé décliné",
+      "nameEn": "Decline bench press",
+      "category": "pectoraux",
+      "equipment": [
+        "barre",
+        "banc"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "pectoraux"
+      ],
+      "secondaryMuscles": [
+        "triceps"
+      ]
+    },
+    {
+      "id": "pompes",
+      "nameFr": "Pompes",
+      "nameEn": "Push-up",
+      "category": "pectoraux",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "pectoraux"
+      ],
+      "secondaryMuscles": [
+        "triceps",
+        "deltoide-anterieur",
+        "abdominaux"
+      ]
+    },
+    {
+      "id": "pompes-inclinees",
+      "nameFr": "Pompes inclinées",
+      "nameEn": "Incline push-up",
+      "category": "pectoraux",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "pectoraux"
+      ],
+      "secondaryMuscles": [
+        "triceps"
+      ]
+    },
+    {
+      "id": "pompes-declivees",
+      "nameFr": "Pompes déclinées",
+      "nameEn": "Decline push-up",
+      "category": "pectoraux",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "pectoraux"
+      ],
+      "secondaryMuscles": [
+        "deltoide-anterieur",
+        "triceps"
+      ]
+    },
+    {
+      "id": "dips-pectoraux",
+      "nameFr": "Dips (pectoraux)",
+      "nameEn": "Chest dip",
+      "category": "pectoraux",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "pectoraux"
+      ],
+      "secondaryMuscles": [
+        "triceps",
+        "deltoide-anterieur"
+      ]
+    },
+    {
+      "id": "ecarte-cable",
+      "nameFr": "Écarté à la poulie",
+      "nameEn": "Cable fly",
+      "category": "pectoraux",
+      "equipment": [
+        "câble"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "pectoraux"
+      ]
+    },
+    {
+      "id": "ecarte-halteres",
+      "nameFr": "Écarté aux haltères",
+      "nameEn": "Dumbbell fly",
+      "category": "pectoraux",
+      "equipment": [
+        "haltères",
+        "banc"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "pectoraux"
+      ],
+      "secondaryMuscles": [
+        "deltoide-anterieur"
+      ]
+    },
+    {
+      "id": "ecarte-machine",
+      "nameFr": "Écarté à la machine",
+      "nameEn": "Pec deck fly",
+      "category": "pectoraux",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "pectoraux"
+      ]
+    },
+    {
+      "id": "pullover-haltere",
+      "nameFr": "Pullover à l'haltère",
+      "nameEn": "Dumbbell pullover",
+      "category": "pectoraux",
+      "equipment": [
+        "haltères",
+        "banc"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "pectoraux"
+      ],
+      "secondaryMuscles": [
+        "grand-dorsal",
+        "triceps"
+      ]
+    },
+    {
+      "id": "traction-pronation",
+      "nameFr": "Tractions (prise pronation)",
+      "nameEn": "Pull-up",
+      "category": "dos",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "grand-dorsal"
+      ],
+      "secondaryMuscles": [
+        "biceps",
+        "rhomboïdes",
+        "trapèzes"
+      ]
+    },
+    {
+      "id": "traction-supination",
+      "nameFr": "Tractions (prise supination)",
+      "nameEn": "Chin-up",
+      "category": "dos",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "grand-dorsal"
+      ],
+      "secondaryMuscles": [
+        "biceps",
+        "rhomboïdes"
+      ]
+    },
+    {
+      "id": "traction-neutre",
+      "nameFr": "Tractions (prise neutre)",
+      "nameEn": "Neutral-grip pull-up",
+      "category": "dos",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "grand-dorsal"
+      ],
+      "secondaryMuscles": [
+        "biceps",
+        "rhomboïdes"
+      ]
+    },
+    {
+      "id": "tractions-assistees",
+      "nameFr": "Tractions assistées",
+      "nameEn": "Assisted pull-up",
+      "category": "dos",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "grand-dorsal"
+      ],
+      "secondaryMuscles": [
+        "biceps",
+        "rhomboïdes"
+      ]
+    },
+    {
+      "id": "tirage-vertical-poulie",
+      "nameFr": "Tirage vertical à la poulie",
+      "nameEn": "Lat pulldown",
+      "category": "dos",
+      "equipment": [
+        "câble"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "grand-dorsal"
+      ],
+      "secondaryMuscles": [
+        "biceps",
+        "rhomboïdes"
+      ]
+    },
+    {
+      "id": "rowing-barre",
+      "nameFr": "Rowing barre buste penché",
+      "nameEn": "Barbell bent-over row",
+      "category": "dos",
+      "equipment": [
+        "barre"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "grand-dorsal"
+      ],
+      "secondaryMuscles": [
+        "rhomboïdes",
+        "trapèzes",
+        "biceps",
+        "lombaires"
+      ]
+    },
+    {
+      "id": "rowing-haltere-un-bras",
+      "nameFr": "Rowing haltère un bras",
+      "nameEn": "One-arm dumbbell row",
+      "category": "dos",
+      "equipment": [
+        "haltères",
+        "banc"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "grand-dorsal"
+      ],
+      "secondaryMuscles": [
+        "rhomboïdes",
+        "biceps"
+      ]
+    },
+    {
+      "id": "rowing-poulie-basse",
+      "nameFr": "Rowing à la poulie basse",
+      "nameEn": "Seated cable row",
+      "category": "dos",
+      "equipment": [
+        "câble"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "grand-dorsal"
+      ],
+      "secondaryMuscles": [
+        "rhomboïdes",
+        "biceps",
+        "trapèzes"
+      ]
+    },
+    {
+      "id": "rowing-machine",
+      "nameFr": "Rowing à la machine",
+      "nameEn": "Machine row",
+      "category": "dos",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "grand-dorsal"
+      ],
+      "secondaryMuscles": [
+        "rhomboïdes",
+        "biceps"
+      ]
+    },
+    {
+      "id": "t-bar-row",
+      "nameFr": "Rowing T-bar",
+      "nameEn": "T-bar row",
+      "category": "dos",
+      "equipment": [
+        "barre"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "grand-dorsal"
+      ],
+      "secondaryMuscles": [
+        "rhomboïdes",
+        "trapèzes",
+        "biceps"
+      ]
+    },
+    {
+      "id": "souleve-de-terre",
+      "nameFr": "Soulevé de terre",
+      "nameEn": "Conventional deadlift",
+      "category": "dos",
+      "equipment": [
+        "barre"
+      ],
+      "modality": "strength",
+      "tags": [
+        "hinge",
+        "pull"
+      ],
+      "primaryMuscles": [
+        "ischio-jambiers",
+        "fessiers",
+        "lombaires"
+      ],
+      "secondaryMuscles": [
+        "quadriceps",
+        "trapèzes",
+        "grand-dorsal",
+        "avant-bras"
+      ]
+    },
+    {
+      "id": "souleve-de-terre-roumain",
+      "nameFr": "Soulevé de terre roumain",
+      "nameEn": "Romanian deadlift",
+      "category": "ischio-jambiers",
+      "equipment": [
+        "barre"
+      ],
+      "modality": "strength",
+      "tags": [
+        "hinge"
+      ],
+      "primaryMuscles": [
+        "ischio-jambiers",
+        "fessiers"
+      ],
+      "secondaryMuscles": [
+        "lombaires",
+        "grand-dorsal"
+      ]
+    },
+    {
+      "id": "souleve-de-terre-sumo",
+      "nameFr": "Soulevé de terre sumo",
+      "nameEn": "Sumo deadlift",
+      "category": "dos",
+      "equipment": [
+        "barre"
+      ],
+      "modality": "strength",
+      "tags": [
+        "hinge",
+        "pull"
+      ],
+      "primaryMuscles": [
+        "fessiers",
+        "quadriceps"
+      ],
+      "secondaryMuscles": [
+        "ischio-jambiers",
+        "adducteurs",
+        "lombaires"
+      ]
+    },
+    {
+      "id": "hyperextension",
+      "nameFr": "Hyperextension lombaire",
+      "nameEn": "Back extension",
+      "category": "dos",
+      "equipment": [
+        "banc"
+      ],
+      "modality": "strength",
+      "tags": [
+        "hinge"
+      ],
+      "primaryMuscles": [
+        "lombaires"
+      ],
+      "secondaryMuscles": [
+        "fessiers",
+        "ischio-jambiers"
+      ]
+    },
+    {
+      "id": "face-pull",
+      "nameFr": "Face pull",
+      "nameEn": "Face pull",
+      "category": "dos",
+      "equipment": [
+        "câble"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "deltoide-posterieur"
+      ],
+      "secondaryMuscles": [
+        "rhomboïdes",
+        "trapèzes"
+      ]
+    },
+    {
+      "id": "shrugs",
+      "nameFr": "Haussements d'épaules",
+      "nameEn": "Barbell shrug",
+      "category": "dos",
+      "equipment": [
+        "barre"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "trapèzes"
+      ]
+    },
+    {
+      "id": "developpe-militaire-barre",
+      "nameFr": "Développé militaire à la barre",
+      "nameEn": "Barbell overhead press",
+      "category": "épaules",
+      "equipment": [
+        "barre"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "deltoide-anterieur"
+      ],
+      "secondaryMuscles": [
+        "deltoide-lateral",
+        "triceps",
+        "trapèzes"
+      ]
+    },
+    {
+      "id": "developpe-epaules-halteres",
+      "nameFr": "Développé épaules aux haltères",
+      "nameEn": "Dumbbell shoulder press",
+      "category": "épaules",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "deltoide-anterieur"
+      ],
+      "secondaryMuscles": [
+        "deltoide-lateral",
+        "triceps"
+      ]
+    },
+    {
+      "id": "developpe-arnold",
+      "nameFr": "Développé Arnold",
+      "nameEn": "Arnold press",
+      "category": "épaules",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "deltoide-anterieur"
+      ],
+      "secondaryMuscles": [
+        "deltoide-lateral",
+        "triceps"
+      ]
+    },
+    {
+      "id": "elevations-laterales",
+      "nameFr": "Élévations latérales",
+      "nameEn": "Lateral raise",
+      "category": "épaules",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "deltoide-lateral"
+      ]
+    },
+    {
+      "id": "elevations-frontales",
+      "nameFr": "Élévations frontales",
+      "nameEn": "Front raise",
+      "category": "épaules",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "deltoide-anterieur"
+      ]
+    },
+    {
+      "id": "oiseau-halteres",
+      "nameFr": "Oiseau aux haltères",
+      "nameEn": "Rear delt fly",
+      "category": "épaules",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "deltoide-posterieur"
+      ],
+      "secondaryMuscles": [
+        "rhomboïdes",
+        "trapèzes"
+      ]
+    },
+    {
+      "id": "developpe-epaules-machine",
+      "nameFr": "Développé épaules à la machine",
+      "nameEn": "Machine shoulder press",
+      "category": "épaules",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "deltoide-anterieur"
+      ],
+      "secondaryMuscles": [
+        "triceps"
+      ]
+    },
+    {
+      "id": "upright-row",
+      "nameFr": "Rowing vertical",
+      "nameEn": "Upright row",
+      "category": "épaules",
+      "equipment": [
+        "barre"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "deltoide-lateral"
+      ],
+      "secondaryMuscles": [
+        "trapèzes",
+        "biceps"
+      ]
+    },
+    {
+      "id": "curl-barre",
+      "nameFr": "Curl biceps à la barre",
+      "nameEn": "Barbell biceps curl",
+      "category": "biceps",
+      "equipment": [
+        "barre"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "biceps"
+      ]
+    },
+    {
+      "id": "curl-halteres",
+      "nameFr": "Curl biceps aux haltères",
+      "nameEn": "Dumbbell biceps curl",
+      "category": "biceps",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "biceps"
+      ]
+    },
+    {
+      "id": "curl-marteau",
+      "nameFr": "Curl marteau",
+      "nameEn": "Hammer curl",
+      "category": "biceps",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "biceps"
+      ],
+      "secondaryMuscles": [
+        "avant-bras"
+      ]
+    },
+    {
+      "id": "curl-incline",
+      "nameFr": "Curl biceps incliné",
+      "nameEn": "Incline dumbbell curl",
+      "category": "biceps",
+      "equipment": [
+        "haltères",
+        "banc"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "biceps"
+      ]
+    },
+    {
+      "id": "curl-pupitre",
+      "nameFr": "Curl au pupitre",
+      "nameEn": "Preacher curl",
+      "category": "biceps",
+      "equipment": [
+        "barre",
+        "banc"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "biceps"
+      ]
+    },
+    {
+      "id": "curl-cable",
+      "nameFr": "Curl biceps à la poulie",
+      "nameEn": "Cable biceps curl",
+      "category": "biceps",
+      "equipment": [
+        "câble"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "biceps"
+      ]
+    },
+    {
+      "id": "curl-concentration",
+      "nameFr": "Curl concentration",
+      "nameEn": "Concentration curl",
+      "category": "biceps",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "biceps"
+      ]
+    },
+    {
+      "id": "extension-triceps-poulie",
+      "nameFr": "Extension triceps à la poulie",
+      "nameEn": "Triceps pushdown",
+      "category": "triceps",
+      "equipment": [
+        "câble"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "triceps"
+      ]
+    },
+    {
+      "id": "extension-triceps-barre",
+      "nameFr": "Barre au front (skull crusher)",
+      "nameEn": "Lying triceps extension",
+      "category": "triceps",
+      "equipment": [
+        "barre",
+        "banc"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "triceps"
+      ]
+    },
+    {
+      "id": "extension-triceps-haltere",
+      "nameFr": "Extension triceps haltère au-dessus de la tête",
+      "nameEn": "Overhead triceps extension",
+      "category": "triceps",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "triceps"
+      ]
+    },
+    {
+      "id": "dips-triceps",
+      "nameFr": "Dips (triceps)",
+      "nameEn": "Triceps dip",
+      "category": "triceps",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "triceps"
+      ],
+      "secondaryMuscles": [
+        "pectoraux",
+        "deltoide-anterieur"
+      ]
+    },
+    {
+      "id": "kickback-triceps",
+      "nameFr": "Kickback triceps",
+      "nameEn": "Triceps kickback",
+      "category": "triceps",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "triceps"
+      ]
+    },
+    {
+      "id": "developpe-couche-prise-serree",
+      "nameFr": "Développé couché prise serrée",
+      "nameEn": "Close-grip bench press",
+      "category": "triceps",
+      "equipment": [
+        "barre",
+        "banc"
+      ],
+      "modality": "strength",
+      "tags": [
+        "push"
+      ],
+      "primaryMuscles": [
+        "triceps"
+      ],
+      "secondaryMuscles": [
+        "pectoraux",
+        "deltoide-anterieur"
+      ]
+    },
+    {
+      "id": "curl-poignet",
+      "nameFr": "Curl poignet",
+      "nameEn": "Wrist curl",
+      "category": "avant-bras",
+      "equipment": [
+        "barre"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "avant-bras"
+      ]
+    },
+    {
+      "id": "curl-poignet-inverse",
+      "nameFr": "Curl poignet inversé",
+      "nameEn": "Reverse wrist curl",
+      "category": "avant-bras",
+      "equipment": [
+        "barre"
+      ],
+      "modality": "strength",
+      "tags": [
+        "pull"
+      ],
+      "primaryMuscles": [
+        "avant-bras"
+      ]
+    },
+    {
+      "id": "farmer-walk",
+      "nameFr": "Farmer walk",
+      "nameEn": "Farmer's walk",
+      "category": "avant-bras",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "carry"
+      ],
+      "primaryMuscles": [
+        "avant-bras"
+      ],
+      "secondaryMuscles": [
+        "trapèzes",
+        "abdominaux"
+      ]
+    },
+    {
+      "id": "squat-barre",
+      "nameFr": "Squat à la barre",
+      "nameEn": "Barbell back squat",
+      "category": "quadriceps",
+      "equipment": [
+        "barre"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "fessiers"
+      ],
+      "secondaryMuscles": [
+        "ischio-jambiers",
+        "lombaires",
+        "abdominaux"
+      ]
+    },
+    {
+      "id": "squat-avant",
+      "nameFr": "Squat avant",
+      "nameEn": "Front squat",
+      "category": "quadriceps",
+      "equipment": [
+        "barre"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "quadriceps"
+      ],
+      "secondaryMuscles": [
+        "fessiers",
+        "abdominaux"
+      ]
+    },
+    {
+      "id": "squat-goblet",
+      "nameFr": "Squat goblet",
+      "nameEn": "Goblet squat",
+      "category": "quadriceps",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "fessiers"
+      ],
+      "secondaryMuscles": [
+        "abdominaux"
+      ]
+    },
+    {
+      "id": "squat-poids-du-corps",
+      "nameFr": "Squat au poids du corps",
+      "nameEn": "Bodyweight squat",
+      "category": "quadriceps",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "fessiers"
+      ]
+    },
+    {
+      "id": "squat-bulgare",
+      "nameFr": "Squat bulgare",
+      "nameEn": "Bulgarian split squat",
+      "category": "quadriceps",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "fessiers"
+      ],
+      "secondaryMuscles": [
+        "ischio-jambiers"
+      ]
+    },
+    {
+      "id": "fentes-marchees",
+      "nameFr": "Fentes marchées",
+      "nameEn": "Walking lunge",
+      "category": "quadriceps",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "fessiers"
+      ],
+      "secondaryMuscles": [
+        "ischio-jambiers"
+      ]
+    },
+    {
+      "id": "fentes-statiques",
+      "nameFr": "Fentes statiques",
+      "nameEn": "Stationary lunge",
+      "category": "quadriceps",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "fessiers"
+      ]
+    },
+    {
+      "id": "fentes-arriere",
+      "nameFr": "Fentes arrière",
+      "nameEn": "Reverse lunge",
+      "category": "quadriceps",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "fessiers"
+      ]
+    },
+    {
+      "id": "presse-a-cuisses",
+      "nameFr": "Presse à cuisses",
+      "nameEn": "Leg press",
+      "category": "quadriceps",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "quadriceps"
+      ],
+      "secondaryMuscles": [
+        "fessiers"
+      ]
+    },
+    {
+      "id": "leg-extension",
+      "nameFr": "Leg extension",
+      "nameEn": "Leg extension",
+      "category": "quadriceps",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "quadriceps"
+      ]
+    },
+    {
+      "id": "hack-squat",
+      "nameFr": "Hack squat",
+      "nameEn": "Hack squat",
+      "category": "quadriceps",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "quadriceps"
+      ],
+      "secondaryMuscles": [
+        "fessiers"
+      ]
+    },
+    {
+      "id": "step-up",
+      "nameFr": "Step-up",
+      "nameEn": "Step-up",
+      "category": "quadriceps",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "fessiers"
+      ]
+    },
+    {
+      "id": "pistol-squat",
+      "nameFr": "Pistol squat",
+      "nameEn": "Pistol squat",
+      "category": "quadriceps",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "fessiers"
+      ]
+    },
+    {
+      "id": "leg-curl-allonge",
+      "nameFr": "Leg curl allongé",
+      "nameEn": "Lying leg curl",
+      "category": "ischio-jambiers",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "strength",
+      "tags": [
+        "hinge"
+      ],
+      "primaryMuscles": [
+        "ischio-jambiers"
+      ]
+    },
+    {
+      "id": "leg-curl-assis",
+      "nameFr": "Leg curl assis",
+      "nameEn": "Seated leg curl",
+      "category": "ischio-jambiers",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "strength",
+      "tags": [
+        "hinge"
+      ],
+      "primaryMuscles": [
+        "ischio-jambiers"
+      ]
+    },
+    {
+      "id": "good-morning",
+      "nameFr": "Good morning",
+      "nameEn": "Good morning",
+      "category": "ischio-jambiers",
+      "equipment": [
+        "barre"
+      ],
+      "modality": "strength",
+      "tags": [
+        "hinge"
+      ],
+      "primaryMuscles": [
+        "ischio-jambiers",
+        "lombaires"
+      ],
+      "secondaryMuscles": [
+        "fessiers"
+      ]
+    },
+    {
+      "id": "nordic-curl",
+      "nameFr": "Nordic curl",
+      "nameEn": "Nordic hamstring curl",
+      "category": "ischio-jambiers",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "hinge"
+      ],
+      "primaryMuscles": [
+        "ischio-jambiers"
+      ]
+    },
+    {
+      "id": "hip-thrust-barre",
+      "nameFr": "Hip thrust à la barre",
+      "nameEn": "Barbell hip thrust",
+      "category": "fessiers",
+      "equipment": [
+        "barre",
+        "banc"
+      ],
+      "modality": "strength",
+      "tags": [
+        "hinge"
+      ],
+      "primaryMuscles": [
+        "fessiers"
+      ],
+      "secondaryMuscles": [
+        "ischio-jambiers",
+        "quadriceps"
+      ]
+    },
+    {
+      "id": "pont-fessier",
+      "nameFr": "Pont fessier",
+      "nameEn": "Glute bridge",
+      "category": "fessiers",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "hinge"
+      ],
+      "primaryMuscles": [
+        "fessiers"
+      ],
+      "secondaryMuscles": [
+        "ischio-jambiers"
+      ]
+    },
+    {
+      "id": "abduction-hanche-machine",
+      "nameFr": "Abduction de hanche à la machine",
+      "nameEn": "Hip abduction machine",
+      "category": "fessiers",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "abducteurs"
+      ],
+      "secondaryMuscles": [
+        "fessiers"
+      ]
+    },
+    {
+      "id": "kickback-poulie",
+      "nameFr": "Kickback fessier à la poulie",
+      "nameEn": "Cable glute kickback",
+      "category": "fessiers",
+      "equipment": [
+        "câble"
+      ],
+      "modality": "strength",
+      "tags": [
+        "hinge"
+      ],
+      "primaryMuscles": [
+        "fessiers"
+      ]
+    },
+    {
+      "id": "mollets-debout",
+      "nameFr": "Mollets debout",
+      "nameEn": "Standing calf raise",
+      "category": "mollets",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "mollets"
+      ]
+    },
+    {
+      "id": "mollets-assis",
+      "nameFr": "Mollets assis",
+      "nameEn": "Seated calf raise",
+      "category": "mollets",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "mollets"
+      ]
+    },
+    {
+      "id": "mollets-presse",
+      "nameFr": "Mollets à la presse",
+      "nameEn": "Leg press calf raise",
+      "category": "mollets",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "strength",
+      "tags": [
+        "squat"
+      ],
+      "primaryMuscles": [
+        "mollets"
+      ]
+    },
+    {
+      "id": "crunch",
+      "nameFr": "Crunch",
+      "nameEn": "Crunch",
+      "category": "abdominaux",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "core"
+      ],
+      "primaryMuscles": [
+        "abdominaux"
+      ]
+    },
+    {
+      "id": "crunch-inverse",
+      "nameFr": "Crunch inversé",
+      "nameEn": "Reverse crunch",
+      "category": "abdominaux",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "core"
+      ],
+      "primaryMuscles": [
+        "abdominaux"
+      ],
+      "secondaryMuscles": [
+        "flechisseurs-hanche"
+      ]
+    },
+    {
+      "id": "releve-de-jambes",
+      "nameFr": "Relevé de jambes",
+      "nameEn": "Leg raise",
+      "category": "abdominaux",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "core"
+      ],
+      "primaryMuscles": [
+        "abdominaux"
+      ],
+      "secondaryMuscles": [
+        "flechisseurs-hanche"
+      ]
+    },
+    {
+      "id": "releve-de-jambes-suspendu",
+      "nameFr": "Relevé de jambes suspendu",
+      "nameEn": "Hanging leg raise",
+      "category": "abdominaux",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "core"
+      ],
+      "primaryMuscles": [
+        "abdominaux"
+      ],
+      "secondaryMuscles": [
+        "flechisseurs-hanche"
+      ]
+    },
+    {
+      "id": "planche",
+      "nameFr": "Planche",
+      "nameEn": "Plank",
+      "category": "abdominaux",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "core"
+      ],
+      "primaryMuscles": [
+        "abdominaux"
+      ],
+      "secondaryMuscles": [
+        "obliques",
+        "lombaires",
+        "deltoide-anterieur"
+      ]
+    },
+    {
+      "id": "planche-laterale",
+      "nameFr": "Planche latérale",
+      "nameEn": "Side plank",
+      "category": "abdominaux",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "core"
+      ],
+      "primaryMuscles": [
+        "obliques"
+      ],
+      "secondaryMuscles": [
+        "abdominaux"
+      ]
+    },
+    {
+      "id": "russian-twist",
+      "nameFr": "Russian twist",
+      "nameEn": "Russian twist",
+      "category": "abdominaux",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "core"
+      ],
+      "primaryMuscles": [
+        "obliques"
+      ],
+      "secondaryMuscles": [
+        "abdominaux"
+      ]
+    },
+    {
+      "id": "ab-wheel",
+      "nameFr": "Roue abdominale",
+      "nameEn": "Ab wheel rollout",
+      "category": "abdominaux",
+      "equipment": [
+        "accessoire"
+      ],
+      "modality": "strength",
+      "tags": [
+        "core"
+      ],
+      "primaryMuscles": [
+        "abdominaux"
+      ],
+      "secondaryMuscles": [
+        "lombaires",
+        "deltoide-anterieur"
+      ]
+    },
+    {
+      "id": "gainage-dead-bug",
+      "nameFr": "Dead bug",
+      "nameEn": "Dead bug",
+      "category": "abdominaux",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "core"
+      ],
+      "primaryMuscles": [
+        "abdominaux"
+      ]
+    },
+    {
+      "id": "gainage-bird-dog",
+      "nameFr": "Bird dog",
+      "nameEn": "Bird dog",
+      "category": "abdominaux",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "core"
+      ],
+      "primaryMuscles": [
+        "lombaires"
+      ],
+      "secondaryMuscles": [
+        "fessiers",
+        "abdominaux"
+      ]
+    },
+    {
+      "id": "crunch-cable",
+      "nameFr": "Crunch à la poulie",
+      "nameEn": "Cable crunch",
+      "category": "abdominaux",
+      "equipment": [
+        "câble"
+      ],
+      "modality": "strength",
+      "tags": [
+        "core"
+      ],
+      "primaryMuscles": [
+        "abdominaux"
+      ]
+    },
+    {
+      "id": "woodchopper",
+      "nameFr": "Woodchopper à la poulie",
+      "nameEn": "Cable woodchopper",
+      "category": "abdominaux",
+      "equipment": [
+        "câble"
+      ],
+      "modality": "strength",
+      "tags": [
+        "core"
+      ],
+      "primaryMuscles": [
+        "obliques"
+      ],
+      "secondaryMuscles": [
+        "abdominaux"
+      ]
+    },
+    {
+      "id": "burpees",
+      "nameFr": "Burpees",
+      "nameEn": "Burpee",
+      "category": "corps entier",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "strength",
+      "tags": [
+        "full_body"
+      ],
+      "primaryMuscles": [
+        "quadriceps"
+      ],
+      "secondaryMuscles": [
+        "pectoraux",
+        "fessiers",
+        "deltoide-anterieur",
+        "abdominaux"
+      ]
+    },
+    {
+      "id": "thruster",
+      "nameFr": "Thruster",
+      "nameEn": "Thruster",
+      "category": "corps entier",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "full_body"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "deltoide-anterieur"
+      ],
+      "secondaryMuscles": [
+        "fessiers",
+        "triceps"
+      ]
+    },
+    {
+      "id": "clean-and-press",
+      "nameFr": "Épaulé-jeté (haltères)",
+      "nameEn": "Dumbbell clean and press",
+      "category": "corps entier",
+      "equipment": [
+        "haltères"
+      ],
+      "modality": "strength",
+      "tags": [
+        "full_body"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "deltoide-anterieur"
+      ],
+      "secondaryMuscles": [
+        "fessiers",
+        "trapèzes",
+        "triceps"
+      ]
+    },
+    {
+      "id": "kettlebell-swing",
+      "nameFr": "Swing kettlebell",
+      "nameEn": "Kettlebell swing",
+      "category": "corps entier",
+      "equipment": [
+        "kettlebell"
+      ],
+      "modality": "strength",
+      "tags": [
+        "hinge",
+        "full_body"
+      ],
+      "primaryMuscles": [
+        "fessiers",
+        "ischio-jambiers"
+      ],
+      "secondaryMuscles": [
+        "lombaires",
+        "deltoide-anterieur"
+      ]
+    },
+    {
+      "id": "snatch-kettlebell",
+      "nameFr": "Arraché kettlebell",
+      "nameEn": "Kettlebell snatch",
+      "category": "corps entier",
+      "equipment": [
+        "kettlebell"
+      ],
+      "modality": "strength",
+      "tags": [
+        "full_body"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "deltoide-anterieur"
+      ],
+      "secondaryMuscles": [
+        "fessiers",
+        "trapèzes",
+        "ischio-jambiers"
+      ]
+    },
+    {
+      "id": "rowing-ergometre",
+      "nameFr": "Rameur",
+      "nameEn": "Rowing machine",
+      "category": "corps entier",
+      "equipment": [
+        "rameur"
+      ],
+      "modality": "cardio",
+      "tags": [
+        "cardio"
+      ],
+      "primaryMuscles": [
+        "grand-dorsal",
+        "quadriceps"
+      ],
+      "secondaryMuscles": [
+        "ischio-jambiers",
+        "biceps"
+      ],
+      "modalityNote": "Cardio full-body."
+    },
+    {
+      "id": "battle-ropes",
+      "nameFr": "Cordes ondulatoires",
+      "nameEn": "Battle ropes",
+      "category": "corps entier",
+      "equipment": [
+        "câble"
+      ],
+      "modality": "cardio",
+      "tags": [
+        "cardio"
+      ],
+      "primaryMuscles": [
+        "deltoide-anterieur"
+      ],
+      "secondaryMuscles": [
+        "abdominaux",
+        "avant-bras"
+      ],
+      "modalityNote": "Cardio haut du corps."
+    },
+    {
+      "id": "sled-push",
+      "nameFr": "Poussée de traîneau",
+      "nameEn": "Sled push",
+      "category": "corps entier",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "strength",
+      "tags": [
+        "full_body"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "fessiers"
+      ],
+      "secondaryMuscles": [
+        "mollets",
+        "abdominaux"
+      ]
+    },
+    {
+      "id": "marche-rapide",
+      "nameFr": "Marche rapide",
+      "nameEn": "Brisk walking",
+      "category": "cardio",
+      "equipment": [
+        "aucun"
+      ],
+      "modality": "cardio",
+      "tags": [
+        "cardio"
+      ],
+      "primaryMuscles": [
+        "fessiers",
+        "ischio-jambiers"
+      ],
+      "secondaryMuscles": [
+        "mollets"
+      ],
+      "modalityNote": "Endurance."
+    },
+    {
+      "id": "course-footing",
+      "nameFr": "Course à pied",
+      "nameEn": "Running",
+      "category": "cardio",
+      "equipment": [
+        "aucun"
+      ],
+      "modality": "cardio",
+      "tags": [
+        "cardio"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "ischio-jambiers",
+        "mollets"
+      ],
+      "secondaryMuscles": [
+        "fessiers"
+      ],
+      "modalityNote": "Endurance."
+    },
+    {
+      "id": "course-intervalles",
+      "nameFr": "Course par intervalles",
+      "nameEn": "Interval running",
+      "category": "cardio",
+      "equipment": [
+        "aucun"
+      ],
+      "modality": "cardio",
+      "tags": [
+        "cardio"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "ischio-jambiers"
+      ],
+      "secondaryMuscles": [
+        "fessiers",
+        "mollets"
+      ],
+      "modalityNote": "HIIT."
+    },
+    {
+      "id": "velo-stationnaire",
+      "nameFr": "Vélo d'appartement",
+      "nameEn": "Stationary bike",
+      "category": "cardio",
+      "equipment": [
+        "vélo"
+      ],
+      "modality": "cardio",
+      "tags": [
+        "cardio"
+      ],
+      "primaryMuscles": [
+        "quadriceps"
+      ],
+      "secondaryMuscles": [
+        "fessiers",
+        "mollets"
+      ],
+      "modalityNote": "Cardio cyclique."
+    },
+    {
+      "id": "velo-route",
+      "nameFr": "Vélo",
+      "nameEn": "Cycling",
+      "category": "cardio",
+      "equipment": [
+        "vélo"
+      ],
+      "modality": "cardio",
+      "tags": [
+        "cardio"
+      ],
+      "primaryMuscles": [
+        "quadriceps"
+      ],
+      "secondaryMuscles": [
+        "fessiers",
+        "mollets"
+      ],
+      "modalityNote": "Cardio cyclique."
+    },
+    {
+      "id": "elliptique",
+      "nameFr": "Elliptique",
+      "nameEn": "Elliptical trainer",
+      "category": "cardio",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "cardio",
+      "tags": [
+        "cardio"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "fessiers"
+      ],
+      "secondaryMuscles": [
+        "ischio-jambiers"
+      ],
+      "modalityNote": "Faible impact."
+    },
+    {
+      "id": "stepper",
+      "nameFr": "Stepper",
+      "nameEn": "Stair climber",
+      "category": "cardio",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "cardio",
+      "tags": [
+        "cardio"
+      ],
+      "primaryMuscles": [
+        "quadriceps",
+        "fessiers"
+      ],
+      "secondaryMuscles": [
+        "mollets"
+      ]
+    },
+    {
+      "id": "natation",
+      "nameFr": "Natation",
+      "nameEn": "Swimming",
+      "category": "cardio",
+      "equipment": [
+        "aucun"
+      ],
+      "modality": "cardio",
+      "tags": [
+        "cardio"
+      ],
+      "primaryMuscles": [
+        "grand-dorsal",
+        "deltoide-posterieur"
+      ],
+      "secondaryMuscles": [
+        "pectoraux",
+        "triceps",
+        "abdominaux"
+      ],
+      "modalityNote": "Selon style de nage."
+    },
+    {
+      "id": "aquabike",
+      "nameFr": "Aquabike",
+      "nameEn": "Water cycling",
+      "category": "cardio",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "cardio",
+      "tags": [
+        "cardio"
+      ],
+      "primaryMuscles": [
+        "quadriceps"
+      ],
+      "secondaryMuscles": [
+        "fessiers",
+        "mollets"
+      ]
+    },
+    {
+      "id": "corde-a-sauter",
+      "nameFr": "Corde à sauter",
+      "nameEn": "Jump rope",
+      "category": "cardio",
+      "equipment": [
+        "accessoire"
+      ],
+      "modality": "cardio",
+      "tags": [
+        "cardio"
+      ],
+      "primaryMuscles": [
+        "mollets"
+      ],
+      "secondaryMuscles": [
+        "quadriceps",
+        "fessiers"
+      ]
+    },
+    {
+      "id": "rameur-cardio",
+      "nameFr": "Rameur (cardio)",
+      "nameEn": "Indoor rowing",
+      "category": "cardio",
+      "equipment": [
+        "rameur"
+      ],
+      "modality": "cardio",
+      "tags": [
+        "cardio"
+      ],
+      "primaryMuscles": [
+        "grand-dorsal",
+        "quadriceps"
+      ],
+      "secondaryMuscles": [
+        "ischio-jambiers",
+        "biceps"
+      ]
+    },
+    {
+      "id": "hiit-general",
+      "nameFr": "HIIT (circuit)",
+      "nameEn": "HIIT circuit",
+      "category": "cardio",
+      "equipment": [
+        "poids du corps"
+      ],
+      "modality": "cardio",
+      "tags": [
+        "cardio"
+      ],
+      "primaryMuscles": [
+        "quadriceps"
+      ],
+      "secondaryMuscles": [
+        "fessiers",
+        "abdominaux"
+      ],
+      "modalityNote": "Circuit variable."
+    },
+    {
+      "id": "escalade",
+      "nameFr": "Escalade",
+      "nameEn": "Climbing",
+      "category": "cardio",
+      "equipment": [
+        "aucun"
+      ],
+      "modality": "cardio",
+      "tags": [
+        "cardio"
+      ],
+      "primaryMuscles": [
+        "avant-bras"
+      ],
+      "secondaryMuscles": [
+        "grand-dorsal",
+        "biceps",
+        "fessiers"
+      ]
+    },
+    {
+      "id": "ski-erg",
+      "nameFr": "Ski erg",
+      "nameEn": "Ski ergometer",
+      "category": "cardio",
+      "equipment": [
+        "machine"
+      ],
+      "modality": "cardio",
+      "tags": [
+        "cardio"
+      ],
+      "primaryMuscles": [
+        "grand-dorsal",
+        "triceps"
+      ],
+      "secondaryMuscles": [
+        "abdominaux",
+        "quadriceps"
+      ]
+    },
+    {
+      "id": "etirements-generaux",
+      "nameFr": "Étirements généraux",
+      "nameEn": "General stretching",
+      "category": "mobilité",
+      "equipment": [
+        "aucun"
+      ],
+      "modality": "mobility",
+      "tags": [
+        "mobility"
+      ],
+      "primaryMuscles": [
+        "ischio-jambiers"
+      ],
+      "secondaryMuscles": [
+        "quadriceps",
+        "mollets"
+      ],
+      "modalityNote": "Mobilité globale."
+    },
+    {
+      "id": "yoga-flow",
+      "nameFr": "Yoga (flow)",
+      "nameEn": "Yoga flow",
+      "category": "mobilité",
+      "equipment": [
+        "tapis"
+      ],
+      "modality": "mobility",
+      "tags": [
+        "mobility"
+      ],
+      "primaryMuscles": [
+        "abdominaux"
+      ],
+      "secondaryMuscles": [
+        "ischio-jambiers",
+        "deltoide-posterieur"
+      ],
+      "modalityNote": "Mobilité / souplesse."
+    },
+    {
+      "id": "mobilite-hanche",
+      "nameFr": "Mobilité des hanches",
+      "nameEn": "Hip mobility",
+      "category": "mobilité",
+      "equipment": [
+        "aucun"
+      ],
+      "modality": "mobility",
+      "tags": [
+        "mobility"
+      ],
+      "primaryMuscles": [
+        "flechisseurs-hanche"
+      ],
+      "secondaryMuscles": [
+        "fessiers",
+        "ischio-jambiers"
+      ]
+    },
+    {
+      "id": "mobilite-epaules",
+      "nameFr": "Mobilité des épaules",
+      "nameEn": "Shoulder mobility",
+      "category": "mobilité",
+      "equipment": [
+        "aucun"
+      ],
+      "modality": "mobility",
+      "tags": [
+        "mobility"
+      ],
+      "primaryMuscles": [
+        "deltoide-posterieur"
+      ],
+      "secondaryMuscles": [
+        "pectoraux",
+        "trapèzes"
+      ]
+    },
+    {
+      "id": "mobilite-thoracique",
+      "nameFr": "Mobilité thoracique",
+      "nameEn": "Thoracic mobility",
+      "category": "mobilité",
+      "equipment": [
+        "aucun"
+      ],
+      "modality": "mobility",
+      "tags": [
+        "mobility"
+      ],
+      "primaryMuscles": [
+        "obliques"
+      ],
+      "secondaryMuscles": [
+        "grand-dorsal"
+      ]
+    },
+    {
+      "id": "foam-rolling",
+      "nameFr": "Auto-massage (foam roller)",
+      "nameEn": "Foam rolling",
+      "category": "mobilité",
+      "equipment": [
+        "accessoire"
+      ],
+      "modality": "mobility",
+      "tags": [
+        "mobility"
+      ],
+      "primaryMuscles": [
+        "grand-dorsal"
+      ],
+      "secondaryMuscles": [
+        "rhomboïdes",
+        "trapèzes"
+      ],
+      "modalityNote": "Auto-massage."
+    },
+    {
+      "id": "worlds-greatest-stretch",
+      "nameFr": "World's greatest stretch",
+      "nameEn": "World's greatest stretch",
+      "category": "mobilité",
+      "equipment": [
+        "aucun"
+      ],
+      "modality": "mobility",
+      "tags": [
+        "mobility"
+      ],
+      "primaryMuscles": [
+        "flechisseurs-hanche"
+      ],
+      "secondaryMuscles": [
+        "ischio-jambiers",
+        "grand-dorsal"
+      ]
+    },
+    {
+      "id": "chat-vache",
+      "nameFr": "Posture chat-vache",
+      "nameEn": "Cat-cow stretch",
+      "category": "mobilité",
+      "equipment": [
+        "aucun"
+      ],
+      "modality": "mobility",
+      "tags": [
+        "mobility"
+      ],
+      "primaryMuscles": [
+        "lombaires"
+      ],
+      "secondaryMuscles": [
+        "abdominaux"
+      ]
+    },
+    {
+      "id": "rotation-thoracique-quadrupedie",
+      "nameFr": "Rotation thoracique à quatre pattes",
+      "nameEn": "Quadruped thoracic rotation",
+      "category": "mobilité",
+      "equipment": [
+        "aucun"
+      ],
+      "modality": "mobility",
+      "tags": [
+        "mobility"
+      ],
+      "primaryMuscles": [
+        "obliques"
+      ],
+      "secondaryMuscles": [
+        "grand-dorsal"
+      ]
+    },
+    {
+      "id": "etirement-ischios",
+      "nameFr": "Étirement des ischio-jambiers",
+      "nameEn": "Hamstring stretch",
+      "category": "mobilité",
+      "equipment": [
+        "aucun"
+      ],
+      "modality": "mobility",
+      "tags": [
+        "mobility"
+      ],
+      "primaryMuscles": [
+        "ischio-jambiers"
+      ]
+    }
+  ],
+  "muscleCatalogRef": "muscles.catalog.json"
 }

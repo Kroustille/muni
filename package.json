@@ -15,6 +15,7 @@
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:tracking": "node scripts/check-no-tracking.mjs",
+    "validate:fitness-catalog": "node specs/008-fitness-training/scripts/validate-fitness-catalog.mjs",
     "smoke:compose": "bash scripts/smoke-compose.sh",
     "format": "prettier --write .",
     "format:check": "prettier --check .",

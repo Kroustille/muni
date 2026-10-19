@@ -35,7 +35,7 @@ Decisions from Valentin (locked) and product defaults pending confirmation (assu
 | 2 | **Cardio** | No separate cardio app or session type in Phases A–B. Cardio fits the **generic set model**: duration required for meaningful cardio rows; optional **distance note** (free text, e.g. “5 km”) on the set or exercise row — not a dedicated GPS/map feature. |
 | 3 | **Program seed** | **Manual entry only** for MVP (user builds program in-app). A one-time **starter program template** (static seed) is **out of MVP** — defer to Phase D or an explicit plan/tasks item. |
 | 4 | **Navigation** | Fitness is a **typed domain with a dedicated primary navigation entry**, same prominence pattern as books/recipes in 001 (reachable from the main app shell without burying under Settings). Exact route label and icon are for planning (`ui-routes` contract). |
-| 5 | **Exercise selection** | **Catalog picker** with search on French labels and English aliases (FR-026). **Recently used** exercises surface first. Catalog updates ship with app releases (`catalogVersion` bump); historical logs keep their stored `exerciseId` + display snapshot. |
+| 5 | **Exercise selection** | **Catalog picker** with search on French labels and English aliases (FR-026); **filtre par groupe musculaire** (`muscles.catalog.json`). **Recently used** exercises surface first. Catalog updates ship with app releases (`catalogVersion` bump); historical logs keep their stored `exerciseId` + display snapshot. |
 
 ## Product scope (phased)
 
@@ -125,6 +125,23 @@ When adding an exercise to a plan or log, the user opens a **catalog picker** wi
 
 ---
 
+### User Story 4b - Choisir un exercice depuis le catalogue musculaire (Priority: P2)
+
+Lors de la construction du programme ou d’une séance, l’utilisateur peut parcourir un **catalogue d’exercices intégré** (fichier statique, ~120 entrées en français) et **filtrer par groupe musculaire** (pectoraux, quadriceps, grand dorsal, etc.). Chaque entrée affiche les **muscles principaux et secondaires** pour ancrer le choix dans l’anatomie, pas seulement la catégorie (force/cardio/mobilité) ou l’équipement. La sélection **pré-remplit le nom** de l’exercice dans la ligne planifiée ou journalisée; les métadonnées musculaires servent aux filtres et à la progression (voir User Story 5b).
+
+**Why this priority**: Valentin veut un compagnon aligné sur le **monde des muscles** — planification et progression par zone, pas une liste plate.
+
+**Independent Test**: Ouvrir le sélecteur d’exercices, filtrer sur « Fessiers », choisir « Hip thrust à la barre », confirmer que le nom apparaît dans la séance et que les muscles affichés correspondent au catalogue.
+
+**Acceptance Scenarios**:
+
+1. **Given** le catalogue chargé hors ligne, **When** l’utilisateur ouvre le picker d’exercices, **Then** il voit la liste en français avec au moins le nom et les muscles principaux.
+2. **Given** le picker ouvert, **When** l’utilisateur active le filtre « Quadriceps », **Then** seuls les exercices dont `primaryMuscles` ou `secondaryMuscles` contient `quadriceps` sont listés.
+3. **Given** un exercice cardio ou mobilité sans hypertrophie ciblée, **When** il est affiché, **Then** les muscles listés reflètent la sollicitation mécanique ou une note de modalité (ex. endurance) sans bloquer l’ajout.
+4. **Given** l’utilisateur choisit une entrée catalogue, **When** il confirme, **Then** la ligne planifiée ou journalisée référence l’`exerciseId` et affiche le `nameFr` courant; la progression reste indexée par `exerciseId` (FR-031).
+
+---
+
 ### Phase C — Progression
 
 ### User Story 5 - View history and progression per exercise (Priority: P1)
@@ -141,6 +158,21 @@ The user browses **past workouts** (by date, newest first) and opens any session
 2. **Given** an exercise logged at least twice, **When** the user opens progression for that name, **Then** they see a chronological list of sessions with key metrics per visit.
 3. **Given** a new set exceeds previous max charge for that exercise, **When** the workout is saved, **Then** the UI indicates a new PR (non-blocking, no share).
 4. **Given** the catalog French label changes in a later app version, **When** viewing progression for an `exerciseId`, **Then** the UI shows the **current** catalog label while historical log rows may show the snapshot taken at log time on detail views.
+
+---
+
+### User Story 5b - Progression et filtres par groupe musculaire (Priority: P2, nice-to-have dans MVP catalogue)
+
+L’utilisateur peut consulter une vue **synthèse par muscle** (ex. « Quadriceps ») listant les exercices du catalogue et de l’historique qui sollicitent ce muscle, avec tendances agrégées simples (volume ou charge max sur les N dernières séances). Ce filtre est un **complément** à la progression par nom d’exercice (User Story 5), pas un remplacement.
+
+**Why this priority**: Relie la progression au corps entier — objectif « world of muscles ».
+
+**Independent Test**: Après avoir loggé squat et presse à cuisses, ouvrir la vue muscle « Quadriceps » et voir les deux exercices avec métriques récentes.
+
+**Acceptance Scenarios**:
+
+1. **Given** des logs liés à des noms présents dans le catalogue, **When** l’utilisateur filtre par muscle `quadriceps`, **Then** les exercices dont le catalogue déclare ce muscle en primaire ou secondaire apparaissent (y compris noms libres si résolus par correspondance exacte sur `nameFr`).
+2. **Given** aucun exercice loggé pour un muscle, **When** l’utilisateur ouvre ce muscle, **Then** un état vide propose des exercices catalogue suggérés pour ce groupe.
 
 ---
 
@@ -229,15 +261,17 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 - **FR-023**: Skipping a planned day MUST record a **skip** entry with date, planned session reference, and optional note.
 - **FR-024**: Workout logs MUST contain ordered **logged exercises**, each with ordered **sets** supporting optional fields: repetitions (non-negative integer), charge (non-negative number with user’s preferred unit), durée (seconds or minutes — single convention in UI), optional distance **note** (free text for cardio), RPE (integer 1–10). Marking a workout **terminé** MUST NOT require every planned exercise to have at least one fully detailed set.
 - **FR-025**: Users MUST be able to add, edit, reorder, and remove exercises and sets during a workout.
-- **FR-026**: Adding an exercise MUST use a **catalog picker**: search matches **`nameFr`** and **`nameEn`** (case- and accent-insensitive substring); optional filters by **category**, **equipment**, and **modality**; **recently used** `exerciseId`s MUST be surfaced first when the search box is empty.
-- **FR-027**: The app MUST ship the MVP catalog **offline** (bundled seed or local store populated on first launch — see data model); users MUST NOT depend on network to list or search exercises.
+- **FR-026**: Adding an exercise MUST use a **catalog picker**: search matches **`nameFr`** and **`nameEn`** (case- and accent-insensitive substring); optional filters by **muscle group** (ids from `muscles.catalog.json`), **category**, **equipment**, and **modality**; **recently used** `exerciseId`s MUST be surfaced first when the search box is empty.
+- **FR-027**: The app MUST ship the MVP catalog **offline** (bundled seed: `exercises.catalog.json` + `muscles.catalog.json`, or local store populated on first launch — see data model); users MUST NOT depend on network to list or search exercises.
 - **FR-028**: **Custom exercises** (user-defined names outside the catalog) MUST NOT be creatable in MVP; missing exercises are handled via a future catalog release, not free text.
+- **FR-029**: Each catalog exercise MUST declare **`primaryMuscles`** (muscle ids) and MAY declare **`secondaryMuscles`**; muscle labels in the UI MUST use **`nameFr`** from the muscle catalog; region (`upper` / `lower` / `core`) MAY group muscles in the picker.
 
 **Progression & history**
 
 - **FR-030**: Users MUST browse completed and skipped activity in reverse chronological order.
 - **FR-031**: Users MUST open a **progression** view per **`exerciseId`** showing metrics from historical logs.
 - **FR-032**: The system MUST detect and surface **personal records** for max charge and max reps at a given charge per **`exerciseId`** when a new log is saved (informational only).
+- **FR-033** *(P2)*: Users SHOULD be able to browse progression or history filtered by **muscle group**, aggregating exercises whose catalog entry lists that muscle in `primaryMuscles` or `secondaryMuscles`.
 
 **Companion (Phase D)**
 
@@ -254,7 +288,7 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 ### Out of Scope (this feature)
 
 - Public social feeds, sharing workouts, or coach/client multi-user accounts.
-- Built-in video library, animated form guides, or **live** third-party exercise APIs during workouts (MVP uses a **bundled** catalog file, not runtime database calls).
+- Built-in video library, animated form guides, or **live** third-party exercise APIs during workouts (MVP uses **bundled** JSON catalogs, not runtime database calls).
 - **User-defined custom exercises** or community-submitted exercise libraries in MVP.
 - Automatic program generation, AI coaching, or **wearable / health platform import** (Apple Health, HealthKit, Google Fit, **Garmin Connect**, etc.) — optional future integration only; not MVP.
 - Static **starter program templates** or import-from-file for the first program (MVP is manual program entry; templates deferred to Phase D or planning).
@@ -268,7 +302,8 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 
 - **Training program**: User-owned active plan: name, created/updated metadata, soft-delete marker.
 - **Planned session**: Belongs to program; title; weekday assignments (one or more); ordered planned exercises.
-- **Exercise catalog entry** (read-only, versioned): Stable `id` (kebab-case slug); `nameFr` (UI); `nameEn` (search alias); `category` (primary muscle or intent); `equipment[]`; `modality` (`strength` | `cardio` | `mobility`); optional `tags[]` (movement pattern). Source file: `exercises.catalog.json` in this feature directory; implementation copies into local store with `catalogVersion`.
+- **Exercise catalog entry** (read-only, versioned): Stable `id` (kebab-case slug); `nameFr` (UI); `nameEn` (search alias); `category` (UX grouping / legacy filter); `equipment[]`; `modality` (`strength` | `cardio` | `mobility`); `primaryMuscles[]`; optional `secondaryMuscles[]`; optional `modalityNote`; optional `tags[]` (movement pattern). Source file: `exercises.catalog.json`; muscle ids defined in `muscles.catalog.json`; implementation copies into local store with `catalogVersion`.
+- **Muscle (catalog)**: Stable `id`, `nameFr`, optional `nameEn`, optional `region` (`upper` | `lower` | `core`) — see `muscles.catalog.json`.
 - **Planned exercise**: `exerciseId` (required); optional template hints (default set count, target reps, notes).
 - **Workout log**: A concrete instance on a calendar date; link to planned session optional; status; start/end timestamps; optional recovery check-in; `catalogVersion` at creation (for audit).
 - **Logged exercise**: `exerciseId` (required); `nameFrSnapshot` (required at save — display if catalog label changes); optional type tag derived from catalog `modality`; ordered sets.
@@ -278,32 +313,42 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 
 ## Exercise catalog (MVP)
 
-Valentin requested a **finished exercise list** (not free-text-only). MVP ships a **curated, versioned catalog** the user picks from when building a program or logging sets.
+Valentin requested a **finished exercise list** linked to **anatomy / muscle groups** (not category-only). MVP ships a **curated, versioned catalog** the user picks from when building a program or logging sets.
 
-### Artifact
+### Artifacts
 
-- **File**: [`exercises.catalog.json`](./exercises.catalog.json) — canonical seed for planning; **121** exercises at `version: 1` (2026-10-19).
-- **Schema** (each item): `id`, `nameFr`, `nameEn`, `category`, `equipment[]`, `modality`, optional `tags[]` (e.g. `push`, `pull`, `squat`, `hinge`, `core`, `cardio`).
-- **Categories** (`category`): `pectoraux`, `dos`, `épaules`, `biceps`, `triceps`, `avant-bras`, `quadriceps`, `ischio-jambiers`, `fessiers`, `mollets`, `abdominaux`, `corps entier`, `cardio`, `mobilité`.
+| File | Role |
+|------|------|
+| [`exercises.catalog.json`](./exercises.catalog.json) | **121** exercises at `version: 1` (2026-10-19); each with `primaryMuscles` / optional `secondaryMuscles`. |
+| [`muscles.catalog.json`](./muscles.catalog.json) | **20** muscle groups (`nameFr`, optional `region`). |
+| [`scripts/validate-fitness-catalog.mjs`](./scripts/validate-fitness-catalog.mjs) | Cross-reference validation (`yarn validate:fitness-catalog`). |
+| [`scripts/enrich-catalog-muscles.mjs`](./scripts/enrich-catalog-muscles.mjs) | Re-applies muscle mappings after editing the exercise list. |
+
+- **Schema** (each exercise): `id`, `nameFr`, `nameEn`, `category`, `equipment[]`, `modality`, `primaryMuscles[]`, optional `secondaryMuscles[]`, optional `modalityNote`, optional `tags[]`.
+- **Categories** (`category`): UX grouping (`pectoraux`, `dos`, `épaules`, …) — **muscle filters use `primaryMuscles` / `secondaryMuscles`**, not `category` alone (e.g. `category: dos` rows may target `grand-dorsal`, `trapèzes`, or `lombaires`).
 - **Equipment** values (closed enum for MVP): `poids du corps`, `barre`, `haltères`, `machine`, `câble`, `kettlebell`, `banc`, `bande élastique`, `vélo`, `rameur`, `tapis`, `accessoire`, `aucun`.
-- **Implementation note** (for planning only): load catalog into IndexedDB (or equivalent) on upgrade when `catalogVersion` increases; do not fetch exercises from the network at runtime.
+- **Implementation note** (for planning only): load catalogs into IndexedDB (or equivalent) on upgrade when `catalogVersion` increases; do not fetch exercises from the network at runtime.
 
 ### Custom exercises
 
 **Not allowed in MVP.** Users cannot type a new exercise name. Expanding the list is a **product/data release** (bump `version`, migration/seed), not an in-app create flow.
 
-### Research sources (names + coverage, not verbatim DB copy)
+### Muscle taxonomy notes (for Valentin)
 
-The list was composed for gym + bodyweight + common machines + cardio/mobility staples, cross-checked against public references:
+- **« Dos » vs split**: exercise `category` may still say `dos` for UX; anatomical filters use **`grand-dorsal`**, **`trapèzes`**, **`rhomboïdes`**, **`lombaires`**. UI may offer a parent chip « Dos » that unions those ids.
+- **Deltoïdes**: three ids (`deltoide-anterieur`, `deltoide-lateral`, `deltoide-posterieur`) for accurate mappings; optional parent filter « Deltoïdes ».
+
+### Research sources (names + coverage, not verbatim DB copy)
 
 | Source | URL | Use in this catalog | License / notes |
 |--------|-----|---------------------|-----------------|
-| Wikipedia — *List of weight training exercises* | https://en.wikipedia.org/wiki/List_of_weight_training_exercises | Movement coverage table (push/pull/legs/core staples) | CC BY-SA 4.0 — article text not copied wholesale; exercise **names** are common fitness vocabulary |
-| U.S. CDC — *What counts as physical activity* | https://www.cdc.gov/physical-activity-basics/adding-adults/what-counts.html | Cardio modality names (walking, running, swimming, cycling, etc.) | U.S. government public domain / CDC site terms |
-| HHS — *Physical Activity Guidelines for Americans*, 2nd ed. (via CDC PDF) | https://www.cdc.gov/physical-activity/media/pdfs/Physical_Activity_Guidelines_2nd_edition.pdf | Aerobic + muscle-strengthening activity examples | U.S. government work |
-| wger Workout Manager (reference only) | https://wger.de/ | Cross-check of common strength exercise naming; **not** imported as a bulk dataset | Per-exercise CC BY-SA 3.0/4.0 or CC0 on wger — **this repo file is an original curated subset**, not a wger dump |
+| Wikipedia — *List of weight training exercises* | https://en.wikipedia.org/wiki/List_of_weight_training_exercises | Movement coverage table | CC BY-SA 4.0 — common vocabulary, not copied wholesale |
+| Wikipedia FR — *Liste des muscles du corps humain* | https://fr.wikipedia.org/wiki/Liste_des_muscles_du_corps_humain | Muscle group labels | CC BY-SA 4.0 |
+| ExRx.net — muscle / exercise directory | https://exrx.net/Lists/Muscle | Muscle involvement defaults | Reference only |
+| U.S. CDC — *What counts as physical activity* | https://www.cdc.gov/physical-activity-basics/adding-adults/what-counts.html | Cardio modality names | U.S. government |
+| wger Workout Manager (reference only) | https://wger.de/ | Naming cross-check; **not** imported as bulk data | Per-item licenses on wger |
 
-**Licensing caveat for Valentin**: Muni’s catalog is a **small original seed** inspired by public lists and common gym terminology. It is **not** a scrape of wger, ExerciseDB, or commercial apps. If we later import third-party exercise *descriptions*, images, or large datasets, each source’s attribution and share-alike terms must be reviewed separately. French display strings were authored for Muni; English strings aid search only.
+**Licensing caveat**: Muni’s catalog is a **small original seed**. It is **not** a scrape of wger, ExerciseDB, or commercial apps.
 
 ## Success Criteria *(mandatory)*
 
@@ -333,4 +378,4 @@ The list was composed for gym + bodyweight + common machines + cardio/mobility s
 ## Dependencies
 
 - `001-typed-lists-companion`: authentication, sync, undo delete, French UI, home cards pattern.
-- **Bundled exercise catalog** (`exercises.catalog.json`) — no third-party fitness API at runtime for MVP.
+- **Bundled catalogs** (`exercises.catalog.json`, `muscles.catalog.json`) — no third-party fitness API at runtime for MVP.
