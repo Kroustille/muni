@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
+import { HomeFitnessCard } from "@/components/fitness/home-fitness-card";
 import { RavenIllustration } from "@/components/illustrations/RavenIllustration";
 import { LIST_TYPE_VISUAL } from "@/components/list-type-visual";
 import { getItemUseCases } from "@/composition/client";
@@ -141,6 +142,9 @@ export default function HomePage() {
         <Search className="h-5 w-5 shrink-0 text-muted" strokeWidth={1.5} aria-hidden />
         <span className="truncate">{t("search.placeholder")}</span>
       </Link>
+      <div className="mb-4">
+        <HomeFitnessCard />
+      </div>
       {showEmpty ? (
         <div className="mb-6 flex flex-col items-center gap-2 py-4 text-center" role="status">
           <RavenIllustration className="h-12 w-12 text-muted" />

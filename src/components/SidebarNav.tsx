@@ -4,7 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Plus } from "lucide-react";
 import { LIST_TYPE_VISUAL } from "@/components/list-type-visual";
-import { LIST_NAV, PRIMARY_NAV } from "@/components/nav-config";
+import { FEATURE_NAV, LIST_NAV, PRIMARY_NAV } from "@/components/nav-config";
 import { itemTypeFromPath } from "@/components/quick-add/item-type-from-path";
 import { useQuickAdd } from "@/components/quick-add/quick-add-context";
 import { t } from "@/i18n";
@@ -42,6 +42,27 @@ export function SidebarNav() {
             );
           })}
         </ul>
+        {FEATURE_NAV.length > 0 && (
+          <ul className="flex flex-col gap-0.5 px-0">
+            {FEATURE_NAV.map(({ href, labelKey, icon: Icon, match }) => {
+              const active = match(pathname);
+              return (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    aria-current={active ? "page" : undefined}
+                    className={`flex min-h-10 items-center gap-3 rounded-lg px-3 text-sm ${
+                      active ? "bg-background font-medium text-accent" : "text-foreground hover:bg-background/80"
+                    }`}
+                  >
+                    <Icon className="h-5 w-5 shrink-0" strokeWidth={1.5} aria-hidden />
+                    <span className="truncate">{t(labelKey)}</span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        )}
         <div>
           <p className="mb-1 px-3 text-xs font-medium tracking-wide text-muted uppercase">
             {t("nav.lists")}

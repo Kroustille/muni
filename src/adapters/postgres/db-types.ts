@@ -153,9 +153,63 @@ export interface WatchGoals {
   year: number;
 }
 
+export interface FitnessProgram {
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  is_active: boolean;
+  name: string;
+  planned_sessions: Json;
+  server_updated_at: Timestamp;
+  user_id: string;
+}
+
+export interface FitnessSkipRecord {
+  calendar_date: Timestamp;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  note: string | null;
+  planned_session_id: string;
+  server_updated_at: Timestamp;
+  user_id: string;
+}
+
+export interface FitnessUserSettings {
+  adherence_min_workouts_per_week: number;
+  adherence_tracking_enabled: boolean;
+  charge_unit: string;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  server_updated_at: Timestamp;
+  user_id: string;
+}
+
+export interface FitnessWorkoutLog {
+  calendar_date: Timestamp;
+  catalog_version: number;
+  completed_at: Timestamp | null;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  logged_exercises: Json;
+  planned_session_id: string | null;
+  recovery: Json | null;
+  server_updated_at: Timestamp;
+  started_at: Timestamp;
+  status: string;
+  title: string;
+  user_id: string;
+}
+
 export interface DB {
   book_quotes: BookQuotes;
   catalog_cache: CatalogCache;
+  fitness_program: FitnessProgram;
+  fitness_skip_record: FitnessSkipRecord;
+  fitness_user_settings: FitnessUserSettings;
+  fitness_workout_log: FitnessWorkoutLog;
   items: Items;
   magic_link_tokens: MagicLinkTokens;
   movie_quotes: MovieQuotes;

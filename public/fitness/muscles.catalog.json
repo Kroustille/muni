@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "locale": "fr",
+  "muscles": [
+    { "id": "pectoraux", "nameFr": "Pectoraux", "sortOrder": 1 },
+    { "id": "dos", "nameFr": "Dos", "sortOrder": 2 },
+    { "id": "épaules", "nameFr": "Épaules", "sortOrder": 3 },
+    { "id": "biceps", "nameFr": "Biceps", "sortOrder": 4 },
+    { "id": "triceps", "nameFr": "Triceps", "sortOrder": 5 },
+    { "id": "avant-bras", "nameFr": "Avant-bras", "sortOrder": 6 },
+    { "id": "quadriceps", "nameFr": "Quadriceps", "sortOrder": 7 },
+    { "id": "ischio-jambiers", "nameFr": "Ischio-jambiers", "sortOrder": 8 },
+    { "id": "fessiers", "nameFr": "Fessiers", "sortOrder": 9 },
+    { "id": "mollets", "nameFr": "Mollets", "sortOrder": 10 },
+    { "id": "abdominaux", "nameFr": "Abdominaux", "sortOrder": 11 },
+    { "id": "corps entier", "nameFr": "Corps entier", "sortOrder": 12 },
+    { "id": "cardio", "nameFr": "Cardio", "sortOrder": 13 },
+    { "id": "mobilité", "nameFr": "Mobilité", "sortOrder": 14 }
+  ]
+}

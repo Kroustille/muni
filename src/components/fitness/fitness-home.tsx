@@ -1,0 +1,177 @@
+"use client";
+
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import {
+  ensureFitnessCatalogSeeded,
+  getFitnessProgramUseCases,
+  getFitnessWorkoutUseCases,
+} from "@/composition/client";
+import { buildWeekAdherenceView } from "@/domain/fitness/adherence";
+import type { FitnessProgram } from "@/domain/fitness/program";
+import type { FitnessSkipRecord, FitnessWorkoutLog } from "@/domain/fitness/workout-log";
+import { resolveTodaySessions, localCalendarDate, type TodayPlannedSession } from "@/application/fitness/today";
+import { WeekAdherenceStrip } from "@/components/fitness/week-strip";
+import { t } from "@/i18n";
+
+function statusLabel(status: TodayPlannedSession["status"]): string {
+  switch (status) {
+    case "todo":
+      return t("fitness.today.todo");
+    case "in_progress":
+      return t("fitness.today.inProgress");
+    case "done":
+      return t("fitness.today.done");
+    case "skipped":
+      return t("fitness.today.skipped");
+    default:
+      return t("fitness.today.past");
+  }
+}
+
+export function FitnessHome() {
+  const [program, setProgram] = useState<FitnessProgram | undefined>();
+  const [logs, setLogs] = useState<FitnessWorkoutLog[]>([]);
+  const [skips, setSkips] = useState<FitnessSkipRecord[]>([]);
+  const [today, setToday] = useState<TodayPlannedSession[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  const refresh = async () => {
+    const programUseCases = await getFitnessProgramUseCases();
+    const workoutUseCases = await getFitnessWorkoutUseCases();
+    const active = await programUseCases.getActiveProgram();
+    const allLogs = await workoutUseCases.listWorkouts();
+    const allSkips = await workoutUseCases.listSkips();
+    setProgram(active);
+    setLogs(allLogs);
+    setSkips(allSkips);
+    setToday(resolveTodaySessions(active, allLogs, allSkips, localCalendarDate()));
+  };
+
+  useEffect(() => {
+    void ensureFitnessCatalogSeeded().then(refresh);
+  }, []);
+
+  useEffect(() => {
+    setToday(resolveTodaySessions(program, logs, skips, localCalendarDate()));
+  }, [program, logs, skips]);
+
+  const weekView = buildWeekAdherenceView(program ?? null, logs, skips, localCalendarDate());
+
+  const startSession = async (session: TodayPlannedSession) => {
+    try {
+      const workoutUseCases = await getFitnessWorkoutUseCases();
+      const log = await workoutUseCases.startWorkoutFromPlan(session.plannedSession);
+      window.location.assign(`/fitness/workout/${log.id}`);
+    } catch (e) {
+      if (e instanceof Error && e.message === "WORKOUT_IN_PROGRESS") {
+        setError(t("fitness.inProgress.modal"));
+      }
+    }
+  };
+
+  const startFree = async () => {
+    try {
+      const workoutUseCases = await getFitnessWorkoutUseCases();
+      const log = await workoutUseCases.startFreeWorkout();
+      window.location.assign(`/fitness/workout/${log.id}`);
+    } catch (e) {
+      if (e instanceof Error && e.message === "WORKOUT_IN_PROGRESS") {
+        setError(t("fitness.inProgress.modal"));
+      }
+    }
+  };
+
+  if (program === undefined) {
+    return (
+      <div className="mx-auto max-w-lg p-4" data-testid="fitness-home-empty">
+        <p className="mb-4 text-muted">{t("fitness.home.empty")}</p>
+        <Link
+          href="/fitness/program"
+          className="inline-flex rounded-xl bg-accent px-4 py-3 text-sm font-medium text-accent-foreground"
+        >
+          {t("fitness.home.createProgram")}
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="mx-auto max-w-lg space-y-4 p-4" data-testid="fitness-home">
+      <header className="flex items-center justify-between">
+        <h1 className="font-serif text-2xl font-semibold">{t("fitness.home.title")}</h1>
+        <Link href="/fitness/program" className="text-sm text-accent">
+          {t("fitness.home.editProgram")}
+        </Link>
+      </header>
+      {error !== null && <p className="text-sm text-destructive">{error}</p>}
+      <WeekAdherenceStrip view={weekView} />
+      <section>
+        <ul className="space-y-2">
+          {today.map((session) => (
+            <li
+              key={session.plannedSession.id}
+              className="flex items-center justify-between rounded-xl border border-border p-3"
+            >
+              <div>
+                <p className="font-medium">{session.plannedSession.title}</p>
+                <p className="text-xs text-muted">{statusLabel(session.status)}</p>
+              </div>
+              {session.status === "todo" && (
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    className="rounded-lg bg-accent px-3 py-2 text-xs font-medium text-accent-foreground"
+                    onClick={() => startSession(session)}
+                    data-testid="fitness-start-session"
+                  >
+                    {t("fitness.action.start")}
+                  </button>
+                  <button
+                    type="button"
+                    className="rounded-lg border border-border px-3 py-2 text-xs"
+                    onClick={async () => {
+                      const workoutUseCases = await getFitnessWorkoutUseCases();
+                      await workoutUseCases.skipPlannedSession(session.plannedSession.id);
+                      await refresh();
+                    }}
+                  >
+                    {t("fitness.action.skip")}
+                  </button>
+                </div>
+              )}
+              {session.status === "in_progress" && session.workoutId && (
+                <Link href={`/fitness/workout/${session.workoutId}`} className="text-sm text-accent">
+                  {t("fitness.today.inProgress")}
+                </Link>
+              )}
+            </li>
+          ))}
+        </ul>
+      </section>
+      <button
+        type="button"
+        className="w-full rounded-xl border border-border py-3 text-sm"
+        onClick={startFree}
+        data-testid="fitness-free-workout"
+      >
+        {t("fitness.home.freeWorkout")}
+      </button>
+      <section>
+        <p className="mb-2 text-sm font-medium">{t("fitness.home.recent")}</p>
+        <ul className="space-y-1">
+          {logs.slice(0, 5).map((log) => (
+            <li key={log.id}>
+              <Link href={`/fitness/workout/${log.id}`} className="text-sm text-accent">
+                {log.title} — {log.calendarDate}
+              </Link>
+            </li>
+          ))}
+        </ul>
+        <Link href="/fitness/history" className="mt-2 inline-block text-sm text-muted">
+          {t("fitness.history.title")}
+        </Link>
+      </section>
+    </div>
+  );
+}

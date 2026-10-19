@@ -25,6 +25,7 @@
     "migrate:down": "yarn run build:migrations && node dist/db/migrate.js down",
     "db:codegen": "yarn run migrate:up && kysely-codegen --dialect postgres --exclude-pattern 'kysely_*' --out-file src/adapters/postgres/db-types.ts && prettier --write src/adapters/postgres/db-types.ts",
     "db:codegen:check": "yarn run db:codegen && git diff --exit-code src/adapters/postgres/db-types.ts",
+    "validate-catalog": "node specs/008-fitness-training/validate-catalog.mjs",
     "verify:ci": "bash scripts/verify-ci.sh"
   },
   "engines": {

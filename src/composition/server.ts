@@ -40,6 +40,14 @@ import {
   createMovieQuoteSyncService,
   type MovieQuoteSyncService,
 } from "@/application/server/movie-quote-sync-service";
+import {
+  createFitnessSyncService,
+  type FitnessSyncService,
+} from "@/application/server/fitness-sync-service";
+import { createPostgresFitnessProgramRepository } from "@/adapters/postgres/fitness-program-repository";
+import { createPostgresFitnessWorkoutRepository } from "@/adapters/postgres/fitness-workout-repository";
+import { createPostgresFitnessSkipRepository } from "@/adapters/postgres/fitness-skip-repository";
+import { createPostgresFitnessSettingsRepository } from "@/adapters/postgres/fitness-settings-repository";
 import type { ServerItemRepository } from "@/application/ports/server-item-repository";
 import { createSyncService, type SyncService } from "@/application/server/sync-service";
 import { loadConfig, type ServerConfig } from "@/composition/config";
@@ -52,6 +60,7 @@ export interface ServerContainer {
   readonly sync: SyncService;
   readonly bookQuoteSync: BookQuoteSyncService;
   readonly movieQuoteSync: MovieQuoteSyncService;
+  readonly fitnessSync: FitnessSyncService;
   readonly lookupBook: LookupBook;
   readonly searchBooks: SearchBooks;
   readonly searchMovies: SearchMovies;
@@ -112,6 +121,13 @@ export function createServerContainer(
   const items = createPostgresItemRepository(db);
   const sync = createSyncService({ repository: items, now });
   const { bookQuoteSync, movieQuoteSync } = wireServerQuoteSync(db, items, now);
+  const fitnessSync = createFitnessSyncService({
+    programs: createPostgresFitnessProgramRepository(db),
+    workouts: createPostgresFitnessWorkoutRepository(db),
+    skips: createPostgresFitnessSkipRepository(db),
+    settings: createPostgresFitnessSettingsRepository(db),
+    now,
+  });
   const catalogCache = createPostgresCatalogCacheRepository(db);
   const bookCatalog = createOpenLibraryBookCatalogLookup({ cache: catalogCache });
   const lookupBook = createLookupBook({ catalog: bookCatalog });
@@ -134,6 +150,7 @@ export function createServerContainer(
     sync,
     bookQuoteSync,
     movieQuoteSync,
+    fitnessSync,
     lookupBook,
     searchBooks,
     searchMovies,

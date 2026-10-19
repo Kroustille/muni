@@ -14,6 +14,8 @@ export type MetaValues = {
   pullCursor: string;
   quotePullCursor: string;
   movieQuotePullCursor: string;
+  fitnessPullCursor: string;
+  fitnessCatalogVersion: number;
   readingGoals: ReadingGoal[];
   watchGoals: import("@/domain/watch-goal").WatchGoal[];
 };

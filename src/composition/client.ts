@@ -8,7 +8,10 @@ import { createUuidIdGenerator } from "../adapters/browser/id-generator";
 import { openMuniDb } from "../adapters/indexeddb/db";
 import { createIndexedDbItemRepository } from "../adapters/indexeddb/item-repository";
 import { wireClientQuoteSync } from "./client-quote-sync";
+import { wireClientFitnessSync } from "./client-fitness-sync";
 import { runSyncEngines, type PausableSyncEngine } from "./sync-run";
+import type { FitnessProgramUseCases } from "../application/fitness/program";
+import type { FitnessWorkoutUseCases } from "../application/fitness/workout";
 import type { BookQuoteUseCases } from "../application/books/book-quotes";
 import type { MovieQuoteUseCases } from "../application/movies/movie-quotes";
 import { createReadingSettings, type ReadingSettingsUseCases } from "../application/books/reading-settings";
@@ -31,6 +34,9 @@ export type ClientContext = {
   bookQuoteUseCases: BookQuoteUseCases;
   movieQuoteUseCases: MovieQuoteUseCases;
   readingSettingsUseCases: ReadingSettingsUseCases;
+  fitnessProgramUseCases: FitnessProgramUseCases;
+  fitnessWorkoutUseCases: FitnessWorkoutUseCases;
+  ensureFitnessCatalogSeeded(): Promise<void>;
   searchUseCase: SearchUseCase;
   sessionUseCases: SessionUseCases;
   authGateway: AuthGateway;
@@ -44,6 +50,7 @@ let syncScheduler: ReturnType<typeof createSyncScheduler> | undefined;
 let syncEngine: ReturnType<typeof createSyncEngine> | undefined;
 let bookQuotesSyncEngine: PausableSyncEngine | undefined;
 let movieQuotesSyncEngine: PausableSyncEngine | undefined;
+let fitnessSyncEngine: PausableSyncEngine | undefined;
 let syncStarted = false;
 
 function publishSyncStatus(next: SyncStatusState): void {
@@ -115,15 +122,29 @@ function buildClientContext(): Promise<ClientContext> {
     bookQuotesSyncEngine = quoteSync.bookQuotesEngine;
     movieQuotesSyncEngine = quoteSync.movieQuotesEngine;
 
+    const fitnessSync = wireClientFitnessSync({
+      db,
+      items: repository,
+      pullLimit: SYNC_PULL_LIMIT,
+      onLocalWrite: notifyLocalWrite,
+    });
+    fitnessSyncEngine = fitnessSync.fitnessEngine;
+
     async function runSync(): Promise<void> {
       const engine = syncEngine;
       const quoteEngine = bookQuotesSyncEngine;
       const movieQuoteEngine = movieQuotesSyncEngine;
-      if (engine === undefined || quoteEngine === undefined || movieQuoteEngine === undefined) {
+      const fitnessEngine = fitnessSyncEngine;
+      if (
+        engine === undefined ||
+        quoteEngine === undefined ||
+        movieQuoteEngine === undefined ||
+        fitnessEngine === undefined
+      ) {
         return;
       }
       await runSyncEngines({
-        engines: [engine, quoteEngine, movieQuoteEngine],
+        engines: [engine, quoteEngine, movieQuoteEngine, fitnessEngine],
         connectivity,
         onStatus: publishSyncStatus,
         onPauseScheduler: () => syncScheduler?.pause(),
@@ -145,6 +166,8 @@ function buildClientContext(): Promise<ClientContext> {
 
     const itemUseCases = wrapLocalWrites(baseItemUseCases, notifyLocalWrite);
     const { bookQuoteUseCases, movieQuoteUseCases } = quoteSync;
+    const { programUseCases: fitnessProgramUseCases, workoutUseCases: fitnessWorkoutUseCases } =
+      fitnessSync;
 
     const searchUseCase = createSearchUseCase({ repository });
 
@@ -172,6 +195,9 @@ function buildClientContext(): Promise<ClientContext> {
       bookQuoteUseCases,
       movieQuoteUseCases,
       readingSettingsUseCases,
+      fitnessProgramUseCases,
+      fitnessWorkoutUseCases,
+      ensureFitnessCatalogSeeded: () => fitnessSync.ensureCatalogSeeded(),
       searchUseCase,
       sessionUseCases: wrappedSession,
       authGateway,
@@ -210,6 +236,18 @@ export function getReadingSettingsUseCases(): Promise<ReadingSettingsUseCases> {
   return getClientContext().then((ctx) => ctx.readingSettingsUseCases);
 }
 
+export function getFitnessProgramUseCases(): Promise<FitnessProgramUseCases> {
+  return getClientContext().then((ctx) => ctx.fitnessProgramUseCases);
+}
+
+export function getFitnessWorkoutUseCases(): Promise<FitnessWorkoutUseCases> {
+  return getClientContext().then((ctx) => ctx.fitnessWorkoutUseCases);
+}
+
+export function ensureFitnessCatalogSeeded(): Promise<void> {
+  return getClientContext().then((ctx) => ctx.ensureFitnessCatalogSeeded());
+}
+
 export function getSearchUseCase(): Promise<SearchUseCase> {
   return getClientContext().then((ctx) => ctx.searchUseCase);
 }
@@ -233,6 +271,7 @@ export function startClientSync(): Promise<void> {
     syncEngine?.resume();
     bookQuotesSyncEngine?.resume();
     movieQuotesSyncEngine?.resume();
+    fitnessSyncEngine?.resume();
     syncScheduler?.resume();
     if (!syncStarted) {
       syncStarted = true;

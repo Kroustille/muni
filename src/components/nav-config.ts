@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Home, Search, Settings } from "lucide-react";
+import { Dumbbell, Home, Search, Settings } from "lucide-react";
 import type { ItemType } from "@/domain/item";
 import type { MessageKey } from "@/i18n";
 
@@ -37,6 +37,22 @@ export type ListNavItem = {
   itemType: ItemType;
   match: (pathname: string) => boolean;
 };
+
+export type FeatureNavItem = {
+  href: string;
+  labelKey: MessageKey;
+  icon: LucideIcon;
+  match: (pathname: string) => boolean;
+};
+
+export const FEATURE_NAV: FeatureNavItem[] = [
+  {
+    href: "/fitness",
+    labelKey: "fitness.nav",
+    icon: Dumbbell,
+    match: (p) => p === "/fitness" || p.startsWith("/fitness/"),
+  },
+];
 
 export const LIST_NAV: ListNavItem[] = [
   {
