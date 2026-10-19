@@ -14,6 +14,28 @@
 
 **Relationship to Muni**: Fitness is a **new typed domain** alongside books, films, recipes, and shopping — not a generic notes app. It reuses companion principles (fast capture, optional fields, private data, sync) but has its own entities and interactions tuned to training.
 
+## Constraints & decisions (2026-10-19)
+
+Decisions from Valentin (locked) and product defaults pending confirmation (assumed aligned with “precise training” vision).
+
+### Locked
+
+| Topic | Decision |
+|-------|----------|
+| **Apple Health / Garmin** | **Not mandatory.** Optional future integration only. No HealthKit, Google Fit, Garmin Connect, or other wearable APIs in MVP (Phases A–C) or Phase D unless explicitly replanned. |
+| **French-only UI** | **Confirmed.** All fitness labels, help text, and empty states are in **French**, consistent with Muni’s norm (`fr.json` / `t(key)`). No separate i18n or English UI for this module beyond what 001 already requires. Exercise names are **user-entered free text** (may be French or informal mix; UI strings stay French). |
+| **Offline mobile** | **Mandatory.** Fitness MUST follow the same **offline-first + sync** model as other Muni typed lists: local persistence (IndexedDB), outbound sync queue while offline, background push/pull when online, per-field last-write-wins and soft deletes per foundation constitution — not a online-only submodule. |
+
+### Assumed default — confirm with Valentin
+
+| # | Topic | Default encoded in this spec |
+|---|--------|------------------------------|
+| 1 | **MVP precision floor** | **Strength**: each logged set MAY include reps and charge when the user wants precision; neither is required to save. **Timed work**: duration on the set is the primary field. User MAY mark a workout **Terminé** without logging every set or every planned exercise (habit completion without full detail). |
+| 2 | **Cardio** | No separate cardio app or session type in Phases A–B. Cardio fits the **generic set model**: duration required for meaningful cardio rows; optional **distance note** (free text, e.g. “5 km”) on the set or exercise row — not a dedicated GPS/map feature. |
+| 3 | **Program seed** | **Manual entry only** for MVP (user builds program in-app). A one-time **starter program template** (static seed) is **out of MVP** — defer to Phase D or an explicit plan/tasks item. |
+| 4 | **Navigation** | Fitness is a **typed domain with a dedicated primary navigation entry**, same prominence pattern as books/recipes in 001 (reachable from the main app shell without burying under Settings). Exact route label and icon are for planning (`ui-routes` contract). |
+| 5 | **Exercise naming** | **Free-text** names with **history-based autocomplete** (FR-026). A small **client-side French alias list** (e.g. “Bench press” → “Développé couché”) is **optional later**, not MVP — no licensed exercise catalog API. |
+
 ## Product scope (phased)
 
 | Phase | Theme | Intent |
@@ -39,7 +61,7 @@ A signed-in user defines **one active training program** with a name and assigns
 
 **Acceptance Scenarios**:
 
-1. **Given** no program yet, **When** the user creates a program with name and at least one planned session on a weekday, **Then** the program is saved and shown as active.
+1. **Given** no program yet, **When** the user creates a program with name and at least one planned session on a weekday (manual entry; no template import in MVP), **Then** the program is saved and shown as active.
 2. **Given** an active program, **When** the user adds a planned exercise with only a name, **Then** it appears in that session’s list in order.
 3. **Given** an active program, **When** the user assigns two sessions to the same weekday, **Then** both are shown for that day in a stable order (user-defined or creation order).
 4. **Given** the user edits the plan (rename session, reorder exercises, move a session to another day), **When** they save, **Then** future “today” views use the new plan and **past logged workouts** still show what was actually performed.
@@ -53,13 +75,13 @@ On any day, the user opens the fitness area and sees **what is planned for today
 
 **Why this priority**: Daily follow-through is the primary habit loop.
 
-**Independent Test**: With a session planned for “today” (or a test harness that fixes the calendar day), start workout, mark complete without logging sets, and see it in history as completed.
+**Independent Test**: With a session planned for “today” (or a test harness that fixes the calendar day), start workout, mark **Terminé** without logging sets or with only exercise names, and see it in history as completed.
 
 **Acceptance Scenarios**:
 
 1. **Given** a session planned for today, **When** the user opens fitness home, **Then** that session is highlighted as **À faire** (or equivalent French label).
 2. **Given** today’s planned session, **When** the user taps start, **Then** a workout log opens pre-filled with planned exercise names in order.
-3. **Given** an in-progress workout, **When** the user marks the workout **Terminé**, **Then** it is stored with completion timestamp and shown in history.
+3. **Given** an in-progress workout, **When** the user marks the workout **Terminé** (with or without per-set reps/charge/duration logged), **Then** it is stored with completion timestamp and shown in history.
 4. **Given** today’s planned session, **When** the user chooses **Passer** with an optional note, **Then** the day is recorded as skipped without a full log.
 5. **Given** no session planned for today, **When** the user opens fitness home, **Then** they see a helpful empty state and can still start a **séance libre** (unplanned workout) from a clear entry point.
 
@@ -69,7 +91,7 @@ On any day, the user opens the fitness area and sees **what is planned for today
 
 ### User Story 3 - Log sets, reps, load, duration, and RPE (Priority: P1)
 
-During or after a workout, the user records **per-exercise** work: one or more **sets**, each with optional **repetitions**, **charge** (weight), **durée** (for timed work), and **RPE** (1–10 scale). Only the exercise name is required to save a row; set details are optional to respect capture speed. The user can add exercises not in the plan mid-workout.
+During or after a workout, the user records **per-exercise** work: one or more **sets**, each with optional **repetitions**, **charge** (weight), **durée** (for timed or cardio work), optional **note de distance** (free text, e.g. kilometres), and **RPE** (1–10 scale). For strength, reps and charge are encouraged when precision matters but are not required on every set. For cardio, duration is the primary field; distance is optional text, not GPS. Only the exercise name is required to save a row; set details are optional to respect capture speed. The user can add exercises not in the plan mid-workout.
 
 **Why this priority**: “Precise training” is the differentiator from a simple checklist.
 
@@ -183,9 +205,10 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 
 **Foundation (inherits 001 — stated for fitness context)**
 
-- **FR-001**: Fitness data MUST obey offline-first rules: all fitness interactions work with no network; sync is background; expired session MUST NOT block local fitness data.
+- **FR-001**: Fitness data MUST obey the same offline-first rules as 001: all fitness reads and writes go through the local store (IndexedDB); changes queue for sync while offline; sync runs in the background when online; merge and soft-delete semantics match the foundation; expired session MUST NOT block local fitness data.
 - **FR-002**: Fitness data MUST be private per user with the same isolation guarantees as other lists.
-- **FR-003**: User-facing fitness strings MUST be in French via the i18n layer.
+- **FR-003**: User-facing fitness strings MUST be in French only, via the same i18n layer as the rest of Muni (`fr.json`); no additional locales for this module in MVP.
+- **FR-004**: Fitness MUST be reachable from a **dedicated primary navigation entry** in the app shell (same class of prominence as typed list destinations such as books and recipes in 001).
 
 **Program & scheduling**
 
@@ -200,7 +223,7 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 - **FR-021**: Starting from a plan MUST create a **workout log** linked to the planned session identifier and calendar date.
 - **FR-022**: A workout log MUST support status: **en cours**, **terminé**, or **abandonné** (abandoned logs do not count as completed for adherence).
 - **FR-023**: Skipping a planned day MUST record a **skip** entry with date, planned session reference, and optional note.
-- **FR-024**: Workout logs MUST contain ordered **logged exercises**, each with ordered **sets** supporting optional fields: repetitions (non-negative integer), charge (non-negative number with user’s preferred unit), durée (seconds or minutes — single convention in UI), RPE (integer 1–10).
+- **FR-024**: Workout logs MUST contain ordered **logged exercises**, each with ordered **sets** supporting optional fields: repetitions (non-negative integer), charge (non-negative number with user’s preferred unit), durée (seconds or minutes — single convention in UI), optional distance **note** (free text for cardio), RPE (integer 1–10). Marking a workout **terminé** MUST NOT require every planned exercise to have at least one fully detailed set.
 - **FR-025**: Users MUST be able to add, edit, reorder, and remove exercises and sets during a workout.
 - **FR-026**: Exercise names MUST offer autocomplete suggestions from the user’s prior exercise names (case- and accent-insensitive substring).
 
@@ -226,7 +249,8 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 
 - Public social feeds, sharing workouts, or coach/client multi-user accounts.
 - Built-in video library, animated form guides, or licensed exercise databases (user-named exercises only in MVP).
-- Automatic program generation, AI coaching, or wearable/HealthKit/Google Fit import.
+- Automatic program generation, AI coaching, or **wearable / health platform import** (Apple Health, HealthKit, Google Fit, **Garmin Connect**, etc.) — optional future integration only; not MVP.
+- Static **starter program templates** or import-from-file for the first program (MVP is manual program entry; templates deferred to Phase D or planning).
 - Nutrition tracking, body-composition analysis, or medical diagnoses.
 - Rest timers, audio cues, and live GPS running maps (may be considered later).
 - Multiple simultaneously active programs, mesocycle periodization engines, or RPE-based auto-regulation algorithms.
@@ -240,7 +264,7 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 - **Planned exercise**: Name; optional template hints (default set count, target reps, notes) — all optional except name.
 - **Workout log**: A concrete instance on a calendar date; link to planned session optional; status; start/end timestamps; optional recovery check-in.
 - **Logged exercise**: Name; optional type tag; ordered sets.
-- **Set**: Optional reps, charge, duration, RPE; order index.
+- **Set**: Optional reps, charge, duration, optional distance note (text), RPE; order index.
 - **Skip record**: Date, planned session reference, optional note.
 - **Personal record (derived)**: Per exercise name, cached or computed bests for display (not a separate user-edited entity).
 
@@ -249,7 +273,7 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 ### Measurable Outcomes
 
 - **SC-001**: A user can create a three-day weekly plan and see today’s session in **under 2 minutes** on first use (guided empty states).
-- **SC-002**: A user can start from today’s plan and mark a workout **terminé** with **at least one exercise and one set** logged in **under 90 seconds** after opening the log (excluding actual gym time).
+- **SC-002**: A user can start from today’s plan and mark a workout **terminé** in **under 90 seconds** after opening the log (excluding actual gym time), either with quick detail (e.g. one exercise and one set) or with **no sets logged** (completion-only path per User Story 2).
 - **SC-003**: With no network, a user can complete a full log with five exercises and fifteen sets; after reconnect, **100%** of fields appear on a second device within 10 seconds under normal test conditions.
 - **SC-004**: Progression view loads recent history for an exercise with **20 past sessions** in **under 1 second** on a mid-range phone.
 - **SC-005**: In isolation testing, **0** fitness records are visible across two user accounts.
@@ -263,17 +287,11 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 - **Duration** is stored in seconds internally; UI may show minutes for entries over 60s.
 - **RPE** uses the common 1–10 integer scale; help text is brief and in French.
 - Week starts **Monday** for adherence views (align with French locale convention); configurable week start is out of scope unless trivial in implementation planning.
-- Fitness appears as a **new primary area** in navigation (exact placement in plan/tasks), not buried inside settings.
+- Fitness appears as a **dedicated primary navigation entry** (locked 2026-10-19); route and label are defined in planning, mirroring how 001 exposes typed lists.
+- First training program is **created manually** in MVP; no bundled template seed.
+- Cardio is modeled with **duration + optional distance note** on sets, not a separate product surface.
 - Historical analytics are **descriptive**, not prescriptive (no “you failed your program” messaging).
 - Constitution technology constraints apply; this spec does not prescribe schema or routes.
-
-## Open questions (for Valentin — not blocking spec draft)
-
-1. **MVP precision floor**: Is logging **reps + charge** required on every strength set for MVP, or is “exercise done” checkbox per exercise enough for v1 with precision in v1.1?
-2. **Cardio**: Should Phase A include a dedicated **cardio session** template (duration + distance optional) or only strength-style sets with a duration field?
-3. **Program source**: Will the first program be **entered manually** only, or should MVP include **import from a static template** (e.g. starting strength snapshot) as a one-time seed?
-4. **Navigation**: Should fitness be a **bottom-nav tab** or a home card + secondary entry (impacts how prominent training is vs libraries)?
-5. **Exercise naming**: Is **French-only** exercise names acceptable, or should the app ship a small built-in **bilingual alias list** (e.g. “Bench press” / “Développé couché”) without a full catalog API?
 
 ## Dependencies
 

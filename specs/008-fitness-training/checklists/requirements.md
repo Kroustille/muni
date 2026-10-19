@@ -31,5 +31,6 @@
 
 ## Notes
 
-- Validation pass 1 (2026-10-19): All items pass. Open questions for Valentin are listed in spec **Open questions** section (product choices, not spec gaps).
-- Ready for `/speckit-plan` after any open questions are resolved or explicitly deferred.
+- Validation pass 1 (2026-10-19): All items pass.
+- Validation pass 2 (2026-10-19): Valentin locked **wearables out of MVP**, **French-only UI**, and **mandatory offline-first sync**; former open questions encoded as **Assumed default — confirm with Valentin** in spec **Constraints & decisions**. No `[NEEDS CLARIFICATION]` markers.
+- Ready for `/speckit-plan` (assumed defaults may be revisited with Valentin without blocking planning).
