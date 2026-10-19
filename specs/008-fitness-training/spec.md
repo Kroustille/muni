@@ -8,7 +8,7 @@
 
 **Status**: Draft
 
-**Input**: Valentin wants a **fitness-focused slice** of the Muni life companion: follow a training plan with **multiple sessions per week on planned days**, log workouts with **precise detail** (exercises, sets, reps, weight, duration, RPE — exact MVP fields TBD), see **progression over time**, and sensible **holistic companion** touches (recovery, habits, motivation) without over-scoping the first release.
+**Input**: Valentin wants a **fitness-focused slice** of the Muni life companion: follow a training plan with **multiple sessions per week on planned days**, log workouts with **precise detail** (exercises from a **curated catalog**, sets, reps, weight, duration, RPE — exact MVP fields TBD), see **progression over time**, and sensible **holistic companion** touches (recovery, habits, motivation) without over-scoping the first release.
 
 **Depends on**: Muni foundation (`001-typed-lists-companion`) — auth, offline-first sync, French UI, home overview patterns, search, and per-user privacy.
 
@@ -23,8 +23,9 @@ Decisions from Valentin (locked) and product defaults pending confirmation (assu
 | Topic | Decision |
 |-------|----------|
 | **Apple Health / Garmin** | **Not mandatory.** Optional future integration only. No HealthKit, Google Fit, Garmin Connect, or other wearable APIs in MVP (Phases A–C) or Phase D unless explicitly replanned. |
-| **French-only UI** | **Confirmed.** All fitness labels, help text, and empty states are in **French**, consistent with Muni’s norm (`fr.json` / `t(key)`). No separate i18n or English UI for this module beyond what 001 already requires. Exercise names are **user-entered free text** (may be French or informal mix; UI strings stay French). |
+| **French-only UI** | **Confirmed.** All fitness labels, help text, and empty states are in **French**, consistent with Muni’s norm (`fr.json` / `t(key)`). No separate i18n or English UI for this module beyond what 001 already requires. **Exercise display names** come from the curated catalog (`nameFr`); English names are **search aliases only**, not shown in the UI. |
 | **Offline mobile** | **Mandatory.** Fitness MUST follow the same **offline-first + sync** model as other Muni typed lists: local persistence (IndexedDB), outbound sync queue while offline, background push/pull when online, per-field last-write-wins and soft deletes per foundation constitution — not a online-only submodule. |
+| **Exercise catalog (MVP)** | **Curated list only** — no user-defined custom exercise names in Phases A–C. Planning and logging **pick from the shipped catalog** (versioned seed; see [Exercise catalog](#exercise-catalog-mvp)). Users cannot create ad-hoc exercise strings in MVP. |
 
 ### Assumed default — confirm with Valentin
 
@@ -34,14 +35,14 @@ Decisions from Valentin (locked) and product defaults pending confirmation (assu
 | 2 | **Cardio** | No separate cardio app or session type in Phases A–B. Cardio fits the **generic set model**: duration required for meaningful cardio rows; optional **distance note** (free text, e.g. “5 km”) on the set or exercise row — not a dedicated GPS/map feature. |
 | 3 | **Program seed** | **Manual entry only** for MVP (user builds program in-app). A one-time **starter program template** (static seed) is **out of MVP** — defer to Phase D or an explicit plan/tasks item. |
 | 4 | **Navigation** | Fitness is a **typed domain with a dedicated primary navigation entry**, same prominence pattern as books/recipes in 001 (reachable from the main app shell without burying under Settings). Exact route label and icon are for planning (`ui-routes` contract). |
-| 5 | **Exercise naming** | **Free-text** names with **history-based autocomplete** (FR-026). A small **client-side French alias list** (e.g. “Bench press” → “Développé couché”) is **optional later**, not MVP — no licensed exercise catalog API. |
+| 5 | **Exercise selection** | **Catalog picker** with search on French labels and English aliases (FR-026). **Recently used** exercises surface first. Catalog updates ship with app releases (`catalogVersion` bump); historical logs keep their stored `exerciseId` + display snapshot. |
 
 ## Product scope (phased)
 
 | Phase | Theme | Intent |
 |-------|--------|--------|
 | **A — Plan & today** | One active program, weekly day assignments, “today’s session”, mark done/skipped | MVP core: user knows what to do and when |
-| **B — Log & precision** | In-session logging: exercises, sets, reps, load, optional duration and RPE | Delivers “precise training” without blocking on a global exercise database |
+| **B — Log & precision** | In-session logging: catalog exercises, sets, reps, load, optional duration and RPE | Delivers “precise training” with a consistent exercise vocabulary |
 | **C — Progression** | History, per-exercise trends, personal records | Answers “am I getting stronger/fitter?” |
 | **D — Companion** | Recovery check-in, adherence streak (no guilt), home card, light motivation | Holistic life companion angle; small, optional surfaces |
 
@@ -53,16 +54,16 @@ Phases **A–C** are the **MVP product** for this feature. Phase **D** ships onl
 
 ### User Story 1 - Set up a weekly training plan (Priority: P1)
 
-A signed-in user defines **one active training program** with a name and assigns **planned sessions** to days of the week (for example Monday upper body, Wednesday run, Friday full body). Each planned session has a title and an ordered list of **planned exercises** (name only required; optional default sets/reps/notes). The user can change the plan later; past completed workouts are never deleted when the plan changes.
+A signed-in user defines **one active training program** with a name and assigns **planned sessions** to days of the week (for example Monday upper body, Wednesday run, Friday full body). Each planned session has a title and an ordered list of **planned exercises** (each row references a **catalog exercise**; optional default sets/reps/notes). The user can change the plan later; past completed workouts are never deleted when the plan changes.
 
 **Why this priority**: Without a plan tied to days, “follow training multiple times per week” has no anchor.
 
-**Independent Test**: Create a program with three weekday sessions, reopen the app offline, and confirm assignments and exercise names persist.
+**Independent Test**: Create a program with three weekday sessions, reopen the app offline, and confirm assignments and catalog exercise selections persist.
 
 **Acceptance Scenarios**:
 
 1. **Given** no program yet, **When** the user creates a program with name and at least one planned session on a weekday (manual entry; no template import in MVP), **Then** the program is saved and shown as active.
-2. **Given** an active program, **When** the user adds a planned exercise with only a name, **Then** it appears in that session’s list in order.
+2. **Given** an active program, **When** the user adds a planned exercise by selecting one from the catalog, **Then** it appears in that session’s list in order with the French display name.
 3. **Given** an active program, **When** the user assigns two sessions to the same weekday, **Then** both are shown for that day in a stable order (user-defined or creation order).
 4. **Given** the user edits the plan (rename session, reorder exercises, move a session to another day), **When** they save, **Then** future “today” views use the new plan and **past logged workouts** still show what was actually performed.
 5. **Given** the user is offline, **When** they edit the program, **Then** changes are saved locally immediately.
@@ -75,12 +76,12 @@ On any day, the user opens the fitness area and sees **what is planned for today
 
 **Why this priority**: Daily follow-through is the primary habit loop.
 
-**Independent Test**: With a session planned for “today” (or a test harness that fixes the calendar day), start workout, mark **Terminé** without logging sets or with only exercise names, and see it in history as completed.
+**Independent Test**: With a session planned for “today” (or a test harness that fixes the calendar day), start workout, mark **Terminé** without logging sets or with only catalog exercises listed, and see it in history as completed.
 
 **Acceptance Scenarios**:
 
 1. **Given** a session planned for today, **When** the user opens fitness home, **Then** that session is highlighted as **À faire** (or equivalent French label).
-2. **Given** today’s planned session, **When** the user taps start, **Then** a workout log opens pre-filled with planned exercise names in order.
+2. **Given** today’s planned session, **When** the user taps start, **Then** a workout log opens pre-filled with planned catalog exercises in order.
 3. **Given** an in-progress workout, **When** the user marks the workout **Terminé** (with or without per-set reps/charge/duration logged), **Then** it is stored with completion timestamp and shown in history.
 4. **Given** today’s planned session, **When** the user chooses **Passer** with an optional note, **Then** the day is recorded as skipped without a full log.
 5. **Given** no session planned for today, **When** the user opens fitness home, **Then** they see a helpful empty state and can still start a **séance libre** (unplanned workout) from a clear entry point.
@@ -91,7 +92,7 @@ On any day, the user opens the fitness area and sees **what is planned for today
 
 ### User Story 3 - Log sets, reps, load, duration, and RPE (Priority: P1)
 
-During or after a workout, the user records **per-exercise** work: one or more **sets**, each with optional **repetitions**, **charge** (weight), **durée** (for timed or cardio work), optional **note de distance** (free text, e.g. kilometres), and **RPE** (1–10 scale). For strength, reps and charge are encouraged when precision matters but are not required on every set. For cardio, duration is the primary field; distance is optional text, not GPS. Only the exercise name is required to save a row; set details are optional to respect capture speed. The user can add exercises not in the plan mid-workout.
+During or after a workout, the user records **per-exercise** work: one or more **sets**, each with optional **repetitions**, **charge** (weight), **durée** (for timed or cardio work), optional **note de distance** (free text, e.g. kilometres), and **RPE** (1–10 scale). For strength, reps and charge are encouraged when precision matters but are not required on every set. For cardio, duration is the primary field; distance is optional text, not GPS. Each logged exercise row MUST reference a **catalog exercise** (`exerciseId`); set details remain optional to respect capture speed. The user can add **other catalog exercises** not in the plan mid-workout.
 
 **Why this priority**: “Precise training” is the differentiator from a simple checklist.
 
@@ -107,18 +108,20 @@ During or after a workout, the user records **per-exercise** work: one or more *
 
 ---
 
-### User Story 4 - Reuse exercises and quick capture (Priority: P2)
+### User Story 4 - Find exercises quickly and reuse sessions (Priority: P2)
 
-When typing an exercise name, the user sees **suggestions from their own history** (same pattern as “recommended by” on books). They can duplicate a **previous workout** as a starting point for today’s séance libre or for editing the plan.
+When adding an exercise to a plan or log, the user opens a **catalog picker** with search (French labels and English aliases, case- and accent-insensitive) and filters (muscle category, equipment, modality). **Recently used** catalog exercises appear at the top. They can duplicate a **previous workout** as a starting point for today’s séance libre or for editing the plan.
 
-**Why this priority**: Reduces typing during training; aligns with Muni capture-speed principle.
+**Why this priority**: Fast selection during training without free-text typos; aligns with Muni capture-speed principle.
 
-**Independent Test**: Log “Squat” once; on a new workout, type “Squ” and select suggestion; duplicate last week’s workout and confirm exercises copy.
+**Independent Test**: Log “Squat à la barre” once; on a new workout, search “squat” and pick from catalog; duplicate last week’s workout and confirm exercises copy by `exerciseId`.
 
 **Acceptance Scenarios**:
 
-1. **Given** prior logs containing “Soulevé de terre”, **When** the user types “soul” in an exercise field, **Then** matching past names are suggested (case- and accent-insensitive).
-2. **Given** a completed workout in history, **When** the user chooses **Dupliquer comme modèle**, **Then** a new draft log or plan session is created with the same exercise names and optional default set counts, not linked as the same historical record.
+1. **Given** the catalog contains “Soulevé de terre”, **When** the user searches “deadlift” or “soul”, **Then** the matching catalog entry is offered and selectable.
+2. **Given** prior logs using “Soulevé de terre”, **When** the user opens the picker without typing, **Then** that exercise appears in **Récemment utilisés** (or equivalent French label).
+3. **Given** a completed workout in history, **When** the user chooses **Dupliquer comme modèle**, **Then** a new draft log or plan session is created with the same catalog exercises and optional default set counts, not linked as the same historical record.
+4. **Given** the user attempts to add an exercise, **When** they cannot find a match in the catalog, **Then** there is **no** free-text “create exercise” path in MVP (empty state explains the fixed list; future feedback channel is out of scope).
 
 ---
 
@@ -126,7 +129,7 @@ When typing an exercise name, the user sees **suggestions from their own history
 
 ### User Story 5 - View history and progression per exercise (Priority: P1)
 
-The user browses **past workouts** (by date, newest first) and opens any session to see full detail. For a given exercise name, they open a **progression** view showing recent sessions (for example last 8 occurrences): best set volume or max charge, and simple trend cues (e.g. “charge max en hausse” when last max exceeds previous). **Records personnels** (PR) for max charge and max reps at a given charge are highlighted when a new best is logged.
+The user browses **past workouts** (by date, newest first) and opens any session to see full detail. For a given **catalog exercise** (`exerciseId`), they open a **progression** view showing recent sessions (for example last 8 occurrences): best set volume or max charge, and simple trend cues (e.g. “charge max en hausse” when last max exceeds previous). **Records personnels** (PR) for max charge and max reps at a given charge are highlighted when a new best is logged. Display uses the current catalog French name when the id still exists; otherwise the **name snapshot** stored on the log.
 
 **Why this priority**: Progression over time was an explicit goal.
 
@@ -137,7 +140,7 @@ The user browses **past workouts** (by date, newest first) and opens any session
 1. **Given** multiple completed workouts, **When** the user opens history, **Then** workouts are listed by date with session title and duration or exercise count summary.
 2. **Given** an exercise logged at least twice, **When** the user opens progression for that name, **Then** they see a chronological list of sessions with key metrics per visit.
 3. **Given** a new set exceeds previous max charge for that exercise, **When** the workout is saved, **Then** the UI indicates a new PR (non-blocking, no share).
-4. **Given** the user renames an exercise in the plan only, **When** viewing progression, **Then** history still uses the names stored on each log (no silent merge unless user explicitly merges names in a future enhancement).
+4. **Given** the catalog French label changes in a later app version, **When** viewing progression for an `exerciseId`, **Then** the UI shows the **current** catalog label while historical log rows may show the snapshot taken at log time on detail views.
 
 ---
 
@@ -192,7 +195,8 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 
 - User changes timezone or travels: workout timestamps store **local calendar date** the user saw when logging, plus UTC instant for ordering/sync (planning uses weekday names, not UTC midnight surprises).
 - Two devices log different workouts offline on the same day: both logs persist; “today” may show multiple in-progress unless product limits one in-progress per day (default: **allow one in-progress**; starting a new one prompts to finish or abandon the other).
-- Exercise name typos create duplicate progression series (“Squat” vs “squat ”): allowed in v1; suggestions reduce but do not merge automatically.
+- Catalog exercise removed in a later version: logs retain `exerciseId` + snapshot; progression remains keyed by id; UI shows “exercice archivé” or snapshot name (exact copy in planning).
+- User requests an exercise not in the catalog: **no custom exercise** in MVP; product may add a feedback link later, not in this spec.
 - User deletes a completed workout: **soft delete** with undo (same as other lists).
 - Plan has zero exercises for a session: user can still start and add exercises ad hoc.
 - Extremely long workouts (50+ sets): UI remains usable; no hard cap in spec beyond reasonable performance (see success criteria).
@@ -214,7 +218,7 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 
 - **FR-010**: The system MUST allow exactly **one active training program** per user at a time (archived programs may be deferred to a later phase; v1 focuses on one active).
 - **FR-011**: A training program MUST have a name and an ordered collection of **planned sessions**, each with a title and **one or more weekdays** on which it is scheduled.
-- **FR-012**: Each planned session MUST contain an ordered list of **planned exercises**; only exercise **name** is required per row.
+- **FR-012**: Each planned session MUST contain an ordered list of **planned exercises**; each row MUST reference a valid **`exerciseId`** from the active catalog version.
 - **FR-013**: Users MUST be able to create, edit, reorder, and delete planned sessions and exercises without deleting historical workout logs.
 
 **Daily use & logs**
@@ -225,13 +229,15 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 - **FR-023**: Skipping a planned day MUST record a **skip** entry with date, planned session reference, and optional note.
 - **FR-024**: Workout logs MUST contain ordered **logged exercises**, each with ordered **sets** supporting optional fields: repetitions (non-negative integer), charge (non-negative number with user’s preferred unit), durée (seconds or minutes — single convention in UI), optional distance **note** (free text for cardio), RPE (integer 1–10). Marking a workout **terminé** MUST NOT require every planned exercise to have at least one fully detailed set.
 - **FR-025**: Users MUST be able to add, edit, reorder, and remove exercises and sets during a workout.
-- **FR-026**: Exercise names MUST offer autocomplete suggestions from the user’s prior exercise names (case- and accent-insensitive substring).
+- **FR-026**: Adding an exercise MUST use a **catalog picker**: search matches **`nameFr`** and **`nameEn`** (case- and accent-insensitive substring); optional filters by **category**, **equipment**, and **modality**; **recently used** `exerciseId`s MUST be surfaced first when the search box is empty.
+- **FR-027**: The app MUST ship the MVP catalog **offline** (bundled seed or local store populated on first launch — see data model); users MUST NOT depend on network to list or search exercises.
+- **FR-028**: **Custom exercises** (user-defined names outside the catalog) MUST NOT be creatable in MVP; missing exercises are handled via a future catalog release, not free text.
 
 **Progression & history**
 
 - **FR-030**: Users MUST browse completed and skipped activity in reverse chronological order.
-- **FR-031**: Users MUST open a **progression** view per exercise name showing metrics from historical logs.
-- **FR-032**: The system MUST detect and surface **personal records** for max charge and max reps at a given charge per exercise name when a new log is saved (informational only).
+- **FR-031**: Users MUST open a **progression** view per **`exerciseId`** showing metrics from historical logs.
+- **FR-032**: The system MUST detect and surface **personal records** for max charge and max reps at a given charge per **`exerciseId`** when a new log is saved (informational only).
 
 **Companion (Phase D)**
 
@@ -248,7 +254,8 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 ### Out of Scope (this feature)
 
 - Public social feeds, sharing workouts, or coach/client multi-user accounts.
-- Built-in video library, animated form guides, or licensed exercise databases (user-named exercises only in MVP).
+- Built-in video library, animated form guides, or **live** third-party exercise APIs during workouts (MVP uses a **bundled** catalog file, not runtime database calls).
+- **User-defined custom exercises** or community-submitted exercise libraries in MVP.
 - Automatic program generation, AI coaching, or **wearable / health platform import** (Apple Health, HealthKit, Google Fit, **Garmin Connect**, etc.) — optional future integration only; not MVP.
 - Static **starter program templates** or import-from-file for the first program (MVP is manual program entry; templates deferred to Phase D or planning).
 - Nutrition tracking, body-composition analysis, or medical diagnoses.
@@ -261,12 +268,42 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 
 - **Training program**: User-owned active plan: name, created/updated metadata, soft-delete marker.
 - **Planned session**: Belongs to program; title; weekday assignments (one or more); ordered planned exercises.
-- **Planned exercise**: Name; optional template hints (default set count, target reps, notes) — all optional except name.
-- **Workout log**: A concrete instance on a calendar date; link to planned session optional; status; start/end timestamps; optional recovery check-in.
-- **Logged exercise**: Name; optional type tag; ordered sets.
+- **Exercise catalog entry** (read-only, versioned): Stable `id` (kebab-case slug); `nameFr` (UI); `nameEn` (search alias); `category` (primary muscle or intent); `equipment[]`; `modality` (`strength` | `cardio` | `mobility`); optional `tags[]` (movement pattern). Source file: `exercises.catalog.json` in this feature directory; implementation copies into local store with `catalogVersion`.
+- **Planned exercise**: `exerciseId` (required); optional template hints (default set count, target reps, notes).
+- **Workout log**: A concrete instance on a calendar date; link to planned session optional; status; start/end timestamps; optional recovery check-in; `catalogVersion` at creation (for audit).
+- **Logged exercise**: `exerciseId` (required); `nameFrSnapshot` (required at save — display if catalog label changes); optional type tag derived from catalog `modality`; ordered sets.
 - **Set**: Optional reps, charge, duration, optional distance note (text), RPE; order index.
 - **Skip record**: Date, planned session reference, optional note.
-- **Personal record (derived)**: Per exercise name, cached or computed bests for display (not a separate user-edited entity).
+- **Personal record (derived)**: Per `exerciseId`, cached or computed bests for display (not a separate user-edited entity).
+
+## Exercise catalog (MVP)
+
+Valentin requested a **finished exercise list** (not free-text-only). MVP ships a **curated, versioned catalog** the user picks from when building a program or logging sets.
+
+### Artifact
+
+- **File**: [`exercises.catalog.json`](./exercises.catalog.json) — canonical seed for planning; **121** exercises at `version: 1` (2026-10-19).
+- **Schema** (each item): `id`, `nameFr`, `nameEn`, `category`, `equipment[]`, `modality`, optional `tags[]` (e.g. `push`, `pull`, `squat`, `hinge`, `core`, `cardio`).
+- **Categories** (`category`): `pectoraux`, `dos`, `épaules`, `biceps`, `triceps`, `avant-bras`, `quadriceps`, `ischio-jambiers`, `fessiers`, `mollets`, `abdominaux`, `corps entier`, `cardio`, `mobilité`.
+- **Equipment** values (closed enum for MVP): `poids du corps`, `barre`, `haltères`, `machine`, `câble`, `kettlebell`, `banc`, `bande élastique`, `vélo`, `rameur`, `tapis`, `accessoire`, `aucun`.
+- **Implementation note** (for planning only): load catalog into IndexedDB (or equivalent) on upgrade when `catalogVersion` increases; do not fetch exercises from the network at runtime.
+
+### Custom exercises
+
+**Not allowed in MVP.** Users cannot type a new exercise name. Expanding the list is a **product/data release** (bump `version`, migration/seed), not an in-app create flow.
+
+### Research sources (names + coverage, not verbatim DB copy)
+
+The list was composed for gym + bodyweight + common machines + cardio/mobility staples, cross-checked against public references:
+
+| Source | URL | Use in this catalog | License / notes |
+|--------|-----|---------------------|-----------------|
+| Wikipedia — *List of weight training exercises* | https://en.wikipedia.org/wiki/List_of_weight_training_exercises | Movement coverage table (push/pull/legs/core staples) | CC BY-SA 4.0 — article text not copied wholesale; exercise **names** are common fitness vocabulary |
+| U.S. CDC — *What counts as physical activity* | https://www.cdc.gov/physical-activity-basics/adding-adults/what-counts.html | Cardio modality names (walking, running, swimming, cycling, etc.) | U.S. government public domain / CDC site terms |
+| HHS — *Physical Activity Guidelines for Americans*, 2nd ed. (via CDC PDF) | https://www.cdc.gov/physical-activity/media/pdfs/Physical_Activity_Guidelines_2nd_edition.pdf | Aerobic + muscle-strengthening activity examples | U.S. government work |
+| wger Workout Manager (reference only) | https://wger.de/ | Cross-check of common strength exercise naming; **not** imported as a bulk dataset | Per-exercise CC BY-SA 3.0/4.0 or CC0 on wger — **this repo file is an original curated subset**, not a wger dump |
+
+**Licensing caveat for Valentin**: Muni’s catalog is a **small original seed** inspired by public lists and common gym terminology. It is **not** a scrape of wger, ExerciseDB, or commercial apps. If we later import third-party exercise *descriptions*, images, or large datasets, each source’s attribution and share-alike terms must be reviewed separately. French display strings were authored for Muni; English strings aid search only.
 
 ## Success Criteria *(mandatory)*
 
@@ -296,4 +333,4 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 ## Dependencies
 
 - `001-typed-lists-companion`: authentication, sync, undo delete, French UI, home cards pattern.
-- No third-party fitness API required for MVP.
+- **Bundled exercise catalog** (`exercises.catalog.json`) — no third-party fitness API at runtime for MVP.

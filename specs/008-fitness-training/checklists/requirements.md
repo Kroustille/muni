@@ -33,4 +33,5 @@
 
 - Validation pass 1 (2026-10-19): All items pass.
 - Validation pass 2 (2026-10-19): Valentin locked **wearables out of MVP**, **French-only UI**, and **mandatory offline-first sync**; former open questions encoded as **Assumed default — confirm with Valentin** in spec **Constraints & decisions**. No `[NEEDS CLARIFICATION]` markers.
+- Validation pass 3 (2026-10-19): Valentin locked **curated exercise catalog** (no custom exercises MVP); artifact [`exercises.catalog.json`](../exercises.catalog.json) + spec section **Exercise catalog (MVP)**; FR-026–FR-028 updated.
 - Ready for `/speckit-plan` (assumed defaults may be revisited with Valentin without blocking planning).
