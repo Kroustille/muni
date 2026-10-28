@@ -7,12 +7,13 @@ import {
   type RecapSection,
   type RecapSnapshot,
   type RecapPeriod,
+  type RecapActivityViewportWindow,
   DEFAULT_RECAP_TIMEZONE,
 } from "@/domain/recap";
 import type { RecapDeps } from "@/application/recap/contributor-types";
 import { RECAP_CONTRIBUTORS } from "@/application/recap/contributors";
-import { addCalendarDays, localTodayDateKey, resolvePeriodBounds } from "@/application/recap/period";
-import { buildActivityDays } from "@/application/recap/recap-activity-days";
+import { localTodayDateKey, resolvePeriodBounds } from "@/application/recap/period";
+import { buildActivityDays, recapActivityWindowStart } from "@/application/recap/recap-activity-days";
 
 export { buildActivityDays };
 
@@ -21,6 +22,8 @@ export type BuildRecapSnapshotInput = {
   deps: RecapDeps;
   /** Override "today" for tests */
   todayDateKey?: string;
+  /** Trailing heatmap window (default wide viewport). */
+  activityViewportWindow?: RecapActivityViewportWindow;
 };
 
 function groupSections(achievements: RecapAchievement[]): RecapSection[] {
@@ -64,9 +67,11 @@ export async function buildRecapSnapshot(input: BuildRecapSnapshotInput): Promis
   const totalCount = periodAchievements.length;
 
   const today = input.todayDateKey ?? localTodayDateKey(resolved.timeZone);
+  const activityViewportWindow = input.activityViewportWindow ?? "365";
   const allForHeatmap = await collectAllAchievementsForHeatmap(
     input.deps,
     today,
+    activityViewportWindow,
     resolved.timeZone,
   );
 
@@ -74,7 +79,7 @@ export async function buildRecapSnapshot(input: BuildRecapSnapshotInput): Promis
     period: resolved,
     sections,
     totalCount,
-    activityDays: buildActivityDays(allForHeatmap, today),
+    activityDays: buildActivityDays(allForHeatmap, today, activityViewportWindow),
     empty: totalCount === 0,
   };
 }
@@ -82,9 +87,10 @@ export async function buildRecapSnapshot(input: BuildRecapSnapshotInput): Promis
 async function collectAllAchievementsForHeatmap(
   deps: RecapDeps,
   todayDateKey: string,
+  viewportWindow: RecapActivityViewportWindow,
   timeZone: string = DEFAULT_RECAP_TIMEZONE,
 ): Promise<RecapAchievement[]> {
-  const windowStart = addCalendarDays(todayDateKey, -364);
+  const windowStart = recapActivityWindowStart(todayDateKey, viewportWindow);
   const heatmapRange = { startDate: windowStart, endDate: todayDateKey, timeZone };
   const chunks = await Promise.all(
     RECAP_CONTRIBUTORS.map((contributor) => contributor.collectAchievements(deps, heatmapRange)),

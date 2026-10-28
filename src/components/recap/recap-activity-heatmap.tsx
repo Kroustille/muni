@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import type { RecapActivityDay, RecapDomainId } from "@/domain/recap";
+import type { RecapActivityDay, RecapActivityViewportWindow, RecapDomainId } from "@/domain/recap";
 import { RECAP_DOMAIN_ACCENTS, heatmapSegmentStyles } from "@/components/recap/recap-domain-accents";
 import { buildRecapHeatmapWeekColumns } from "@/components/recap/recap-heatmap-week-columns";
 import { RECAP_DOMAIN_IDS } from "@/domain/recap";
@@ -27,20 +27,23 @@ function formatDayFr(dateKey: string): string {
 
 type RecapActivityHeatmapProps = {
   days: RecapActivityDay[];
+  viewportWindow: RecapActivityViewportWindow;
 };
 
-export function RecapActivityHeatmap({ days }: RecapActivityHeatmapProps) {
+export function RecapActivityHeatmap({ days, viewportWindow }: RecapActivityHeatmapProps) {
   const weekColumns = useMemo(() => buildRecapHeatmapWeekColumns(days), [days]);
+  const titleKey =
+    viewportWindow === "84" ? "recap.heatmap.titleNarrow" : "recap.heatmap.title";
 
   return (
-    <section className="flex flex-col gap-3" aria-label={t("recap.heatmap.title")}>
-      <h2 className="text-lg font-medium">{t("recap.heatmap.title")}</h2>
+    <section className="flex flex-col gap-3" aria-label={t(titleKey)}>
+      <h2 className="text-lg font-medium">{t(titleKey)}</h2>
       <div className="-mx-1 overflow-x-auto overscroll-x-contain px-1 pb-1">
         <div
           className="inline-flex gap-1"
           data-testid="recap-activity-heatmap"
           role="group"
-          aria-label={t("recap.heatmap.title")}
+          aria-label={t(titleKey)}
         >
           {weekColumns.map((week, weekIndex) => (
             <div key={weekIndex} className="flex flex-col gap-1">

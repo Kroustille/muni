@@ -62,6 +62,9 @@ export type RecapActivityDay = {
   isActive: boolean;
 };
 
+/** Trailing heatmap window ending today (OD-011-1 / OD-011-11). */
+export type RecapActivityViewportWindow = "365" | "84";
+
 export type RecapSnapshot = {
   period: RecapPeriodResolved;
   sections: RecapSection[];
