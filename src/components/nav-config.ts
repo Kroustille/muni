@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { CalendarRange, Dumbbell, Home, Search, Settings } from "lucide-react";
+import { CalendarRange, Dumbbell, Home, Leaf, Search, Settings } from "lucide-react";
 import type { ItemType } from "@/domain/item";
 import type { MessageKey } from "@/i18n";
 
@@ -57,6 +57,12 @@ export const FEATURE_NAV: FeatureNavItem[] = [
     labelKey: "fitness.nav",
     icon: Dumbbell,
     match: (p) => p === "/fitness" || p.startsWith("/fitness/"),
+  },
+  {
+    href: "/plants",
+    labelKey: "plants.nav",
+    icon: Leaf,
+    match: (p) => p === "/plants" || p.startsWith("/plants/"),
   },
 ];
 

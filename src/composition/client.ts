@@ -11,10 +11,15 @@ import { wireClientQuoteSync } from "./client-quote-sync";
 import { wireClientCookbookSync } from "./client-cookbook-sync";
 import { wireClientFitnessSync } from "./client-fitness-sync";
 import { wireClientSuggestions } from "./client-suggestions";
+import { wireClientPlantsGardenSync } from "./client-plants-garden-sync";
 import type { CookbookUseCases } from "../application/cookbooks/cookbook-use-cases";
 import { runSyncEngines, type PausableSyncEngine } from "./sync-run";
 import type { FitnessProgramUseCases } from "../application/fitness/program";
 import type { FitnessWorkoutUseCases } from "../application/fitness/workout";
+import type { PlantUseCases } from "../application/plants-garden/plant-use-cases";
+import type { RecordCareEventUseCases } from "../application/plants-garden/record-care-event";
+import type { CultureUseCases } from "../application/plants-garden/culture-use-cases";
+import type { CareProfileUseCases } from "../application/plants-garden/care-profile";
 import type { BookQuoteUseCases } from "../application/books/book-quotes";
 import type { MovieQuoteUseCases } from "../application/movies/movie-quotes";
 import { createReadingSettings, type ReadingSettingsUseCases } from "../application/books/reading-settings";
@@ -41,6 +46,10 @@ export type ClientContext = {
   fitnessProgramUseCases: FitnessProgramUseCases;
   fitnessWorkoutUseCases: FitnessWorkoutUseCases;
   cookbookUseCases: CookbookUseCases;
+  plantUseCases: PlantUseCases;
+  recordCareEventUseCases: RecordCareEventUseCases;
+  cultureUseCases: CultureUseCases;
+  careProfileUseCases: CareProfileUseCases;
   ensureFitnessCatalogSeeded(): Promise<void>;
   searchUseCase: SearchUseCase;
   sessionUseCases: SessionUseCases;
@@ -58,6 +67,7 @@ let bookQuotesSyncEngine: PausableSyncEngine | undefined;
 let movieQuotesSyncEngine: PausableSyncEngine | undefined;
 let fitnessSyncEngine: PausableSyncEngine | undefined;
 let cookbookSyncEngine: PausableSyncEngine | undefined;
+let plantsGardenSyncEngine: PausableSyncEngine | undefined;
 let syncStarted = false;
 
 function publishSyncStatus(next: SyncStatusState): void {
@@ -151,23 +161,40 @@ function buildClientContext(): Promise<ClientContext> {
     });
     fitnessSyncEngine = fitnessSync.fitnessEngine;
 
+    const plantsGardenSync = wireClientPlantsGardenSync({
+      db,
+      items: repository,
+      pullLimit: SYNC_PULL_LIMIT,
+      onLocalWrite: notifyLocalWrite,
+    });
+    plantsGardenSyncEngine = plantsGardenSync.plantsGardenEngine;
+
     async function runSync(): Promise<void> {
       const cookbookEngine = cookbookSyncEngine;
       const engine = syncEngine;
       const quoteEngine = bookQuotesSyncEngine;
       const movieQuoteEngine = movieQuotesSyncEngine;
       const fitnessEngine = fitnessSyncEngine;
+      const plantsEngine = plantsGardenSyncEngine;
       if (
         cookbookEngine === undefined ||
         engine === undefined ||
         quoteEngine === undefined ||
         movieQuoteEngine === undefined ||
-        fitnessEngine === undefined
+        fitnessEngine === undefined ||
+        plantsEngine === undefined
       ) {
         return;
       }
       await runSyncEngines({
-        engines: [cookbookEngine, engine, quoteEngine, movieQuoteEngine, fitnessEngine],
+        engines: [
+          cookbookEngine,
+          engine,
+          quoteEngine,
+          movieQuoteEngine,
+          fitnessEngine,
+          plantsEngine,
+        ],
         connectivity,
         onStatus: publishSyncStatus,
         onPauseScheduler: () => syncScheduler?.pause(),
@@ -191,6 +218,12 @@ function buildClientContext(): Promise<ClientContext> {
     const { bookQuoteUseCases, movieQuoteUseCases } = quoteSync;
     const { programUseCases: fitnessProgramUseCases, workoutUseCases: fitnessWorkoutUseCases } =
       fitnessSync;
+    const {
+      plantUseCases,
+      recordCareEvent: recordCareEventUseCases,
+      cultureUseCases,
+      careProfileUseCases,
+    } = plantsGardenSync;
 
     const searchUseCase = createSearchUseCase({
       repository,
@@ -231,6 +264,10 @@ function buildClientContext(): Promise<ClientContext> {
       fitnessProgramUseCases,
       fitnessWorkoutUseCases,
       cookbookUseCases: cookbookSync.cookbookUseCases,
+      plantUseCases,
+      recordCareEventUseCases,
+      cultureUseCases,
+      careProfileUseCases,
       ensureFitnessCatalogSeeded: () => fitnessSync.ensureCatalogSeeded(),
       searchUseCase,
       sessionUseCases: wrappedSession,
@@ -283,6 +320,22 @@ export function getCookbookUseCases(): Promise<CookbookUseCases> {
   return getClientContext().then((ctx) => ctx.cookbookUseCases);
 }
 
+export function getPlantUseCases(): Promise<PlantUseCases> {
+  return getClientContext().then((ctx) => ctx.plantUseCases);
+}
+
+export function getRecordCareEventUseCases(): Promise<RecordCareEventUseCases> {
+  return getClientContext().then((ctx) => ctx.recordCareEventUseCases);
+}
+
+export function getCultureUseCases(): Promise<CultureUseCases> {
+  return getClientContext().then((ctx) => ctx.cultureUseCases);
+}
+
+export function getCareProfileUseCases(): Promise<CareProfileUseCases> {
+  return getClientContext().then((ctx) => ctx.careProfileUseCases);
+}
+
 export function ensureFitnessCatalogSeeded(): Promise<void> {
   return getClientContext().then((ctx) => ctx.ensureFitnessCatalogSeeded());
 }
@@ -316,6 +369,7 @@ export function startClientSync(): Promise<void> {
     bookQuotesSyncEngine?.resume();
     movieQuotesSyncEngine?.resume();
     fitnessSyncEngine?.resume();
+    plantsGardenSyncEngine?.resume();
     syncScheduler?.resume();
     if (!syncStarted) {
       syncStarted = true;

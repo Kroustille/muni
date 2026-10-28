@@ -1,3 +1,4 @@
+import { createUuidIdGenerator } from "../adapters/browser/id-generator";
 import { createHttpPlantsGardenRemoteStore } from "../adapters/http/plants-garden-remote-store";
 import type { MuniDb } from "../adapters/indexeddb/db";
 import { createIndexedDbPlantsGardenPlantRepository } from "../adapters/indexeddb/plants-garden-plant-repository";
@@ -27,7 +28,7 @@ export type ClientPlantsGardenBundle = {
 
 const PLANT_MUTATIONS = ["createPlant", "updatePlant", "softDeletePlant"] as const;
 const CARE_MUTATIONS = ["recordPlantWatered", "recordCareEvent"] as const;
-const CULTURE_MUTATIONS = ["createCulture", "updateCulture", "softDeleteCulture"] as const;
+const CULTURE_MUTATIONS = ["createCulture", "updateCulture", "softDeleteCulture", "recordMilestone"] as const;
 const PROFILE_MUTATIONS = ["createCareProfile", "updateCareProfile", "softDeleteCareProfile"] as const;
 
 export function wireClientPlantsGardenSync(deps: {
@@ -76,10 +77,30 @@ export function wireClientPlantsGardenSync(deps: {
     return wrapped as T;
   };
 
-  const basePlant = createPlantUseCases({ plants });
-  const baseCare = createRecordCareEventUseCases({ careEvents });
-  const baseCulture = createCultureUseCases({ cultures });
-  const baseProfile = createCareProfileUseCases({ careProfiles });
+  const idGenerator = createUuidIdGenerator();
+  const now = () => Date.now();
+
+  const basePlant = createPlantUseCases({ plants, meta: deps.items.meta, idGenerator, now });
+  const baseCare = createRecordCareEventUseCases({
+    careEvents,
+    plants,
+    meta: deps.items.meta,
+    idGenerator,
+    now,
+  });
+  const baseCulture = createCultureUseCases({
+    cultures,
+    milestones,
+    meta: deps.items.meta,
+    idGenerator,
+    now,
+  });
+  const baseProfile = createCareProfileUseCases({
+    careProfiles,
+    meta: deps.items.meta,
+    idGenerator,
+    now,
+  });
 
   return {
     plantsGardenEngine,

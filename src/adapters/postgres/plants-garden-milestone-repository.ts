@@ -86,7 +86,7 @@ function createRepo(db: DbOrTrx, inTransaction: boolean): ServerPlantsGardenMile
         .where("user_id", "=", userId)
         .where("culture_id", "=", cultureId)
         .where("milestone_type", "=", milestoneType)
-        .where("occurred_at", "=", day)
+        .where("occurred_at", "=", new Date(`${day}T00:00:00.000Z`))
         .where("deleted_at", "is", null);
       if (excludeId !== undefined) {
         query = query.where("id", "!=", excludeId);
@@ -137,8 +137,8 @@ function createRepo(db: DbOrTrx, inTransaction: boolean): ServerPlantsGardenMile
         .selectFrom("vegetable_milestone")
         .selectAll()
         .where("user_id", "=", userId)
-        .where("occurred_at", ">=", from)
-        .where("occurred_at", "<=", to)
+        .where("occurred_at", ">=", new Date(`${from}T00:00:00.000Z`))
+        .where("occurred_at", "<=", new Date(`${to}T00:00:00.000Z`))
         .where("deleted_at", "is", null)
         .execute();
       return rows.map(toDomain);
