@@ -65,7 +65,7 @@ specs/008-fitness-training/
 │   ├── ui-routes.md
 │   ├── exercise-catalog.md
 │   ├── fitness-sync-api.md
-│   ├── program-editor.md          # rename/amend → séance library in implement task
+│   ├── session-library.md
 │   ├── workout-log-ui.md
 │   └── progression.md
 └── tasks.md

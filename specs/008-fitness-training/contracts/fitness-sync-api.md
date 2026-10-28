@@ -1,38 +1,31 @@
-# Contract: Fitness sync API
+# Contract: Fitness sync API (008)
 
-**Applies to**: Offline-first push/pull for fitness entities (FR-001, FR-051). Pattern mirrors `book_quotes` sync.
+**Routes**: `src/app/api/sync/fitness/push`, `pull`
 
 ## Entities synced
 
-| Entity | Table / store | Push | Pull |
-|--------|---------------|------|------|
-| User settings | `fitness_user_settings` | yes | yes |
-| Program | `fitness_program` | yes | yes |
-| Workout log | `fitness_workout_log` | yes | yes |
-| Skip record | `fitness_skip_record` | yes | yes |
+| Entity | Postgres table | Client IDB store | Outbox |
+|--------|----------------|------------------|--------|
+| Session template | `fitness_session_template` | `fitnessSessionTemplates` | yes |
+| Scheduled session | `fitness_scheduled_session` | `fitnessScheduledSessions` | yes |
+| Workout log | `fitness_workout_log` | `fitnessWorkoutLogs` | yes |
+| Skip record | `fitness_skip_record` | `fitnessSkipRecords` | yes |
+| User settings | `fitness_user_settings` | `fitnessUserSettings` | yes |
 
-**Not synced**: exercise catalog (bundled read-only).
+**Removed (2026-10-28)**: `fitness_program` / `programs[]` payload — break-fast, no migration.
 
-## Routes (tentative paths)
+## Push
 
-| Method | Path | Body / query |
-|--------|------|----------------|
-| POST | `/api/sync/fitness/push` | `{ programs[], workoutLogs[], skipRecords[], settings? }` |
-| GET | `/api/sync/fitness/pull` | `?since=<iso>&limit=<n>` |
+| Method | Path | Body |
+|--------|------|------|
+| POST | `/api/sync/fitness/push` | `{ sessionTemplates[], scheduledSessions[], workoutLogs[], skipRecords[], settings? }` |
 
-Alternative: one route per entity type — implementation may split if payload size requires; semantics unchanged.
+Wire shapes: domain `*Wire` types in `session-template.ts`, `scheduled-session.ts`, `workout-log.ts`.
 
-## Merge semantics
+## Pull
 
-- Per-field LWW using `fields_updated_at` on each top-level field.
-- `plannedSessions` and `loggedExercises` are **single fields** — latest whole-array write wins (same as recipe ingredients).
-- Soft delete: `deleted_at` set; pull includes tombstones until client purges per existing sync policy.
+| Method | Path | Query | Response |
+|--------|------|-------|----------|
+| GET | `/api/sync/fitness/pull` | `since`, `limit` | Same arrays + `cursor` |
 
-## Authorization
-
-- Session required; `user_id` from session only; isolation tests required (SC-005).
-
-## Client queue
-
-- IndexedDB outbound queue entries tagged `fitness_*` consistent with existing sync engine registration.
-- Fitness reads/writes never block on network; expired session does not block local fitness CRUD (FR-001).
+LWW merge per field via `fields_updated_at` (unchanged from 008 research §1).

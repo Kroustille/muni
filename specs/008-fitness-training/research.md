@@ -81,8 +81,4 @@
 | **Contracts** | Update [program-editor.md](./contracts/program-editor.md) → séance library contract; sync payload shapes in [fitness-sync-api.md](./contracts/fitness-sync-api.md). |
 | **Tasks** | Regenerate or append migration tasks in [tasks.md](./tasks.md); e2e flows in [quickstart.md](./quickstart.md). |
 
-**Open questions for implement planning**:
-
-- Whether to auto-migrate existing user program data on upgrade or show empty library + import offer.
-- Whether `fitness_program` table is dropped in a later migration or kept as a compatibility view.
-- How week adherence (US6) treats legacy weekday-only data before migration completes.
+**Open questions for implement planning** — **Resolved 2026-10-28**: break-fast implementation on `main` (commit `03d09f4`); no program migration; IDB v8 wipe; migration `0018_fitness_session_first`.

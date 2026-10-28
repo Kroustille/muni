@@ -1,36 +1,23 @@
-# Contract: Fitness UI routes and navigation
-
-**Applies to**: App shell primary navigation (FR-004), French labels via `fr.json`.
-
-## Primary navigation
+# UI routes: Fitness (008)
 
 | Route | Purpose | Phase |
 |-------|---------|-------|
-| `/fitness` | Fitness home — today’s sessions, week strip entry, recent activity | A |
-| `/fitness/program` | Edit active training program (sessions, weekdays, planned exercises) | A |
-| `/fitness/workout/[id]` | In-progress or completed workout log editor | A/B |
-| `/fitness/history` | Reverse-chronological workouts and skips | C |
-| `/fitness/exercises/[exerciseId]/progression` | Per-exercise trends and PRs | C |
-| `/fitness/settings` | Charge unit, adherence toggle (Phase D) | A / D |
+| `/fitness` | Home: today **planifiée**, **Démarrer** library séances, **Séance libre**, week strip | A |
+| `/fitness/sessions` | **Mes séances** — séance template library | A |
+| `/fitness/workout/[id]` | In-progress / completed log editor | B |
+| `/fitness/history` | Past workouts | C |
+| `/fitness/exercises/[exerciseId]/progression` | Per-exercise trends | C |
+| `/fitness/settings` | Charge unit, adherence (D) | A/D |
 
-## Navigation label (French)
+**Removed**: `/fitness/program` (weekly active program editor).
 
-- Shell entry: **Entraînement** (or **Fitness** if product prefers shorter — pick one key in i18n; default **Entraînement**).
-- Icon: consistent with other list destinations (hand-built SVG, no new library).
+## Nav
 
-## Fitness home (`/fitness`)
+- Primary shell entry: **Entraînement** (`fitness.nav`).
 
-- **Today block**: planned sessions for local calendar day with status **À faire** / **En cours** / **Fait** / **Passé**.
-- Actions: **Commencer**, **Passer** (optional note), **Séance libre**.
-- **Recent activity**: last N completed/skipped (configurable in UI, default 5).
-- Empty state: CTA to create program → `/fitness/program`.
+## Home (`/fitness`)
 
-## Deep links
-
-- Workout detail always `/fitness/workout/[id]`.
-- Progression from history row or exercise name tap on log detail.
-
-## Non-goals (MVP)
-
-- No `/search` global integration required (FR-052 optional later).
-- No settings sub-routes for Health/Garmin.
+- Empty library: CTA → `/fitness/sessions`.
+- **Planifiée** for today: **Démarrer** / **Passer**.
+- Library shortcuts: start any template (**do now**).
+- **Séance libre** entry.
