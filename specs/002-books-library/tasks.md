@@ -275,6 +275,7 @@
 - [ ] T345 [P2] Implement optional **Google Books** server adapter + env `GOOGLE_BOOKS_API_KEY`; chain in composition (depends on T343)
 - [ ] T346 [P2] Integration test fallback route with mocked Google response in `tests/integration/books-catalog-routes.test.ts`
 - [ ] T347 [P1] E2e: empty OL fixture shows manual-add path without nested-form regression (cross-ref 001 T114)
+- [ ] T348 [P3] Spike **ISBNdb** adapter (commercial key) for ISBN-only scan misses — document ToS/cost; only if OL+Google insufficient (research.md §17; not in public-apis index)
 
 ---
 

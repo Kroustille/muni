@@ -187,6 +187,7 @@
 - [ ] T404 [P2] Map TMDB hits to `MovieSearchHit`; optional persist `tmdbId` on item (migration + domain)
 - [ ] T405 [P2] Integration tests composite search route in `tests/integration/movies-catalog-routes.test.ts`
 - [ ] T406 [P1] E2e honest empty search → manual add path (movies quick-add)
+- [ ] T407 [P3] Optional **TVDB** episode-list enrichment for séries — server key; research.md §18 public-apis Video entry
 
 ---
 
