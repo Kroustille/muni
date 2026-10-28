@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [x] No [NEEDS CLARIFICATION] markers remain (open product questions listed separately in spec)
+- [x] No [NEEDS CLARIFICATION] markers remain (product decisions locked 2026-10-28)
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)
@@ -32,6 +32,6 @@
 ## Notes
 
 - Staleness thresholds and selection algorithm are normative in [research.md](../research.md); planning should add contributor contracts parallel to 011 registry.
-- **3 open questions** (cadence, default visibility, domain diversity) await Valentin — defaults documented in spec **Clarifications**.
+- Product decisions locked **2026-10-28** (Valentin) in spec **Clarifications** and plan **Locked decisions**.
 - Contrast with **011** documented in spec and research — do not merge recap aggregation with suggestion pool.
-- Checklist validated **2026-10-28** — ready for `/speckit-plan` after product answers (optional `/speckit-clarify`).
+- Checklist validated **2026-10-28** — ready for implement (`/speckit-implement`).

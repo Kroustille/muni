@@ -112,7 +112,15 @@ tests/e2e/music-practice.spec.ts
 | **5 — Polish** | A–C | A3, B3–B4, C4 | Filters, search, cancel/archive flows |
 | **6 — P2 links** | A–C | B4, A3 links | 004 track picker shared component |
 
-## Open decisions (defaults in research.md)
+## Locked decisions (Valentin 2026-10-28)
+
+| ID | Topic | Decision |
+|----|--------|----------|
+| OD-012-9 | Apprentissage IA | One screen with sections — see [ui-routes.md](contracts/ui-routes.md) |
+| OD-012-10 | Composition create | Default **`idea`**; **`in_progress`** in picker |
+| OD-012-11 | **`comfortable`** | Not recap-eligible; **`practice_log`** only for 011 |
+
+## Open decisions (implementation defaults)
 
 | ID | Topic | Default |
 |----|--------|---------|

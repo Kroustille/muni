@@ -13,7 +13,7 @@
 ```
 ┌─────────────────────────────────────┐
 │ {suggestions.title}                 │
-│ {suggestions.subtitle}        [×]   │  ← block dismiss (optional P1)
+│ {suggestions.subtitle}     [↻] [×]  │  ← manual refresh (FR-015) + block dismiss
 ├─────────────────────────────────────┤
 │ · {row.title} ({domain label})      │
 │   [{primaryAction}] [Pas maintenant]│
@@ -43,6 +43,7 @@
 |---------|----------|
 | Primary | Navigate `deepLink` ([suggestion-deep-links.md](suggestion-deep-links.md)) |
 | Pas maintenant | `dismissSlot` — row removed, no backfill |
+| ↻ (header) | `refreshSuggestions` — recompute today’s pair (FR-015); respects dismissals |
 | × (header) | `dismissBlock` for calendar day |
 
 ## Accessibility

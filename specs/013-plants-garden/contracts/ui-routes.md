@@ -27,8 +27,8 @@
 |---------|----|----|
 | Quick-add | Title only at list footer | — |
 | Row subtitle | Optional — | **Dernier arrosage** date or « — » (US6) |
-| Location filter | — | Chips **Intérieur** / **Extérieur** / **Les deux** (tag **`both`** in both outdoor+indoor filters) |
-| Potager entry | — | Link or tab to `/plants/potager` |
+| Location filter | — | Chips **Intérieur** / **Extérieur** / **Les deux**; **Extérieur / potager** shows potager cultures + outdoor-tagged plants (US5) |
+| Potager entry | — | **Filter chip** on **`/plants`** list (subsection) — **not** a separate bottom-nav tab |
 
 **Forbidden copy**: « en retard », overdue badges, streak loss (009 anti-pattern).
 

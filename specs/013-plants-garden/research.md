@@ -73,6 +73,8 @@ Domain id: **`plants`**. French section: **Plantes**. Stable order: **after `fit
 | Event source | Include in period when | `RecapAchievement.title` | `subtitle` |
 |--------------|------------------------|--------------------------|------------|
 | `PlantCareEvent` | `occurredAt` in period | Plant `title` | French care label |
+
+**Density (locked 2026-10-28)**: **One recap line per care event** — two events same plant same day → **two lines** (no combined row).
 | `VegetableMilestone` | `occurredAt` in period | Culture `title` | French milestone label |
 
 **Exclude**: deleted plant/culture; events without valid date; inferred watering from notes edits.
@@ -123,6 +125,11 @@ Implementation MAY collapse to **`PlantCareEventType`** + **`VegetableMilestoneT
 | Merge into fitness or shopping | Wrong typed list semantics |
 | Recap-only shadow log | 011 reads domain events only (FR-012) |
 
-## Open questions (product — max 4 for handoff)
+## Locked decisions (Valentin 2026-10-28)
 
-See spec completion report; defaults documented in spec Assumptions where not blocking.
+| Topic | Decision |
+|--------|----------|
+| Potager | Subsection + **Extérieur / potager** filter on **`/plants`** — not separate app tab |
+| P2 scope | Seasonal hints + vegetable culture **after** P1 watering/care core |
+| Recap | **One `RecapAchievement` line per care event** (water + fertilize same day → two lines) |
+| Care profiles | **`PlantCareProfile`** templates — **P2**, not MVP |

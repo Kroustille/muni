@@ -85,11 +85,11 @@
 
 ---
 
-## Phase 6: User Story 3 — Domain diversity and deep link (P2)
+## Phase 6: User Story 3 — Domain diversity and deep link (P1)
 
 **Goal**: Cross-domain pair when possible; primary navigation (FR-008, FR-014).
 
-**Independent Test**: [quickstart.md](quickstart.md) § P2 — Domain diversity.
+**Independent Test**: [quickstart.md](quickstart.md) § P1 — Domain diversity.
 
 - [ ] T1437 [US3] Implement `deepLink` builders in `src/application/suggestions/deep-links.ts` per [contracts/suggestion-deep-links.md](contracts/suggestion-deep-links.md)
 - [ ] T1438 [US3] Unit tests deep link paths per domain in `tests/unit/suggestions/deep-links.test.ts` (depends on T1437)

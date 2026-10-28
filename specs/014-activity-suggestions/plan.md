@@ -106,15 +106,16 @@ tests/e2e/activity-suggestions.spec.ts
 | **6 — Récap teaser** | Cross-surface | US4 | Single line when ≥1 suggestion today |
 | **7 — Polish** | Quality | — | Guilt lexicon audit, offline e2e, contributor coverage |
 
-## Open decisions (plan defaults — spec open questions)
+## Locked decisions (Valentin 2026-10-28)
 
-| ID | Topic | Plan default (implement unless Valentin changes spec) |
-|----|--------|--------------------------------------------------------|
+| ID | Topic | Decision |
+|----|--------|----------|
 | OD-014-1 | Refresh cadence | **First Accueil visit per local calendar day** (`Europe/Paris`); idempotent if revisit same day |
-| OD-014-2 | Default visibility | Accueil card **on by default**; entire block dismissible for the day (not permanent hide — P2) |
-| OD-014-3 | Domain diversity | When ≥2 domains qualify, **prefer S2 from different domain** if any candidate within **7** score days of S1; else allow same domain (research step 4) |
+| OD-014-1b | Manual refresh | French control on Accueil (e.g. **« Autres idées »**); recomputes pair same day; respects dismissals |
+| OD-014-2 | Default visibility | Accueil card **on by default**; **shown every Accueil load** when enabled; dismiss/block hides **today only**; permanent off → settings **P2** |
+| OD-014-3 | Domain diversity | When **≥2 domains** in eligible pool, **MUST** pick two different domains; single-domain pool → one + empty or two items same domain if ≥2 items |
 | OD-014-4 | Récap link target | Navigate to **`/`** with hash **`#activity-suggestions`** (Accueil scroll anchor) |
-| OD-014-5 | Dismiss storage | Per **snapshot slot id** + calendar day; keyed dismiss excludes candidate from display but does not re-run pick |
+| OD-014-5 | Dismiss storage | Per **snapshot slot id** + calendar day; keyed dismiss excludes candidate from display but does not re-run pick until refresh boundary |
 | OD-014-6 | Block dismiss | Optional **×** on card header hides **whole block for today** (stored as `blockDismissed` on snapshot row) |
 | OD-014-7 | Fitness cap | At most **one** fitness-derived candidate in sorted pool before pick (research note) |
 | OD-014-8 | Contributor order | Registry: `books`, `movies`, `musicTracks`, `recipes`, `fitness`, `musicPractice`, `plants` — tie-break priority in research |

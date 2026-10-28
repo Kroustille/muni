@@ -13,7 +13,7 @@
 
 ## Requirement Completeness
 
-- [x] No [NEEDS CLARIFICATION] markers remain (open questions listed in research.md for Valentin)
+- [x] No [NEEDS CLARIFICATION] markers remain (product decisions locked 2026-10-28 in research.md)
 - [x] Requirements are testable and unambiguous
 - [x] Success criteria are measurable
 - [x] Success criteria are technology-agnostic (no implementation details)

@@ -6,7 +6,7 @@
 
 **Created**: 2026-10-28
 
-**Status**: Draft (specification only — no implementation authorized by this document)
+**Status**: Specified — product decisions locked **2026-10-28** (Valentin)
 
 **Input**: Valentin wants to **track what he does in music** through **three distinct workflows**: (1) **music composition** — creating original work with its own lifecycle; (2) **DJ sets** — logging performances with a separate lifecycle; (3) **instrument learning / apprentissage** — planning **technical exercises** (études, gammes, drills — user-named) and tracking **specific pieces or tracks being learned**, separate from the **004** listen-list and from **Workflow A** composition projects. French UI, offline-first, companion tone (**no guilt**), aligned with Muni typed-domain patterns.
 
@@ -24,12 +24,14 @@
 
 | Topic | Decision |
 |-------|----------|
-| **Three workflows** | **Separate typed lists** under one **Musique — pratique** area (hub with three tabs or equivalent — exact nav in planning): **Compositions**, **Sets DJ**, and **Apprentissage** (instrument practice). |
+| **Three workflows** | **Separate typed lists** under one **Musique — pratique** area (hub with three top-level tabs: **Compositions**, **Sets DJ**, **Apprentissage**). **Apprentissage** is **one screen** with vertical **sections** (Aujourd’hui, Plan, Exercices, Répertoire) — **not** separate Plan/Répertoire sub-tabs (Valentin **2026-10-28**). |
 | **Apprentissage vs 004** | **004** = discovery and **listening** (`to_listen` / `listened`). **Apprentissage** = **learning/practice repertoire** and exercise planning. Optional **one-way** link from a **learning piece** row to a **004** `music_track` id (“the piece I’m learning”) — **does not** change track listen status. |
 | **Apprentissage vs composition** | **Composition** = original work lifecycle (Idée → Terminé). **Learning piece** = studying an existing work (score, transcription, cover) with **progress**, not production status. Same hub, **different entity types and screens**. |
 | **Capture speed** | Each workflow: **title required** to save; all other fields optional on first save (constitution II). |
 | **Audio** | **No in-app playback**, **no file upload/hosting** in v1 (same spirit as 004 MU-scope). Optional **external URL** (demo, recording on SoundCloud, etc.) as paste-only link. |
 | **004 cross-link** | **Optional** reference from a composition row or setlist line to an existing **music_track** row (by id) — **P2** for setlist lines; **P2** for composition “inspirations”. Never required; track detail need not mirror back in v1. |
+| **Composition quick-add** | Default status **`idea` (Idée)** on title-only create; **`in_progress` (En cours)** available in status picker on create or immediately after save (Valentin **2026-10-28** — both supported). |
+| **À l’aise (`comfortable`)** | Optional **`learning_piece`** status meaning the user **feels at ease playing the piece** (personal progress, not platform-verified). **Does NOT** feed **[011](../011-periodic-recap/spec.md)** recap — only **`practice_log`** rows with **`practicedAt`** (mark **Fait** / ad-hoc) do, unless product replans later (locked **2026-10-28**). |
 | **Tone** | French labels; celebrate progress optionally; **no** streak loss, “you haven’t composed in X days”, or comparison with others. |
 | **Offline** | Full CRUD offline; sync per foundation LWW + soft delete. |
 
@@ -47,7 +49,7 @@
 | `finished` | Terminé | User considers the piece **done for their goals** (release, share, or personal closure — not platform-verified) |
 | `archived` | Archivé | Hidden from default list; history preserved |
 
-**Default on create**: `idea` or `in_progress` (planning picks one; spec assumes **`idea`** for fastest capture, user can bump to **En cours** in one tap).
+**Default on create**: **`idea` (Idée)** on title-only quick-add; user MAY choose **`in_progress` (En cours)** in the create flow status picker (locked **2026-10-28**).
 
 **Transitions**: User may move freely among non-terminal states; **`finished`** and **`archived`** remain editable (notes, links) but list filters may hide archived by default.
 
@@ -163,7 +165,7 @@ Lightweight completion record when user finishes planned or ad-hoc practice.
 |-------|----------|--------|
 | **title** | Yes | Piece name (may mirror a track title or be free text) |
 | **instrumentId** | No | Primary instrument for this piece |
-| **status** | Yes (default) | `learning` **En apprentissage**, `comfortable` **À l’aise**, `paused` **En pause**, `archived` **Archivé** (hidden from default list) |
+| **status** | Yes (default) | `learning` **En apprentissage**, `comfortable` **À l’aise** (user feels at ease playing the piece — progress marker only; **not** recap-eligible without a **`practice_log`**), `paused` **En pause**, `archived` **Archivé** (hidden from default list) |
 | **linkedTrackId** | No | **P2** — optional **004** `music_track` id as reference (“the recording I’m learning from”); **does not** set **`listened`** or alter 004 status |
 | **startedAt** | No | Optional calendar date |
 | **lastPracticedAt** | No | Updated when user logs practice linked to this piece or taps “pratiqué aujourd’hui” (**P1** manual on log or piece detail) |
@@ -367,7 +369,7 @@ User filters exercises by instrument, pieces by status, sorts by last practiced 
 ## Assumptions
 
 - Valentin is the primary user; scale stays within foundation “few thousand items” per domain.
-- **Navigation**: One shell entry **Musique — pratique** with **Compositions**, **Sets DJ**, and **Apprentissage** sub-areas — exact IA deferred to planning.
+- **Navigation**: One shell entry **Musique — pratique** with top-level tabs **Compositions**, **Sets DJ**, **Apprentissage**. **Apprentissage** = **one scrollable screen** with sections (Aujourd’hui, Plan, Exercices, Répertoire) per [ui-routes contract](contracts/ui-routes.md).
 - **011 recap**: Spec’d in [011](../011-periodic-recap/spec.md) — **`dj_set` → `performed`** (**`performedAt`**), **`music_composition` → `finished`** (**`finishedAt`**), **`practice_log`** with **`practicedAt`**. Planned/cancelled sets, idea/paused compositions, and archived pieces excluded. **`learning_piece` → `comfortable`** alone excluded in MVP (practice logs only). **012** persists timestamps; **011** implements contributors ([T1195–T1196](../011-periodic-recap/tasks.md)).
 - BPM fields are **manual** user entry, not detected from audio.
 - DJ “home practice” counts as **`performed`** when the user says so — no separate “rehearsal” status in v1.

@@ -109,19 +109,28 @@ tests/e2e/plants-garden.spec.ts
 | **2 — Plants capture** | List/detail | US1 | Quick-add, location tag, soft delete |
 | **3 — Watering** | Care log | US2 | **Arrosé**, backdate, dedupe, **Dernier arrosage** |
 | **4 — Other care** | Care menu | US3 | Fertilize/repot/prune/mist/other + recap port |
-| **5 — P2 seasonal** | Hints | US4 | Seasonal hints jsonb + **Fait** → event |
-| **6 — P2 potager** | Culture | US5 | Vegetable culture + milestone buttons |
+| **5 — P2 seasonal** | Hints | US4 | Seasonal hints jsonb + **Fait** → event (**after P1 checkpoint**) |
+| **6 — P2 potager** | Culture | US5 | Vegetable culture + milestone buttons (**after P1 checkpoint**) |
 | **7 — P2 list polish** | Browse | US6 | Last-watered column, location filters |
 | **8 — 011 integration** | Recap | — | Wire `PlantsRecapRepository`; verify [T1115](../011-periodic-recap/tasks.md) + heatmap **`plants`** segment |
 
-## Open decisions (defaults in research.md)
+## Locked decisions (Valentin 2026-10-28)
+
+| ID | Topic | Decision |
+|----|--------|----------|
+| OD-013-4 | Potager UX | **Subsection** on **`/plants`** + filter **Extérieur / potager** — not separate app tab |
+| OD-013-9 | P2 sequencing | Seasonal hints + vegetable culture **after** P1 watering/care core (plan phases 5–6) |
+| OD-013-10 | Recap lines | **One line per `plant_care_event`** (multi-type same day → multiple lines) |
+| OD-013-11 | Care profiles | **`PlantCareProfile`** reusable templates — **P2 only**, not MVP |
+
+## Open decisions (implementation defaults)
 
 | ID | Topic | Default |
 |----|--------|---------|
 | OD-013-1 | Hub route | `/plants` — label **Plantes** ([contracts/ui-routes.md](contracts/ui-routes.md)) |
 | OD-013-2 | Sync routes | `POST /api/sync/plants-garden/push`, `GET /api/sync/plants-garden/pull` |
 | OD-013-3 | Seasonal hints storage | jsonb `seasonalHints` on `plant` row; LWW whole field |
-| OD-013-4 | Potager UX | Subsection **Potager** under same route + filter `outdoor` / culture list |
+| OD-013-4 | Potager UX | **Subsection** on **`/plants`** list + filter chip **Extérieur / potager** (cultures + outdoor-tagged plants); detail at `/plants/potager/[id]` — **not** separate nav tab |
 | OD-013-5 | Nav label | `plants.nav` → « Plantes » |
 | OD-013-6 | Default location tag | `indoor` on create (French **Intérieur**) |
 | OD-013-7 | **011 recap** | Implement event recording in 013; **`plants-contributor`** in 011 [T1115](../011-periodic-recap/tasks.md) reads [plants-recap-port.md](contracts/plants-recap-port.md); heatmap segment per [011 recap-activity-heatmap](../011-periodic-recap/contracts/recap-activity-heatmap.md) |

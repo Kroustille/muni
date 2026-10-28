@@ -90,9 +90,10 @@
 | PD-012-5 | **011 integration** | [011 spec](../011-periodic-recap/spec.md) locked **2026-10-28** — **`practice_log`**, composition **Terminé**, DJ **Joué**; 012 ships data, 011 ships contributors |
 | PD-012-6 | Learning default status | **`learning` (En apprentissage)** on quick-add |
 | PD-012-7 | Mark done | Creates **`practice_log`**; updates **`learning_piece.lastPracticedAt`** when linked |
+| PD-012-8 | Apprentissage IA | **One screen**, sections Aujourd’hui / Plan / Exercices / Répertoire — **not** Plan vs Répertoire sub-tabs (**2026-10-28**) |
+| PD-012-9 | **`comfortable` / À l’aise** | Progress status only; **011 recap** uses **`practice_log.practicedAt`** only (**2026-10-28**) |
+| PD-012-10 | Composition quick-add | Default **`idea`**; **`in_progress`** in create picker (**2026-10-28**) |
 
-## Open product questions (for Valentin — optional clarify)
+## Resolved (2026-10-28 — Valentin)
 
-1. **Apprentissage sub-nav**: Single screen with sections vs two sub-tabs (Plan / Répertoire)?
-2. **Comfortable status**: Should **`comfortable` (À l’aise)** ever feed 011 recap, or only **practice_log** dates?
-3. **Composition default status**: **Idée** vs **En cours** on quick-add (unchanged from prior research)?
+Former open product questions — **locked** in [spec.md](spec.md) Decision summary and contracts.

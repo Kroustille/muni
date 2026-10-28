@@ -74,7 +74,7 @@ The user records **fertilized**, **repotted**, **pruned**, or **other** care fro
 **Acceptance Scenarios**:
 
 1. **Given** plant detail, **When** user selects **Fertilisé** and saves, **Then** event type **`fertilize`** is stored with **`occurredAt`**.
-2. **Given** multiple care types same day, **When** recap aggregates, **Then** **one recap line per care event** (same plant fertilized and watered same day → two lines or one combined line — **default: one line per event type per day per plant**, subtitle shows care type label in French).
+2. **Given** multiple care types same day, **When** recap aggregates, **Then** **one recap line per care event** (same plant watered and fertilized same day → **two lines**; subtitle shows care type label in French) — locked default **2026-10-28**.
 3. **Given** event types **`repot`**, **`prune`**, **`mist`**, **`other`**, **When** logged, **Then** each maps to a stable **`PlantCareEventType`** for recap titles (see Key Entities).
 
 ---
@@ -105,7 +105,7 @@ For **potager** rows, the user creates a **culture annuelle** (e.g. “Tomates c
 
 **Acceptance Scenarios**:
 
-1. **Given** user creates **culture annuelle** with title, **When** saved, **Then** row appears under **Potager** subsection or filter **Extérieur / légumes**.
+1. **Given** user creates **culture annuelle** with title, **When** saved, **Then** row appears in **Potager** subsection of **Plantes** list when filter **Extérieur / potager** is active (same nav entry — not a separate app tab).
 2. **Given** culture detail, **When** user logs **Semis** with date, **Then** milestone stored; recap line title includes culture name + milestone label (French).
 3. **Given** same milestone type twice same day, **When** user saves again, **Then** dedupe per culture per milestone type per calendar day (or allow two — **default: dedupe**).
 
@@ -179,12 +179,24 @@ List view shows plant name, location tag, and **Dernier arrosage** (relative or 
 - **SC-004**: After logging care, **[011](../011-periodic-recap/spec.md)** weekly recap shows the event **without app reload** when returning to **Récap** same session (when 011 UI exists).
 - **SC-005**: No-guilt copy review passes for plant empty states and list (no “overdue”, no streak loss).
 
+## Clarifications
+
+### Session 2026-10-28 (locked — Valentin)
+
+| Topic | Decision |
+|--------|----------|
+| **Potager UX** | **Subsection** of **`/plants`** list with filter **Extérieur / potager** — single **Plantes** area; **not** a separate bottom-nav tab |
+| **P2 timing** | **Seasonal hints** + **vegetable culture** ship in **P2** only **after** P1 watering/care core is done (same release train as plan phases) |
+| **Recap density** | **One line per care event** (water + fertilize same day → two recap lines) |
+| **Care profiles** | Reusable **`PlantCareProfile`** templates — **P2**, not MVP |
+
 ## Assumptions
 
 - **Plantes** is a **new typed domain** (dedicated store/table), not a generic 001 shopping-style list.
 - Recap contributor lands in **011** implementation (may ship before or with 013 UI); 013 spec only requires **stable event shapes and dates**.
 - Seasonal hints are **user-authored** in MVP — no bundled encyclopedia of species care.
-- **Potager** UX may be a filter, tab, or subsection under **Plantes** — planning chooses; entities support both houseplants and annual vegetables.
+- **Potager** UX is a **subsection + filter** on **`/plants`** (**Extérieur / potager**), not a separate app tab (detail routes under `/plants/potager/...` remain — see [ui-routes.md](contracts/ui-routes.md)).
+- **P2** (**seasonal hints**, **care profiles**, **vegetable culture**) follows **P1** watering + care events in the plan release train — not before P1 is complete.
 - Photos of plants are **out of scope** MVP (storage and scope).
 
 ## Out of Scope (MVP)
@@ -201,7 +213,7 @@ List view shows plant name, location tag, and **Dernier arrosage** (relative or 
 | Phase | Deliverables |
 |-------|----------------|
 | **P1 (MVP)** | Plants CRUD, location tag, water + other care events, last watered, **011 recap contributor** contract satisfied |
-| **P2** | Seasonal hints / care profiles, vegetable culture + milestones, list filters by location |
+| **P2** | Seasonal hints, reusable **PlantCareProfile** templates, vegetable culture + milestones, list filters by location (**after P1** complete) |
 
 ## Future link to other features
 

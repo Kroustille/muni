@@ -4,7 +4,7 @@
 
 ## List
 
-- Quick-add field: **title** only → create with status **Idée** (`idea`).
+- Quick-add field: **title** only → create with status **Idée** (`idea`) unless user picks **En cours** (`in_progress`) in optional status control on the same form.
 - Row shows: title, French status badge, optional `lastWorkedAt`.
 - Filters: status multi-select (P1 minimum: En cours, Terminé).
 - Local search on title (`normalizeText`).

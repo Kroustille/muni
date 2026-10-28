@@ -16,7 +16,7 @@
 
 ## Constraints & decisions (2026-10-19)
 
-Decisions from Valentin (locked) and product defaults pending confirmation (assumed aligned with “precise training” vision).
+Decisions from Valentin (locked). MVP product defaults below were **validated in production** — Valentin **2026-10-28**.
 
 ### Locked
 
@@ -27,7 +27,7 @@ Decisions from Valentin (locked) and product defaults pending confirmation (assu
 | **Offline mobile** | **Mandatory.** Fitness MUST follow the same **offline-first + sync** model as other Muni typed lists: local persistence (IndexedDB), outbound sync queue while offline, background push/pull when online, per-field last-write-wins and soft deletes per foundation constitution — not a online-only submodule. |
 | **Exercise catalog (MVP)** | **Curated list only** — no user-defined custom exercise names in Phases A–C. Planning and logging **pick from the shipped catalog** (versioned seed; see [Exercise catalog](#exercise-catalog-mvp)). Users cannot create ad-hoc exercise strings in MVP. |
 
-### Assumed default — confirm with Valentin
+### Locked product defaults (2026-10-28 — confirmed shipped)
 
 | # | Topic | Default encoded in this spec |
 |---|--------|------------------------------|

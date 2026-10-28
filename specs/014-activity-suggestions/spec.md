@@ -6,7 +6,7 @@
 
 **Created**: 2026-10-28
 
-**Status**: Specified — defaults documented; **3 product open questions** for Valentin (see [Open questions](#open-questions-product))
+**Status**: Specified — product decisions locked **2026-10-28** (Valentin)
 
 **Input**: Valentin wants the app to **propose two activities** the user **has not done in quite some time**, to gently nudge **new or resumed experiences** aligned with [009](../009-experiences-achievements/spec.md) north star. Tone: **companion, not guilt** — optional, dismissible, no streak shame. French UI, **offline-first** (derive from local domain data only). **Not** the same as [011](../011-periodic-recap/spec.md) periodic recap (recap = **what happened**; this feature = **what you might enjoy doing next**).
 
@@ -16,13 +16,16 @@
 
 ## Clarifications
 
-### Session 2026-10-28 (spec defaults — pending Valentin on cadence & placement)
+### Session 2026-10-28 (locked — Valentin)
 
-| Topic | Default in this spec |
-|--------|----------------------|
-| **Count** | **Exactly two** suggestions whenever the feature refreshes |
-| **Refresh cadence** | **Once per local calendar day** on **first visit to Accueil** after local midnight (timezone: **`Europe/Paris`** until a global preference exists — same as 011) — **not** on every cold app open (see Open questions) |
-| **Persistence of picks** | Same two suggestions **stable for the rest of that calendar day** unless user **dismisses** one (see FR-012) |
+| Topic | Decision |
+|--------|----------|
+| **Count** | **Exactly two** suggestions whenever the feature refreshes (when pool allows) |
+| **Refresh cadence** | **Once per local calendar day** on **first visit to Accueil** after local midnight (timezone: **`Europe/Paris`** until a global preference exists — same as 011) — **not** on every cold app open |
+| **Manual refresh** | User MAY **explicitly refresh** on Accueil (French control, e.g. **« Autres idées »** or equivalent refresh affordance) **when they ask** — recomputes today’s pair from the pool, respecting dismissals already recorded for today; **daily first-visit snapshot remains the default** |
+| **Persistence of picks** | Same two suggestions **stable for the rest of that calendar day** unless user **dismisses** one (see FR-012) or **manually refreshes** (FR-015) |
+| **Default visibility** | Accueil card **on by default** (user may disable entirely in settings — **P2** setting). When enabled, block **shown on every Accueil load** that day — **not** auto-hidden after viewing. **Per-suggestion dismiss** or **block dismiss (×)** hides for **that local day only**; returns next calendar day unless settings off |
+| **Domain diversity** | When the eligible pool spans **≥2 domains**, the two suggestions MUST be from **two different domains**. When only **one domain** has eligible candidates: show **one** suggestion plus neutral empty slot / copy, or a **second** row from the same domain only if a second distinct item qualifies — never invent fake suggestions |
 | **Primary surface** | **Accueil card** — optional companion block below existing home content (not replacing lists) |
 | **Secondary surface** | **Teaser line** on **`/recap`** header or above period switcher: “Deux idées pour plus tard →” linking to Accueil anchor or expanded sheet — **informational only**, no duplicate algorithm |
 | **Tone & copy** | Invitational French (“Et si…”, “Tu n’as pas … depuis un moment”) — **never** days-since counters in primary copy, **never** “tu es en retard”, broken chains, or streak loss |
@@ -66,9 +69,9 @@ The user dismisses **one** suggestion (swipe, “Pas maintenant”, or equivalen
 
 ---
 
-### User Story 3 - Domain diversity and deep link (Priority: P2)
+### User Story 3 - Domain diversity and deep link (Priority: P1)
 
-When the pool has candidates in **multiple domains**, the two daily suggestions **prefer different domains** (e.g. one cultural backlog item + one embodied/care item) so the nudge feels like **breadth of life**, not two similar rows.
+When the pool has candidates in **multiple domains**, the two daily suggestions MUST use **two different domains** (e.g. one cultural backlog item + one embodied/care item) so the nudge feels like **breadth of life**, not two similar rows.
 
 **Why this priority**: Aligns with 009 “full life” story; avoids “two books” fatigue when fitness or plants also qualify.
 
@@ -77,7 +80,9 @@ When the pool has candidates in **multiple domains**, the two daily suggestions 
 **Acceptance Scenarios**:
 
 1. **Given** stale candidates in books and recipes, **When** suggestions are chosen, **Then** one suggestion is from books and one from recipes (not two books if recipe also qualifies above threshold).
-2. **Given** the user taps a suggestion, **When** navigation completes, **Then** they land on the **authoritative domain screen** for that item (library detail, recipe detail, fitness today, plant detail, music practice hub, …).
+2. **Given** eligible candidates exist in **only one domain**, **When** suggestions refresh, **Then** at most **one** suggestion is shown and the second slot uses **neutral empty** copy (no guilt) unless a **second distinct item** in that domain qualifies.
+3. **Given** the user taps a suggestion, **When** navigation completes, **Then** they land on the **authoritative domain screen** for that item (library detail, recipe detail, fitness today, plant detail, music practice hub, …).
+4. **Given** suggestions were shown today, **When** the user taps **manual refresh**, **Then** a new pair is computed (cross-domain rule applies) while **dismissed slots stay dismissed** for today.
 
 ---
 
@@ -117,13 +122,15 @@ On **`/recap`**, the user sees a **single optional line** pointing to the same d
 - **FR-005**: Copy and empty states MUST comply with [009](../009-experiences-achievements/spec.md) anti-patterns: **no guilt**, **no social comparison**, **no streak loss** for this feature.
 - **FR-006**: User MUST be able to **dismiss** each suggestion for the **current local day** without affecting domain data.
 - **FR-007**: Dismissals MUST persist locally until next local day (per-item or per-slot — plan decides storage shape).
-- **FR-008**: When ≥2 domains have eligible candidates above staleness threshold, selection SHOULD **prefer two different domains** (tie-break rules in research).
+- **FR-008**: When ≥2 domains have eligible candidates above staleness threshold, selection MUST pick **two different domains** (tie-break rules in [research.md](research.md)). When only one domain qualifies, apply Clarifications **2026-10-28** edge case (one + empty or two same-domain items if ≥2 distinct items exist).
 - **FR-009**: System MUST NOT write new “completion” or “experience” entities; suggestions are **read-only projections** plus dismiss metadata local to this feature.
 - **FR-010**: Accueil MUST expose the suggestions block as **clearly optional** (dismissible block or per-row dismiss).
 - **FR-011**: **`/recap`** MUST remain a **past achievement** view; suggestions MUST NOT appear as recap lines or heatmap events.
-- **FR-012**: After user dismisses one of two suggestions, system MUST **not** backfill a third candidate until the next refresh boundary.
+- **FR-012**: After user dismisses one of two suggestions, system MUST **not** backfill a third candidate until the next refresh boundary (next local day or **manual refresh** per FR-015).
 - **FR-013**: Staleness rules MUST follow per-domain definitions in [research.md](research.md); domains without implemented stores contribute **zero** candidates until shipped.
 - **FR-014**: Primary actions MUST deep-link into existing domain UX (no parallel “suggestion-only” screens except optional sheet mirroring Accueil content).
+- **FR-015**: Accueil MUST expose an explicit **manual refresh** control (French label) that recomputes today’s suggestions on user action without waiting for the next calendar day; MUST respect today’s dismiss records.
+- **FR-016**: When the feature is enabled (default **on**), the Accueil suggestions block MUST appear on **each** Accueil visit that day until the user dismisses the block or individual rows for today, or disables the feature in settings (**P2**).
 
 ### Key Entities *(conceptual — local preference only)*
 
@@ -146,7 +153,7 @@ On **`/recap`**, the user sees a **single optional line** pointing to the same d
 - Staleness thresholds default to **30 local days** where domain has no finer rule; domains may use stricter defaults in research (e.g. plants watering).
 - **Constitution Principle IV** interpreted as **no LLM / AI ranking** in v1 — deterministic scoring only.
 - Multi-device dismiss sync is **not** required for MVP; worst case: suggestion reappears on another device same day — acceptable until P2.
-- Home card is **on by default** but entire block dismissible for the day; permanent hide is **P2** (Open questions).
+- Home card is **on by default**; shown on every Accueil load when enabled; block or row dismiss hides **for that local day only**; permanent disable in settings is **P2**.
 
 ## Out of Scope
 
@@ -164,7 +171,6 @@ On **`/recap`**, the user sees a **single optional line** pointing to the same d
 
 - Explicit **snooze** per candidate item (exclude until date)
 - User setting: disable suggestions entirely or change staleness sensitivity
-- Refresh on **each app foreground** instead of daily (if Valentin rejects daily default)
 
 ## UX sketch (informational)
 
@@ -174,7 +180,7 @@ Accueil (excerpt)
 │ … existing home lists / teasers …   │
 ├─────────────────────────────────────┤
 │ Deux idées pour plus tard           │
-│ Sans obligation — tu choisis.   [×] │
+│ Sans obligation — tu choisis. [↻][×]│
 │  · Reprendre « Dune » (lecture)     │
 │      [Ouvrir]  [Pas maintenant]     │
 │  · Cuisiner « Curry lentilles »     │
@@ -188,12 +194,6 @@ Récap (excerpt)
 │ … period lists (past only) …        │
 └─────────────────────────────────────┘
 ```
-
-## Open questions (product)
-
-1. **Refresh cadence**: Keep **once per local day on first Accueil visit** (spec default) vs **recompute on every app open**?
-2. **Default visibility**: Accueil card **on by default** vs **opt-in** in settings?
-3. **Diversity rule**: When pool allows, **always two different domains** vs allow two from same domain if both are strongest stale?
 
 ## References
 

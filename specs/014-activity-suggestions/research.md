@@ -147,14 +147,17 @@ Optional **`snoozedUntil`** per `(domainId, itemId)` — excluded while `today <
 3. PICK S1 = first item in sorted pool
 
 4. PICK S2:
-     - Filter pool \ {S1}
-     - Prefer first item where domain(S2) ≠ domain(S1) if any exists with score within 7 days of S1.score
-     - Else take next highest score (same domain allowed — see Open question 3)
+     - Let D = set of domains represented in eligible pool
+     - If |D| ≥ 2: pick highest-score candidate in pool \ {S1} with domain ∉ {domain(S1)} (MUST differ — Valentin **2026-10-28**)
+     - If |D| = 1: pick next highest in pool \ {S1} if another distinct item exists; else S2 empty (one suggestion + neutral empty slot)
 
-5. PERSIST daily snapshot { date, S1, S2, snapshotId } on first Accueil visit;
-   reuse snapshot for rest of day unless dismiss removes slot (no backfill)
+5. PERSIST daily snapshot { date, S1, S2?, snapshotId } on first Accueil visit;
+   reuse snapshot for rest of day unless dismiss removes slot, user manual refresh (FR-015), or no backfill after dismiss (step 6)
 
-6. DISMISS:
+6. MANUAL REFRESH (FR-015):
+   - Re-run steps 3–4 for unfilled slots; keep dismiss records for today
+
+7. DISMISS:
    - Remove slot for today only; do not re-run steps 3–4 until next calendar day
 ```
 

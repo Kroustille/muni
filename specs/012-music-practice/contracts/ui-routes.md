@@ -32,15 +32,16 @@
 - **OD-012-5**: Dedicated typed-domain entry in main shell (same prominence pattern as fitness **Entraînement**).
 - Icon + label from i18n keys `musicPractice.nav`, `musicPractice.tabs.*`.
 
-## Apprentissage sub-IA (default)
+## Apprentissage sub-IA (locked 2026-10-28)
 
-Single **Apprentissage** tab with internal segments:
+**One screen** at `/music-practice/apprentissage` with vertical **sections** (scroll or in-page anchors — not separate top-level sub-tabs):
+
 1. **Aujourd’hui** (today + recent logs)
 2. **Plan** (active plan editor)
 3. **Exercices** (library)
 4. **Répertoire** (learning pieces)
 
-Segments may be sub-routes under `/music-practice/apprentissage/...` or a segmented control — e2e covers today + piece detail minimum.
+Optional deep links (e.g. `/music-practice/apprentissage/pieces/[id]`) for detail; hub remains a **single screen** with sections.
 
 ## Empty states (copy direction)
 
