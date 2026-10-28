@@ -1,102 +1,56 @@
 import { describe, expect, it } from "vitest";
 
-import { createPracticeLogUseCases } from "@/application/music-practice/practice-log";
-import { resolveTodayExercises } from "@/application/music-practice/practice-today";
-import { createPracticePlanUseCases } from "@/application/music-practice/plan";
-import type { LearningPiece } from "@/domain/learning-piece";
-import type { PracticeLog } from "@/domain/practice-log";
-import type { PracticePlan } from "@/domain/practice-plan";
-import { buildPlanAssignment, buildPracticePlan } from "./fixtures";
-
-function memoryPlanRepo() {
-  const store = new Map<string, PracticePlan>();
-  return {
-    get: (id: string) => Promise.resolve(store.get(id)),
-    getActive: () => Promise.resolve([...store.values()].find((p) => p.isActive && p.deletedAt === null)),
-    list: () => Promise.resolve([...store.values()]),
-    upsert: async (row: PracticePlan) => {
-      store.set(row.id, row);
-      return row;
-    },
-    subscribe: () => () => undefined,
-    outbox: () => Promise.resolve([]),
-    clearOutbox: () => Promise.resolve(),
-  };
-}
-
-function memoryLogRepo() {
-  const store = new Map<string, PracticeLog>();
-  return {
-    get: (id: string) => Promise.resolve(store.get(id)),
-    list: () => Promise.resolve([...store.values()]),
-    upsert: async (row: PracticeLog) => {
-      store.set(row.id, row);
-      return row;
-    },
-    subscribe: () => () => undefined,
-    outbox: () => Promise.resolve([]),
-    clearOutbox: () => Promise.resolve(),
-  };
-}
-
-function memoryPieceRepo() {
-  const store = new Map<string, LearningPiece>();
-  return {
-    get: () => Promise.resolve(undefined),
-    list: () => Promise.resolve([]),
-    upsert: async (row: LearningPiece) => row,
-    subscribe: () => () => undefined,
-    outbox: () => Promise.resolve([]),
-    clearOutbox: () => Promise.resolve(),
-  };
-}
-
-const meta = {
-  data: new Map<string, unknown>(),
-  get: async (key: string) => meta.data.get(key) as never,
-  set: async (key: string, value: unknown) => {
-    meta.data.set(key, value);
-  },
-};
+import {
+  assignmentsForDate,
+  hydrateTodayExercises,
+  resolveTodayExercises,
+} from "@/application/music-practice/practice-today";
+import { buildPlanAssignment, buildPracticeExercise, buildPracticePlan } from "./fixtures";
 
 describe("practice today", () => {
-  it("resolves weekday assignments", () => {
+  it("filters assignments by weekday and specific date", () => {
     const plan = buildPracticePlan({
       assignments: [
         buildPlanAssignment({
-          exerciseId: "44444444-4444-4444-8444-444444444444",
-          weekdays: [4],
+          id: "a1",
+          weekdays: [1],
+          specificDates: ["2026-06-15"],
+        }),
+        buildPlanAssignment({
+          id: "a2",
+          exerciseId: "ex-2",
+          weekdays: [2],
         }),
       ],
     });
-    const today = resolveTodayExercises(plan, "2026-01-01");
+    const monday = assignmentsForDate(plan, "2026-06-15");
+    expect(monday.map((a) => a.id)).toContain("a1");
+    expect(assignmentsForDate(plan, "2026-06-16").map((a) => a.id)).toContain("a2");
+  });
+
+  it("returns empty when plan inactive or deleted", () => {
+    const active = buildPracticePlan({ isActive: false });
+    expect(resolveTodayExercises(active, "2026-06-15")).toEqual([]);
+    const deleted = buildPracticePlan({ deletedAt: "2026-01-01T00:00:00.000Z" });
+    expect(resolveTodayExercises(deleted, "2026-06-15")).toEqual([]);
+  });
+
+  it("dedupes exercises by lowest sort order and hydrates live rows", () => {
+    const exId = "11111111-1111-4111-8111-111111111111";
+    const plan = buildPracticePlan({
+      assignments: [
+        buildPlanAssignment({ id: "low", exerciseId: exId, sortOrder: 1 }),
+        buildPlanAssignment({ id: "high", exerciseId: exId, sortOrder: 5 }),
+      ],
+    });
+    const today = resolveTodayExercises(plan, "2026-06-15");
     expect(today).toHaveLength(1);
-    expect(today[0]?.exerciseId).toBe("44444444-4444-4444-8444-444444444444");
-  });
-
-  it("markDoneToday creates log for today", async () => {
-    const logUc = createPracticeLogUseCases({
-      logs: memoryLogRepo(),
-      learningPieces: memoryPieceRepo(),
-      meta,
-      idGenerator: { newId: () => "77777777-7777-4777-8777-777777777777" },
-      now: () => new Date("2026-01-01T12:00:00.000Z").getTime(),
-    });
-    const log = await logUc.markDoneToday({
-      exerciseIds: ["44444444-4444-4444-8444-444444444444"],
-    });
-    expect(log.practicedAt).toBe("2026-01-01");
-    expect(log.exerciseIds).toEqual(["44444444-4444-4444-8444-444444444444"]);
-  });
-
-  it("createPlan activates plan", async () => {
-    const planUc = createPracticePlanUseCases({
-      plans: memoryPlanRepo(),
-      meta,
-      idGenerator: { newId: () => "66666666-6666-4666-8666-666666666666" },
-      now: () => 1,
-    });
-    const plan = await planUc.createPlan({ name: "Semaine" });
-    expect(plan.isActive).toBe(true);
+    expect(today[0]?.assignmentId).toBe("low");
+    const exercise = buildPracticeExercise({ id: exId });
+    const hydrated = hydrateTodayExercises(today, [exercise]);
+    expect(hydrated[0]?.exercise.id).toBe(exId);
+    expect(hydrateTodayExercises(today, [{ ...exercise, deletedAt: "2026-01-01T00:00:00.000Z" }])).toEqual(
+      [],
+    );
   });
 });

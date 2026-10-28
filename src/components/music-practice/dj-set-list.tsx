@@ -70,7 +70,11 @@ export function DjSetList() {
           className="rounded-lg border border-border bg-background px-3 py-2 text-sm"
           data-testid="dj-set-quick-add-title"
         />
-        <button type="submit" className="rounded-xl bg-accent px-4 py-2 text-sm text-accent-foreground">
+        <button
+          type="submit"
+          className="rounded-xl bg-accent px-4 py-2 text-sm text-accent-foreground"
+          data-testid="dj-set-quick-add-submit"
+        >
           {t("action.add")}
         </button>
       </form>

@@ -29,7 +29,7 @@ export async function createTestDatabase(): Promise<TestDatabase> {
 
   const db = new Kysely<unknown>({
     dialect: new PostgresDialect({
-      pool: new Pool({ connectionString, max: 20, options: `-c search_path=${schema}` }),
+      pool: new Pool({ connectionString, max: 1, options: `-c search_path=${schema}` }),
     }),
   });
 

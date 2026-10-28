@@ -126,7 +126,7 @@ export function ApprentissageHub() {
       </section>
 
       <section id="plan">
-        <PlanEditor />
+        <PlanEditor exercises={exercises} onPlanUpdated={() => void refresh()} />
       </section>
 
       <section id="exercises" className="space-y-3" data-testid="apprentissage-exercises">

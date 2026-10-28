@@ -12,17 +12,19 @@ test.describe("music practice apprentissage", () => {
     await page.getByTestId("instrument-quick-add").press("Enter");
     await page.getByTestId("exercise-quick-add").fill("Gamme pentatonique");
     await page.getByTestId("exercise-quick-add").press("Enter");
-    await expect(page.getByText("Gamme pentatonique")).toBeVisible();
+    await expect(
+      page.locator('[data-testid^="exercise-row-"]').filter({ hasText: "Gamme pentatonique" }),
+    ).toBeVisible();
 
+    await expect(page.getByTestId("plan-pick-exercise").locator("option", { hasText: "Gamme pentatonique" })).toHaveCount(1);
     await page.getByTestId("plan-pick-exercise").selectOption({ label: "Gamme pentatonique" });
     await page.getByTestId("plan-add-assignment").click();
     await page.getByTestId("plan-save").click();
 
     const markDone = page.locator("[data-testid^=today-mark-done-]").first();
-    if (await markDone.isVisible()) {
-      await markDone.click();
-      await expect(page.locator("[data-testid^=recent-log-]").first()).toBeVisible();
-    }
+    await expect(markDone).toBeVisible({ timeout: 10_000 });
+    await markDone.click();
+    await expect(page.locator("[data-testid^=recent-log-]").first()).toBeVisible();
 
     await page.getByTestId("piece-quick-add").fill("Blackbird");
     await page.getByTestId("piece-quick-add").press("Enter");

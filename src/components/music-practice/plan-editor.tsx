@@ -3,11 +3,19 @@
 import { useEffect, useState } from "react";
 
 import { getPracticeExerciseUseCases, getPracticePlanUseCases } from "@/composition/client";
+import { isoWeekdayFromCalendarDate } from "@/domain/fitness/adherence";
+import { localCalendarDate } from "@/domain/music-practice-dates";
 import type { PlanAssignment, PracticePlan } from "@/domain/practice-plan";
 import type { PracticeExercise } from "@/domain/practice-exercise";
 import { t } from "@/i18n";
 
-export function PlanEditor() {
+export function PlanEditor({
+  exercises: exercisesFromParent,
+  onPlanUpdated,
+}: {
+  exercises?: PracticeExercise[];
+  onPlanUpdated?: () => void;
+}) {
   const [plan, setPlan] = useState<PracticePlan | undefined>();
   const [exercises, setExercises] = useState<PracticeExercise[]>([]);
   const [name, setName] = useState("");
@@ -29,12 +37,19 @@ export function PlanEditor() {
     void refresh();
   }, []);
 
+  useEffect(() => {
+    if (exercisesFromParent !== undefined) {
+      setExercises(exercisesFromParent.filter((row) => row.deletedAt === null));
+    }
+  }, [exercisesFromParent]);
+
   if (plan === undefined) return null;
 
   const savePlan = async (next: PracticePlan) => {
     const planUc = await getPracticePlanUseCases();
     const saved = await planUc.upsertPlan(next);
     setPlan(saved);
+    onPlanUpdated?.();
   };
 
   const addAssignment = async () => {
@@ -42,7 +57,7 @@ export function PlanEditor() {
     const assignment: PlanAssignment = {
       id: crypto.randomUUID(),
       exerciseId: pickExerciseId,
-      weekdays: [new Date().getDay() === 0 ? 7 : new Date().getDay()],
+      weekdays: [isoWeekdayFromCalendarDate(localCalendarDate())],
       specificDates: null,
       sortOrder: plan.assignments.length,
     };
