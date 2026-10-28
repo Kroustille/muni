@@ -29,13 +29,13 @@ Design refs: [plan.md](plan.md), [data-model.md](data-model.md), [contracts/](co
 1. From `/search`, tap bottom **Récap** → weekly recap (no Accueil visit required).
 2. Optional: home teaser shows count → opens `/recap`.
 
-## Phase A — Desktop heatmap (US7)
+## Phase A — Activity heatmap (US7)
 
-1. Set viewport **≥ 768px** → grid visible at top (`data-testid="recap-activity-heatmap"`).
-2. Seed book finish + workout same day → cell shows **two vertical segments** (book + fitness colors).
-3. Seed track **écouté** + **012** practice log same day → **one** Musique segment (not two).
-4. Film only another day → single-segment cell.
-5. Resize **< 768px** → heatmap absent; list unchanged.
+1. Open `/recap` at default width → grid visible at top (`data-testid="recap-activity-heatmap"`).
+2. Set viewport **iPhone 13** (or < 768px) → same heatmap **visible**; swipe/scroll horizontally to see full week columns.
+3. Seed book finish + workout same day → cell shows **two vertical segments** (book + fitness colors).
+4. Seed track **écouté** + **012** practice log same day → **one** Musique segment (not two).
+5. Film only another day → single-segment cell.
 6. Legend shows French domain labels; focus/hover cell → domain names in tooltip/a11y.
 
 ## Phase A — Daily and yearly (US4–US5, MVP v1)
@@ -56,6 +56,6 @@ Design refs: [plan.md](plan.md), [data-model.md](data-model.md), [contracts/](co
 
 - `yarn typecheck`
 - `tests/unit/recap/**/*.test.ts`
-- `tests/e2e/recap.spec.ts` (weekly offline + day/year period switch + desktop heatmap path)
+- `tests/e2e/recap.spec.ts` (weekly offline + day/year period switch + heatmap at desktop and narrow viewport)
 - No-guilt string checklist for `recap.*` and home teaser keys (SC-003)
 - `yarn verify:ci` before push to `main`

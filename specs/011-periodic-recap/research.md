@@ -55,9 +55,9 @@
 
 Books and movies already define **activity days**, streaks, and **year goals** on domain screens. Recap **does not replace** those; it **aggregates across domains** with a single companion narrative in **`/recap`**. Yearly recap is **standalone** (no tie-in to book/movie goal screens). Copy MUST avoid duplicating guilt-prone streak loss patterns from fitness (008 assiduity stays opt-in and fitness-local).
 
-## Activity tracker (heatmap) — recap desktop
+## Activity tracker (heatmap) — recap `/recap`
 
-**Product ask (Valentin 2026-10-28)**: GitHub-style grid at top of **`/recap`** on **desktop only**; hidden on mobile/narrow viewports (dense grid poor tap/read UX; list + bottom nav suffice).
+**Product ask (Valentin 2026-10-28)**: GitHub-style **week-column** grid at top of **`/recap`** on **all viewports**; on narrow widths the grid **scrolls horizontally** (cells stay ~12px) so the full trailing year remains visible without hiding the heatmap.
 
 **Correction (Valentin 2026-10-28)**: Day cells MUST support **multiple domain accents** when several recap domains had eligible activity on the **same calendar day** — not a single global accent for “any activity.”
 
@@ -71,7 +71,7 @@ Books and movies already define **activity days**, streaks, and **year goals** o
 | **Range** | Default trailing **12 months** ending today unless plan ties range to selected period — spec allows either; plan must pick one |
 | **Data** | Derived at read time from same aggregation as recap lists — **no new persisted heatmap table**; each day exposes `domainsPresent[]` ordered like list sections |
 
-**Rejected for MVP**: binary single-accent “on/off” cells (superseded by multi-domain segments); multi-hue **intensity** by event count (adds legend burden); showing heatmap on phone (Valentin: out of scope).
+**Rejected for MVP**: binary single-accent “on/off” cells (superseded by multi-domain segments); multi-hue **intensity** by event count (adds legend burden).
 
 ## Extensibility
 
@@ -85,7 +85,7 @@ Recap aggregation MUST be driven by a **registry of domain contributors** (conce
 |--------|----------|
 | MVP v1 periods | **Day, week, month, year** — all four in v1 (Valentin **2026-10-28**); fitness PR highlights optional post-v1 |
 | Heatmap window | **Trailing 365 local calendar days** ending today; **independent** of recap period switcher (OD-011-1) |
-| Heatmap breakpoint | **`md` (768px)** — hidden below, visible at sidebar layout widths |
+| Heatmap narrow layout | **Week-column grid** + **`overflow-x: auto`** on recap page — no viewport unmount (supersedes former `md` breakpoint gate, 2026-10-28) |
 | Fitness segment color | **`#0d9488`** (app accent / fitness shell) |
 | Domain order | Livres → Films & séries → Musique (004 + 012) → Recettes → Entraînement → Plantes (`book`, `movie`, `music_track`, `recipe`, `fitness`, `plants`) |
 | **012 dependency** | Music-practice recap lines require **012** stores on device; ship **012 foundation** before or with music-practice contributor tasks ([011 tasks](tasks.md) T1195–T1196; [012 plan](../012-music-practice/plan.md)) |

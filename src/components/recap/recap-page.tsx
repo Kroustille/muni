@@ -9,7 +9,6 @@ import { getRecapUseCases } from "@/composition/client-recap";
 import { RecapActivityHeatmap } from "@/components/recap/recap-activity-heatmap";
 import { RecapDomainSections, RecapEmptyState } from "@/components/recap/recap-domain-sections";
 import { RecapPeriodControls } from "@/components/recap/recap-period-controls";
-import { useIsMobile } from "@/components/use-is-mobile";
 import { t } from "@/i18n";
 
 function periodFromSearchParams(
@@ -35,7 +34,6 @@ function periodFromSearchParams(
 
 export function RecapPage() {
   const searchParams = useSearchParams();
-  const isMobile = useIsMobile();
   const [period, setPeriod] = useState<RecapPeriod>(() =>
     periodFromSearchParams(searchParams, defaultRecapPeriod().timeZone),
   );
@@ -63,7 +61,7 @@ export function RecapPage() {
   return (
     <main className="mx-auto flex w-full max-w-4xl flex-col gap-6 p-4 pb-20 md:pb-4">
       <h1 className="font-serif text-2xl font-semibold">{t("recap.title")}</h1>
-      {!isMobile && snapshot ? <RecapActivityHeatmap days={snapshot.activityDays} /> : null}
+      {snapshot ? <RecapActivityHeatmap days={snapshot.activityDays} /> : null}
       <RecapPeriodControls period={period} onChange={setPeriod} />
       <p className="text-sm text-muted">{intro}</p>
       {loading || snapshot == null ? (

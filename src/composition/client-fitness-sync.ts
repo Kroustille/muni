@@ -8,16 +8,13 @@ import {
 import { createIndexedDbFitnessProgramRepository } from "../adapters/indexeddb/fitness-program-repository";
 import { createIndexedDbFitnessWorkoutRepository } from "../adapters/indexeddb/fitness-workout-repository";
 import { createIndexedDbFitnessSkipRepository } from "../adapters/indexeddb/fitness-skip-repository";
-import {
-  defaultFitnessUserSettings,
-  type FitnessUserSettings,
-} from "../domain/fitness/workout-log";
 import { createFitnessProgramUseCases, type FitnessProgramUseCases } from "../application/fitness/program";
 import { createFitnessWorkoutUseCases, type FitnessWorkoutUseCases } from "../application/fitness/workout";
 import { createFitnessSyncApply } from "../application/fitness/sync-apply";
 import { createFitnessSyncEngine } from "../application/sync/fitness-sync-engine";
 import type { ItemRepository } from "../application/ports/item-repository";
 import type { PausableSyncEngine } from "./sync-run";
+import type { FitnessUserSettings } from "../domain/fitness/workout-log";
 import {
   fetchBundledExerciseCatalog,
   seedExerciseCatalogIfNeeded,
@@ -27,8 +24,8 @@ export type ClientFitnessBundle = {
   fitnessEngine: PausableSyncEngine;
   programUseCases: FitnessProgramUseCases;
   workoutUseCases: FitnessWorkoutUseCases;
-  getUserSettings(): Promise<FitnessUserSettings>;
-  saveUserSettings(settings: FitnessUserSettings): Promise<FitnessUserSettings>;
+  getUserSettings(): Promise<FitnessUserSettings | undefined>;
+  upsertUserSettings(settings: FitnessUserSettings): Promise<FitnessUserSettings>;
   ensureCatalogSeeded(): Promise<void>;
 };
 
@@ -111,12 +108,8 @@ export function wireClientFitnessSync(deps: {
     fitnessEngine,
     programUseCases: wrapWrites(baseProgram),
     workoutUseCases: wrapWrites(baseWorkout),
-    getUserSettings: async () => (await settings.get()) ?? defaultFitnessUserSettings(),
-    saveUserSettings: async (row) => {
-      const saved = await settings.upsert(row);
-      deps.onLocalWrite();
-      return saved;
-    },
+    getUserSettings: () => settings.get(),
+    upsertUserSettings: (row) => settings.upsert(row),
     ensureCatalogSeeded: () =>
       seedExerciseCatalogIfNeeded({
         catalog,

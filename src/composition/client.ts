@@ -11,12 +11,20 @@ import { wireClientQuoteSync } from "./client-quote-sync";
 import { wireClientCookbookSync } from "./client-cookbook-sync";
 import { wireClientFitnessSync } from "./client-fitness-sync";
 import { wireClientSuggestions } from "./client-suggestions";
+import { wireClientMusicPracticeSync } from "./client-music-practice-sync";
 import { wireClientPlantsGardenSync } from "./client-plants-garden-sync";
 import type { CookbookUseCases } from "../application/cookbooks/cookbook-use-cases";
 import { runSyncEngines, type PausableSyncEngine } from "./sync-run";
 import type { FitnessProgramUseCases } from "../application/fitness/program";
 import type { FitnessWorkoutUseCases } from "../application/fitness/workout";
 import type { FitnessUserSettings } from "../domain/fitness/workout-log";
+import type { MusicCompositionUseCases } from "../application/music-practice/composition";
+import type { DjSetUseCases } from "../application/music-practice/dj-set";
+import type { PracticeInstrumentUseCases } from "../application/music-practice/instrument";
+import type { PracticeExerciseUseCases } from "../application/music-practice/exercise";
+import type { PracticePlanUseCases } from "../application/music-practice/plan";
+import type { PracticeLogUseCases } from "../application/music-practice/practice-log";
+import type { LearningPieceUseCases } from "../application/music-practice/learning-piece";
 import type { PlantUseCases } from "../application/plants-garden/plant-use-cases";
 import type { RecordCareEventUseCases } from "../application/plants-garden/record-care-event";
 import type { CultureUseCases } from "../application/plants-garden/culture-use-cases";
@@ -47,8 +55,15 @@ export type ClientContext = {
   fitnessProgramUseCases: FitnessProgramUseCases;
   fitnessWorkoutUseCases: FitnessWorkoutUseCases;
   cookbookUseCases: CookbookUseCases;
-  getFitnessUserSettings(): Promise<FitnessUserSettings>;
-  saveFitnessUserSettings(settings: FitnessUserSettings): Promise<FitnessUserSettings>;
+  getFitnessUserSettings(): Promise<FitnessUserSettings | undefined>;
+  upsertFitnessUserSettings(settings: FitnessUserSettings): Promise<FitnessUserSettings>;
+  musicCompositionUseCases: MusicCompositionUseCases;
+  djSetUseCases: DjSetUseCases;
+  practiceInstrumentUseCases: PracticeInstrumentUseCases;
+  practiceExerciseUseCases: PracticeExerciseUseCases;
+  practicePlanUseCases: PracticePlanUseCases;
+  practiceLogUseCases: PracticeLogUseCases;
+  learningPieceUseCases: LearningPieceUseCases;
   plantUseCases: PlantUseCases;
   recordCareEventUseCases: RecordCareEventUseCases;
   cultureUseCases: CultureUseCases;
@@ -70,6 +85,7 @@ let bookQuotesSyncEngine: PausableSyncEngine | undefined;
 let movieQuotesSyncEngine: PausableSyncEngine | undefined;
 let fitnessSyncEngine: PausableSyncEngine | undefined;
 let cookbookSyncEngine: PausableSyncEngine | undefined;
+let musicPracticeSyncEngine: PausableSyncEngine | undefined;
 let plantsGardenSyncEngine: PausableSyncEngine | undefined;
 let syncStarted = false;
 
@@ -164,6 +180,14 @@ function buildClientContext(): Promise<ClientContext> {
     });
     fitnessSyncEngine = fitnessSync.fitnessEngine;
 
+    const musicPracticeSync = wireClientMusicPracticeSync({
+      db,
+      items: repository,
+      pullLimit: SYNC_PULL_LIMIT,
+      onLocalWrite: notifyLocalWrite,
+    });
+    musicPracticeSyncEngine = musicPracticeSync.musicPracticeEngine;
+
     const plantsGardenSync = wireClientPlantsGardenSync({
       db,
       items: repository,
@@ -178,6 +202,7 @@ function buildClientContext(): Promise<ClientContext> {
       const quoteEngine = bookQuotesSyncEngine;
       const movieQuoteEngine = movieQuotesSyncEngine;
       const fitnessEngine = fitnessSyncEngine;
+      const musicPracticeEngine = musicPracticeSyncEngine;
       const plantsEngine = plantsGardenSyncEngine;
       if (
         cookbookEngine === undefined ||
@@ -185,6 +210,7 @@ function buildClientContext(): Promise<ClientContext> {
         quoteEngine === undefined ||
         movieQuoteEngine === undefined ||
         fitnessEngine === undefined ||
+        musicPracticeEngine === undefined ||
         plantsEngine === undefined
       ) {
         return;
@@ -196,6 +222,7 @@ function buildClientContext(): Promise<ClientContext> {
           quoteEngine,
           movieQuoteEngine,
           fitnessEngine,
+          musicPracticeEngine,
           plantsEngine,
         ],
         connectivity,
@@ -219,8 +246,17 @@ function buildClientContext(): Promise<ClientContext> {
 
     const itemUseCases = wrapLocalWrites(itemUseCasesWithCookbooks, notifyLocalWrite);
     const { bookQuoteUseCases, movieQuoteUseCases } = quoteSync;
-    const { programUseCases: fitnessProgramUseCases, workoutUseCases: fitnessWorkoutUseCases, getUserSettings, saveUserSettings } =
+    const { programUseCases: fitnessProgramUseCases, workoutUseCases: fitnessWorkoutUseCases } =
       fitnessSync;
+    const {
+      compositionUseCases: musicCompositionUseCases,
+      djSetUseCases,
+      instrumentUseCases: practiceInstrumentUseCases,
+      exerciseUseCases: practiceExerciseUseCases,
+      planUseCases: practicePlanUseCases,
+      logUseCases: practiceLogUseCases,
+      learningPieceUseCases,
+    } = musicPracticeSync;
     const {
       plantUseCases,
       recordCareEvent: recordCareEventUseCases,
@@ -267,8 +303,15 @@ function buildClientContext(): Promise<ClientContext> {
       fitnessProgramUseCases,
       fitnessWorkoutUseCases,
       cookbookUseCases: cookbookSync.cookbookUseCases,
-      getFitnessUserSettings: getUserSettings,
-      saveFitnessUserSettings: saveUserSettings,
+      getFitnessUserSettings: () => fitnessSync.getUserSettings(),
+      upsertFitnessUserSettings: (settings) => fitnessSync.upsertUserSettings(settings),
+      musicCompositionUseCases,
+      djSetUseCases,
+      practiceInstrumentUseCases,
+      practiceExerciseUseCases,
+      practicePlanUseCases,
+      practiceLogUseCases,
+      learningPieceUseCases,
       plantUseCases,
       recordCareEventUseCases,
       cultureUseCases,
@@ -325,14 +368,42 @@ export function getCookbookUseCases(): Promise<CookbookUseCases> {
   return getClientContext().then((ctx) => ctx.cookbookUseCases);
 }
 
-export function getFitnessUserSettings(): Promise<FitnessUserSettings> {
+export function getFitnessUserSettings(): Promise<FitnessUserSettings | undefined> {
   return getClientContext().then((ctx) => ctx.getFitnessUserSettings());
 }
 
-export function saveFitnessUserSettings(
+export function upsertFitnessUserSettings(
   settings: FitnessUserSettings,
 ): Promise<FitnessUserSettings> {
-  return getClientContext().then((ctx) => ctx.saveFitnessUserSettings(settings));
+  return getClientContext().then((ctx) => ctx.upsertFitnessUserSettings(settings));
+}
+
+export function getMusicCompositionUseCases(): Promise<MusicCompositionUseCases> {
+  return getClientContext().then((ctx) => ctx.musicCompositionUseCases);
+}
+
+export function getDjSetUseCases(): Promise<DjSetUseCases> {
+  return getClientContext().then((ctx) => ctx.djSetUseCases);
+}
+
+export function getPracticeInstrumentUseCases(): Promise<PracticeInstrumentUseCases> {
+  return getClientContext().then((ctx) => ctx.practiceInstrumentUseCases);
+}
+
+export function getPracticeExerciseUseCases(): Promise<PracticeExerciseUseCases> {
+  return getClientContext().then((ctx) => ctx.practiceExerciseUseCases);
+}
+
+export function getPracticePlanUseCases(): Promise<PracticePlanUseCases> {
+  return getClientContext().then((ctx) => ctx.practicePlanUseCases);
+}
+
+export function getPracticeLogUseCases(): Promise<PracticeLogUseCases> {
+  return getClientContext().then((ctx) => ctx.practiceLogUseCases);
+}
+
+export function getLearningPieceUseCases(): Promise<LearningPieceUseCases> {
+  return getClientContext().then((ctx) => ctx.learningPieceUseCases);
 }
 
 export function getPlantUseCases(): Promise<PlantUseCases> {
@@ -384,6 +455,7 @@ export function startClientSync(): Promise<void> {
     bookQuotesSyncEngine?.resume();
     movieQuotesSyncEngine?.resume();
     fitnessSyncEngine?.resume();
+    musicPracticeSyncEngine?.resume();
     plantsGardenSyncEngine?.resume();
     syncScheduler?.resume();
     if (!syncStarted) {

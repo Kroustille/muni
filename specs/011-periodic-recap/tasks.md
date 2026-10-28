@@ -76,16 +76,17 @@
 
 ---
 
-## Phase 6: User Story 7 — Desktop activity heatmap (P2) — Phase A
+## Phase 6: User Story 7 — Activity heatmap (P2) — Phase A
 
-**Goal**: Multi-domain segment heatmap desktop-only (FR-019, FR-020).
+**Goal**: Multi-domain segment heatmap on all viewports (FR-019, FR-020).
 
-**Independent Test**: [quickstart.md](quickstart.md) § Phase A — Desktop heatmap.
+**Independent Test**: [quickstart.md](quickstart.md) § Phase A — Activity heatmap.
 
 - [x] T1150 [US7] Implement `recap-activity-heatmap.tsx` per [contracts/recap-activity-heatmap.md](contracts/recap-activity-heatmap.md)
-- [x] T1151 [US7] Mount heatmap only at `md+` in `recap-page.tsx` (depends on T1150)
+- [x] T1151 [US7] Mount heatmap when snapshot loaded in `recap-page.tsx` (depends on T1150) — *2026-10-28: scope expanded from `md+` only to all viewports*
 - [x] T1152 [US7] Unit tests segment rendering for 1 / 2 / 6 domains in `tests/unit/recap/heatmap-segments.test.ts`
-- [x] T1153 [US7] E2e desktop heatmap visible + mobile hidden in `tests/e2e/recap.spec.ts` (depends on T1151)
+- [x] T1153 [US7] E2e heatmap visible at desktop + narrow viewport in `tests/e2e/recap.spec.ts` (depends on T1151)
+- [x] T1154 [US7] Week-column layout helper + unit tests; horizontal scroll wrapper on narrow (2026-10-28 mobile heatmap)
 
 ---
 

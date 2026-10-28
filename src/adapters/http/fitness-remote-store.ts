@@ -1,10 +1,7 @@
-import type { FitnessProgramWire } from "@/domain/fitness/program";
-import type {
-  FitnessSkipRecordWire,
-  FitnessUserSettingsWire,
-  FitnessWorkoutLogWire,
-} from "@/domain/fitness/workout-log";
-import type { FitnessPullResult, FitnessRemoteStore } from "@/application/ports/fitness-remote-store";
+import {
+  type FitnessPullResult,
+  type FitnessRemoteStore,
+} from "@/application/ports/fitness-remote-store";
 import { RemoteStoreError, type RowError } from "@/application/ports/remote-store";
 
 export type { FitnessPullResult, FitnessRemoteStore };

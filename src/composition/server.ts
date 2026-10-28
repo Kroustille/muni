@@ -50,6 +50,10 @@ import {
   type FitnessSyncService,
 } from "@/application/server/fitness-sync-service";
 import {
+  createMusicPracticeSyncService,
+  type MusicPracticeSyncService,
+} from "@/application/server/music-practice-sync-service";
+import {
   createPlantsGardenSyncService,
   type PlantsGardenSyncService,
 } from "@/application/server/plants-garden-sync-service";
@@ -57,6 +61,13 @@ import { createPostgresFitnessProgramRepository } from "@/adapters/postgres/fitn
 import { createPostgresFitnessWorkoutRepository } from "@/adapters/postgres/fitness-workout-repository";
 import { createPostgresFitnessSkipRepository } from "@/adapters/postgres/fitness-skip-repository";
 import { createPostgresFitnessSettingsRepository } from "@/adapters/postgres/fitness-settings-repository";
+import { createPostgresMusicPracticeCompositionRepository } from "@/adapters/postgres/music-practice-composition-repository";
+import { createPostgresMusicPracticeDjSetRepository } from "@/adapters/postgres/music-practice-dj-set-repository";
+import { createPostgresMusicPracticeInstrumentRepository } from "@/adapters/postgres/music-practice-instrument-repository";
+import { createPostgresMusicPracticeExerciseRepository } from "@/adapters/postgres/music-practice-exercise-repository";
+import { createPostgresMusicPracticePlanRepository } from "@/adapters/postgres/music-practice-plan-repository";
+import { createPostgresMusicPracticeLogRepository } from "@/adapters/postgres/music-practice-log-repository";
+import { createPostgresMusicPracticeLearningPieceRepository } from "@/adapters/postgres/music-practice-learning-piece-repository";
 import { createPostgresPlantsGardenPlantRepository } from "@/adapters/postgres/plants-garden-plant-repository";
 import { createPostgresPlantsGardenCareEventRepository } from "@/adapters/postgres/plants-garden-care-event-repository";
 import { createPostgresPlantsGardenCareProfileRepository } from "@/adapters/postgres/plants-garden-care-profile-repository";
@@ -76,6 +87,7 @@ export interface ServerContainer {
   readonly movieQuoteSync: MovieQuoteSyncService;
   readonly cookbookSync: CookbookSyncService;
   readonly fitnessSync: FitnessSyncService;
+  readonly musicPracticeSync: MusicPracticeSyncService;
   readonly plantsGardenSync: PlantsGardenSyncService;
   readonly lookupBook: LookupBook;
   readonly searchBooks: SearchBooks;
@@ -146,6 +158,16 @@ export function createServerContainer(
     settings: createPostgresFitnessSettingsRepository(db),
     now,
   });
+  const musicPracticeSync = createMusicPracticeSyncService({
+    compositions: createPostgresMusicPracticeCompositionRepository(db),
+    djSets: createPostgresMusicPracticeDjSetRepository(db),
+    instruments: createPostgresMusicPracticeInstrumentRepository(db),
+    exercises: createPostgresMusicPracticeExerciseRepository(db),
+    plans: createPostgresMusicPracticePlanRepository(db),
+    logs: createPostgresMusicPracticeLogRepository(db),
+    learningPieces: createPostgresMusicPracticeLearningPieceRepository(db),
+    now,
+  });
   const plantsGardenSync = createPlantsGardenSyncService({
     plants: createPostgresPlantsGardenPlantRepository(db),
     careEvents: createPostgresPlantsGardenCareEventRepository(db),
@@ -178,6 +200,7 @@ export function createServerContainer(
     movieQuoteSync,
     cookbookSync,
     fitnessSync,
+    musicPracticeSync,
     plantsGardenSync,
     lookupBook,
     searchBooks,

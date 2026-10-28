@@ -1,31 +1,30 @@
-# Contract: Recap activity heatmap (desktop component)
+# Contract: Recap activity heatmap
 
-**Applies to**: `src/components/recap/recap-activity-heatmap.tsx`, consumed only from `/recap` (FR-019, User Story 7).
+**Applies to**: `src/components/recap/recap-activity-heatmap.tsx`, `src/components/recap/recap-heatmap-week-columns.ts`, consumed only from `/recap` (FR-019, User Story 7).
 
 ## Visibility
 
 | Viewport | Behavior |
 |----------|----------|
-| `< md` (< 768px) | **Do not mount** component (no placeholder, no collapse teaser) |
-| `≥ md` | Render at top of recap page above period navigation |
+| All widths | **Mount** at top of recap page above period navigation whenever `RecapSnapshot` is loaded (including empty trailing window — inactive cells only) |
+| Narrow (< 768px typical) | Same week-column grid; wrapper **`overflow-x: auto`** (horizontal scroll) so cell size stays legible; legend below grid (wrap OK) |
+| Wide (≥ 768px) | Same component; scroll optional if grid fits within page max width |
 
-Use CSS/`useMediaQuery` consistent with `BottomNav` (`md:hidden`).
+Do **not** gate mount on `useMediaQuery`, `md:`, or `useIsMobile`.
 
 ## Data input
 
 ```typescript
 type RecapActivityHeatmapProps = {
   days: RecapActivityDay[];  // 365 entries, ascending date
-  domainAccents: Record<RecapDomainId, string>;  // hex or CSS var
-  domainLabelsFr: Record<RecapDomainId, string>;
 };
 ```
 
-Built from `RecapSnapshot.activityDays` (see [recap-aggregation-service.md](recap-aggregation-service.md)).
+Accents and French labels come from `recap-domain-accents` + i18n (implementation). Built from `RecapSnapshot.activityDays` (see [recap-aggregation-service.md](recap-aggregation-service.md)).
 
 ## Visual (FR-020 — locked)
 
-- GitHub-style **week-column grid** (weeks as columns, weekdays as rows) OR horizontal scroll month grid — implementation choice if week columns match books insights; must show **~365 days**.
+- GitHub-style **week-column grid**: **7 weekday rows** (ISO Monday → Sunday), **weeks as columns** left→right; padding cells before first / after last day in window.
 - **Inactive day**: neutral border/fill (`bg-muted` or equivalent).
 - **Active day, one domain**: **full cell** fill with that domain’s accent.
 - **Active day, multiple domains**: cell interior split into **vertical micro-segments** (equal width, left→right) in stable domain order; each segment uses domain accent from table.
@@ -61,7 +60,7 @@ Inactive cells: date only or omitted from tab order (product choice; prefer skip
 
 | `data-testid` | Element |
 |---------------|---------|
-| `recap-activity-heatmap` | Root grid |
+| `recap-activity-heatmap` | Root grid (week columns) |
 | `recap-activity-heatmap-legend` | Legend |
 | `recap-activity-day-{YYYY-MM-DD}` | Cell (active or inactive) |
 
@@ -71,8 +70,8 @@ Heatmap always reflects **trailing 365 local days** (OD-011-1), **not** the sele
 
 ## Testing
 
-- Unit: segment layout given `domainsPresent` permutations (1, 2, 5 domains); **same day** track listened + composition finished → **one** Musique segment.
-- Playwright desktop viewport: heatmap visible; multi-segment cell when seeded; narrow viewport hidden (US7 scenarios 1–4).
+- Unit: `buildRecapHeatmapWeekColumns` pads ISO weeks; segment layout given `domainsPresent` permutations (1, 2, 5 domains); **same day** track listened + composition finished → **one** Musique segment.
+- Playwright: heatmap visible at default and **iPhone** viewport; multi-segment cell when seeded (US7 scenarios 1–3); narrow viewport still shows grid (scenario 4).
 - a11y: active cell accessible name includes domain names (scenario 5).
 
 ## Reuse note
@@ -83,5 +82,5 @@ Book/movie domain heatmaps (`reading-heatmap`, watch insights) remain **separate
 
 | FR | Mechanism |
 |----|-----------|
-| FR-019 | Desktop-only mount |
+| FR-019 | Mount on all viewports; horizontal scroll on narrow |
 | FR-020 | Segments, legend, tooltip/a11y |

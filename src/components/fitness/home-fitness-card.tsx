@@ -2,13 +2,10 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-  getFitnessProgramUseCases,
-  getFitnessUserSettings,
-  getFitnessWorkoutUseCases,
-} from "@/composition/client";
+import { getFitnessProgramUseCases, getFitnessUserSettings, getFitnessWorkoutUseCases } from "@/composition/client";
 import { computeAdherenceStreak } from "@/application/fitness/adherence-streak";
 import { buildWeekAdherenceView } from "@/domain/fitness/adherence";
+import { defaultFitnessUserSettings } from "@/domain/fitness/workout-log";
 import { localCalendarDate, plannedSessionsForToday } from "@/application/fitness/today";
 import { t } from "@/i18n";
 
@@ -22,7 +19,7 @@ export function HomeFitnessCard() {
       const program = await programUseCases.getActiveProgram();
       if (program === undefined) return;
       const logs = await workoutUseCases.listWorkouts();
-      const settings = await getFitnessUserSettings();
+      const settings = (await getFitnessUserSettings()) ?? defaultFitnessUserSettings();
       const week = buildWeekAdherenceView(program, logs, [], localCalendarDate());
       const streak = computeAdherenceStreak(logs, settings);
       const todaySessions = plannedSessionsForToday(program, localCalendarDate());

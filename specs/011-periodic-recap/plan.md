@@ -12,7 +12,7 @@
 
 ## Summary
 
-Ship a **read-only cross-domain Récap** at **`/recap`**: derive **`RecapAchievement`** rows and **`RecapActivityDay`** heatmap cells from **local stores only** (items + fitness logs + **012** music-practice stores) via a **registry of domain contributors** and a single **`buildRecapSnapshot`** application service. **MVP v1 (Phase A)**: **day**, ISO **week**, **calendar month**, and **calendar year** periods; **bottom-nav Récap**, optional **Accueil** weekly teaser, recipe **`cookedDates`** with **backdating**, **Musique** section (004 **écouté** + 012 **Terminé / Joué / Fait**), **desktop-only** GitHub-style **multi-domain vertical-segment** activity heatmap. **Phase B (optional)**: fitness PR subsection (FR-015); **learning_piece → comfortable** recap lines if product expands. No recap journal table, no server aggregation, no guilt copy (009 alignment).
+Ship a **read-only cross-domain Récap** at **`/recap`**: derive **`RecapAchievement`** rows and **`RecapActivityDay`** heatmap cells from **local stores only** (items + fitness logs + **012** music-practice stores) via a **registry of domain contributors** and a single **`buildRecapSnapshot`** application service. **MVP v1 (Phase A)**: **day**, ISO **week**, **calendar month**, and **calendar year** periods; **bottom-nav Récap**, optional **Accueil** weekly teaser, recipe **`cookedDates`** with **backdating**, **Musique** section (004 **écouté** + 012 **Terminé / Joué / Fait**), GitHub-style **multi-domain vertical-segment** activity heatmap on **all viewports** (narrow = horizontal scroll). **Phase B (optional)**: fitness PR subsection (FR-015); **learning_piece → comfortable** recap lines if product expands. No recap journal table, no server aggregation, no guilt copy (009 alignment).
 
 ## Technical Context
 
@@ -22,9 +22,9 @@ Ship a **read-only cross-domain Récap** at **`/recap`**: derive **`RecapAchieve
 
 **Storage**: **No new Postgres tables for recap**. Recipe extension: **`cookedDates: string[]`** on `items` (recipe type) as LWW json field + sync patch. All recap view models computed at read time in application layer.
 
-**Testing**: Vitest for period boundaries, each contributor, aggregation sort/group rules, heatmap `domainsPresent`; Playwright offline `/recap` weekly + desktop heatmap visibility per [quickstart.md](quickstart.md); no-guilt copy checklist (SC-003); `yarn verify:ci` gate
+**Testing**: Vitest for period boundaries, each contributor, aggregation sort/group rules, heatmap `domainsPresent` + week-column layout; Playwright offline `/recap` weekly + heatmap at desktop and narrow widths per [quickstart.md](quickstart.md); no-guilt copy checklist (SC-003); `yarn verify:ci` gate
 
-**Target Platform**: PWA mobile-first; heatmap **only** at **`md` (768px)+** (`BottomNav` hidden breakpoint)
+**Target Platform**: PWA mobile-first; heatmap on **`/recap`** at all breakpoints (week-column grid + horizontal scroll when needed)
 
 **Performance Goals**: SC-001 — 50 achievements in one month interactive within 2s offline on mid-tier mobile; design aggregation to scan items + fitness logs once per snapshot (O(n) domains)
 
@@ -91,7 +91,7 @@ src/components/recap/
   recap-page.tsx
   recap-period-controls.tsx
   recap-domain-sections.tsx
-  recap-activity-heatmap.tsx           # desktop-only; multi-segment cells
+  recap-activity-heatmap.tsx           # week-column grid; multi-segment cells; mobile scroll
   recap-home-teaser.tsx                  # optional Accueil card
 src/components/nav-config.ts           # RECAP_NAV entry
 src/components/BottomNav.tsx           # fifth tab slot
@@ -113,7 +113,7 @@ Aligned with spec **Phase A (MVP v1) → B (optional)**:
 | **2 — Aggregation core** | A | US1, US2, US4, US5, US6 | Period math (all four granularities), contributors (incl. **012** when stores exist), grouped list VM, unit tests |
 | **3 — Route & nav** | A | US3 | `/recap`, bottom-nav **Récap**, optional home teaser |
 | **4 — Period UI** | A | US2, US4, US5 | Semaine / Mois / Aujourd’hui (or Hier) / Cette année controls + prev/next; month labels on yearly lines |
-| **5 — Desktop heatmap** | A | US7 | Multi-segment grid, legend, a11y, trailing window |
+| **5 — Activity heatmap** | A | US7 | Week-column grid, legend, a11y, trailing window, mobile scroll |
 | **6 — Optional** | B | FR-015 | Fitness PR highlights subsection |
 
 ## Open decisions (defaults locked in research.md)
@@ -121,7 +121,7 @@ Aligned with spec **Phase A (MVP v1) → B (optional)**:
 | ID | Topic | Default |
 |----|--------|---------|
 | OD-011-1 | Heatmap date window | **Fixed trailing 365 local days** ending **today** — **does not** shrink/grow when user changes week/month period (list and heatmap decoupled; less jarring than sync-to-period) |
-| OD-011-2 | Heatmap breakpoint | **`md` (768px)** — match `BottomNav` `md:hidden` / sidebar `md:flex` |
+| OD-011-2 | Heatmap narrow layout | **Week columns** + horizontal scroll — mount on all viewports (no `md` gate) |
 | OD-011-3 | Fitness heatmap accent | **`#0d9488`** — same as app `--accent` / fitness shell (not a list-type row) |
 | OD-011-4 | Default timezone | **`Europe/Paris`** — export `DEFAULT_RECAP_TIMEZONE` aliasing book/movie constants until user TZ preference |
 | OD-011-5 | Stable domain order | `book` → `movie` → `music_track` → `recipe` → `fitness` → `plants` (French **Musique** = 004 + 012 events; one heatmap segment) |
