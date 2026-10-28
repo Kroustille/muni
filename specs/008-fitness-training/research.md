@@ -81,4 +81,4 @@
 | **Contracts** | Update [program-editor.md](./contracts/program-editor.md) → séance library contract; sync payload shapes in [fitness-sync-api.md](./contracts/fitness-sync-api.md). |
 | **Tasks** | Regenerate or append migration tasks in [tasks.md](./tasks.md); e2e flows in [quickstart.md](./quickstart.md). |
 
-**Open questions for implement planning** — **Resolved 2026-10-28**: break-fast implementation on `main` (commit `03d09f4`); no program migration; IDB v8 wipe; migration `0018_fitness_session_first`.
+**Open questions for implement planning** — **Resolved 2026-10-28**: break-fast implementation on `main`; no program migration; IDB v9 fitness wipe; migration `0019_fitness_session_first`.
