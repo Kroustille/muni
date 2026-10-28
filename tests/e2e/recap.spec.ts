@@ -14,13 +14,15 @@ test.describe("recap", () => {
     await expect(page.getByRole("heading", { name: fr["recap.title"] })).toBeVisible();
   });
 
-  test("desktop heatmap visible, hidden on narrow viewport", async ({ page }) => {
+  test("heatmap visible on desktop and iPhone viewport", async ({ page }) => {
     await page.goto("/recap");
     await expect(page.getByTestId("recap-activity-heatmap")).toBeVisible();
+    await expect(page.getByTestId("recap-activity-heatmap-legend")).toBeVisible();
 
     await page.setViewportSize(devices["iPhone 13"].viewport);
     await page.goto("/recap");
-    await expect(page.getByTestId("recap-activity-heatmap")).toHaveCount(0);
+    await expect(page.getByTestId("recap-activity-heatmap")).toBeVisible();
+    await expect(page.getByTestId("recap-activity-heatmap-legend")).toBeVisible();
   });
 
   test("month granularity switch", async ({ page }) => {

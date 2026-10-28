@@ -6,7 +6,7 @@
 
 | Route | Purpose | Phase |
 |-------|---------|-------|
-| `/recap` | Periodic recap — period controls, optional desktop heatmap, domain-grouped achievement lists | A (MVP v1: day/week/month/year) |
+| `/recap` | Periodic recap — period controls, activity heatmap (all viewports), domain-grouped achievement lists | A (MVP v1: day/week/month/year) |
 
 **Default query/state**: Weekly period for **current ISO week** on first visit (FR-004, US1).
 
@@ -23,7 +23,7 @@ Invalid query → fall back to defaults.
 
 1. **Header**: title **Récap** + period granularity control (tabs or select: **Semaine**, **Mois**, **Aujourd’hui** / **Hier** (or day picker), **Cette année**).
 2. **Period navigation**: **◀ période précédente** / **période suivante ▶** with French label for active range.
-3. **Heatmap slot** (desktop only): see [recap-activity-heatmap.md](recap-activity-heatmap.md) — `null` below `md`.
+3. **Heatmap slot**: see [recap-activity-heatmap.md](recap-activity-heatmap.md) — always mounted when snapshot loaded; narrow viewports scroll horizontally.
 4. **Intro line**: celebratory/neutral one-liner (non-guilt).
 5. **Sections**: `RecapDomainSection` per non-empty domain; count in header **Livres (3)**.
 6. **Empty state**: neutral copy when `snapshot.empty` (US1 scenario 7).
@@ -62,4 +62,4 @@ Invalid query → fall back to defaults.
 | FR-009 | Intro + empty states |
 | FR-010 | Nav + optional home teaser |
 | FR-018 | Standalone yearly UX |
-| FR-019 | Heatmap slot desktop only |
+| FR-019 | Heatmap slot all viewports |
