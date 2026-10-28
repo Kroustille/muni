@@ -61,3 +61,16 @@ export function normalizeIsbn(raw: string): string {
   }
   throw new Error("Invalid ISBN length");
 }
+
+/** Convert a 978-prefixed ISBN-13 to ISBN-10 for provider retry, or null when not applicable. */
+export function isbn13ToIsbn10(isbn13: string): string | null {
+  if (!isValidIsbn13(isbn13) || !isbn13.startsWith("978")) return null;
+  const nine = isbn13.slice(3, 12);
+  let sum = 0;
+  for (let i = 0; i < 9; i++) {
+    sum += Number(nine[i]) * (10 - i);
+  }
+  const check = (11 - (sum % 11)) % 11;
+  const checkChar = check === 10 ? "X" : String(check);
+  return `${nine}${checkChar}`;
+}

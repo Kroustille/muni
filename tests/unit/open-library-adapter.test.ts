@@ -111,6 +111,38 @@ describe("Open Library BookCatalogLookup adapter", () => {
     expect(fetch).toHaveBeenCalledTimes(1);
   });
 
+  it("strips French articles from title search requests", async () => {
+    const fetch = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      expect(url).toContain(encodeURIComponent("Petit Prince"));
+      expect(url).not.toContain(encodeURIComponent("Le Petit Prince"));
+      return jsonResponse({ docs: [] });
+    });
+    const lookup = createOpenLibraryBookCatalogLookup({ fetch, apiBase: API_BASE });
+    await lookup.searchByTitle("Le Petit Prince");
+  });
+
+  it("retries ISBN lookup with ISBN-10 when ISBN-13 is missing", async () => {
+    const isbn13 = "9782070368228";
+    const isbn10 = "207036822X";
+    const fetch = vi.fn(async (input: RequestInfo | URL) => {
+      const url = String(input);
+      if (url === `${API_BASE}/isbn/${isbn13}.json`) {
+        return new Response("", { status: 404 });
+      }
+      if (url === `${API_BASE}/isbn/${isbn10}.json`) {
+        return jsonResponse({ title: "Le Petit Prince" });
+      }
+      return new Response("missing", { status: 404 });
+    });
+    const lookup = createOpenLibraryBookCatalogLookup({ fetch, apiBase: API_BASE });
+    await expect(lookup.lookupByIsbn(isbn13)).resolves.toMatchObject({
+      isbn: isbn13,
+      title: "Le Petit Prince",
+    });
+    expect(fetch).toHaveBeenCalledTimes(2);
+  });
+
   it("serves fresh cache hits without calling Open Library", async () => {
     const fetch = vi.fn(async () => jsonResponse({ title: "Unexpected fetch" }));
     const cache = new InMemoryCatalogCacheRepository();

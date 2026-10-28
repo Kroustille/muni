@@ -18,6 +18,7 @@ import { t } from "@/i18n";
 import { runCatalogMultiAdd } from "@/application/catalog/catalog-multi-add";
 
 import { CatalogPreview, catalogHitToPreviewValues, type CatalogPreviewValues } from "./catalog-preview";
+import { ManualBookAddSheet } from "./manual-book-add-sheet";
 
 export type BookCatalogSearchSheetProps = {
   open: boolean;
@@ -50,6 +51,8 @@ export function BookCatalogSearchSheet({
   const [saving, setSaving] = useState(false);
   const [selectedIsbns, setSelectedIsbns] = useState<Set<string>>(() => new Set());
   const [batchError, setBatchError] = useState<string | null>(null);
+  const [manualOpen, setManualOpen] = useState(false);
+  const [emptyResults, setEmptyResults] = useState(false);
 
   const reset = useCallback(() => {
     setQuery("");
@@ -62,6 +65,8 @@ export function BookCatalogSearchSheet({
     setSaving(false);
     setSelectedIsbns(new Set());
     setBatchError(null);
+    setManualOpen(false);
+    setEmptyResults(false);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -76,10 +81,14 @@ export function BookCatalogSearchSheet({
     setLoading(true);
     setError(null);
     setResults([]);
+    setEmptyResults(false);
     try {
       const hits = await fetchBookCatalogSearch(trimmed);
       setResults(hits);
-      if (hits.length === 0) setError(t("books.catalog.empty"));
+      if (hits.length === 0) {
+        setError(t("books.catalog.empty"));
+        setEmptyResults(true);
+      }
     } catch {
       setError(t("books.catalog.error"));
     } finally {
@@ -211,9 +220,16 @@ export function BookCatalogSearchSheet({
               </p>
             ) : null}
             {error !== null ? (
-              <p className="text-sm text-muted" role="status">
-                {error}
-              </p>
+              <div className="flex flex-col gap-2">
+                <p className="text-sm text-muted" role="status">
+                  {error}
+                </p>
+                {emptyResults ? (
+                  <Button type="button" variant="secondary" onClick={() => setManualOpen(true)}>
+                    {t("books.addManually")}
+                  </Button>
+                ) : null}
+              </div>
             ) : null}
             {batchError !== null ? (
               <p className="text-sm text-danger" role="alert">{batchError}</p>
@@ -265,6 +281,16 @@ export function BookCatalogSearchSheet({
           saving={saving}
         />
       ) : null}
+      <ManualBookAddSheet
+        open={manualOpen}
+        initialTitle={query.trim()}
+        onClose={() => setManualOpen(false)}
+        onSaved={() => {
+          setManualOpen(false);
+          handleClose();
+          onSaved?.();
+        }}
+      />
     </>
   );
 }

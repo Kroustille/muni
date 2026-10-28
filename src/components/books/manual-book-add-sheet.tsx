@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { getItemUseCases } from "@/composition/client";
 import { defaultStatus } from "@/domain/item";
@@ -11,16 +11,31 @@ import { t } from "@/i18n";
 
 export type ManualBookAddSheetProps = {
   open: boolean;
-  isbn: string;
+  isbn?: string;
+  initialTitle?: string;
   onClose: () => void;
   onSaved?: () => void;
 };
 
-export function ManualBookAddSheet({ open, isbn, onClose, onSaved }: ManualBookAddSheetProps) {
-  const [title, setTitle] = useState("");
+export function ManualBookAddSheet({
+  open,
+  isbn = "",
+  initialTitle = "",
+  onClose,
+  onSaved,
+}: ManualBookAddSheetProps) {
+  const [title, setTitle] = useState(initialTitle);
   const [author, setAuthor] = useState("");
   const [titleError, setTitleError] = useState<string | undefined>();
   const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setTitle(initialTitle);
+      setAuthor("");
+      setTitleError(undefined);
+    }
+  }, [initialTitle, open]);
 
   const save = async () => {
     const trimmed = title.trim();
@@ -33,8 +48,9 @@ export function ManualBookAddSheet({ open, isbn, onClose, onSaved }: ManualBookA
       const useCases = await getItemUseCases();
       const extra: Parameters<typeof useCases.createItem>[2] = {
         status: defaultStatus("book") ?? undefined,
-        isbn,
       };
+      const isbnTrimmed = isbn.trim();
+      if (isbnTrimmed) extra.isbn = isbnTrimmed;
       const authorTrimmed = author.trim();
       if (authorTrimmed) extra.author = authorTrimmed;
       await useCases.createItem("book", trimmed, extra);
@@ -50,7 +66,9 @@ export function ManualBookAddSheet({ open, isbn, onClose, onSaved }: ManualBookA
   return (
     <BottomSheet open={open} title={t("type.book")} onClose={onClose}>
       <div className="flex flex-col gap-4 p-4">
-        <TextField label={t("field.isbn")} value={isbn} disabled />
+        {isbn.trim() !== "" ? (
+          <TextField label={t("field.isbn")} value={isbn} disabled />
+        ) : null}
         <TextField
           label={t("field.title")}
           value={title}

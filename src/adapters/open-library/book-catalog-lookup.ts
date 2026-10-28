@@ -7,6 +7,8 @@ import {
 import type { CatalogCacheRepository } from "@/application/ports/catalog-cache-repository";
 
 import { normalizeOpenLibraryWorkKey } from "@/domain/open-library-work";
+import { bookCatalogSearchCacheKey, prepareBookCatalogTitleSearchQuery } from "@/domain/book-catalog-query";
+import { isbn13ToIsbn10 } from "@/domain/isbn";
 
 import {
   mapSearchResponseToHits,
@@ -71,12 +73,8 @@ function normalizeSubjects(subjects: unknown): string[] | undefined {
   return labels.length === 0 ? undefined : labels;
 }
 
-function normalizeQuery(query: string): string {
-  return query.trim().toLowerCase();
-}
-
 function searchCacheKey(query: string, limit: number): string {
-  return `search:${normalizeQuery(query)}:${limit}`;
+  return bookCatalogSearchCacheKey(query, limit);
 }
 
 async function fetchJson<T>(
@@ -120,7 +118,22 @@ export function createOpenLibraryBookCatalogLookup(
       }
 
       if (!editionResult.ok) {
-        return editionResult.status === 404 ? null : null;
+        if (editionResult.status === 404) {
+          const isbn10 = isbn13ToIsbn10(isbn);
+          if (isbn10 !== null && isbn10 !== isbn) {
+            const retryUrl = `${apiBase}/isbn/${encodeURIComponent(isbn10)}.json`;
+            try {
+              editionResult = await fetchJson<OpenLibraryEdition>(fetchFn, retryUrl);
+            } catch (error) {
+              throw error instanceof CatalogLookupError
+                ? error
+                : new CatalogLookupError("Open Library lookup failed", error);
+            }
+          }
+        }
+        if (!editionResult.ok) {
+          return editionResult.status === 404 ? null : null;
+        }
       }
 
       const edition = editionResult.data;
@@ -187,9 +200,11 @@ export function createOpenLibraryBookCatalogLookup(
     async searchByTitle(query: string, limit = 20): Promise<BookCatalogHit[]> {
       const trimmed = query.trim();
       if (trimmed === "") return [];
+      const searchQuery = prepareBookCatalogTitleSearchQuery(trimmed);
+      if (searchQuery === "") return [];
       const capped = Math.min(Math.max(1, limit), 20);
       const now = deps.now?.() ?? new Date();
-      const cacheKey = searchCacheKey(trimmed, capped);
+      const cacheKey = searchCacheKey(searchQuery, capped);
 
       if (deps.cache) {
         const cached = await deps.cache.get("open_library", cacheKey, now);
@@ -200,7 +215,7 @@ export function createOpenLibraryBookCatalogLookup(
         }
       }
 
-      const searchUrl = `${apiBase}/search.json?q=${encodeURIComponent(trimmed)}&limit=${capped}`;
+      const searchUrl = `${apiBase}/search.json?q=${encodeURIComponent(searchQuery)}&limit=${capped}`;
       let searchPayload: OpenLibrarySearchResponse;
       try {
         const result = await fetchJson<OpenLibrarySearchResponse>(fetchFn, searchUrl);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { isValidIsbn, normalizeIsbn } from "@/domain/isbn";
+import { isValidIsbn, isbn13ToIsbn10, normalizeIsbn } from "@/domain/isbn";
 
 describe("normalizeIsbn", () => {
   it("strips hyphens and spaces", () => {
@@ -18,6 +18,15 @@ describe("normalizeIsbn", () => {
 
   it("accepts ISBN-10 with X check digit", () => {
     expect(normalizeIsbn("043942089X")).toBe("9780439420891");
+  });
+
+  it("converts valid 978 ISBN-13 back to ISBN-10", () => {
+    expect(isbn13ToIsbn10("9782070368228")).toBe("207036822X");
+    expect(isbn13ToIsbn10("9780306406157")).toBe("0306406152");
+  });
+
+  it("returns null for non-978 ISBN-13", () => {
+    expect(isbn13ToIsbn10("9791234567890")).toBeNull();
   });
 
   it("throws on invalid checksum", () => {
