@@ -24,7 +24,7 @@
 - [x] T1205 Unit tests for practice + learning-piece validation in `tests/unit/music-practice/apprentissage-domain.test.ts`
 - [x] T1206 Implement `src/domain/music-composition.ts` and `src/domain/dj-set.ts` (depends on T1204)
 - [x] T1207 Implement `src/domain/practice-instrument.ts`, `practice-exercise.ts`, `practice-plan.ts`, `practice-log.ts`, `learning-piece.ts` (depends on T1205)
-- [x] T1208 Migration `db/migrations/0015_music_practice_tables.ts` + register in `db/migrations/index.ts`
+- [x] T1208 Migration `db/migrations/0017_music_practice_tables.ts` + register in `db/migrations/index.ts`
 - [x] T1209 [P] Ports under `src/application/ports/music-practice-*-repository.ts` per entity family
 - [x] T1210 Postgres adapters `src/adapters/postgres/music-practice-*-repository.ts` with user scoping and pullSince
 - [x] T1211 IndexedDB adapters + store version bump in `src/adapters/indexeddb/db.ts`

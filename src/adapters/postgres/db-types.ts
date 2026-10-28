@@ -40,6 +40,13 @@ export interface BookQuotes {
   user_id: string;
 }
 
+export interface CatalogCache {
+  cache_key: string;
+  fetched_at: Timestamp;
+  payload: Json;
+  provider: string;
+}
+
 export interface Cookbooks {
   author: string | null;
   created_at: Timestamp;
@@ -50,13 +57,6 @@ export interface Cookbooks {
   server_updated_at: Timestamp;
   title: string;
   user_id: string;
-}
-
-export interface CatalogCache {
-  cache_key: string;
-  fetched_at: Timestamp;
-  payload: Json;
-  provider: string;
 }
 
 export interface DjSet {
