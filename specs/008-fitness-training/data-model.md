@@ -1,5 +1,7 @@
 # Data Model: Fitness — training, logging, progression (008)
 
+**Session-first realignment (2026-10-28)**: Prefer **séance template** + **scheduled séance** entities below. Legacy **`fitness_program`** / **`plannedSessions`** / **`weekdays[]`** on `main` is documented in [research.md](./research.md) §11.
+
 ## Read-only catalog (not synced per user)
 
 ### ExerciseCatalogDocument (bundled seed)
@@ -50,26 +52,16 @@ All tables: composite PK `(user_id, id)`, `deleted_at`, `fields_updated_at` json
 | `adherenceTrackingEnabled` | boolean | Default false (Phase D) |
 | `adherenceMinWorkoutsPerWeek` | smallint | Default 1 when enabled |
 
-### fitness_program (one active program MVP)
+### fitness_seance_template (library)
 
 | Field | Type | Rules |
 |-------|------|-------|
 | `id` | uuid | |
-| `name` | text | Trimmed, non-empty |
-| `isActive` | boolean | Exactly one `true` per user in MVP (FR-010) |
-| `plannedSessions` | jsonb | Ordered array of PlannedSession (LWW whole field) |
+| `title` | text | Trimmed, non-empty (French UI) |
+| `sortOrder` | number optional | Library ordering |
+| `templateExercises` | jsonb | Ordered array of TemplateExercise (LWW whole field) |
 
-### PlannedSession (inside `plannedSessions`)
-
-| Field | Type | Rules |
-|-------|------|-------|
-| `id` | string | Stable uuid within program |
-| `title` | text | French UI |
-| `weekdays` | int[] | 1=Monday … 7=Sunday (ISO); multiple sessions same day allowed |
-| `sortOrder` | number | Stable order among sessions sharing a weekday |
-| `exercises` | PlannedExercise[] | Ordered |
-
-### PlannedExercise
+### TemplateExercise (inside `templateExercises`)
 
 | Field | Type | Rules |
 |-------|------|-------|
@@ -78,6 +70,15 @@ All tables: composite PK `(user_id, id)`, `deleted_at`, `fields_updated_at` json
 | `targetReps` | int optional | |
 | `notes` | text optional | |
 
+### fitness_scheduled_seance (optional **planifier**)
+
+| Field | Type | Rules |
+|-------|------|-------|
+| `id` | uuid | |
+| `calendarDate` | date | User-chosen explicit date (FR-014) |
+| `seanceTemplateId` | uuid | References `fitness_seance_template.id` |
+| `sortOrder` | number optional | When multiple scheduled on same date |
+
 ### fitness_workout_log
 
 | Field | Type | Rules |
@@ -85,8 +86,9 @@ All tables: composite PK `(user_id, id)`, `deleted_at`, `fields_updated_at` json
 | `id` | uuid | |
 | `status` | `in_progress` \| `completed` \| `abandoned` | FR-022 |
 | `calendarDate` | date | Local calendar day for adherence |
-| `plannedSessionId` | string null | Set when started from plan (FR-021) |
-| `title` | text | Default from planned session or “Séance libre” |
+| `seanceTemplateId` | uuid null | Set when started from a template (FR-021) |
+| `scheduledSeanceId` | uuid null | Set when started from a **planifiée** row |
+| `title` | text | Default from template or “Séance libre” |
 | `startedAt` | timestamptz | |
 | `completedAt` | timestamptz null | Set when `completed` |
 | `catalogVersion` | int | Catalog version at log creation |
@@ -117,25 +119,39 @@ All tables: composite PK `(user_id, id)`, `deleted_at`, `fields_updated_at` json
 |-------|------|-------|
 | `id` | uuid | |
 | `calendarDate` | date | |
-| `plannedSessionId` | string | |
+| `scheduledSeanceId` | uuid | Preferred link when skipping **planifiée** |
+| `seanceTemplateId` | uuid optional | Denormalized for display if schedule row deleted |
 | `note` | text optional | |
+
+## Legacy (shipped weekly-program shape — migrate away)
+
+### fitness_program (deprecated target)
+
+| Field | Type | Rules |
+|-------|------|-------|
+| `id` | uuid | |
+| `name` | text | Was program container |
+| `isActive` | boolean | **Reject** as product default post 2026-10-28 |
+| `plannedSessions` | jsonb | Each **PlannedSession** had `weekdays[]` — map to templates + scheduled rows or drop |
+
+See [research.md](./research.md) §11 for migration intent.
 
 ## Client-only / derived (not synced)
 
 | Entity | Purpose |
 |--------|---------|
-| `RecentlyUsedExerciseIds` | Last N `exerciseId`s from logs/plan edits (FR-026) |
+| `RecentlyUsedExerciseIds` | Last N `exerciseId`s from logs/template edits (FR-026) |
 | `PersonalRecordView` | Derived max charge / reps per `exerciseId` for UI badges |
-| `WeekAdherenceView` | Planned vs completed vs skipped for current week (US6) |
+| `WeekAdherenceView` | **Planifiée** vs completed vs skipped for current week (US6) |
 
 ## Validation summary
 
 - No custom `exerciseId` outside catalog (FR-028).
 - RPE 1–10 only; reject out of range on save.
-- Soft delete workout/program components with undo toast (FR-050).
+- Soft delete workout/template/schedule with undo toast (FR-050).
 - Archived catalog id: show `nameFrSnapshot` + “exercice archivé” if id missing from current catalog.
 
 ## Migrations (implementation)
 
-- `db/migrations/0014_fitness_tables.ts` (numbers tentative): create tables above + indexes on `(user_id, server_updated_at)` per entity.
+- `db/migrations/0014_fitness_tables.ts` (numbers tentative): create tables above + indexes on `(user_id, server_updated_at)` per entity. Follow-up migration may rename/split program table when implementing session-first.
 - Sync routes: `src/app/api/sync/fitness/...` (see [contracts/fitness-sync-api.md](contracts/fitness-sync-api.md)).

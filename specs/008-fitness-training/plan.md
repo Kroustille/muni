@@ -1,18 +1,20 @@
-# Implementation Plan: Fitness — weekly training, session logging, progression
+# Implementation Plan: Fitness — séance library, session logging, progression
 
-**Branch**: `008-fitness-training` (work on `main`) | **Date**: 2026-10-19 | **Spec**: [spec.md](spec.md)
+**Branch**: `008-fitness-training` (work on `main`) | **Date**: 2026-10-19 (session-first realignment **2026-10-28**) | **Spec**: [spec.md](spec.md)
 
 **Input**: Feature specification from `/specs/008-fitness-training/spec.md`
 
 **Depends on**: **001–007** foundation (auth, offline sync, French UI, home patterns, list UX norms). No dependency on external fitness APIs.
 
-**Task band**: **T801–T8xx** (see [tasks.md](tasks.md)).
+**Task band**: **T801–T8xx** (see [tasks.md](tasks.md) — **regenerate or amend** when implementing session-first migration; not in scope for this spec-only update).
 
-**Product context**: Locked decisions in spec § Constraints & decisions; exercise seed in [exercises.catalog.json](exercises.catalog.json) + [muscles.catalog.json](muscles.catalog.json).
+**Product context**: Locked decisions in spec § Constraints & decisions + **Clarifications 2026-10-28 (session-first)**; exercise seed in [exercises.catalog.json](exercises.catalog.json) + [muscles.catalog.json](muscles.catalog.json).
 
 ## Summary
 
-Add a **typed fitness domain**: one active **training program** with weekday sessions and catalog-based planned exercises; **today** flow to start, skip, or run a **séance libre**; **workout logs** with optional set-level precision (reps, charge, duration, RPE); **history and progression** with PR highlights; Phase **D** adds recovery check-in, adherence streak, and home card. **Offline-first** via IndexedDB + dedicated Postgres tables and sync routes (Kysely migrations). **French-only** UI. **Bundled exercise catalog** (versioned seed, no Health/Garmin).
+Add a **typed fitness domain**: a **library of séance templates** (catalog-based exercises); **do now** (**Démarrer** any séance anytime); optional **planifier** on explicit calendar dates; **workout logs** with optional set-level precision (reps, charge, duration, RPE); **history and progression** with PR highlights; Phase **D** adds recovery check-in, adherence streak, and home card. **Offline-first** via IndexedDB + dedicated Postgres tables and sync routes (Kysely migrations). **French-only** UI. **Bundled exercise catalog** (versioned seed, no Health/Garmin).
+
+**2026-10-28 note**: Spec de-emphasizes **one active weekly program with weekday slots**. Code on `main` may still follow the earlier program editor shape until a migration task lands ([research.md](research.md) §11).
 
 ## Technical Context
 
@@ -20,11 +22,11 @@ Add a **typed fitness domain**: one active **training program** with weekday ses
 
 **Primary Dependencies**: Existing hexagonal stack; `normalizeText` for catalog search; `UndoDeleteProvider`; sync engine patterns from items and book quotes
 
-**Storage**: New tables `fitness_user_settings`, `fitness_program`, `fitness_workout_log`, `fitness_skip_record` (see [data-model.md](data-model.md)); client IndexedDB mirrors + catalog store; Kysely migration `0014_*` (tentative id)
+**Storage (target shape)**: New tables `fitness_user_settings`, **`fitness_seance_template`**, **`fitness_scheduled_seance`**, `fitness_workout_log`, `fitness_skip_record` (see [data-model.md](data-model.md)); client IndexedDB mirrors + catalog store; Kysely migration `0014_*` (tentative id). **Legacy**: `fitness_program` + jsonb `plannedSessions` with `weekdays[]` may exist on `main` — reconcile in implementation.
 
 **Testing**: Vitest for domain validation, PR derivation, week adherence; repository + sync isolation tests; Playwright e2e per [quickstart.md](quickstart.md); `node specs/008-fitness-training/validate-catalog.mjs` in gate
 
-**Target Platform**: PWA mobile-first; desktop usable for program editing
+**Target Platform**: PWA mobile-first; desktop usable for séance library editing
 
 **Constraints**: No custom exercises (FR-028); no wearable APIs; catalog offline-only; one in-progress workout; soft delete + undo; charge kg internally; duration seconds internally
 
@@ -63,7 +65,7 @@ specs/008-fitness-training/
 │   ├── ui-routes.md
 │   ├── exercise-catalog.md
 │   ├── fitness-sync-api.md
-│   ├── program-editor.md
+│   ├── program-editor.md          # rename/amend → séance library in implement task
 │   ├── workout-log-ui.md
 │   └── progression.md
 └── tasks.md
@@ -73,9 +75,9 @@ specs/008-fitness-training/
 
 ```text
 src/domain/fitness/
-  program.ts, workout-log.ts, catalog.ts, progression.ts, adherence.ts
+  seance-template.ts, scheduled-seance.ts, workout-log.ts, catalog.ts, progression.ts, adherence.ts
 src/application/fitness/
-  program-*, workout-*, skip-*, catalog-seed.ts, progression-*
+  seance-*, schedule-*, workout-*, skip-*, catalog-seed.ts, progression-*
 src/application/ports/fitness-*-repository.ts
 src/adapters/postgres/fitness-*-repository.ts
 src/adapters/indexeddb/fitness-*-repository.ts
@@ -98,7 +100,7 @@ Aligned with spec product phases **A → B → C → D**:
 | Ship batch | Spec phase | User stories | Outcome |
 |------------|------------|--------------|---------|
 | **1 — Foundation** | — | — | Migrations, repos, sync, catalog seed, nav shell, i18n |
-| **2 — Plan & today** | A | US1, US2 | Program editor, fitness home, start/skip/libre |
+| **2 — Library & today** | A | US1, US2 | Séance library, **planifier**, fitness home, start/skip/libre |
 | **3 — Log & precision** | B | US3, US4 | Set logging, picker + recent, duplicate template |
 | **4 — Progression** | C | US5, US6 | History, progression, week strip |
 | **5 — Companion** | D | US7, US8 | Recovery, streak, home card |
@@ -108,15 +110,17 @@ Aligned with spec product phases **A → B → C → D**:
 | ID | Topic | Default |
 |----|--------|---------|
 | OD-008-1 | Sync route shape | Single push/pull pair under `/api/sync/fitness/*` |
-| OD-008-2 | Program JSON vs normalized sessions table | JSON `plannedSessions` on program row for MVP |
-| OD-008-3 | Nav label | i18n key `fitness.nav` → “Entraînement” |
+| OD-008-2 | Template storage | One row per **séance template**; `templateExercises` jsonb; **scheduled séances** as separate rows (preferred over weekdays on template) |
+| OD-008-3 | Nav label | i18n key `fitness.nav` → “Entraînement”; library → “Mes séances” (tentative) |
 | OD-008-4 | Build copy of catalog | `public/fitness/` static file + import in seed use case |
 | OD-008-5 | Phase D schema | Nullable `recovery` on workout log in migration 0014; UI in D tasks |
+| OD-008-6 | Legacy `fitness_program` | See research.md §11 — migration TBD in implement task |
 
 ## Complexity Tracking
 
 | Addition | Why Needed | Simpler Alternative Rejected Because |
 |----------|------------|--------------------------------------|
-| Dedicated fitness tables + sync | Nested logs and program structure | `items` type would break field constraints and sync size |
+| Dedicated fitness tables + sync | Nested logs and template structure | `items` type would break field constraints and sync size |
 | jsonb `loggedExercises` | Many sets per workout | Normalized sets table = more sync entities for MVP |
 | Bundled catalog + IndexedDB | FR-027 offline gym | Runtime API conflicts with offline mandate |
+| `fitness_scheduled_seance` rows | Explicit-date **planifier** without recurrence engine | Weekday arrays on templates recreate rejected UX |
