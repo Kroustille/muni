@@ -19,6 +19,7 @@ import {
   itemToBookDiscoveryValues,
 } from "@/components/items/BookDetailSections";
 import { MovieDetailSections } from "@/components/items/MovieDetailSections";
+import { RecipeCookedActions } from "@/components/recipes/recipe-cooked-actions";
 import { bookDiscoveryValuesToPatch } from "@/components/books/book-discovery-fields";
 import type { BookDiscoveryFieldValues } from "@/components/books/book-discovery-fields";
 import { Button } from "@/components/ui/Button";
@@ -178,15 +179,18 @@ export function ItemDetailForm({
         />
       ) : null}
       {item.type === "recipe" ? (
-        <RecipeFields
-          values={values as RecipeFieldValues}
-          onChange={(next) => {
-            setValues(next);
-            setTitleError(undefined);
-          }}
-          titleError={titleError}
-          defaultSourceCollapsed={item.cookbookId === null}
-        />
+        <>
+          <RecipeCookedActions itemId={item.id} />
+          <RecipeFields
+            values={values as RecipeFieldValues}
+            onChange={(next) => {
+              setValues(next);
+              setTitleError(undefined);
+            }}
+            titleError={titleError}
+            defaultSourceCollapsed={item.cookbookId === null}
+          />
+        </>
       ) : null}
       {item.type === "music_artist" ? (
         <>

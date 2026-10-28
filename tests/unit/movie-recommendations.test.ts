@@ -54,8 +54,9 @@ function movie(partial: Partial<Item>): Item {
     musicBrainzRecordingId: null,
     spotifyUrl: null,
     soundcloudUrl: null,
-  cookbookId: null,
-  sourcePage: null,
+    cookbookId: null,
+    sourcePage: null,
+    cookedDates: null,
   };
 }
 

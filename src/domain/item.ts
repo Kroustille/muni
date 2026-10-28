@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { cookedDatesSchema, isValidCookedDate } from "./item-recipe";
 import { isValidHttpsUrl } from "./external-url";
 import { isValidMusicBrainzId } from "./musicbrainz";
 import {
@@ -138,13 +139,14 @@ export type Item = {
   soundcloudUrl: string | null;
   cookbookId: string | null;
   sourcePage: string | null;
+  cookedDates: string[] | null;
 };
 
 const FIELDS_BY_TYPE: Record<ItemType, readonly (keyof Item)[]> = {
   shopping: ["quantity", "checked"],
   book: BOOK_ITEM_FIELD_KEYS,
   movie: MOVIE_ITEM_FIELD_KEYS,
-  recipe: ["notes", "ingredients", "steps", "cookbookId", "sourcePage"],
+  recipe: ["notes", "ingredients", "steps", "cookbookId", "sourcePage", "cookedDates"],
   music_artist: [
     "recommendedBy",
     "rating",
@@ -212,6 +214,7 @@ const TYPE_SPECIFIC_FIELDS = [
   "soundcloudUrl",
   "cookbookId",
   "sourcePage",
+  "cookedDates",
 ] as const satisfies readonly (keyof Item)[];
 
 const timestamp = z.iso.datetime({ offset: true });
@@ -257,6 +260,7 @@ const itemShape = {
       return trimmed;
     })
     .pipe(z.union([z.null(), z.string().max(100)])),
+  cookedDates: cookedDatesSchema.nullable(),
 };
 
 function checkCrossType(value: Item, ctx: z.RefinementCtx, path: (f: string) => string): void {
@@ -337,6 +341,17 @@ function checkCrossType(value: Item, ctx: z.RefinementCtx, path: (f: string) => 
       message: "sourcePage requires cookbookId",
     });
   }
+  if (value.type === "recipe" && value.cookedDates != null) {
+    for (const entry of value.cookedDates) {
+      if (!isValidCookedDate(entry)) {
+        ctx.addIssue({
+          code: "custom",
+          path: [path("cookedDates")],
+          message: `invalid cooked date: ${entry}`,
+        });
+      }
+    }
+  }
 }
 
 const itemSchema = z
@@ -375,6 +390,7 @@ const SNAKE: Partial<Record<keyof Item, string>> = {
   soundcloudUrl: "soundcloud_url",
   cookbookId: "cookbook_id",
   sourcePage: "source_page",
+  cookedDates: "cooked_dates",
 };
 
 const snakeOf = (field: string): string => SNAKE[field as keyof Item] ?? field;
@@ -453,6 +469,7 @@ export const itemWireSchema = z
     soundcloud_url: itemShape.soundcloudUrl.optional(),
     cookbook_id: itemShape.cookbookId.optional(),
     source_page: itemShape.sourcePage.optional(),
+    cooked_dates: itemShape.cookedDates.optional(),
     server_updated_at: timestamp.nullable(),
   })
   .superRefine((wire, ctx) =>
@@ -525,6 +542,7 @@ export type NewItemInput = {
     | "soundcloudUrl"
     | "cookbookId"
     | "sourcePage"
+    | "cookedDates"
   >
 >;
 
@@ -583,6 +601,7 @@ export function newItem(input: NewItemInput): Item {
     soundcloudUrl: input.soundcloudUrl ?? null,
     cookbookId: input.cookbookId ?? null,
     sourcePage: input.sourcePage ?? null,
+    cookedDates: input.cookedDates ?? null,
   };
   return itemSchema.parse(candidate) as Item;
 }
@@ -652,6 +671,7 @@ function coalesceCatalogWireFields(
     soundcloudUrl: wire.soundcloud_url ?? null,
     cookbookId: wire.cookbook_id ?? null,
     sourcePage: wire.source_page ?? null,
+    cookedDates: wire.cooked_dates ?? null,
   };
 }
 

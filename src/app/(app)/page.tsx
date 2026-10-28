@@ -8,6 +8,7 @@ import {
   ActivitySuggestionsCard,
 } from "@/components/home/activity-suggestions-card";
 import { useDailySuggestions } from "@/components/home/use-daily-suggestions";
+import { RecapHomeTeaser } from "@/components/recap/recap-page";
 import { RavenIllustration } from "@/components/illustrations/RavenIllustration";
 import { LIST_TYPE_VISUAL } from "@/components/list-type-visual";
 import { getItemUseCases } from "@/composition/client";
@@ -153,6 +154,7 @@ export default function HomePage() {
       <div className="mb-4">
         <ActivitySuggestionsCard state={suggestions} />
       </div>
+      <RecapHomeTeaser />
       {showEmpty ? (
         <div className="mb-6 flex flex-col items-center gap-2 py-4 text-center" role="status">
           <RavenIllustration className="h-12 w-12 text-muted" />

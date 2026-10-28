@@ -87,6 +87,7 @@ function toWire(row: Selectable<Items>): ItemWire {
     soundcloud_url: row.soundcloud_url,
     cookbook_id: row.cookbook_id,
     source_page: row.source_page,
+    cooked_dates: row.cooked_dates as ItemWire["cooked_dates"],
     server_updated_at: toIso(row.server_updated_at),
   };
 }
@@ -151,6 +152,7 @@ function toRow(userId: string, wire: ItemWire): Insertable<Items> {
     soundcloud_url: wire.soundcloud_url ?? null,
     cookbook_id: wire.cookbook_id ?? null,
     source_page: wire.source_page ?? null,
+    cooked_dates: toJsonbColumn(wire.cooked_dates ?? null),
     server_updated_at: wire.server_updated_at,
   };
 }
@@ -242,6 +244,7 @@ function createRepo(db: DbOrTrx, inTransaction: boolean): ServerItemRepository {
               soundcloud_url: values.soundcloud_url,
               cookbook_id: values.cookbook_id,
               source_page: values.source_page,
+              cooked_dates: values.cooked_dates,
               server_updated_at: values.server_updated_at,
             }),
           )

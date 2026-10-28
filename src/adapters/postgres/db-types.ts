@@ -67,6 +67,7 @@ export interface Items {
   catalog_rating: Numeric | null;
   checked: Generated<boolean>;
   cookbook_id: string | null;
+  cooked_dates: Json | null;
   created_at: Timestamp;
   deleted_at: Timestamp | null;
   director: string | null;

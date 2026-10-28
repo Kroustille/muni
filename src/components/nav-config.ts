@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { Dumbbell, Home, Search, Settings } from "lucide-react";
+import { CalendarRange, Dumbbell, Home, Search, Settings } from "lucide-react";
 import type { ItemType } from "@/domain/item";
 import type { MessageKey } from "@/i18n";
 
@@ -22,6 +22,12 @@ export const PRIMARY_NAV: PrimaryNavItem[] = [
     labelKey: "nav.search",
     icon: Search,
     match: (pathname) => pathname === "/search" || pathname.startsWith("/search/"),
+  },
+  {
+    href: "/recap",
+    labelKey: "recap.nav",
+    icon: CalendarRange,
+    match: (pathname) => pathname === "/recap" || pathname.startsWith("/recap/"),
   },
   {
     href: "/settings",
