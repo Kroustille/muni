@@ -181,12 +181,12 @@
 
 ## Phase 18: Catalog search quality & fallback (2026-10-28)
 
-- [ ] T401 [P1] Unit tests Wikidata search edge cases + empty result handling in `tests/unit/wikidata-movie-search.test.ts`
-- [ ] T402 [P1] Improve Wikidata query params (French labels, entity type filters) in adapter
+- [x] T401 [P1] Unit tests Wikidata search edge cases + empty result handling in `tests/unit/wikidata-movie-search.test.ts`
+- [x] T402 [P1] Improve Wikidata query params (French labels, entity type filters) in adapter
 - [ ] T403 [P2] TMDB search adapter + `TMDB_API_KEY` env; composite port Wikidata → TMDB fallback
 - [ ] T404 [P2] Map TMDB hits to `MovieSearchHit`; optional persist `tmdbId` on item (migration + domain)
 - [ ] T405 [P2] Integration tests composite search route in `tests/integration/movies-catalog-routes.test.ts`
-- [ ] T406 [P1] E2e honest empty search → manual add path (movies quick-add)
+- [x] T406 [P1] E2e honest empty search → manual add path (movies quick-add)
 - [ ] T407 [P3] Optional **TVDB** episode-list enrichment for séries — server key; research.md §18 public-apis Video entry
 
 ---

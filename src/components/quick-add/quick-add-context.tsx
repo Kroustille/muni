@@ -287,7 +287,12 @@ export function QuickAddProvider({ children }: { children: ReactNode }) {
       case "movie":
         return (
           <>
-            <MovieCatalogFlow onSaved={close} />
+            <MovieCatalogFlow
+              onSaved={close}
+              onManualAdd={(title) =>
+                updateValues({ ...(values as MovieFieldValues), title })
+              }
+            />
             <MovieFields
               values={values as MovieFieldValues}
               onChange={updateValues}

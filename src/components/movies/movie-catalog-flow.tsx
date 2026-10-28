@@ -11,6 +11,7 @@ import type { MovieCatalogPreviewValues } from "./catalog-preview";
 
 export type MovieCatalogFlowProps = {
   onSaved?: () => void;
+  onManualAdd?: (title: string) => void;
 };
 
 function optionalText(value: string): string | null {
@@ -46,7 +47,7 @@ async function saveMoviePreview(values: MovieCatalogPreviewValues): Promise<void
   });
 }
 
-export function MovieCatalogFlow({ onSaved }: MovieCatalogFlowProps) {
+export function MovieCatalogFlow({ onSaved, onManualAdd }: MovieCatalogFlowProps) {
   const [open, setOpen] = useState(false);
 
   const onConfirmSave = useCallback(async (values: MovieCatalogPreviewValues) => {
@@ -63,6 +64,7 @@ export function MovieCatalogFlow({ onSaved }: MovieCatalogFlowProps) {
         onClose={() => setOpen(false)}
         onSaved={onSaved}
         onConfirmSave={onConfirmSave}
+        onManualAdd={onManualAdd}
       />
     </>
   );

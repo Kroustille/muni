@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-import type { MovieSearchHit } from "@/application/ports/movie-catalog-search";
+import type { MovieCatalogDetail, MovieSearchHit } from "@/application/ports/movie-catalog-search";
 import {
   MovieCatalogClientError,
   fetchMovieCatalogDetail,
@@ -17,14 +17,28 @@ import { t, type MessageKey } from "@/i18n";
 
 import { runCatalogMultiAdd } from "@/application/catalog/catalog-multi-add";
 
-import { MovieCatalogPreview, movieDetailToPreviewValues, type MovieCatalogPreviewValues } from "./catalog-preview";
+import {
+  MovieCatalogPreview,
+  movieDetailToPreviewValues,
+  type MovieCatalogPreviewValues,
+} from "./catalog-preview";
 
 export type MovieCatalogSearchProps = {
   open: boolean;
   onClose: () => void;
   onSaved?: () => void;
   onConfirmSave: (values: MovieCatalogPreviewValues) => Promise<void>;
+  /** When set (quick-add), empty search offers manual add by prefilling the outer title field. */
+  onManualAdd?: (title: string) => void;
 };
+
+function manualMovieDetail(title: string): MovieCatalogDetail {
+  return {
+    wikidataId: "manual",
+    title: title.trim(),
+    mediaKind: "film",
+  };
+}
 
 function formatHitSubtitle(hit: MovieSearchHit): string {
   const parts: string[] = [];
@@ -41,6 +55,7 @@ export function MovieCatalogSearchSheet({
   onClose,
   onSaved,
   onConfirmSave,
+  onManualAdd,
 }: MovieCatalogSearchProps) {
   const online = useOnline();
   const [query, setQuery] = useState("");
@@ -55,6 +70,8 @@ export function MovieCatalogSearchSheet({
   const [saving, setSaving] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const [batchError, setBatchError] = useState<string | null>(null);
+  const [manualPreviewOpen, setManualPreviewOpen] = useState(false);
+  const [manualDetail, setManualDetail] = useState<MovieCatalogDetail | null>(null);
 
   const reset = useCallback(() => {
     setQuery("");
@@ -67,6 +84,8 @@ export function MovieCatalogSearchSheet({
     setSaving(false);
     setSelectedIds(new Set());
     setBatchError(null);
+    setManualPreviewOpen(false);
+    setManualDetail(null);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -166,9 +185,31 @@ export function MovieCatalogSearchSheet({
     [handleClose, onConfirmSave, onSaved],
   );
 
+  const emptyAfterSearch =
+    !loading &&
+    query.trim() !== "" &&
+    results.length === 0 &&
+    error === t("movies.catalog.empty");
+
+  const startManualAdd = useCallback(() => {
+    const title = query.trim();
+    if (title === "") return;
+    if (onManualAdd) {
+      onManualAdd(title);
+      handleClose();
+      return;
+    }
+    setManualDetail(manualMovieDetail(title));
+    setManualPreviewOpen(true);
+  }, [handleClose, onManualAdd, query]);
+
   return (
     <>
-      <BottomSheet open={open && !previewOpen} onClose={handleClose} title={t("movies.catalog.search")}>
+      <BottomSheet
+        open={open && !previewOpen && !manualPreviewOpen}
+        onClose={handleClose}
+        title={t("movies.catalog.search")}
+      >
         {!online ? (
           <p className="text-sm text-muted" role="status">
             {t("movies.catalog.offline")}
@@ -203,6 +244,11 @@ export function MovieCatalogSearchSheet({
               <p className="text-sm text-muted" role="status">
                 {error}
               </p>
+            ) : null}
+            {emptyAfterSearch ? (
+              <Button type="button" variant="secondary" onClick={startManualAdd}>
+                {t("books.addManually")}
+              </Button>
             ) : null}
             {batchError !== null ? (
               <p className="text-sm text-danger" role="alert">{batchError}</p>
@@ -249,6 +295,18 @@ export function MovieCatalogSearchSheet({
           onClose={() => {
             setPreviewOpen(false);
             setDetail(null);
+          }}
+          onConfirm={confirmSave}
+          saving={saving}
+        />
+      ) : null}
+      {manualDetail !== null ? (
+        <MovieCatalogPreview
+          open={manualPreviewOpen}
+          detail={manualDetail}
+          onClose={() => {
+            setManualPreviewOpen(false);
+            setManualDetail(null);
           }}
           onConfirm={confirmSave}
           saving={saving}
