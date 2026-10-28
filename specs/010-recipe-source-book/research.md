@@ -93,6 +93,18 @@ Help text (detail): *Référence bibliographique — distincte de votre liste de
 
 ## Open questions (reduced)
 
-- **Cookbook edit surface:** MVP may allow editing author/ISBN only when changing cookbook on recipe, or a minimal “edit cookbook” affordance — planning decides; not blocking spec.
+- ~~**Cookbook edit surface**~~ — **Resolved (plan OD-010-3)**: optional **Auteur** / **ISBN** on recipe add/edit when a cookbook is selected; upsert cookbook row on save; title only via combobox.
 - **Orphan cookbooks:** Keep in catalog in MVP (no garbage collection required).
 - ~~Partial source / orphan page without title~~ — resolved: page requires selected cookbook.
+
+## Planning decisions (2026-10-28)
+
+| ID | Decision | Rationale |
+|----|----------|-----------|
+| OD-010-1 | Sync routes `/api/sync/cookbooks/push` and `/pull` | Matches book quotes / fitness split; keeps item payload smaller |
+| OD-010-2 | Item fields `cookbook_id`, `source_page` on wire | Consistent snake_case with existing item sync |
+| OD-010-3 | Inline author/ISBN on recipe form | No standalone cookbook admin screen; satisfies US2 metadata update |
+| OD-010-4 | Detail block after steps, before notes | Keeps notes at bottom; source visible near procedural content |
+| OD-010-5 | Collapsible source section after title on add | Capture speed — title-only path unchanged |
+| OD-010-6 | Title max 500 chars | Accommodate long cookbook names without list UI change |
+| OD-010-7 | P2 search via in-memory join to cookbook title | Smallest change to `search.ts`; no Postgres full-text in MVP |
