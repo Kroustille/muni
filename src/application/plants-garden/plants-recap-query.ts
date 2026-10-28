@@ -42,7 +42,7 @@ export function createPlantsRecapRepository(deps: PlantsRecapQueryDeps): PlantsR
     async listMilestonesInRange(from, to) {
       const [milestones, cultures] = await Promise.all([
         deps.milestones.listInRange(from, to),
-        deps.cultures.list(true),
+        deps.cultures.list(),
       ]);
       const cultureById = new Map(cultures.map((c) => [c.id, c]));
       return milestones

@@ -27,6 +27,11 @@ yarn migrate:up
 yarn run db:codegen:check
 yarn run test:coverage
 npx playwright install --with-deps chromium
+export PLAYWRIGHT_SKIP_WEBSERVER_BUILD=1
+if curl -sf "${APP_URL:-http://localhost:3000}/" >/dev/null 2>&1; then
+  export PORT=3010
+  export APP_URL=http://localhost:3010
+fi
 yarn run test:e2e
 
 echo "verify-ci: all steps passed"

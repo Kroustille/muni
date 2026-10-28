@@ -40,6 +40,13 @@ export interface BookQuotes {
   user_id: string;
 }
 
+export interface CatalogCache {
+  cache_key: string;
+  fetched_at: Timestamp;
+  payload: Json;
+  provider: string;
+}
+
 export interface Cookbooks {
   author: string | null;
   created_at: Timestamp;
@@ -50,13 +57,6 @@ export interface Cookbooks {
   server_updated_at: Timestamp;
   title: string;
   user_id: string;
-}
-
-export interface CatalogCache {
-  cache_key: string;
-  fetched_at: Timestamp;
-  payload: Json;
-  provider: string;
 }
 
 export interface FitnessProgram {
@@ -283,11 +283,6 @@ export interface DB {
   book_quotes: BookQuotes;
   catalog_cache: CatalogCache;
   cookbooks: Cookbooks;
-  plant: Plant;
-  plant_care_event: PlantCareEvent;
-  plant_care_profile: PlantCareProfile;
-  vegetable_culture: VegetableCulture;
-  vegetable_milestone: VegetableMilestone;
   fitness_program: FitnessProgram;
   fitness_skip_record: FitnessSkipRecord;
   fitness_user_settings: FitnessUserSettings;
@@ -295,8 +290,13 @@ export interface DB {
   items: Items;
   magic_link_tokens: MagicLinkTokens;
   movie_quotes: MovieQuotes;
+  plant: Plant;
+  plant_care_event: PlantCareEvent;
+  plant_care_profile: PlantCareProfile;
   reading_goals: ReadingGoals;
   sessions: Sessions;
   users: Users;
+  vegetable_culture: VegetableCulture;
+  vegetable_milestone: VegetableMilestone;
   watch_goals: WatchGoals;
 }

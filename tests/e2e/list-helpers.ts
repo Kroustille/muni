@@ -113,6 +113,13 @@ export async function openQuickAddType(page: Page, kind: ItemKind): Promise<void
   await picker.getByRole("button", { name: quickAddTypeLabel(kind) }).click();
 }
 
+/** Alias for capture-style e2e helpers. */
+export const openQuickAdd = openQuickAddType;
+
+export async function submitQuickAdd(page: Page): Promise<void> {
+  await locators.quickAddSubmit(page).click();
+}
+
 export async function addItem(page: Page, kind: ItemKind, title: string): Promise<void> {
   await openQuickAddType(page, kind);
   const dialog = page.getByRole("dialog");

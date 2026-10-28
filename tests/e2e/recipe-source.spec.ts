@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import fr from "../../src/i18n/fr.json";
-import { locators, openQuickAdd, signIn, submitQuickAdd } from "./capture.spec";
+import { locators, openQuickAdd, signIn, submitQuickAdd } from "./list-helpers";
 
 test("add recipe with cookbook source and page", async ({ page }) => {
   await signIn(page);

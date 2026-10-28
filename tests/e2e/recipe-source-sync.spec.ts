@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import fr from "../../src/i18n/fr.json";
-import { openQuickAdd, signIn, submitQuickAdd } from "./capture.spec";
+import { openQuickAdd, signIn, submitQuickAdd } from "./list-helpers";
 
 test("cookbook author syncs after server round-trip", async ({ page, context }) => {
   await signIn(page);
