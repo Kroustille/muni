@@ -174,20 +174,24 @@ export function MovieCatalogSearchSheet({
             {t("movies.catalog.offline")}
           </p>
         ) : (
-          <form
-            className="flex flex-col gap-3"
-            onSubmit={(event) => {
-              event.preventDefault();
-              void runSearch();
-            }}
-          >
+          <div className="flex flex-col gap-3" role="search">
             <TextField
               label={t("movies.catalog.search.placeholder")}
               value={query}
               onChange={(event) => setQuery(event.target.value)}
               autoComplete="off"
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  event.preventDefault();
+                  void runSearch();
+                }
+              }}
             />
-            <Button type="submit" disabled={loading || query.trim() === ""}>
+            <Button
+              type="button"
+              disabled={loading || query.trim() === ""}
+              onClick={() => void runSearch()}
+            >
               {loading ? t("movies.catalog.loading") : t("books.lookup.search")}
             </Button>
             {detailLoading ? (
@@ -235,7 +239,7 @@ export function MovieCatalogSearchSheet({
                 </ul>
               </>
             ) : null}
-          </form>
+          </div>
         )}
       </BottomSheet>
       {detail !== null ? (

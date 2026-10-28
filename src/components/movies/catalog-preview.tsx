@@ -73,13 +73,7 @@ export function MovieCatalogPreview({
 
   return (
     <BottomSheet open={open} onClose={onClose} title={t("movies.preview.title")}>
-      <form
-        className="flex flex-col gap-3"
-        onSubmit={(event) => {
-          event.preventDefault();
-          void submit();
-        }}
-      >
+      <div className="flex flex-col gap-3">
         <TextField
           label={t("field.title")}
           value={values.title}
@@ -118,11 +112,16 @@ export function MovieCatalogPreview({
           <Button type="button" variant="secondary" className="flex-1" onClick={onClose} disabled={saving}>
             {t("action.cancel")}
           </Button>
-          <Button type="submit" className="flex-1" disabled={saving || values.title.trim() === ""}>
+          <Button
+            type="button"
+            className="flex-1"
+            disabled={saving || values.title.trim() === ""}
+            onClick={() => void submit()}
+          >
             {t("action.save")}
           </Button>
         </div>
-      </form>
+      </div>
     </BottomSheet>
   );
 }

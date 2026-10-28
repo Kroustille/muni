@@ -243,9 +243,9 @@
 
 ## Phase 12: Cross-cutting UI — nested forms (2026-10-28)
 
-- [ ] T112 [P] Refactor quick-add shell: no outer `<form>` when book/movie catalog children can mount — use div + button submit per [contracts/nested-forms-ui.md](contracts/nested-forms-ui.md)
-- [ ] T113 [P] Refactor book/movie catalog search + preview to avoid `<form>` or portal sheets outside ancestor forms (depends on T112)
-- [ ] T114 E2e regression: quick-add book → title catalog open → assert zero `form form` in DOM in `tests/e2e/quick-add-nested-forms.spec.ts` (depends on T113)
+- [X] T112 [P] Refactor quick-add shell: no outer `<form>` when book/movie catalog children can mount — use div + button submit per [contracts/nested-forms-ui.md](contracts/nested-forms-ui.md)
+- [X] T113 [P] Refactor book/movie catalog search + preview to avoid `<form>` or portal sheets outside ancestor forms (depends on T112)
+- [X] T114 E2e regression: quick-add book → title catalog open → assert zero `form form` in DOM in `tests/e2e/quick-add-nested-forms.spec.ts` (depends on T113)
 
 ---
 

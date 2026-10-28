@@ -346,18 +346,12 @@ export function QuickAddProvider({ children }: { children: ReactNode }) {
             ))}
           </ul>
         ) : kind !== null ? (
-          <form
-            className="flex flex-col gap-3"
-            onSubmit={(e) => {
-              e.preventDefault();
-              void submit();
-            }}
-          >
+          <div className="flex flex-col gap-3">
             {renderFields()}
-            <Button type="submit" disabled={submitting}>
+            <Button type="button" disabled={submitting} onClick={() => void submit()}>
               {t("action.add")}
             </Button>
-          </form>
+          </div>
         ) : null}
         </div>
       </BottomSheet>
