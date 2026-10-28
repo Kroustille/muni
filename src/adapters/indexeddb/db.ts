@@ -11,6 +11,8 @@ import type {
 } from "../../domain/fitness/workout-log";
 import type { Item, ItemType } from "../../domain/item";
 import type { MetaKey, MetaValues } from "../../application/ports/item-repository";
+import type { DailyActivitySuggestionSnapshot } from "../../domain/activity-suggestion";
+import type { Cookbook } from "../../domain/cookbook";
 
 export interface MuniDbSchema extends DBSchema {
   items: {
@@ -71,17 +73,21 @@ export interface MuniDbSchema extends DBSchema {
   fitnessSettingsOutbox: { key: string; value: { id: string } };
   cookbooks: {
     key: string;
-    value: import("../../domain/cookbook").Cookbook;
+    value: Cookbook;
   };
   cookbookOutbox: {
     key: string;
     value: { id: string };
   };
+  activity_suggestion_snapshot: {
+    key: string;
+    value: DailyActivitySuggestionSnapshot;
+  };
 }
 
 export type MuniDb = IDBPDatabase<MuniDbSchema>;
 
-const DB_VERSION = 5;
+const DB_VERSION = 6;
 
 export function openMuniDb(name: string): Promise<MuniDb> {
   return openDB<MuniDbSchema>(name, DB_VERSION, {
@@ -120,6 +126,9 @@ export function openMuniDb(name: string): Promise<MuniDb> {
       if (oldVersion < 5) {
         db.createObjectStore("cookbooks", { keyPath: "id" });
         db.createObjectStore("cookbookOutbox", { keyPath: "id" });
+      }
+      if (oldVersion < 6) {
+        db.createObjectStore("activity_suggestion_snapshot", { keyPath: "calendarDay" });
       }
     },
   });

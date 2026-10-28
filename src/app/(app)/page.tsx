@@ -4,6 +4,10 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { HomeFitnessCard } from "@/components/fitness/home-fitness-card";
+import {
+  ActivitySuggestionsCard,
+} from "@/components/home/activity-suggestions-card";
+import { useDailySuggestions } from "@/components/home/use-daily-suggestions";
 import { RavenIllustration } from "@/components/illustrations/RavenIllustration";
 import { LIST_TYPE_VISUAL } from "@/components/list-type-visual";
 import { getItemUseCases } from "@/composition/client";
@@ -94,6 +98,7 @@ function HomeListCard({
 export default function HomePage() {
   const [counts, setCounts] = useState<Record<ItemType, number> | null>(null);
   const [recent, setRecent] = useState<Item[]>([]);
+  const suggestions = useDailySuggestions();
 
   useEffect(() => {
     let cancelled = false;
@@ -144,6 +149,9 @@ export default function HomePage() {
       </Link>
       <div className="mb-4">
         <HomeFitnessCard />
+      </div>
+      <div className="mb-4">
+        <ActivitySuggestionsCard state={suggestions} />
       </div>
       {showEmpty ? (
         <div className="mb-6 flex flex-col items-center gap-2 py-4 text-center" role="status">

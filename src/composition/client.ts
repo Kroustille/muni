@@ -10,6 +10,7 @@ import { createIndexedDbItemRepository } from "../adapters/indexeddb/item-reposi
 import { wireClientQuoteSync } from "./client-quote-sync";
 import { wireClientCookbookSync } from "./client-cookbook-sync";
 import { wireClientFitnessSync } from "./client-fitness-sync";
+import { wireClientSuggestions } from "./client-suggestions";
 import type { CookbookUseCases } from "../application/cookbooks/cookbook-use-cases";
 import { runSyncEngines, type PausableSyncEngine } from "./sync-run";
 import type { FitnessProgramUseCases } from "../application/fitness/program";
@@ -25,6 +26,7 @@ import type { Unsubscribe } from "../application/ports/item-repository";
 import { createSessionUseCases, type SessionUseCases } from "../application/session";
 import { createSyncEngine } from "../application/sync/engine";
 import { createSyncScheduler } from "../application/sync/scheduler";
+import type { SuggestionsUseCases } from "../application/suggestions/use-cases";
 
 export const MUNI_DB_NAME = "muni";
 const SYNC_PULL_LIMIT = 100;
@@ -42,6 +44,7 @@ export type ClientContext = {
   ensureFitnessCatalogSeeded(): Promise<void>;
   searchUseCase: SearchUseCase;
   sessionUseCases: SessionUseCases;
+  suggestionsUseCases: SuggestionsUseCases;
   authGateway: AuthGateway;
   subscribeSyncStatus(listener: (state: SyncStatusState) => void): Unsubscribe;
 };
@@ -205,6 +208,13 @@ function buildClientContext(): Promise<ClientContext> {
       connectivity,
     });
 
+    const { suggestionsUseCases } = wireClientSuggestions({
+      db,
+      items: repository,
+      idGenerator,
+      now: nowMs,
+    });
+
     const wrappedSession: SessionUseCases = {
       open: () => sessionUseCases.open(),
       signOut: async () => {
@@ -224,6 +234,7 @@ function buildClientContext(): Promise<ClientContext> {
       ensureFitnessCatalogSeeded: () => fitnessSync.ensureCatalogSeeded(),
       searchUseCase,
       sessionUseCases: wrappedSession,
+      suggestionsUseCases,
       authGateway,
       subscribeSyncStatus(listener) {
         syncStatusListeners.add(listener);
@@ -282,6 +293,10 @@ export function getSearchUseCase(): Promise<SearchUseCase> {
 
 export function getSessionUseCases(): Promise<SessionUseCases> {
   return getClientContext().then((ctx) => ctx.sessionUseCases);
+}
+
+export function getSuggestionsUseCases(): Promise<SuggestionsUseCases> {
+  return getClientContext().then((ctx) => ctx.suggestionsUseCases);
 }
 
 export function getAuthGateway(): Promise<AuthGateway> {

@@ -16,7 +16,19 @@ describe("IndexedDB schema", () => {
   it("creates the items, outbox and meta stores", async () => {
     const db = await openMuniDb(freshName());
     expect([...db.objectStoreNames].sort()).toEqual([
+      "activity_suggestion_snapshot",
       "bookQuotes",
+      "cookbookOutbox",
+      "cookbooks",
+      "fitnessExerciseCatalog",
+      "fitnessProgramOutbox",
+      "fitnessPrograms",
+      "fitnessSettingsOutbox",
+      "fitnessSkipOutbox",
+      "fitnessSkipRecords",
+      "fitnessUserSettings",
+      "fitnessWorkoutLogs",
+      "fitnessWorkoutOutbox",
       "items",
       "meta",
       "movieQuoteOutbox",
