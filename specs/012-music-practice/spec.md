@@ -18,7 +18,7 @@
 
 **Serves**: [009](../009-experiences-achievements/spec.md) north star — **registering creative work and performance** as personal experience and achievement, without guilt copy or social feeds.
 
-**Future link to [011](../011-periodic-recap/spec.md)**: When 011 implementation adds or extends its **domain contributor registry**, **performed DJ sets**, **composition milestones** (user-marked “terminé”), and **logged instrument practice sessions** (user-marked done with a calendar date) MAY feed recap lines — **not in scope for 012 v1 delivery**; 012 MUST persist clear **completion timestamps** (`finishedAt`, `performedAt`, **`practicedAt`** on practice logs) so 011 can subscribe later without redesign. Do **not** expand 011 spec or tasks in this change set.
+**Future link to [011](../011-periodic-recap/spec.md)**: **011** includes **Musique** recap lines from **012** completion timestamps — **`finishedAt`** (composition **Terminé**), **`performedAt`** (set **Joué**), **`practicedAt`** on **`practice_log`** (mark **Fait** / ad-hoc). **012 v1** persists those fields; **011** implements aggregation contributors ([011 tasks](../011-periodic-recap/tasks.md) T1195–T1196). **`learning_piece` → `comfortable`** alone is **not** recap-eligible in MVP (logs only).
 
 ## Decision summary (MVP)
 
@@ -368,7 +368,7 @@ User filters exercises by instrument, pieces by status, sorts by last practiced 
 
 - Valentin is the primary user; scale stays within foundation “few thousand items” per domain.
 - **Navigation**: One shell entry **Musique — pratique** with **Compositions**, **Sets DJ**, and **Apprentissage** sub-areas — exact IA deferred to planning.
-- **011 recap**: Not implemented in 012; eligible events when added: **`dj_set` → `performed`** (**performedAt**), **`music_composition` → `finished`** (**finishedAt**), **`practice_log`** with **practicedAt** (and optionally **`learning_piece` → `comfortable`** if product expands). Planned/cancelled sets, idea/paused compositions, and archived pieces excluded unless product later expands.
+- **011 recap**: Spec’d in [011](../011-periodic-recap/spec.md) — **`dj_set` → `performed`** (**`performedAt`**), **`music_composition` → `finished`** (**`finishedAt`**), **`practice_log`** with **`practicedAt`**. Planned/cancelled sets, idea/paused compositions, and archived pieces excluded. **`learning_piece` → `comfortable`** alone excluded in MVP (practice logs only). **012** persists timestamps; **011** implements contributors ([T1195–T1196](../011-periodic-recap/tasks.md)).
 - BPM fields are **manual** user entry, not detected from audio.
 - DJ “home practice” counts as **`performed`** when the user says so — no separate “rehearsal” status in v1.
 
@@ -381,13 +381,13 @@ User filters exercises by instrument, pieces by status, sorts by last practiced 
 - MIDI/project file storage, stem tracking, multi-version mix history.
 - Social sharing, public profiles, or audience stats.
 - Merging 012 into **004** or reusing `music_track` rows as composition proxies.
-- Implementing or extending **011** recap aggregation in this feature’s delivery batch.
+- Implementing **011** recap aggregation UI or contributors inside **012** delivery (see [011 tasks](../011-periodic-recap/tasks.md) T1195–T1196).
 - Exercise **catalog seed** or MusicBrainz-backed exercise types (user library only in v1).
 - Changing **004** `music_track` schema or listen status when linking from **learning_piece**.
 
 ## Future (not scheduled)
 
-- Recap contributor for compositions finished, sets performed, and **practice logs** ([011](../011-periodic-recap/spec.md)).
+- **`learning_piece` → `comfortable`** as its own recap line (if product expands beyond **`practice_log`** dates).
 - Rich setlist: BPM per track, energy curve, link to **004** artists.
 - Optional “released on” platform metadata; live-sync from DJ software.
 - Separate status **Répétition** for DJ practice vs public **Joué**.

@@ -12,9 +12,9 @@ Design refs: [plan.md](plan.md), [data-model.md](data-model.md), [contracts/](co
 
 ## Phase A — Weekly recap (US1)
 
-1. Seed (or use UI): one book → **Lu**, one film → **Vu**, one track → **Écouté**, one recipe cook this week, one **completed** workout this week.
+1. Seed (or use UI): one book → **Lu**, one film → **Vu**, one track → **Écouté**, **012** composition **Terminé** this week, **012** set **Joué** this week, **012** practice **Fait** (log) this week, one recipe cook this week, one **completed** workout this week.
 2. Go **offline** → bottom nav **Récap** → `/recap` loads with **Semaine** default.
-3. Verify sections **Livres**, **Films & séries**, **Musique**, **Recettes**, **Entraînement** with counts; lines show title + weekday.
+3. Verify sections **Livres**, **Films & séries**, **Musique** (écouté + terminé + joué + pratique lines), **Recettes**, **Entraînement** with counts; lines show title + weekday.
 4. Mark a série episode watched this week → **one line per episode** (series title + episode key).
 5. Clear all events → neutral empty state (no guilt copy).
 
@@ -33,9 +33,10 @@ Design refs: [plan.md](plan.md), [data-model.md](data-model.md), [contracts/](co
 
 1. Set viewport **≥ 768px** → grid visible at top (`data-testid="recap-activity-heatmap"`).
 2. Seed book finish + workout same day → cell shows **two vertical segments** (book + fitness colors).
-3. Film only another day → single-segment cell.
-4. Resize **< 768px** → heatmap absent; list unchanged.
-5. Legend shows French domain labels; focus/hover cell → domain names in tooltip/a11y.
+3. Seed track **écouté** + **012** practice log same day → **one** Musique segment (not two).
+4. Film only another day → single-segment cell.
+5. Resize **< 768px** → heatmap absent; list unchanged.
+6. Legend shows French domain labels; focus/hover cell → domain names in tooltip/a11y.
 
 ## Phase A — Daily and yearly (US4–US5, MVP v1)
 

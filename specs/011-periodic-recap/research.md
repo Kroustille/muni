@@ -17,6 +17,9 @@
 | **Séries** | 003 | Episode marked in **`episodeProgress`** | `watchedAt` on episode key `S{n}E{m}` | **One recap line per episode** in period (locked 2026-10-28); no weekly roll-up |
 | **Séries (whole)** | 003 | Status → **`watched`** | Same as films | Distinct from per-episode lines |
 | **Music tracks** | [004](../004-music-artists-tracks/spec.md) | Status → **`listened`** | `fieldsUpdatedAt.status` when entering `listened` | **Music artists** have rating only — **no** `listened` status → **exclude artists** from recap counts unless product adds status later |
+| **Music practice — composition** | [012](../012-music-practice/spec.md) | Status → **`finished`** (**Terminé**) | **`finishedAt`** (calendar date; backdate allowed) | Exclude `idea`, `in_progress`, `paused`, `archived` without finished signal; session notes alone do not count |
+| **Music practice — DJ set** | 012 | Status → **`performed`** (**Joué**) | **`performedAt`** | Exclude `planned`, `cancelled` |
+| **Music practice — apprentissage** | 012 | **`practice_log`** row (mark **Fait** or ad-hoc) | **`practicedAt`** | **One recap line per log** in period; **`learning_piece` → `comfortable`** alone **excluded** in MVP (logs only). Plan rows without log excluded |
 | **Recipes** | [001](../001-typed-lists-companion/spec.md) | **None today** | — | Requires new explicit signal (see below) |
 | **Fitness workouts** | [008](../008-fitness-training/spec.md) | Workout log **`completed`** | `completedAt` (fallback `calendarDate` at local day granularity if missing) | Exclude `abandoned`, `in_progress`; **skipped** planned sessions are **not** achievements |
 | **Fitness PRs** | 008 | New personal record on save | Derived at save time from log | **Optional post-v1** recap highlight (subsection), not MVP blocker |
@@ -58,7 +61,7 @@ Books and movies already define **activity days**, streaks, and **year goals** o
 
 | Concept | Rule |
 |---------|------|
-| **Active day** | Local calendar day with **≥ 1** recap-eligible event (union of FR-006 / table above) |
+| **Active day** | Local calendar day with **≥ 1** recap-eligible event (union of FR-006 / table above). **Musique**: any 004 **`listened`** or 012 **`finishedAt` / `performedAt` / `practicedAt`** counts toward **one** Musique segment |
 | **Visual MVP** | **Vertical micro-segments** inside each day cell: one equal-width column per **domain present** that day, left → right in **stable recap domain order** (Livres, Films & séries, Musique, Recettes, Entraînement). **Single-domain** day = full-cell fill in that domain’s accent. **No** intensity scale by event count in v1. |
 | **Domain colors** | Map each segment to the domain’s **design-system accent token**: book, movie, music_track, recipe list-type accents from 005 / `list-type-visual`; **Entraînement** uses fitness accent token (planning). Shopping and other out-of-recap domains never appear. |
 | **Segment cap** | Max **5** visible segment colors per cell (matches in-scope recap domains). If extensibility adds more contributors later, overflow domains appear in **tooltip + accessible name only** — not as extra strip colors beyond cap. |
@@ -80,7 +83,8 @@ Recap aggregation MUST be driven by a **registry of domain contributors** (conce
 | Heatmap window | **Trailing 365 local calendar days** ending today; **independent** of recap period switcher (OD-011-1) |
 | Heatmap breakpoint | **`md` (768px)** — hidden below, visible at sidebar layout widths |
 | Fitness segment color | **`#0d9488`** (app accent / fitness shell) |
-| Domain order | Livres → Films & séries → Musique → Recettes → Entraînement (`book`, `movie`, `music_track`, `recipe`, `fitness`) |
+| Domain order | Livres → Films & séries → Musique (004 + 012) → Recettes → Entraînement (`book`, `movie`, `music_track`, `recipe`, `fitness`) |
+| **012 dependency** | Music-practice recap lines require **012** stores on device; ship **012 foundation** before or with music-practice contributor tasks ([011 tasks](tasks.md) T1195–T1196; [012 plan](../012-music-practice/plan.md)) |
 | Bottom nav | **Récap** tab after FAB: Home, Search \| + \| Récap, Settings |
 | Aggregation API | Single `buildRecapSnapshot({ period, timeZone, deps })` in application layer; see [contracts/recap-aggregation-service.md](contracts/recap-aggregation-service.md) |
 

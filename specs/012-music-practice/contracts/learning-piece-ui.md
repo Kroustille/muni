@@ -21,4 +21,4 @@ Display « Piste supprimée » when linked track missing locally; allow clear li
 
 ## 011 note
 
-Only `practice_log.practicedAt` is recap-eligible in future 011 work — not status change alone unless product expands (research PD-012-5).
+Recap-eligible: **`practice_log.practicedAt`** per [011 FR-006](../011-periodic-recap/spec.md). **`learning_piece` → `comfortable`** alone is **not** recap-eligible in MVP — see [011 spec](../011-periodic-recap/spec.md) clarifications **2026-10-28 (Musique in recap)**.

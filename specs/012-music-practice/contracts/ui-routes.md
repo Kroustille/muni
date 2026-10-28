@@ -51,6 +51,6 @@ Segments may be sub-routes under `/music-practice/apprentissage/...` or a segmen
 
 No streak or guilt language (SC-004).
 
-## Deep links from future 011
+## Deep links from [011](../011-periodic-recap/spec.md)
 
-Recap lines MAY deep-link to composition detail, dj set detail, or apprentissage log list — **not implemented in 012**.
+Recap **Musique** lines MAY deep-link to composition detail, DJ set detail, or apprentissage context via `deepLinkHref` — implemented in **011** recap UI, not **012**.

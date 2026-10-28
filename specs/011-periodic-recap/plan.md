@@ -4,7 +4,7 @@
 
 **Input**: Feature specification from `/specs/011-periodic-recap/spec.md`
 
-**Depends on**: **001–007** foundation; **008** fitness workout logs locally available; recipe **`cookedDates`** ships as first 011 slice (see [research.md](research.md)). **Recommended after** stable **010** cookbook metadata if both land together — recap does not require 010 for aggregation.
+**Depends on**: **001–007** foundation; **008** fitness workout logs locally available; **012** music-practice entities locally available for Musique practice lines; recipe **`cookedDates`** ships as first 011 slice (see [research.md](research.md)). **Recommended after** stable **010** cookbook metadata and **012** sync if both land together — recap does not require 010 for aggregation.
 
 **Task band**: **T1101–T1194** (see [tasks.md](tasks.md)).
 
@@ -12,13 +12,13 @@
 
 ## Summary
 
-Ship a **read-only cross-domain Récap** at **`/recap`**: derive **`RecapAchievement`** rows and **`RecapActivityDay`** heatmap cells from **local stores only** (items + fitness logs) via a **registry of domain contributors** and a single **`buildRecapSnapshot`** application service. **MVP v1 (Phase A)**: **day**, ISO **week**, **calendar month**, and **calendar year** periods; **bottom-nav Récap**, optional **Accueil** weekly teaser, recipe **`cookedDates`** with **backdating**, **desktop-only** GitHub-style **multi-domain vertical-segment** activity heatmap. **Phase B (optional)**: fitness PR subsection (FR-015). No recap journal table, no server aggregation, no guilt copy (009 alignment).
+Ship a **read-only cross-domain Récap** at **`/recap`**: derive **`RecapAchievement`** rows and **`RecapActivityDay`** heatmap cells from **local stores only** (items + fitness logs + **012** music-practice stores) via a **registry of domain contributors** and a single **`buildRecapSnapshot`** application service. **MVP v1 (Phase A)**: **day**, ISO **week**, **calendar month**, and **calendar year** periods; **bottom-nav Récap**, optional **Accueil** weekly teaser, recipe **`cookedDates`** with **backdating**, **Musique** section (004 **écouté** + 012 **Terminé / Joué / Fait**), **desktop-only** GitHub-style **multi-domain vertical-segment** activity heatmap. **Phase B (optional)**: fitness PR subsection (FR-015); **learning_piece → comfortable** recap lines if product expands. No recap journal table, no server aggregation, no guilt copy (009 alignment).
 
 ## Technical Context
 
 **Language/Version**: TypeScript 5.9, Node ≥22, Next.js 16+ (per 006 on `main`)
 
-**Primary Dependencies**: Existing hexagonal stack; `LIST_TYPE_VISUAL` accents; book `reading-activity` / `book-stats` finish rules; movie `watch-activity` / episode progress; music track status; fitness workout repository (008); period math via `Intl` + shared **`Europe/Paris`** default timezone constant (reuse book/movie patterns until global preference)
+**Primary Dependencies**: Existing hexagonal stack; `LIST_TYPE_VISUAL` accents; book `reading-activity` / `book-stats` finish rules; movie `watch-activity` / episode progress; music track status; **012** composition / DJ / practice-log repositories; fitness workout repository (008); period math via `Intl` + shared **`Europe/Paris`** default timezone constant (reuse book/movie patterns until global preference)
 
 **Storage**: **No new Postgres tables for recap**. Recipe extension: **`cookedDates: string[]`** on `items` (recipe type) as LWW json field + sync patch. All recap view models computed at read time in application layer.
 
@@ -79,7 +79,8 @@ src/application/recap/
   contributors/
     books-contributor.ts
     movies-contributor.ts
-    music-contributor.ts
+    music-tracks-contributor.ts       # 004 listened → domainId music_track
+    music-practice-contributor.ts     # 012 finishedAt, performedAt, practice_log
     recipes-contributor.ts
     fitness-contributor.ts
   recap-activity-days.ts               # heatmap derivation from achievements
@@ -108,7 +109,7 @@ Aligned with spec **Phase A (MVP v1) → B (optional)**:
 | Ship batch | Spec phase | User stories | Outcome |
 |------------|------------|--------------|---------|
 | **1 — Recipe signal** | A prereq | — | `cookedDates` schema, sync, record-cooked use case + recipe detail UI (backdate) |
-| **2 — Aggregation core** | A | US1, US2, US4, US5, US6 | Period math (all four granularities), contributors, grouped list VM, unit tests |
+| **2 — Aggregation core** | A | US1, US2, US4, US5, US6 | Period math (all four granularities), contributors (incl. **012** when stores exist), grouped list VM, unit tests |
 | **3 — Route & nav** | A | US3 | `/recap`, bottom-nav **Récap**, optional home teaser |
 | **4 — Period UI** | A | US2, US4, US5 | Semaine / Mois / Aujourd’hui (or Hier) / Cette année controls + prev/next; month labels on yearly lines |
 | **5 — Desktop heatmap** | A | US7 | Multi-segment grid, legend, a11y, trailing window |
@@ -122,7 +123,8 @@ Aligned with spec **Phase A (MVP v1) → B (optional)**:
 | OD-011-2 | Heatmap breakpoint | **`md` (768px)** — match `BottomNav` `md:hidden` / sidebar `md:flex` |
 | OD-011-3 | Fitness heatmap accent | **`#0d9488`** — same as app `--accent` / fitness shell (not a list-type row) |
 | OD-011-4 | Default timezone | **`Europe/Paris`** — export `DEFAULT_RECAP_TIMEZONE` aliasing book/movie constants until user TZ preference |
-| OD-011-5 | Stable domain order | `book` → `movie` → `music_track` → `recipe` → `fitness` (French section labels via i18n) |
+| OD-011-5 | Stable domain order | `book` → `movie` → `music_track` → `recipe` → `fitness` (French **Musique** = 004 + 012 events; one heatmap segment) |
+| OD-011-8 | **012 gate** | Implement **`music-practice-contributor`** only after **012** Phase 2 checkpoint (repos + local stores); track contributor may ship earlier |
 | OD-011-6 | Bottom nav layout | **Home, Search \| + \| Récap, Settings** — Récap inserted post-FAB per [contracts/bottom-nav.md](contracts/bottom-nav.md) |
 | OD-011-7 | Home teaser | **Ship in MVP v1** behind simple predicate (≥0 achievements); gentle copy only |
 

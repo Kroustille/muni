@@ -45,10 +45,11 @@ Output: RecapPeriod with sensible default anchor (e.g. today for week/month/day;
 
 | Port | Used by |
 |------|---------|
-| `ItemRepository.listAll()` (or existing list use case) | book, movie, music, recipe contributors |
+| `ItemRepository.listAll()` (or existing list use case) | book, movie, music tracks, recipe contributors |
 | `FitnessWorkoutRepository.listCompleted()` | fitness contributor |
+| **012** `MusicCompositionRepository`, `DjSetRepository`, `PracticeLogRepository` (list non-deleted) | music practice contributor |
 
-No network calls. Reads reflect current IndexedDB (+ in-memory fitness) state.
+No network calls. Reads reflect current IndexedDB (+ in-memory fitness + **012** stores) state.
 
 ## Contributor interface
 
@@ -61,7 +62,9 @@ export const booksRecapContributor: DomainRecapContributor = {
 };
 ```
 
-**Registry** (`contributors/index.ts`): ordered array `[books, movies, music, recipes, fitness]`.
+**Registry** (`contributors/index.ts`): ordered array `[books, movies, musicTracks, musicPractice, recipes, fitness]`.
+
+**Musique grouping**: `musicTracks` and `musicPractice` both emit `domainId: "music_track"` (French section **Musique**). Snapshot builder merges into one `RecapSection` and dedupes **`domainsPresent`** to a single Musique entry per calendar day for heatmap.
 
 Adding a domain = new contributor + i18n section label + heatmap accent mapping — **no change** to route or snapshot orchestrator signature.
 
@@ -71,7 +74,8 @@ Adding a domain = new contributor + i18n section label + heatmap accent mapping 
 |-------------|----------------------|
 | Books | Finish `read`; instant from `fieldsUpdatedAt.read` ?? status transition ([002](../002-books-library/spec.md)) |
 | Movies | `watchedAt`, episode `episodeProgress` ([003](../003-films-tv-library/spec.md)); **one line per episode** |
-| Music | Tracks `listened` only ([004](../004-music-artists-tracks/spec.md)) |
+| Music (004) | Tracks `listened` only ([004](../004-music-artists-tracks/spec.md)); `domainId` **`music_track`** |
+| Music practice (012) | `music_composition` **`finished`** + **`finishedAt`**; `dj_set` **`performed`** + **`performedAt`**; **`practice_log.practicedAt`** ([012](../012-music-practice/data-model.md)); same **`music_track`** domainId; one line per log |
 | Recipes | `cookedDates` entries ([recipe-cooked-dates.md](recipe-cooked-dates.md)) |
 | Fitness | `completed` + `completedAt` / `calendarDate` ([008](../008-fitness-training/spec.md)) |
 
@@ -85,7 +89,9 @@ Adding a domain = new contributor + i18n section label + heatmap accent mapping 
 | Test file | Covers |
 |-----------|--------|
 | `tests/unit/recap/period.test.ts` | ISO week, month edges, prev/next |
-| `tests/unit/recap/*-contributor.test.ts` | Each domain edge cases from spec |
+| `tests/unit/recap/*-contributor.test.ts` | Books, movies, recipes, fitness edge cases |
+| `tests/unit/recap/music-tracks-contributor.test.ts` | 004 listened |
+| `tests/unit/recap/music-practice-contributor.test.ts` | 012 finished / performed / practice_log |
 | `tests/unit/recap/build-recap-snapshot.test.ts` | Grouping, sort, omit empty sections, soft delete |
 | `tests/unit/recap/activity-days.test.ts` | Multi-domain same day, 365 window |
 

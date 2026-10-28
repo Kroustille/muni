@@ -122,7 +122,8 @@
 - [ ] T1280 Soft-delete restore flows for each entity (foundation pattern)
 - [ ] T1281 Orphan `linkedTrackId` / setlist track display copy
 - [ ] T1282 SC-004 copy review checklist in e2e or unit snapshot for empty states
-- [ ] T1283 Document 011 contributor hook points in code comments referencing FR-013 (no 011 code)
+- [ ] T1283 Document recap-eligible fields (`finishedAt`, `performedAt`, `practicedAt`) in domain JSDoc referencing [011 FR-006](../011-periodic-recap/spec.md)
+- [ ] T1284 Cross-check [011 tasks](../011-periodic-recap/tasks.md) T1195–T1196 after **012** Phase 2 checkpoint (repos wired)
 - [ ] T1290 Run `yarn verify:ci` and fix regressions
 - [ ] T1291 Update [quickstart.md](quickstart.md) if routes differ from implementation
 - [ ] T1292 Mark completed tasks in this file when shipping

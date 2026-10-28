@@ -48,7 +48,8 @@ Invalid query → fall back to defaults.
 ## i18n keys (minimum set)
 
 - `recap.nav`, `recap.title`, `recap.period.week`, `recap.period.month`, `recap.period.day`, `recap.period.year`
-- `recap.prev`, `recap.next`, `recap.empty`, `recap.section.*` (per domain)
+- `recap.prev`, `recap.next`, `recap.empty`, `recap.section.*` (per domain — **Musique** covers 004 + 012 line kinds)
+- `recap.music.line.listened`, `recap.music.line.compositionFinished`, `recap.music.line.djPerformed`, `recap.music.line.practiceSession`
 - `recap.homeTeaser.title`, `recap.homeTeaser.cta`
 - `recap.heatmap.legend`, `recap.heatmap.a11yDay`
 

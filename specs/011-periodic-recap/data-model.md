@@ -41,7 +41,7 @@ Closed enum MVP (stable order FR-016 / heatmap):
 |-----------------|----------------|--------------|
 | `book` | Livres | `items` type `book`, status `read` |
 | `movie` | Films & séries | `items` type `movie`, film `watched` + episode `episodeProgress` |
-| `music_track` | Musique | `items` type `music_track`, status `listened` |
+| `music_track` | Musique | **004** `items` type `music_track`, status `listened`; **012** `music_composition` (`finished` + `finishedAt`), `dj_set` (`performed` + `performedAt`), `practice_log` (`practicedAt`) |
 | `recipe` | Recettes | `items` type `recipe`, `cookedDates` entries in period |
 | `fitness` | Entraînement | `fitness_workout_log` status `completed` |
 
@@ -54,10 +54,14 @@ Built at read time; one row per qualifying **event** in period.
 | `domainId` | `RecapDomainId` | |
 | `occurredOn` | `string` | `YYYY-MM-DD` local bucket for display + sort |
 | `sortInstant` | `string` | ISO timestamp for tie-break (newest first within domain) |
-| `title` | `string` | Book/film/track/recipe title or workout session title |
-| `subtitle` | `string?` | Episode key (`S1E3`), series name, etc. |
-| `sourceItemId` | `string?` | Item id when from `items` |
+| `title` | `string` | Book/film/track/recipe title, workout session title, composition title, DJ set title, or practice line label |
+| `subtitle` | `string?` | Episode key (`S1E3`), series name, French line kind (« Écouté », « Composition terminée », « Set joué », « Séance de pratique »), exercise/piece names for logs |
+| `musicLineKind` | enum? | When `domainId === music_track`: `listened` \| `composition_finished` \| `dj_performed` \| `practice_session` — drives i18n template |
+| `sourceItemId` | `string?` | Item id when from `items` (book, movie, track, recipe) |
 | `sourceWorkoutId` | `string?` | Fitness log id when from fitness store |
+| `sourceCompositionId` | `string?` | **012** composition id |
+| `sourceDjSetId` | `string?` | **012** DJ set id |
+| `sourcePracticeLogId` | `string?` | **012** practice log id |
 | `deepLinkHref` | `string?` | Optional navigation to detail (read-only recap) |
 
 **Exclusion rules (FR-007, FR-014)**:
@@ -67,6 +71,9 @@ Built at read time; one row per qualifying **event** in period.
 - Books: only transition to **`read`** (use finish instant rules from `book-stats` / `fieldsUpdatedAt.read`).
 - Films: **`watched`** with `watchedAt` or status day; episodes: one line per `episodeProgress` entry with `watchedAt` in period.
 - Tracks: **`listened`** with status transition day.
+- **012 compositions**: status **`finished`**; **`occurredOn` := `finishedAt`** (required when finished).
+- **012 DJ sets**: status **`performed`**; **`occurredOn` := `performedAt`**.
+- **012 practice logs**: **one line per log** with **`practicedAt`** in period (same pattern as recipe dates); optional subtitle from linked exercise / learning piece titles.
 - Recipes: **one line per `cookedDates` entry** in period (same recipe twice → two lines if two dates).
 - Fitness: **`completed`** with `completedAt` or fallback `calendarDate`.
 
@@ -87,7 +94,7 @@ Built at read time; one row per qualifying **event** in period.
 | Field | Type | Rules |
 |-------|------|-------|
 | `calendarDate` | `string` | `YYYY-MM-DD` |
-| `domainsPresent` | `RecapDomainId[]` | Unique domains with ≥1 achievement that day; **ordered** per stable domain order |
+| `domainsPresent` | `RecapDomainId[]` | Unique domains with ≥1 achievement that day; **ordered** per stable domain order. **Musique**: at most **one** entry in array even if multiple 004/012 event types occurred |
 | `eventCount` | `number` | Total achievements that day (tooltip/a11y optional) |
 | `isActive` | `boolean` | `domainsPresent.length > 0` |
 
@@ -109,6 +116,6 @@ Built at read time; one row per qualifying **event** in period.
 |----------------|--------|
 | `domainId` | Stable id |
 | `collectAchievements` | `(deps, { startDate, endDate, timeZone }) → RecapAchievement[]` |
-| Dependencies | Injected ports: `ItemRepository`, fitness workout repo, etc. |
+| Dependencies | Injected ports: `ItemRepository`, fitness workout repo, **012** music-practice repos (composition, dj_set, practice_log) |
 
 Registry order MUST match `RecapDomainId` table order.

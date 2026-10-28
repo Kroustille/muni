@@ -14,7 +14,7 @@
 | **Status model** | Track: `to_listen` / `listened`; artist: rating only | Composition / DJ / learning-piece statuses per workflow |
 | **Completion signal** | **`listened`** on a **consumption** row | **`finished`**, **`performed`**, **`practice_log.practicedAt`**, learning **status** |
 | **Typical fields** | Album, year, recording MBID | Session notes, setlist, venue, exercise plan, instrument name |
-| **011 recap today** | Listened **tracks** included ([011 research](../011-periodic-recap/research.md)) | **Future** contributors: finished compositions, performed sets, **practice logs** (not in 012 v1 scope) |
+| **011 recap** | Listened **tracks** + **012** practice dates in **Musique** section ([011 research](../011-periodic-recap/research.md)) | **012** persists timestamps; **011** aggregates ([tasks](../011-periodic-recap/tasks.md) T1195–T1196) |
 | **Analogy in Muni** | Books/films **library** | **[010](../010-recipe-source-book/spec.md) cookbooks** vs **[002](../002-books-library/spec.md) reading list** — same theme, different domain |
 
 **Conclusion**: Keep **012** as a **new numbered feature**. Optional **P2** links from **learning_piece** / composition / setlist → 004 track ids are references only, like recipe → cookbook, not a merge.
@@ -87,7 +87,7 @@
 | PD-012-2 | Sync channel | Dedicated **`/api/sync/music-practice/*`** (or split sub-routes) for all 012 persisted entities — mirror **008 fitness** + **010 cookbooks** |
 | PD-012-3 | Migration band | **`0016_music_practice_tables.ts`** after **0015** cookbooks (010); compositions, dj_set, instrument entities in one migration family |
 | PD-012-4 | Active plan | Exactly one **`isActive`** practice plan per user (MVP) |
-| PD-012-5 | 011 timing | Register **`practice_log`** contributor in follow-up 011 task — 012 only persists **practicedAt** |
+| PD-012-5 | **011 integration** | [011 spec](../011-periodic-recap/spec.md) locked **2026-10-28** — **`practice_log`**, composition **Terminé**, DJ **Joué**; 012 ships data, 011 ships contributors |
 | PD-012-6 | Learning default status | **`learning` (En apprentissage)** on quick-add |
 | PD-012-7 | Mark done | Creates **`practice_log`**; updates **`learning_piece.lastPracticedAt`** when linked |
 

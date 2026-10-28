@@ -28,7 +28,8 @@ Built from `RecapSnapshot.activityDays` (see [recap-aggregation-service.md](reca
 - GitHub-style **week-column grid** (weeks as columns, weekdays as rows) OR horizontal scroll month grid — implementation choice if week columns match books insights; must show **~365 days**.
 - **Inactive day**: neutral border/fill (`bg-muted` or equivalent).
 - **Active day, one domain**: **full cell** fill with that domain’s accent.
-- **Active day, multiple domains**: cell interior split into **vertical micro-segments** (equal width, left→right) in stable domain order; each segment uses domain accent from table:
+- **Active day, multiple domains**: cell interior split into **vertical micro-segments** (equal width, left→right) in stable domain order; each segment uses domain accent from table.
+- **Active day, Musique only**: **full cell** fill with music track accent even when multiple 012 event types occurred (still **one** segment).
 
 | Domain | Accent source |
 |--------|----------------|
@@ -69,7 +70,7 @@ Heatmap always reflects **trailing 365 local days** (OD-011-1), **not** the sele
 
 ## Testing
 
-- Unit: segment layout given `domainsPresent` permutations (1, 2, 5 domains).
+- Unit: segment layout given `domainsPresent` permutations (1, 2, 5 domains); **same day** track listened + composition finished → **one** Musique segment.
 - Playwright desktop viewport: heatmap visible; multi-segment cell when seeded; narrow viewport hidden (US7 scenarios 1–4).
 - a11y: active cell accessible name includes domain names (scenario 5).
 

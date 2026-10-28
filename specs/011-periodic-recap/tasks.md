@@ -2,7 +2,7 @@
 
 **Input**: `/specs/011-periodic-recap/`
 
-**Prerequisites**: Features **001–007**; **008** fitness logs on `main`. Design docs: [plan.md](plan.md), [spec.md](spec.md), [research.md](research.md), [data-model.md](data-model.md), [contracts/](contracts/), [quickstart.md](quickstart.md).
+**Prerequisites**: Features **001–007**; **008** fitness logs on `main`; **012** music-practice on `main` before Musique practice recap lines. Design docs: [plan.md](plan.md), [spec.md](spec.md), [research.md](research.md), [data-model.md](data-model.md), [contracts/](contracts/), [quickstart.md](quickstart.md). Cross-ref: [012 tasks](../012-music-practice/tasks.md) T1284.
 
 **Task IDs**: **T1101–T1194** (feature 011 band).
 
@@ -26,8 +26,8 @@
 - [ ] T1107 Recipe detail UI: **Cuisiné** + backdate picker in recipe detail route/components (depends on T1106)
 - [ ] T1108 Unit tests ISO week/month/day/year bounds + prev/next in `tests/unit/recap/period.test.ts`
 - [ ] T1109 Implement `src/application/recap/period.ts` (depends on T1108)
-- [ ] T1110 Unit tests per domain contributor (books, movies/episodes, music, recipes, fitness) in `tests/unit/recap/*-contributor.test.ts`
-- [ ] T1111 Implement `src/application/recap/contributors/*.ts` + registry per [contracts/recap-aggregation-service.md](contracts/recap-aggregation-service.md) (depends on T1110, T1106)
+- [ ] T1110 Unit tests per domain contributor (books, movies/episodes, music tracks, **music practice 012**, recipes, fitness) in `tests/unit/recap/*-contributor.test.ts`
+- [ ] T1111 Implement `src/application/recap/contributors/*.ts` + registry per [contracts/recap-aggregation-service.md](contracts/recap-aggregation-service.md) (depends on T1110, T1106, **012** repos for practice contributor)
 - [ ] T1112 Unit tests snapshot grouping, sort, empty-section omission, soft-delete in `tests/unit/recap/build-recap-snapshot.test.ts`
 - [ ] T1113 Implement `buildRecapSnapshot`, `buildActivityDays` in `src/application/recap/build-recap-snapshot.ts` + `recap-activity-days.ts` (depends on T1111, T1112, T1109)
 - [ ] T1114 Unit tests heatmap window (365 days) and multi-domain `domainsPresent` in `tests/unit/recap/activity-days.test.ts` (depends on T1113)
@@ -46,7 +46,7 @@
 - [ ] T1121 [US1] `recap-domain-sections.tsx` — section headers with counts, lines newest-first (depends on T1120)
 - [ ] T1122 [US1] Neutral empty state component when `snapshot.empty` (depends on T1120)
 - [ ] T1123 [US1] Route `src/app/(app)/recap/page.tsx` shell (depends on T1121, T1122)
-- [ ] T1124 [US1] Unit/integration tests for weekly aggregation acceptance scenarios 1–7 in `tests/unit/recap/build-recap-snapshot.test.ts` (extend)
+- [ ] T1124 [US1] Unit/integration tests for weekly aggregation acceptance scenarios 1–10 in `tests/unit/recap/build-recap-snapshot.test.ts` (extend)
 
 ---
 
@@ -131,6 +131,8 @@
 - [ ] T1192 Session refresh: home teaser count updates after mark-read without full reload (SC-005) — wire store subscription or revalidate on focus
 - [ ] T1193 Run `yarn verify:ci` and fix regressions
 - [ ] T1194 Optional Phase B: fitness PR subsection under **Entraînement** (FR-015) — defer until post-v1 if needed
+- [ ] T1195 Unit tests **012** music-practice recap rules (`finishedAt`, `performedAt`, `practicedAt`, soft-delete) in `tests/unit/recap/music-practice-contributor.test.ts` (depends on **012** T1216)
+- [ ] T1196 Implement `music-practice-contributor.ts` + extend Musique section i18n line templates (depends on T1195, T1111)
 
 ---
 
@@ -153,4 +155,4 @@ Phase 10 last
 
 ## Task count
 
-**Total tasks**: **44** (T1101–T1194)
+**Total tasks**: **46** (T1101–T1196)

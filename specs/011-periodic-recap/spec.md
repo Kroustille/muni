@@ -8,9 +8,9 @@
 
 **Status**: Specified — product decisions locked **2026-10-28** (Valentin); planning and implementation pending
 
-**Input**: Valentin wants a **read-only periodic recap** of what was done in Muni — finished books, watched films/séries, cooked recipes, completed fitness workouts, listened tracks, and extensible hooks for future domains — aggregated from **existing local data** and **explicit completion events**. French UI, offline-first, celebratory companion tone aligned with [009](../009-experiences-achievements/spec.md) (**no guilt**, no social comparison). Not a separate journal unless completion is already recorded in domain data.
+**Input**: Valentin wants a **read-only periodic recap** of what was done in Muni — finished books, watched films/séries, cooked recipes, completed fitness workouts, **Musique** (tracks **écoutés** plus **012** practice completions), and extensible hooks for future domains — aggregated from **existing local data** and **explicit completion events**. French UI, offline-first, celebratory companion tone aligned with [009](../009-experiences-achievements/spec.md) (**no guilt**, no social comparison). Not a separate journal unless completion is already recorded in domain data.
 
-**Depends on**: Foundation (**001**), books (**002**), films & TV (**003**), music tracks (**004**), fitness (**008**). **Recipe cooked signal** is a **prerequisite slice** (see [research.md](research.md)) — may ship in 001/010 amendment or as first task of 011 implementation. **Recommended after** fitness (**008**) and any in-flight **010** cookbook-source work are stable enough to avoid merge thrash; recap itself does not require 010 for cookbook metadata.
+**Depends on**: Foundation (**001**), books (**002**), films & TV (**003**), music tracks (**004**), fitness (**008**), music practice (**012**) for composition / DJ / apprentissage recap lines. **Recipe cooked signal** is a **prerequisite slice** (see [research.md](research.md)) — may ship in 001/010 amendment or as first task of 011 implementation. **Recommended after** fitness (**008**), **012** music-practice stores locally available, and any in-flight **010** cookbook-source work are stable enough to avoid merge thrash; recap itself does not require 010 for cookbook metadata.
 
 **Serves**: [009](../009-experiences-achievements/spec.md) north star (visibility of discovery and milestones over time) without implementing 009’s non-scheduled “fil de vie” or new experience entities.
 
@@ -22,7 +22,7 @@
 |--------|----------|
 | Data model for recap | **No new recap journal table** in MVP — compute from domain items + fitness logs (+ recipe `cookedDates` when added) |
 | Shopping | **Excluded** from recap achievements |
-| Music | **Tracks** with `listened` included; **artists** excluded (no finish status) |
+| Music | **Single section Musique** (MVP): **004** tracks **`listened`**; **012** **`music_composition` → `finished`** (**`finishedAt`**), **`dj_set` → `performed`** (**`performedAt`**), **`practice_log`** rows (**`practicedAt`** from mark **Fait** or ad-hoc log). **Artists** excluded; **012** planned/cancelled sets and non-**Terminé** compositions excluded; **learning_piece** status alone excluded (only **`practice_log`** dates for apprentissage) |
 | Fitness | **`completed`** workouts only; skipped / abandoned excluded |
 | Tone | Celebratory, optional empty states (“Rien de marqué cette semaine — et c’est ok”) — **no** guilt, streak loss, or comparison copy |
 | Notifications | **Out of scope** MVP (future optional prompt) |
@@ -46,6 +46,15 @@
 |--------|----------|
 | **Heatmap accents** | **Multi-domain** per day — vertical micro-segments with domain accent tokens; legend + tooltip/a11y text; **not** binary single-accent MVP. Mobile heatmap remains **hidden**. |
 
+### Session 2026-10-28 (Valentin — Musique in recap, 011)
+
+| Topic | Decision |
+|--------|----------|
+| **Musique list section** | **One** domain block **Musique** (stable order unchanged). Lines distinguish event kind via French subtitle/template (écouté, composition terminée, set joué, séance de pratique) — **no** separate recap domain per 012 workflow in MVP. |
+| **012 signals** | **Terminé** → **`finishedAt`**; **Joué** → **`performedAt`**; **Fait** / ad-hoc → **`practice_log.practicedAt`** ([012 data-model](../012-music-practice/data-model.md)). |
+| **Heatmap** | Still **one Musique segment** per day if **any** eligible Musique event (004 or 012) occurred; multiple music event types the same day do **not** add extra segments. |
+| **Periods** | Four-period v1 (**day / week / month / year**) unchanged. |
+
 ## User Scenarios & Testing *(mandatory)*
 
 ### User Story 1 - Weekly recap across domains (Priority: P1 — MVP Phase A)
@@ -61,10 +70,13 @@ A signed-in user opens **Récap** and sees **this week** (ISO week, Monday–Sun
 1. **Given** a book transitioned to **`read`** with finish timestamp falling in the current week, **When** the user opens weekly recap, **Then** that book appears under **Livres** with title and day.
 2. **Given** a film marked **`watched`** this week, **When** recap loads, **Then** it appears under **Films & séries**.
 3. **Given** a série episode with **`watchedAt`** this week, **When** recap loads, **Then** an episode line appears (series title + episode key or equivalent French label).
-4. **Given** a track with status **`listened`** this week, **When** recap loads, **Then** it appears under **Musique**.
-5. **Given** a recipe with **`cookedDates`** containing a date this week, **When** recap loads, **Then** it appears under **Recettes** (one line per date entry in period).
-6. **Given** a fitness workout log with status **`completed`** and **`completedAt`** this week, **When** recap loads, **Then** it appears under **Entraînement** with session title and day.
-7. **Given** no qualifying events in the week, **When** recap loads, **Then** a **neutral, non-guilt** empty state appears (no “you failed” framing).
+4. **Given** a track with status **`listened`** this week, **When** recap loads, **Then** it appears under **Musique** (line kind **écouté**).
+5. **Given** a **012** composition with status **`finished`** and **`finishedAt`** this week, **When** recap loads, **Then** it appears under **Musique** (composition terminée + date).
+6. **Given** a **012** DJ set with status **`performed`** and **`performedAt`** this week, **When** recap loads, **Then** it appears under **Musique** (set joué + date).
+7. **Given** a **012** **`practice_log`** with **`practicedAt`** this week (from **Fait** or ad-hoc), **When** recap loads, **Then** it appears under **Musique** (séance de pratique + date; optional exercise/piece title in subtitle).
+8. **Given** a recipe with **`cookedDates`** containing a date this week, **When** recap loads, **Then** it appears under **Recettes** (one line per date entry in period).
+9. **Given** a fitness workout log with status **`completed`** and **`completedAt`** this week, **When** recap loads, **Then** it appears under **Entraînement** with session title and day.
+10. **Given** no qualifying events in the week, **When** recap loads, **Then** a **neutral, non-guilt** empty state appears (no “you failed” framing).
 
 ---
 
@@ -156,7 +168,7 @@ On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activ
 |--------------|----------------|
 | Livres | Book list-type accent |
 | Films & séries | Movie list-type accent |
-| Musique (tracks) | Music track list-type accent |
+| Musique (004 écouté + 012 practice) | Music track list-type accent (single segment for all Musique events) |
 | Recettes | Recipe list-type accent |
 | Entraînement | Fitness domain accent (planning) |
 
@@ -178,7 +190,7 @@ On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activ
 6. **Given** the heatmap is visible, **When** the user views the grid, **Then** a **legend** maps each accent to its French domain label.
 7. **Given** user selects previous month/week in period control, **When** on desktop, **Then** heatmap range behavior follows planning default (fixed trailing window **or** sync to selected period — document in plan; spec requires heatmap presence on desktop recap).
 
-**Activity day definition (normative)**: For each local calendar day, compute **`domainsPresent`**: the set of recap domains (FR-006) with **≥ 1** eligible event bucketed to that day. Day is **active** iff `domainsPresent` is non-empty. Same event sources as list aggregation (books `read`, films/séries watched, episode `watchedAt`, tracks `listened`, recipe `cookedDates` entries, fitness `completed`).
+**Activity day definition (normative)**: For each local calendar day, compute **`domainsPresent`**: the set of recap domains (FR-006) with **≥ 1** eligible event bucketed to that day. Day is **active** iff `domainsPresent` is non-empty. Same event sources as list aggregation (books `read`, films/séries watched, episode `watchedAt`, tracks `listened`, **012** composition **`finished`/`finishedAt`**, DJ **`performed`/`performedAt`**, **`practice_log.practicedAt`**, recipe `cookedDates` entries, fitness `completed`). Multiple Musique event types on one day still yield **one** Musique segment.
 
 ---
 
@@ -201,8 +213,8 @@ On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activ
 - **FR-003**: Recap MUST compute from **local on-device data** (IndexedDB and local fitness stores) without requiring network.
 - **FR-004**: **MVP v1** MUST support **daily** (single calendar day), **weekly** (ISO), **monthly**, and **yearly** (calendar year) periods with previous/next navigation for the selected granularity.
 - **FR-005**: All four period types MUST use the **same aggregation rules** (FR-006, FR-016); only period boundaries and labels differ.
-- **FR-006**: Recap MUST include achievements from: books **`read`**, films/séries **`watched`** and **episode `watchedAt`**, music tracks **`listened`**, recipes with **`cookedDates`** in period, fitness workouts **`completed`**.
-- **FR-007**: Recap MUST **exclude** shopping check-offs, music **artist-only** rows, fitness **skipped/abandoned** sessions, and quote creation events.
+- **FR-006**: Recap MUST include achievements from: books **`read`**, films/séries **`watched`** and **episode `watchedAt`**, **Musique** — music tracks **`listened`**; **`music_composition`** with status **`finished`** bucketed by **`finishedAt`**; **`dj_set`** with status **`performed`** bucketed by **`performedAt`**; **`practice_log`** rows bucketed by **`practicedAt`** ([012](../012-music-practice/spec.md)); recipes with **`cookedDates`** in period; fitness workouts **`completed`**.
+- **FR-007**: Recap MUST **exclude** shopping check-offs, music **artist-only** rows, **012** non-**Terminé** compositions, **Prévu**/**Annulé** DJ sets, **`practice_plan`** assignments without a **`practice_log`**, **learning_piece** status changes without a log date, fitness **skipped/abandoned** sessions, and quote creation events.
 - **FR-008**: Each achievement line MUST show at minimum **domain**, **title** (or session title), and **calendar date** within the selected period.
 - **FR-009**: Section headers MUST use celebratory/neutral French copy; MUST NOT use guilt, loss, or social comparison language (009 anti-patterns).
 - **FR-010**: Bottom navigation MUST include a **Récap** item routing to **`/recap`**. Accueil MAY show an optional weekly summary card linking to `/recap`; bottom nav remains the primary entry.
@@ -220,7 +232,7 @@ On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activ
 ### Key Entities *(conceptual — mostly derived)*
 
 - **RecapPeriod**: `{ granularity: week \| month \| day \| year, anchorDate }` — selection state in UI, not persisted server-side in MVP.
-- **RecapAchievement** (derived view model): `{ domainId, occurredOn, title, subtitle?, sourceItemId?, sourceWorkoutId?, sortInstant }` — built at read time.
+- **RecapAchievement** (derived view model): `{ domainId, occurredOn, title, subtitle?, musicLineKind?, sourceItemId?, sourceWorkoutId?, sourceCompositionId?, sourceDjSetId?, sourcePracticeLogId?, sortInstant }` — built at read time. **`musicLineKind`** (when `domainId` is Musique): `listened` \| `composition_finished` \| `dj_performed` \| `practice_session`.
 - **DomainRecapContributor** (conceptual registry): maps domain to rules for extracting `RecapAchievement[]` from local stores.
 - **Recipe item extension**: **`cookedDates`**: `string[]` ISO dates on recipe items (see [research.md](research.md)).
 - **RecapActivityDay** (derived): `{ calendarDate, eventCount, domainsPresent: DomainId[], isActive }` — for heatmap; `domainsPresent` ordered per FR-016 domain order; `isActive := domainsPresent.length ≥ 1`; `eventCount` optional for tooltip/a11y.
@@ -241,6 +253,7 @@ On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activ
 - **`cookedDates`** on recipes is acceptable as a small 001 data-model extension (or bundled with first 011 implementation PR); v1 includes **backdated** cook dates.
 - Domain year goals and domain-specific activity heatmaps on book/movie screens **remain independent**; `/recap` yearly view is **standalone** and does not replace or link-require those screens.
 - Fitness **008** workout logs are synced and available locally before fitness lines appear in recap.
+- **012** music-practice entities are synced and available locally before composition / DJ / practice-log lines appear in recap; track **listened** lines still use **004** `items` only.
 - Recap **activity heatmap** on `/recap` is **desktop-only**; mobile users rely on period lists and bottom-nav **Récap** without a contribution grid.
 
 ## Out of Scope (MVP)
@@ -249,7 +262,7 @@ On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activ
 - Sharing recap externally or social feeds
 - Unified **fil de vie** timeline with arbitrary filtering (009 future direction)
 - Editing achievements or manual “life moment” entries not tied to domain completion
-- Shopping, artist-only music rows, reading **activity** days that are not **finished read**
+- Shopping, artist-only music rows, **012** session notes / setlist edits without status dates, reading **activity** days that are not **finished read**
 - **Mobile / narrow viewport** rendering of the GitHub-style activity heatmap (explicitly out of scope — hidden)
 - Server-side pre-aggregation tables or new sync entities for recap alone
 - AI-generated narrative summaries
