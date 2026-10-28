@@ -103,6 +103,44 @@ describe("quote sync engine", () => {
     expect(result.quarantined[0]?.message).toMatch(/missing local quote/i);
   });
 
+  it("pulls multiple pages when server returns full batches", async () => {
+    const { engine, metaRepo, remoteStore } = setup();
+    for (let i = 0; i < 6; i++) {
+      remoteStore.set(`id-${i}`, {
+        id: `00000000-0000-4000-8000-${String(i).padStart(12, "0")}`,
+        text: `Q${i}`,
+        server_updated_at: new Date(Date.UTC(2026, 0, 1, 0, 0, i + 1)).toISOString(),
+      });
+    }
+    const pullLimit = 2;
+    const eng = createQuoteSyncEngine<Quote, Wire>({
+      repository: {
+        get: async () => undefined,
+        outbox: async () => [],
+        clearOutbox: async () => {},
+      },
+      meta: metaRepo.meta,
+      remote: {
+        push: async (wires) => wires,
+        pull: async (since, limit) => {
+          const quotes = [...remoteStore.values()]
+            .filter((row) => since === null || (row.server_updated_at ?? "") > since)
+            .sort((a, b) => (a.server_updated_at ?? "").localeCompare(b.server_updated_at ?? ""))
+            .slice(0, limit);
+          return { quotes, cursor: quotes.at(-1)?.server_updated_at ?? "" };
+        },
+      },
+      quotes: { applyRemote: async () => {} },
+      pullLimit,
+      sleep: async () => {},
+      pullCursorMetaKey: "quotePullCursor",
+      toWire: (quote) => ({ id: quote.id, text: quote.text }),
+      safeParseWire: (wire) => ({ success: true, data: wire }),
+    });
+    await eng.run();
+    expect(await metaRepo.meta.get("quotePullCursor")).toBeTruthy();
+  });
+
   it("pauses on unauthenticated errors until resumed", async () => {
     vi.useFakeTimers();
     let deny = true;
