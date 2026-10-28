@@ -19,7 +19,7 @@ Recap **does not persist** its own entities in MVP. This document defines **deri
 
 | Field | Type | Rules |
 |-------|------|-------|
-| `granularity` | `"week"` \| `"month"` \| `"day"` \| `"year"` | Phase A: week + month; Phase B: + day + year |
+| `granularity` | `"week"` \| `"month"` \| `"day"` \| `"year"` | MVP v1: all four granularities |
 | `anchorDate` | `string` (`YYYY-MM-DD`) | Local calendar day anchoring the period (e.g. any day in target ISO week) |
 | `timeZone` | `string` | Default `Europe/Paris` (OD-011-4) |
 

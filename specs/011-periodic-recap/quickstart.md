@@ -37,7 +37,7 @@ Design refs: [plan.md](plan.md), [data-model.md](data-model.md), [contracts/](co
 4. Resize **< 768px** → heatmap absent; list unchanged.
 5. Legend shows French domain labels; focus/hover cell → domain names in tooltip/a11y.
 
-## Phase B — Daily and yearly (US4–US5)
+## Phase A — Daily and yearly (US4–US5, MVP v1)
 
 1. **Aujourd’hui** / **Hier** (or day picker) → only that day’s lines.
 2. **Cette année** → January and December events both listed with month indication; **no** book/movie goal UI embedded.
@@ -55,6 +55,6 @@ Design refs: [plan.md](plan.md), [data-model.md](data-model.md), [contracts/](co
 
 - `yarn typecheck`
 - `tests/unit/recap/**/*.test.ts`
-- `tests/e2e/recap.spec.ts` (weekly offline + desktop heatmap path)
+- `tests/e2e/recap.spec.ts` (weekly offline + day/year period switch + desktop heatmap path)
 - No-guilt string checklist for `recap.*` and home teaser keys (SC-003)
 - `yarn verify:ci` before push to `main`

@@ -31,7 +31,8 @@
 
 ## Notes
 
-- Recipe **`cookedDates`** is specified as a domain prerequisite in [research.md](../research.md); planning should sequence that field before or with Phase A recap UI. **Backdating** cook dates is **in v1** (Valentin 2026-10-28).
+- Recipe **`cookedDates`** is specified as a domain prerequisite in [research.md](../research.md); planning should sequence that field before or with MVP v1 recap UI. **Backdating** cook dates is **in v1** (Valentin 2026-10-28).
+- **MVP v1 periods (Valentin 2026-10-28)**: **Daily + weekly + monthly + yearly** — not deferred to Phase B; optional fitness PR highlights remain post-v1.
 - Product decisions locked **2026-10-28**: bottom-nav **Récap**, domain-grouped ordering, standalone yearly `/recap`, desktop activity heatmap — see spec **Clarifications**.
 - **Heatmap (2026-10-28 correction)**: Multi-domain **vertical micro-segments** per day + legend/tooltip/a11y — not binary single-accent; mobile heatmap hidden.
 - Checklist validated 2026-10-28 — ready for `/speckit-plan`.

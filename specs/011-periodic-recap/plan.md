@@ -12,7 +12,7 @@
 
 ## Summary
 
-Ship a **read-only cross-domain Récap** at **`/recap`**: derive **`RecapAchievement`** rows and **`RecapActivityDay`** heatmap cells from **local stores only** (items + fitness logs) via a **registry of domain contributors** and a single **`buildRecapSnapshot`** application service. **Phase A**: ISO **week** + **calendar month** periods, **bottom-nav Récap**, optional **Accueil** weekly teaser, recipe **`cookedDates`** with **backdating**, **desktop-only** GitHub-style **multi-domain vertical-segment** activity heatmap. **Phase B**: **day** + **year** periods, optional fitness PR subsection (FR-015). No recap journal table, no server aggregation, no guilt copy (009 alignment).
+Ship a **read-only cross-domain Récap** at **`/recap`**: derive **`RecapAchievement`** rows and **`RecapActivityDay`** heatmap cells from **local stores only** (items + fitness logs) via a **registry of domain contributors** and a single **`buildRecapSnapshot`** application service. **MVP v1 (Phase A)**: **day**, ISO **week**, **calendar month**, and **calendar year** periods; **bottom-nav Récap**, optional **Accueil** weekly teaser, recipe **`cookedDates`** with **backdating**, **desktop-only** GitHub-style **multi-domain vertical-segment** activity heatmap. **Phase B (optional)**: fitness PR subsection (FR-015). No recap journal table, no server aggregation, no guilt copy (009 alignment).
 
 ## Technical Context
 
@@ -103,16 +103,16 @@ tests/e2e/recap.spec.ts
 
 ## Phased implementation outline (recommended ship order)
 
-Aligned with spec **Phase A → B → C**:
+Aligned with spec **Phase A (MVP v1) → B (optional)**:
 
 | Ship batch | Spec phase | User stories | Outcome |
 |------------|------------|--------------|---------|
 | **1 — Recipe signal** | A prereq | — | `cookedDates` schema, sync, record-cooked use case + recipe detail UI (backdate) |
-| **2 — Aggregation core** | A | US1, US2, US6 | Period math, contributors, grouped list VM, unit tests |
+| **2 — Aggregation core** | A | US1, US2, US4, US5, US6 | Period math (all four granularities), contributors, grouped list VM, unit tests |
 | **3 — Route & nav** | A | US3 | `/recap`, bottom-nav **Récap**, optional home teaser |
-| **4 — Desktop heatmap** | A | US7 | Multi-segment grid, legend, a11y, trailing window |
-| **5 — Phase B periods** | B | US4, US5 | Day + year controls; month labels on yearly lines |
-| **6 — Optional** | B/C | FR-015 | Fitness PR highlights subsection |
+| **4 — Period UI** | A | US2, US4, US5 | Semaine / Mois / Aujourd’hui (or Hier) / Cette année controls + prev/next; month labels on yearly lines |
+| **5 — Desktop heatmap** | A | US7 | Multi-segment grid, legend, a11y, trailing window |
+| **6 — Optional** | B | FR-015 | Fitness PR highlights subsection |
 
 ## Open decisions (defaults locked in research.md)
 
@@ -124,7 +124,7 @@ Aligned with spec **Phase A → B → C**:
 | OD-011-4 | Default timezone | **`Europe/Paris`** — export `DEFAULT_RECAP_TIMEZONE` aliasing book/movie constants until user TZ preference |
 | OD-011-5 | Stable domain order | `book` → `movie` → `music_track` → `recipe` → `fitness` (French section labels via i18n) |
 | OD-011-6 | Bottom nav layout | **Home, Search \| + \| Récap, Settings** — Récap inserted post-FAB per [contracts/bottom-nav.md](contracts/bottom-nav.md) |
-| OD-011-7 | Home teaser | **Ship in Phase A** behind simple predicate (≥0 achievements); gentle copy only |
+| OD-011-7 | Home teaser | **Ship in MVP v1** behind simple predicate (≥0 achievements); gentle copy only |
 
 ## Complexity Tracking
 

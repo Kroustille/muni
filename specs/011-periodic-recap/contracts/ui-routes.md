@@ -6,22 +6,22 @@
 
 | Route | Purpose | Phase |
 |-------|---------|-------|
-| `/recap` | Periodic recap — period controls, optional desktop heatmap, domain-grouped achievement lists | A (week/month); B (+ day/year) |
+| `/recap` | Periodic recap — period controls, optional desktop heatmap, domain-grouped achievement lists | A (MVP v1: day/week/month/year) |
 
 **Default query/state**: Weekly period for **current ISO week** on first visit (FR-004, US1).
 
-**Deep links** (optional Phase A):
+**Deep links** (optional MVP v1):
 
 | Query | Effect |
 |-------|--------|
-| `?period=week` \| `month` \| `day` \| `year` | Initial granularity (Phase B adds day/year) |
+| `?period=week` \| `month` \| `day` \| `year` | Initial granularity (all four in v1) |
 | `?date=YYYY-MM-DD` | Anchor date |
 
 Invalid query → fall back to defaults.
 
 ## Page layout (`RecapPage`)
 
-1. **Header**: title **Récap** + period granularity control (tabs or select: **Semaine**, **Mois**; Phase B: **Aujourd’hui**, **Cette année**).
+1. **Header**: title **Récap** + period granularity control (tabs or select: **Semaine**, **Mois**, **Aujourd’hui** / **Hier** (or day picker), **Cette année**).
 2. **Period navigation**: **◀ période précédente** / **période suivante ▶** with French label for active range.
 3. **Heatmap slot** (desktop only): see [recap-activity-heatmap.md](recap-activity-heatmap.md) — `null` below `md`.
 4. **Intro line**: celebratory/neutral one-liner (non-guilt).

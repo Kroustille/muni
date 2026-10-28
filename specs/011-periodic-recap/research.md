@@ -19,7 +19,7 @@
 | **Music tracks** | [004](../004-music-artists-tracks/spec.md) | Status → **`listened`** | `fieldsUpdatedAt.status` when entering `listened` | **Music artists** have rating only — **no** `listened` status → **exclude artists** from recap counts unless product adds status later |
 | **Recipes** | [001](../001-typed-lists-companion/spec.md) | **None today** | — | Requires new explicit signal (see below) |
 | **Fitness workouts** | [008](../008-fitness-training/spec.md) | Workout log **`completed`** | `completedAt` (fallback `calendarDate` at local day granularity if missing) | Exclude `abandoned`, `in_progress`; **skipped** planned sessions are **not** achievements |
-| **Fitness PRs** | 008 | New personal record on save | Derived at save time from log | **Phase B** recap highlight (optional subsection), not MVP blocker |
+| **Fitness PRs** | 008 | New personal record on save | Derived at save time from log | **Optional post-v1** recap highlight (subsection), not MVP blocker |
 | **Shopping** | 001 | `checked` on items | — | **Out of recap** — errands, not life milestones (009 table) |
 | **Quotes** (book/movie) | 002/003 | Quote created | `createdAt` | **Out of recap MVP** — capture, not “finished” experience |
 
@@ -76,6 +76,7 @@ Recap aggregation MUST be driven by a **registry of domain contributors** (conce
 
 | Topic | Decision |
 |--------|----------|
+| MVP v1 periods | **Day, week, month, year** — all four in v1 (Valentin **2026-10-28**); fitness PR highlights optional post-v1 |
 | Heatmap window | **Trailing 365 local calendar days** ending today; **independent** of recap period switcher (OD-011-1) |
 | Heatmap breakpoint | **`md` (768px)** — hidden below, visible at sidebar layout widths |
 | Fitness segment color | **`#0d9488`** (app accent / fitness shell) |

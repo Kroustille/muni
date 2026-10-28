@@ -38,7 +38,7 @@ Output: new RecapPeriod (same granularity, shifted anchor)
 
 ```text
 Input: current anchorDate, new granularity
-Output: RecapPeriod with sensible default anchor (e.g. today for week/month/day; Jan 1 for year when switching to year in Phase B)
+Output: RecapPeriod with sensible default anchor (e.g. today for week/month/day; Jan 1 for year when switching to year)
 ```
 
 ## `RecapDeps` (ports)

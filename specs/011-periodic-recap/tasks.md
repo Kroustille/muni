@@ -56,7 +56,7 @@
 
 **Independent Test**: [quickstart.md](quickstart.md) § Phase A — Monthly + navigation.
 
-- [ ] T1130 [US2] `recap-period-controls.tsx` — Semaine/Mois tabs + prev/next (depends on T1109)
+- [ ] T1130 [US2] `recap-period-controls.tsx` — **Semaine**, **Mois**, **Aujourd’hui** (or **Hier** / day picker), **Cette année** + prev/next (depends on T1109)
 - [ ] T1131 [US2] Connect controls to snapshot rebuild on period change (depends on T1130, T1120)
 - [ ] T1132 [US2] E2e offline month switch `tests/e2e/recap.spec.ts` (depends on T1131)
 
@@ -99,11 +99,11 @@
 
 ---
 
-## Phase 8: User Story 4 — Daily recap (P2) — Phase B
+## Phase 8: User Story 4 — Daily recap (P1) — MVP v1
 
-**Goal**: Single-day period (FR-005).
+**Goal**: Single-day period (FR-004, FR-005).
 
-**Independent Test**: [quickstart.md](quickstart.md) § Phase B — daily.
+**Independent Test**: [quickstart.md](quickstart.md) § MVP v1 — daily.
 
 - [ ] T1170 [US4] Add **Aujourd’hui** / **Hier** (or day picker) to period controls (depends on T1130)
 - [ ] T1171 [US4] Unit tests daily bounds in `tests/unit/recap/period.test.ts`
@@ -111,11 +111,11 @@
 
 ---
 
-## Phase 9: User Story 5 — Yearly recap (P2) — Phase B
+## Phase 9: User Story 5 — Yearly recap (P1) — MVP v1
 
-**Goal**: Calendar year in `/recap` only; standalone from 002/003 goals (FR-005, FR-018).
+**Goal**: Calendar year in `/recap` only; standalone from 002/003 goals (FR-004, FR-005, FR-018).
 
-**Independent Test**: [quickstart.md](quickstart.md) § Phase B — yearly.
+**Independent Test**: [quickstart.md](quickstart.md) § MVP v1 — yearly.
 
 - [ ] T1180 [US5] Add **Cette année** granularity + year prev/next (depends on T1130)
 - [ ] T1181 [US5] Month labels on lines or subheaders for yearly volume (depends on T1121)
@@ -130,16 +130,16 @@
 - [ ] T1191 Performance fixture test or manual checklist for 50 events / month (SC-001)
 - [ ] T1192 Session refresh: home teaser count updates after mark-read without full reload (SC-005) — wire store subscription or revalidate on focus
 - [ ] T1193 Run `yarn verify:ci` and fix regressions
-- [ ] T1194 Optional Phase B: fitness PR subsection under **Entraînement** (FR-015) — defer until C batch if needed
+- [ ] T1194 Optional Phase B: fitness PR subsection under **Entraînement** (FR-015) — defer until post-v1 if needed
 
 ---
 
 ## Dependencies & execution order
 
 ```text
-Phase 1 → Phase 2 → Phase 3 (US1) → Phase 4 (US2) → Phase 5 (US3) + Phase 6 (US7) [parallel after US1 route]
+Phase 1 → Phase 2 → Phase 3 (US1) → Phase 4 (US2) + Phase 8–9 (US4–US5) [period UI; can follow T1130 scaffold]
+Phase 5 (US3) + Phase 6 (US7) [parallel after US1 route]
 Phase 7 (US6) anytime after Phase 2
-Phase 8–9 (US4–US5) after Phase 4
 Phase 10 last
 ```
 
