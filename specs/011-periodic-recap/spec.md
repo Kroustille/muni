@@ -22,7 +22,7 @@
 |--------|----------|
 | Data model for recap | **No new recap journal table** in MVP — compute from domain items + fitness logs (+ recipe `cookedDates` when added) |
 | Shopping | **Excluded** from recap achievements |
-| Music | **Single section Musique** (MVP): **004** tracks **`listened`**; **012** **`music_composition` → `finished`** (**`finishedAt`**), **`dj_set` → `performed`** (**`performedAt`**), **`practice_log`** rows (**`practicedAt`** from mark **Fait** or ad-hoc log). **Artists** excluded; **012** planned/cancelled sets and non-**Terminé** compositions excluded; **learning_piece** status alone excluded (only **`practice_log`** dates for apprentissage) |
+| Music | **Single section Musique** (MVP): **004** tracks **`listened`**; **012** **`music_composition` → `finished`** (**`finishedAt`**), **`dj_set` → `performed`** (**`performedAt`**), **each non-deleted `practice_log`** bucketed by **`practicedAt`** (mark **Fait**, structured ad-hoc, **`practiceKind: improvisation`**). **Artists** excluded; **012** planned/cancelled sets and non-**Terminé** compositions excluded; **learning_piece** status alone excluded — **logs are the apprentissage recap signal**; **multiple logs same piece/week/day → multiple lines** |
 | Fitness | **`completed`** workouts only; skipped / abandoned excluded |
 | Tone | Celebratory, optional empty states (“Rien de marqué cette semaine — et c’est ok”) — **no** guilt, streak loss, or comparison copy |
 | Notifications | **Out of scope** MVP (future optional prompt) |
@@ -50,9 +50,10 @@
 
 | Topic | Decision |
 |--------|----------|
-| **Musique list section** | **One** domain block **Musique** (stable order unchanged). Lines distinguish event kind via French subtitle/template (écouté, composition terminée, set joué, séance de pratique) — **no** separate recap domain per 012 workflow in MVP. |
-| **012 signals** | **Terminé** → **`finishedAt`**; **Joué** → **`performedAt`**; **Fait** / ad-hoc → **`practice_log.practicedAt`** ([012 data-model](../012-music-practice/data-model.md)). |
-| **Heatmap** | Still **one Musique segment** per day if **any** eligible Musique event (004 or 012) occurred; multiple music event types the same day do **not** add extra segments. |
+| **Musique list section** | **One** domain block **Musique** (stable order unchanged). Lines distinguish event kind via French subtitle/template (écouté, composition terminée, set joué, séance de pratique, **improvisation**) — **no** separate recap domain per 012 workflow in MVP. **One line per eligible event**; **one line per `practice_log`** (dedupe **same log id** only). |
+| **012 signals** | **Terminé** → **`finishedAt`**; **Joué** → **`performedAt`**; **Fait** / ad-hoc / **improvisation** → **one Musique line per `practice_log`**, bucketed by **`practicedAt`** ([012 data-model](../012-music-practice/data-model.md)). Contributor dedupes **same `sourcePracticeLogId`** only — **not** by calendar day, piece, or instrument. |
+| **Every session counts** | A piece may span **several practice sessions** — **each** eligible log → **one** Musique line and contributes to heatmap activity that day. **`comfortable`** (or any **learning_piece** status) **without** a log → **no** line. |
+| **Heatmap** | Still **one Musique segment** per calendar day if **any** eligible Musique event (004 or 012) occurred — including **any** **`practice_log`** that day; multiple logs or event types the same day do **not** add extra segments. |
 | **Periods** | Four-period v1 (**day / week / month / year**) unchanged. |
 
 ## User Scenarios & Testing *(mandatory)*
@@ -73,7 +74,9 @@ A signed-in user opens **Récap** and sees **this week** (ISO week, Monday–Sun
 4. **Given** a track with status **`listened`** this week, **When** recap loads, **Then** it appears under **Musique** (line kind **écouté**).
 5. **Given** a **012** composition with status **`finished`** and **`finishedAt`** this week, **When** recap loads, **Then** it appears under **Musique** (composition terminée + date).
 6. **Given** a **012** DJ set with status **`performed`** and **`performedAt`** this week, **When** recap loads, **Then** it appears under **Musique** (set joué + date).
-7. **Given** a **012** **`practice_log`** with **`practicedAt`** this week (from **Fait** or ad-hoc), **When** recap loads, **Then** it appears under **Musique** (séance de pratique + date; optional exercise/piece title in subtitle).
+7. **Given** a **012** **`practice_log`** with **`practicedAt`** this week (from **Fait**, structured ad-hoc, or **`practiceKind: improvisation`**), **When** recap loads, **Then** it appears under **Musique** (line kind **séance de pratique** or **improvisation** + date; optional exercise/piece/instrument in subtitle).
+7b. **Given** **two** distinct **`practice_log`** rows for the **same learning piece** with **`practicedAt`** dates this week, **When** recap loads, **Then** **two** Musique lines appear (not merged to one).
+7c. **Given** a **learning_piece** moved to **À l’aise** this week **without** a new **`practice_log`**, **When** recap loads, **Then** **no** apprentissage line is emitted from that status change alone.
 8. **Given** a recipe with **`cookedDates`** containing a date this week, **When** recap loads, **Then** it appears under **Recettes** (one line per date entry in period).
 9. **Given** a fitness workout log with status **`completed`** and **`completedAt`** this week, **When** recap loads, **Then** it appears under **Entraînement** with session title and day.
 10. **Given** a **`plant_care_event`** or **vegetable milestone** with **`occurredAt`** this week ([013](../013-plants-garden/spec.md)), **When** recap loads, **Then** it appears under **Plantes** with plant or culture title and care/milestone label.
@@ -215,7 +218,7 @@ On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activ
 - **FR-003**: Recap MUST compute from **local on-device data** (IndexedDB and local fitness stores) without requiring network.
 - **FR-004**: **MVP v1** MUST support **daily** (single calendar day), **weekly** (ISO), **monthly**, and **yearly** (calendar year) periods with previous/next navigation for the selected granularity.
 - **FR-005**: All four period types MUST use the **same aggregation rules** (FR-006, FR-016); only period boundaries and labels differ.
-- **FR-006**: Recap MUST include achievements from: books **`read`**, films/séries **`watched`** and **episode `watchedAt`**, **Musique** — music tracks **`listened`**; **`music_composition`** with status **`finished`** bucketed by **`finishedAt`**; **`dj_set`** with status **`performed`** bucketed by **`performedAt`**; **`practice_log`** rows bucketed by **`practicedAt`** ([012](../012-music-practice/spec.md)); recipes with **`cookedDates`** in period; fitness workouts **`completed`**; **plant care events** and **vegetable milestones** with **`occurredAt`** in period ([013](../013-plants-garden/research.md) § Recap signals).
+- **FR-006**: Recap MUST include achievements from: books **`read`**, films/séries **`watched`** and **episode `watchedAt`**, **Musique** — music tracks **`listened`**; **`music_composition`** with status **`finished`** bucketed by **`finishedAt`**; **`dj_set`** with status **`performed`** bucketed by **`performedAt`**; each non-deleted **`practice_log`** (incl. **`practiceKind: improvisation`**) bucketed by **`practicedAt`** — **one achievement per log** ([012](../012-music-practice/spec.md)); recipes with **`cookedDates`** in period; fitness workouts **`completed`**; **plant care events** and **vegetable milestones** with **`occurredAt`** in period ([013](../013-plants-garden/research.md) § Recap signals).
 - **FR-007**: Recap MUST **exclude** shopping check-offs, music **artist-only** rows, **012** non-**Terminé** compositions, **Prévu**/**Annulé** DJ sets, **`practice_plan`** assignments without a **`practice_log`**, **learning_piece** status changes without a log date, fitness **skipped/abandoned** sessions, and quote creation events.
 - **FR-008**: Each achievement line MUST show at minimum **domain**, **title** (or session title), and **calendar date** within the selected period.
 - **FR-009**: Section headers MUST use celebratory/neutral French copy; MUST NOT use guilt, loss, or social comparison language (009 anti-patterns).
@@ -234,7 +237,7 @@ On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activ
 ### Key Entities *(conceptual — mostly derived)*
 
 - **RecapPeriod**: `{ granularity: week \| month \| day \| year, anchorDate }` — selection state in UI, not persisted server-side in MVP.
-- **RecapAchievement** (derived view model): `{ domainId, occurredOn, title, subtitle?, musicLineKind?, sourceItemId?, sourceWorkoutId?, sourceCompositionId?, sourceDjSetId?, sourcePracticeLogId?, sortInstant }` — built at read time. **`musicLineKind`** (when `domainId` is Musique): `listened` \| `composition_finished` \| `dj_performed` \| `practice_session`.
+- **RecapAchievement** (derived view model): `{ domainId, occurredOn, title, subtitle?, musicLineKind?, sourceItemId?, sourceWorkoutId?, sourceCompositionId?, sourceDjSetId?, sourcePracticeLogId?, sortInstant }` — built at read time. **`musicLineKind`** (when `domainId` is Musique): `listened` \| `composition_finished` \| `dj_performed` \| `practice_session` \| `practice_improvisation`.
 - **DomainRecapContributor** (conceptual registry): maps domain to rules for extracting `RecapAchievement[]` from local stores.
 - **Recipe item extension**: **`cookedDates`**: `string[]` ISO dates on recipe items (see [research.md](research.md)).
 - **RecapActivityDay** (derived): `{ calendarDate, eventCount, domainsPresent: DomainId[], isActive }` — for heatmap; `domainsPresent` ordered per FR-016 domain order; `isActive := domainsPresent.length ≥ 1`; `eventCount` optional for tooltip/a11y.

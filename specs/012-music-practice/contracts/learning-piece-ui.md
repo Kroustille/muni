@@ -21,4 +21,4 @@ Display « Piste supprimée » when linked track missing locally; allow clear li
 
 ## 011 note
 
-Recap-eligible: **`practice_log.practicedAt`** per [011 FR-006](../011-periodic-recap/spec.md). **`learning_piece` → `comfortable`** alone is **not** recap-eligible in MVP — see [011 spec](../011-periodic-recap/spec.md) clarifications **2026-10-28 (Musique in recap)**.
+Recap-eligible: **each** **`practice_log.practicedAt`** (structured, **Fait**, **improvisation**) — **one 011 line per log**; multiple practice sessions on the same piece → multiple lines. **`learning_piece` → `comfortable`** (or any status) **without** a log is **not** recap-eligible — see [011 spec](../011-periodic-recap/spec.md) clarifications **2026-10-28 (Musique in recap; récap every session)**.

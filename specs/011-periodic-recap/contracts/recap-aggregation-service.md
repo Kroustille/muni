@@ -76,7 +76,7 @@ Adding a domain = new contributor + i18n section label + heatmap accent mapping 
 | Books | Finish `read`; instant from `fieldsUpdatedAt.read` ?? status transition ([002](../002-books-library/spec.md)) |
 | Movies | `watchedAt`, episode `episodeProgress` ([003](../003-films-tv-library/spec.md)); **one line per episode** |
 | Music (004) | Tracks `listened` only ([004](../004-music-artists-tracks/spec.md)); `domainId` **`music_track`** |
-| Music practice (012) | `music_composition` **`finished`** + **`finishedAt`**; `dj_set` **`performed`** + **`performedAt`**; **`practice_log.practicedAt`** ([012](../012-music-practice/data-model.md)); same **`music_track`** domainId; one line per log |
+| Music practice (012) | `music_composition` **`finished`** + **`finishedAt`**; `dj_set` **`performed`** + **`performedAt`**; each **`practice_log`** with **`practicedAt`** (incl. **`improvisation`**) ([012](../012-music-practice/data-model.md)); same **`music_track`** domainId; **one line per log** (dedupe log id only) |
 | Recipes | `cookedDates` entries ([recipe-cooked-dates.md](recipe-cooked-dates.md)) |
 | Fitness | `completed` + `completedAt` / `calendarDate` ([008](../008-fitness-training/spec.md)) |
 | Plants | `plant_care_event`, `vegetable_milestone` — `occurredAt` ([013](../013-plants-garden/research.md)) |

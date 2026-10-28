@@ -12,7 +12,7 @@
 | **Primary entities** | `music_artist`, `music_track` | `music_composition`, `dj_set`, `practice_*`, `learning_piece` |
 | **Catalog** | MusicBrainz search, MBIDs, optional Spotify/SC URLs | **No** catalog requirement for practice rows; user-authored titles |
 | **Status model** | Track: `to_listen` / `listened`; artist: rating only | Composition / DJ / learning-piece statuses per workflow |
-| **Completion signal** | **`listened`** on a **consumption** row | **`finished`**, **`performed`**, **`practice_log.practicedAt`**, learning **status** |
+| **Completion signal** | **`listened`** on a **consumption** row | **`finished`**, **`performed`**, **`practice_log.practicedAt`** per log (incl. **improvisation**); **learning_piece status** is progress metadata — **not** a recap substitute |
 | **Typical fields** | Album, year, recording MBID | Session notes, setlist, venue, exercise plan, instrument name |
 | **011 recap** | Listened **tracks** + **012** practice dates in **Musique** section ([011 research](../011-periodic-recap/research.md)) | **012** persists timestamps; **011** aggregates ([tasks](../011-periodic-recap/tasks.md) T1195–T1196) |
 | **Analogy in Muni** | Books/films **library** | **[010](../010-recipe-source-book/spec.md) cookbooks** vs **[002](../002-books-library/spec.md) reading list** — same theme, different domain |
@@ -47,7 +47,7 @@
 | **MVP anchor** | Project status | Event **performedAt** | **practicedAt** on logs + plan “today” |
 | **Structured log** | Session notes | Setlist lines | **practice_log** + exercise library |
 | **Planning** | — | Prévu → Joué | **practice_plan** weekdays/dates |
-| **Achievement moment** | **Terminé** | **Joué** | **Fait** on planned item / log session |
+| **Achievement moment** | **Terminé** | **Joué** | **Fait** / ad-hoc log / **improvisation** (`practiceKind`) |
 | **Instrument** | — | — | **practice_instrument** name registry |
 
 ## Comparison to other Muni “practice” domains
@@ -65,6 +65,7 @@
 | title / name | ✓ | ✓ | exercise + piece title | P1 |
 | plan + today | — | — | ✓ | P1 |
 | practicedAt | — | performedAt | ✓ on log | P1 |
+| practiceKind (improvisation) | — | — | ✓ | P1 |
 | instrument link | — | — | ✓ | P1 |
 | linkedTrackId | P2 | P2 setlist | P2 learning piece | P2 |
 
@@ -91,8 +92,9 @@
 | PD-012-6 | Learning default status | **`learning` (En apprentissage)** on quick-add |
 | PD-012-7 | Mark done | Creates **`practice_log`**; updates **`learning_piece.lastPracticedAt`** when linked |
 | PD-012-8 | Apprentissage IA | **One screen**, sections Aujourd’hui / Plan / Exercices / Répertoire — **not** Plan vs Répertoire sub-tabs (**2026-10-28**) |
-| PD-012-9 | **`comfortable` / À l’aise** | Progress status only; **011 recap** uses **`practice_log.practicedAt`** only (**2026-10-28**) |
-| PD-012-10 | Composition quick-add | Default **`idea`**; **`in_progress`** in create picker (**2026-10-28**) |
+| PD-012-9 | **`comfortable` / À l’aise** | Progress status only; **011 recap** uses **`practice_log.practicedAt`** only — **every log counts**; status without log → **no** recap line (**2026-10-28**) |
+| PD-012-10 | **Improvisation** | **`practiceKind: improvisation`** on **`practice_log`**; instrument + optional notes; no exercise/piece required; **011** **`practice_improvisation`** line kind |
+| PD-012-11 | Composition quick-add | Default **`idea`**; **`in_progress`** in create picker (**2026-10-28**) |
 
 ## Resolved (2026-10-28 — Valentin)
 

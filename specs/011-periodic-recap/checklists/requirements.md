@@ -35,5 +35,5 @@
 - **MVP v1 periods (Valentin 2026-10-28)**: **Daily + weekly + monthly + yearly** — not deferred to Phase B; optional fitness PR highlights remain post-v1.
 - Product decisions locked **2026-10-28**: bottom-nav **Récap**, domain-grouped ordering, standalone yearly `/recap`, desktop activity heatmap — see spec **Clarifications**.
 - **Heatmap (2026-10-28 correction)**: Multi-domain **vertical micro-segments** per day + legend/tooltip/a11y — not binary single-accent; mobile heatmap hidden.
-- **Musique in recap (Valentin 2026-10-28)**: **012** **Terminé / Joué / Fait** (`finishedAt`, `performedAt`, `practicedAt`) in single **Musique** section + one heatmap segment; see [012](../012-music-practice/spec.md).
+- **Musique in recap (Valentin 2026-10-28)**: **012** **Terminé / Joué / Fait / Improvisation** — **one récap line per `practice_log`** (every session counts); single **Musique** section + one heatmap segment per day with any Musique event; see [012](../012-music-practice/spec.md).
 - Checklist validated 2026-10-28 — ready for `/speckit-plan`.

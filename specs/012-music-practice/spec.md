@@ -18,7 +18,7 @@
 
 **Serves**: [009](../009-experiences-achievements/spec.md) north star — **registering creative work and performance** as personal experience and achievement, without guilt copy or social feeds.
 
-**Future link to [011](../011-periodic-recap/spec.md)**: **011** includes **Musique** recap lines from **012** completion timestamps — **`finishedAt`** (composition **Terminé**), **`performedAt`** (set **Joué**), **`practicedAt`** on **`practice_log`** (mark **Fait** / ad-hoc). **012 v1** persists those fields; **011** implements aggregation contributors ([011 tasks](../011-periodic-recap/tasks.md) T1195–T1196). **`learning_piece` → `comfortable`** alone is **not** recap-eligible in MVP (logs only).
+**Future link to [011](../011-periodic-recap/spec.md)**: **011** includes **Musique** recap lines from **012** completion timestamps — **`finishedAt`** (composition **Terminé**), **`performedAt`** (set **Joué**), **`practicedAt`** on each **`practice_log`** (mark **Fait**, structured ad-hoc, or **improvisation**). **Every practice attempt counts for récap**: one eligible log → one **011** line; **multiple logs** for the same **learning_piece** in the same week (or same calendar day) → **multiple** Musique lines and repeated heatmap activity (011 dedupes only the **same log id**, not by date or piece). **`learning_piece` → `comfortable`** (or any status change) **without** a **`practice_log`** is **not** recap-eligible — logs are the apprentissage recap signal. **012 v1** persists fields; **011** implements contributors ([T1195–T1196](../011-periodic-recap/tasks.md)).
 
 ## Decision summary (MVP)
 
@@ -34,6 +34,8 @@
 | **À l’aise (`comfortable`)** | Optional **`learning_piece`** status meaning the user **feels at ease playing the piece** (personal progress, not platform-verified). **Does NOT** feed **[011](../011-periodic-recap/spec.md)** recap — only **`practice_log`** rows with **`practicedAt`** (mark **Fait** / ad-hoc) do, unless product replans later (locked **2026-10-28**). |
 | **Tone** | French labels; celebrate progress optionally; **no** streak loss, “you haven’t composed in X days”, or comparison with others. |
 | **Offline** | Full CRUD offline; sync per foundation LWW + soft delete. |
+| **Récap signal (apprentissage)** | **`practice_log.practicedAt`** only — each **Fait** / ad-hoc / **improvisation** log counts; status **À l’aise** alone does **not** substitute for a log ([011](../011-periodic-recap/spec.md)). |
+| **Improvisation (P1)** | First-class ad-hoc **`practice_log`** with **`practiceKind: improvisation`** — **instrument** + optional **notes**; **no** `exerciseIds` or **`learningPieceId`** required. |
 
 ## Workflow A — Music composition
 
@@ -149,13 +151,18 @@ Lightweight completion record when user finishes planned or ad-hoc practice.
 | Field | Required | Notes |
 |-------|----------|--------|
 | **practicedAt** | Yes | Calendar date (default today; **backdate** allowed — recap-friendly) |
-| **instrumentId** | No | Which instrument; optional if exercise already linked |
-| **exerciseIds** | No | One or more library exercises touched this session |
-| **learningPieceId** | No | Optional link if session focused on a **learning piece** row |
+| **practiceKind** | Yes (default) | `structured` (default) — planned **Fait**, exercise-led ad-hoc, or piece-linked session; **`improvisation`** — free playing on an instrument (see below) |
+| **instrumentId** | No | Which instrument; **SHOULD** be set for **`improvisation`** logs; optional if exercise already linked |
+| **exerciseIds** | No | One or more library exercises touched this session; typically **empty** for **`improvisation`** |
+| **learningPieceId** | No | Optional link if session focused on a **learning piece** row; **not** required for récap eligibility |
 | **durationMinutes** | No | Integer optional |
 | **notes** | No | Free text |
 
 **Ad-hoc**: User MAY log practice **without** a plan assignment (free session with optional exercise/piece picks).
+
+**Improvisation**: User MAY log **`practiceKind: improvisation`** from apprentissage (dedicated action, e.g. **Improviser**) with **`instrumentId`** and optional **notes** only — no exercise library row and no **learning_piece** required. Each improvisation log is **récap-eligible** via **`practicedAt`** ([011](../011-periodic-recap/spec.md)).
+
+**Récap (012 persistence rule)**: Every non-deleted **`practice_log`** with **`practicedAt`** is an independent completion event for **011** — including **each time** the user practises a given piece across **several sessions**. Changing **learning_piece** status to **À l’aise** does **not** emit recap data without a matching log.
 
 ### Learning piece (repertoire in progress)
 
@@ -299,10 +306,26 @@ User adds a **learning piece** with title and instrument, updates **status** and
 
 1. **Given** learning piece **En apprentissage**, **When** user logs practice linked to it with backdated **practicedAt**, **Then** **lastPracticedAt** reflects that date.
 2. **Given** piece with optional **004** link (**P2**), **When** user views detail, **Then** link opens track detail or external listen link per 004 — **listened** status unchanged.
+3. **Given** a learning piece, **When** user logs **two** separate **`practice_log`** rows (same piece, same ISO week, distinct saves), **Then** both logs persist with their **`practicedAt`** values and **both** are eligible for **011** (two Musique lines — not collapsed to one).
 
 ---
 
-### User Story C4 - Browse apprentissage and filter (Priority: P2)
+### User Story C4 - Log improvisation (Priority: P1)
+
+User records **improvisation** on an instrument without picking an exercise or repertoire row — instrument + optional note, default **today**.
+
+**Why this priority**: Valentin treats **every time doing something** in music as worth registering, including unstructured playing.
+
+**Independent Test**: Log improvisation on guitar offline; verify log has **`practiceKind: improvisation`**, no **`learningPieceId`**, récap fields present.
+
+**Acceptance Scenarios**:
+
+1. **Given** apprentissage, **When** user saves an **improvisation** log with instrument **Guitare** and optional note, **Then** a **`practice_log`** exists with **`practiceKind: improvisation`**, **`practicedAt`** set, and empty **`exerciseIds`**.
+2. **Given** a learning piece **En apprentissage**, **When** user sets status **À l’aise** without creating a log, **Then** no new **`practice_log`** exists and **011** has **no** apprentissage line from that status change alone.
+
+---
+
+### User Story C5 - Browse apprentissage and filter (Priority: P2)
 
 User filters exercises by instrument, pieces by status, sorts by last practiced or title; searches locally.
 
@@ -318,7 +341,9 @@ User filters exercises by instrument, pieces by status, sorts by last practiced 
 - **004 track deleted** while referenced — setlist/composition shows orphaned reference gracefully (French “piste supprimée”, link cleared on next edit optional).
 - **Learning piece linkedTrackId orphaned** — same graceful copy as composition/setlist P2 links.
 - **Plan change** — past **practice logs** retain what was done; future “today” uses new assignments (008 pattern).
-- **Mark done without plan** — ad-hoc **practice log** allowed with **practicedAt** only.
+- **Mark done without plan** — ad-hoc **practice log** allowed with **practicedAt** only (structured or **improvisation**).
+- **Same piece, many sessions** — each log stands alone for **lastPracticedAt** (newest wins) and for **011** (every log → one line).
+- **Comfortable without log** — status **À l’aise** is repertoire metadata only until user logs **`practicedAt`**.
 
 ## Requirements *(mandatory)*
 
@@ -340,7 +365,8 @@ User filters exercises by instrument, pieces by status, sorts by last practiced 
 - **FR-014**: Introduce **practice_instrument** registry with **name** required; quick-add offline (Workflow C).
 - **FR-015**: Introduce **practice_exercise** library rows (title required; optional instrument, category, notes).
 - **FR-016**: Introduce **practice_plan** with one **active** plan MVP and assignments to weekdays and/or specific dates referencing **practice_exercise** ids.
-- **FR-017**: Introduce **practice_log** with required **practicedAt** (backdating allowed); optional links to exercises, instrument, **learning_piece**; ad-hoc logs without plan (**P1**).
+- **FR-017**: Introduce **practice_log** with required **practicedAt** (backdating allowed), **`practiceKind`** (`structured` \| `improvisation`, default **`structured`**); optional links to exercises, instrument, **learning_piece**; ad-hoc logs without plan (**P1**). Each log is an independent **011**-eligible event; **`learning_piece` status alone** MUST NOT substitute for a log.
+- **FR-022**: User MUST be able to create **`practiceKind: improvisation`** logs with **`instrumentId`** and optional **notes** without **`exerciseIds`** or **`learningPieceId`** (**P1**).
 - **FR-018**: Introduce **learning_piece** with statuses `learning`, `comfortable`, `paused`, `archived` and French labels; **title** required on create.
 - **FR-019**: **Today** apprentissage view MUST list planned exercises for the current calendar day and allow **mark done** → **practice_log** (**P1**).
 - **FR-020**: Optional **linkedTrackId** on **learning_piece** (**P2**) — one-way to **004**; MUST NOT mutate 004 listen status.
@@ -353,7 +379,7 @@ User filters exercises by instrument, pieces by status, sorts by last practiced 
 - **Practice instrument**: name, notes?.
 - **Practice exercise**: title, instrumentId?, category?, notes?.
 - **Practice plan**: name, isActive, assignments[] (exerciseId, weekdays?, specificDates?, sortOrder).
-- **Practice log**: practicedAt, instrumentId?, exerciseIds[], learningPieceId?, durationMinutes?, notes?.
+- **Practice log**: practicedAt, practiceKind (`structured` \| `improvisation`), instrumentId?, exerciseIds[], learningPieceId?, durationMinutes?, notes?.
 - **Learning piece**: title, instrumentId?, status, linkedTrackId? (P2), startedAt?, lastPracticedAt?, notes?.
 
 ## Success Criteria *(mandatory)*
@@ -370,7 +396,7 @@ User filters exercises by instrument, pieces by status, sorts by last practiced 
 
 - Valentin is the primary user; scale stays within foundation “few thousand items” per domain.
 - **Navigation**: One shell entry **Musique — pratique** with top-level tabs **Compositions**, **Sets DJ**, **Apprentissage**. **Apprentissage** = **one scrollable screen** with sections (Aujourd’hui, Plan, Exercices, Répertoire) per [ui-routes contract](contracts/ui-routes.md).
-- **011 recap**: Spec’d in [011](../011-periodic-recap/spec.md) — **`dj_set` → `performed`** (**`performedAt`**), **`music_composition` → `finished`** (**`finishedAt`**), **`practice_log`** with **`practicedAt`**. Planned/cancelled sets, idea/paused compositions, and archived pieces excluded. **`learning_piece` → `comfortable`** alone excluded in MVP (practice logs only). **012** persists timestamps; **011** implements contributors ([T1195–T1196](../011-periodic-recap/tasks.md)).
+- **011 recap**: Spec’d in [011](../011-periodic-recap/spec.md) — **`dj_set` → `performed`** (**`performedAt`**), **`music_composition` → `finished`** (**`finishedAt`**), and **one Musique line per `practice_log`** (structured **Fait**, ad-hoc, and **`improvisation`**). Multiple logs for the same piece in the same week or day → multiple lines. Planned/cancelled sets, idea/paused compositions, and archived pieces excluded. **`learning_piece` status without a log** excluded. **012** persists timestamps; **011** implements contributors ([T1195–T1196](../011-periodic-recap/tasks.md)).
 - BPM fields are **manual** user entry, not detected from audio.
 - DJ “home practice” counts as **`performed`** when the user says so — no separate “rehearsal” status in v1.
 

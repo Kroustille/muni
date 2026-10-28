@@ -8,7 +8,7 @@
 
 **Task band**: **T1201–T1294** (see [tasks.md](tasks.md)).
 
-**Product context**: Three typed workflows under **Musique — pratique** hub; apprentissage mirrors **008** plan/today/done pattern with **user-named** exercises ([research.md](research.md) PD-012-*). **[011 recap](../011-periodic-recap/spec.md)** reads **`finishedAt`**, **`performedAt`**, **`practicedAt`** via dedicated contributors ([011 tasks](../011-periodic-recap/tasks.md) T1195–T1196) after **012** foundation ships.
+**Product context**: Three typed workflows under **Musique — pratique** hub; apprentissage mirrors **008** plan/today/done pattern with **user-named** exercises ([research.md](research.md) PD-012-*). **[011 recap](../011-periodic-recap/spec.md)** reads **`finishedAt`**, **`performedAt`**, and **one event per `practice_log`** (structured, **Fait**, **`improvisation`**) via dedicated contributors ([011 tasks](../011-periodic-recap/tasks.md) T1195–T1196) after **012** foundation ships.
 
 ## Summary
 
@@ -130,7 +130,7 @@ tests/e2e/music-practice.spec.ts
 | OD-012-4 | Session notes / setlist | jsonb arrays on composition / dj_set rows (LWW whole field) |
 | OD-012-5 | Nav label | `musicPractice.nav` → « Musique — pratique » |
 | OD-012-6 | Default composition status | `idea` on create |
-| OD-012-7 | **011 recap** | [011 spec](../011-periodic-recap/spec.md) **Musique** lines from **`finishedAt`**, **`performedAt`**, **`practice_log.practicedAt`**; implement [011 T1195–T1196](../011-periodic-recap/tasks.md) after T1216 |
+| OD-012-7 | **011 recap** | [011 spec](../011-periodic-recap/spec.md) **Musique** — `finishedAt`, `performedAt`, one line per `practice_log` (incl. improvisation); status-only learning_piece excluded; [011 T1195–T1196](../011-periodic-recap/tasks.md) after T1216 |
 | OD-012-8 | Push payload | Single batch body with entity arrays (split later if needed) |
 
 ## Complexity Tracking

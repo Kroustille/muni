@@ -75,11 +75,14 @@ All user tables: composite PK `(user_id, id)`, `deleted_at`, `fields_updated_at`
 | Field | Type | Rules |
 |-------|------|-------|
 | `practicedAt` | date | Required; backdate allowed; not future |
+| `practiceKind` | enum | `structured` \| `improvisation`; default **`structured`** |
 | `instrumentId` | uuid null | |
-| `exerciseIds` | uuid[] | May be empty for ad-hoc note-only log |
-| `learningPieceId` | uuid null | |
+| `exerciseIds` | uuid[] | May be empty for ad-hoc or **`improvisation`** logs |
+| `learningPieceId` | uuid null | Optional; not required for récap |
 | `durationMinutes` | int null | ≥ 0 |
 | `notes` | text null | Max **2000** |
+
+**Récap (011)**: Each non-deleted row → one Musique achievement keyed by **`sourcePracticeLogId`**; multiple rows same **`learningPieceId`** and/or same calendar **`practicedAt`** remain distinct unless the **same log id** is replayed. **`practiceKind: improvisation`** included. Status-only **learning_piece** changes do not substitute.
 
 **Side effect (application)**: When `learningPieceId` set, update that piece’s `lastPracticedAt` to `practicedAt` if newer (not a separate stored event table).
 

@@ -41,7 +41,7 @@ Closed enum MVP (stable order FR-016 / heatmap):
 |-----------------|----------------|--------------|
 | `book` | Livres | `items` type `book`, status `read` |
 | `movie` | Films & séries | `items` type `movie`, film `watched` + episode `episodeProgress` |
-| `music_track` | Musique | **004** `items` type `music_track`, status `listened`; **012** `music_composition` (`finished` + `finishedAt`), `dj_set` (`performed` + `performedAt`), `practice_log` (`practicedAt`) |
+| `music_track` | Musique | **004** `items` type `music_track`, status `listened`; **012** `music_composition` (`finished` + `finishedAt`), `dj_set` (`performed` + `performedAt`), each `practice_log` (`practicedAt`, incl. improvisation) — **one list line per log** |
 | `recipe` | Recettes | `items` type `recipe`, `cookedDates` entries in period |
 | `fitness` | Entraînement | `fitness_workout_log` status `completed` |
 | `plants` | Plantes | `plant_care_event` + `vegetable_milestone` with `occurredAt` in period ([013](../013-plants-garden/research.md)) |
@@ -74,7 +74,7 @@ Built at read time; one row per qualifying **event** in period.
 - Tracks: **`listened`** with status transition day.
 - **012 compositions**: status **`finished`**; **`occurredOn` := `finishedAt`** (required when finished).
 - **012 DJ sets**: status **`performed`**; **`occurredOn` := `performedAt`**.
-- **012 practice logs**: **one line per log** with **`practicedAt`** in period (same pattern as recipe dates); optional subtitle from linked exercise / learning piece titles.
+- **012 practice logs**: **one line per log** with **`practicedAt`** in period (incl. **`practiceKind: improvisation`**; same learning piece or same day → **multiple lines** if multiple logs; dedupe **same `sourcePracticeLogId`** only); optional subtitle from linked exercise / learning piece / instrument names.
 - Recipes: **one line per `cookedDates` entry** in period (same recipe twice → two lines if two dates).
 - Fitness: **`completed`** with `completedAt` or fallback `calendarDate`.
 - Plants: **one line per care event** or **milestone** with `occurredAt` in period; title = plant or culture name; subtitle = French care/milestone label; skip when parent plant/culture soft-deleted.

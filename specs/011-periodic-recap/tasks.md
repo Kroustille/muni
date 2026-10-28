@@ -132,8 +132,8 @@
 - [ ] T1192 Session refresh: home teaser count updates after mark-read without full reload (SC-005) — wire store subscription or revalidate on focus
 - [ ] T1193 Run `yarn verify:ci` and fix regressions
 - [ ] T1194 Optional Phase B: fitness PR subsection under **Entraînement** (FR-015) — defer until post-v1 if needed
-- [ ] T1195 Unit tests **012** music-practice recap rules (`finishedAt`, `performedAt`, `practicedAt`, soft-delete) in `tests/unit/recap/music-practice-contributor.test.ts` (depends on **012** T1216)
-- [ ] T1196 Implement `music-practice-contributor.ts` + extend Musique section i18n line templates (depends on T1195, T1111)
+- [ ] T1195 Unit tests **012** music-practice recap rules (`finishedAt`, `performedAt`, **one line per `practice_log`** incl. **improvisation**, multi-log same piece, status-without-log excluded, soft-delete) in `tests/unit/recap/music-practice-contributor.test.ts` (depends on **012** T1216)
+- [ ] T1196 Implement `music-practice-contributor.ts` + extend Musique section i18n line templates (**séance de pratique**, **improvisation**) (depends on T1195, T1111)
 
 ---
 

@@ -26,10 +26,11 @@
 - Each row: exercise title, instrument name if any, **Fait** button.
 - **Fait** creates `practice_log` with `practicedAt=today`, `exerciseIds=[id]`, optional instrument from exercise.
 - **Ad-hoc log** button: optional exercise multi-select, instrument, notes, date (default today).
+- **Improviser** (improvisation): creates `practice_log` with `practiceKind=improvisation`, required **instrument** picker, optional notes, `practicedAt` (default today); no exercise or learning piece.
 
 ## Recent activity
 
-- Below today list: last N practice logs (title derived from exercises or « Séance libre »).
+- Below today list: last N practice logs (title derived from exercises, instrument name for improvisation, piece title when linked, or « Séance libre »).
 
 ## Offline
 
