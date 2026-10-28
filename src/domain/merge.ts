@@ -29,6 +29,8 @@ const MERGED_FIELDS = [
   "music_brainz_recording_id",
   "spotify_url",
   "soundcloud_url",
+  "cookbook_id",
+  "source_page",
 ] as const satisfies readonly (keyof ItemWire)[];
 
 function compareValues(a: unknown, b: unknown): number {

@@ -56,6 +56,8 @@ const base: Item = {
   musicBrainzRecordingId: null,
   spotifyUrl: null,
   soundcloudUrl: null,
+cookbookId: null,
+sourcePage: null,
 };
 
 describe("watch activity", () => {

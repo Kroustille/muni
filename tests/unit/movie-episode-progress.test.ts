@@ -54,6 +54,8 @@ function series(overrides: Partial<Item> = {}): Item {
     musicBrainzRecordingId: null,
     spotifyUrl: null,
     soundcloudUrl: null,
+    cookbookId: null,
+    sourcePage: null,
     ...overrides,
   };
 }

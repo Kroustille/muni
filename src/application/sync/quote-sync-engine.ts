@@ -33,7 +33,10 @@ export type QuoteSyncEngineDeps<TQuote, TWire extends QuoteWireBase> = {
   quotes: { applyRemote(wires: TWire[]): Promise<void> };
   pullLimit: number;
   sleep: (ms: number) => Promise<void>;
-  pullCursorMetaKey: Extract<MetaKey, "quotePullCursor" | "movieQuotePullCursor">;
+  pullCursorMetaKey: Extract<
+    MetaKey,
+    "quotePullCursor" | "movieQuotePullCursor" | "cookbookPullCursor"
+  >;
   toWire: (quote: TQuote) => TWire;
   safeParseWire: (
     wire: TWire,

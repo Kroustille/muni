@@ -43,6 +43,8 @@ function wire(overrides: Record<string, unknown> = {}) {
     catalog_rating: null,
     media_kind: null,
     server_updated_at: NOW,
+    cookbook_id: null,
+    source_page: null,
     ...overrides,
   };
 }

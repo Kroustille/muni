@@ -159,6 +159,13 @@ export function itemToRecipeValues(item: Item): RecipeFieldValues {
     ingredients: item.ingredients ?? [],
     steps: item.steps ?? [],
     notes: item.notes ?? "",
+    cookbookId: item.cookbookId,
+    cookbookQuery: "",
+    pendingCookbookTitle: null,
+    sourcePage: item.sourcePage ?? "",
+    cookbookAuthor: "",
+    cookbookIsbn: "",
+    sourceSectionOpen: item.cookbookId !== null,
   };
 }
 

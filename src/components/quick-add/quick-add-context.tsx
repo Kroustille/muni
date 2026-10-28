@@ -35,6 +35,7 @@ import {
   type MusicTrackFieldValues,
   RecipeFields,
   recipeFieldValuesToExtra,
+  recipeSourcePayloadFromValues,
   emptyRecipeFieldValues,
   type RecipeFieldValues,
   ShoppingFields,
@@ -243,10 +244,10 @@ export function QuickAddProvider({ children }: { children: ReactNode }) {
           );
           break;
         case "recipe":
-          await useCases.createItem(
-            kind,
+          await useCases.createRecipe(
             trimmedTitle,
             recipeFieldValuesToExtra(values as RecipeFieldValues),
+            recipeSourcePayloadFromValues(values as RecipeFieldValues),
           );
           break;
       }

@@ -8,7 +8,9 @@ import { createUuidIdGenerator } from "../adapters/browser/id-generator";
 import { openMuniDb } from "../adapters/indexeddb/db";
 import { createIndexedDbItemRepository } from "../adapters/indexeddb/item-repository";
 import { wireClientQuoteSync } from "./client-quote-sync";
+import { wireClientCookbookSync } from "./client-cookbook-sync";
 import { wireClientFitnessSync } from "./client-fitness-sync";
+import type { CookbookUseCases } from "../application/cookbooks/cookbook-use-cases";
 import { runSyncEngines, type PausableSyncEngine } from "./sync-run";
 import type { FitnessProgramUseCases } from "../application/fitness/program";
 import type { FitnessWorkoutUseCases } from "../application/fitness/workout";
@@ -36,6 +38,7 @@ export type ClientContext = {
   readingSettingsUseCases: ReadingSettingsUseCases;
   fitnessProgramUseCases: FitnessProgramUseCases;
   fitnessWorkoutUseCases: FitnessWorkoutUseCases;
+  cookbookUseCases: CookbookUseCases;
   ensureFitnessCatalogSeeded(): Promise<void>;
   searchUseCase: SearchUseCase;
   sessionUseCases: SessionUseCases;
@@ -51,6 +54,7 @@ let syncEngine: ReturnType<typeof createSyncEngine> | undefined;
 let bookQuotesSyncEngine: PausableSyncEngine | undefined;
 let movieQuotesSyncEngine: PausableSyncEngine | undefined;
 let fitnessSyncEngine: PausableSyncEngine | undefined;
+let cookbookSyncEngine: PausableSyncEngine | undefined;
 let syncStarted = false;
 
 function publishSyncStatus(next: SyncStatusState): void {
@@ -71,6 +75,8 @@ function wrapLocalWrites(items: ItemUseCases, onLocalWrite: () => void): ItemUse
     ...items,
     createItem: after(items.createItem),
     updateItem: after(items.updateItem),
+    createRecipe: after(items.createRecipe),
+    updateRecipe: after(items.updateRecipe),
     deleteItem: after(items.deleteItem),
     restoreItem: after(items.restoreItem),
     upsertBookFromCatalog: after(items.upsertBookFromCatalog),
@@ -96,22 +102,34 @@ function buildClientContext(): Promise<ClientContext> {
 
     syncStatus = connectivity.isOnline() ? "idle" : "offline";
 
-    const baseItemUseCases = createItemUseCases({
+    const idGenerator = createUuidIdGenerator();
+    const nowMs = () => Date.now();
+
+    const notifyLocalWrite = () => syncScheduler?.notifyLocalWrite();
+
+    const cookbookSync = wireClientCookbookSync({
+      db,
+      items: repository,
+      pullLimit: SYNC_PULL_LIMIT,
+      onLocalWrite: notifyLocalWrite,
+    });
+    cookbookSyncEngine = cookbookSync.cookbookEngine;
+
+    const itemUseCasesWithCookbooks = createItemUseCases({
       repository,
-      idGenerator: createUuidIdGenerator(),
-      now: () => Date.now(),
+      idGenerator,
+      now: nowMs,
+      cookbooks: cookbookSync.cookbookUseCases,
     });
 
     syncEngine = createSyncEngine({
       repository,
       remote,
-      items: baseItemUseCases,
+      items: itemUseCasesWithCookbooks,
       pullLimit: SYNC_PULL_LIMIT,
-      now: () => Date.now(),
+      now: nowMs,
       sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
     });
-
-    const notifyLocalWrite = () => syncScheduler?.notifyLocalWrite();
 
     const quoteSync = wireClientQuoteSync({
       db,
@@ -131,11 +149,13 @@ function buildClientContext(): Promise<ClientContext> {
     fitnessSyncEngine = fitnessSync.fitnessEngine;
 
     async function runSync(): Promise<void> {
+      const cookbookEngine = cookbookSyncEngine;
       const engine = syncEngine;
       const quoteEngine = bookQuotesSyncEngine;
       const movieQuoteEngine = movieQuotesSyncEngine;
       const fitnessEngine = fitnessSyncEngine;
       if (
+        cookbookEngine === undefined ||
         engine === undefined ||
         quoteEngine === undefined ||
         movieQuoteEngine === undefined ||
@@ -144,7 +164,7 @@ function buildClientContext(): Promise<ClientContext> {
         return;
       }
       await runSyncEngines({
-        engines: [engine, quoteEngine, movieQuoteEngine, fitnessEngine],
+        engines: [cookbookEngine, engine, quoteEngine, movieQuoteEngine, fitnessEngine],
         connectivity,
         onStatus: publishSyncStatus,
         onPauseScheduler: () => syncScheduler?.pause(),
@@ -164,12 +184,15 @@ function buildClientContext(): Promise<ClientContext> {
       }
     });
 
-    const itemUseCases = wrapLocalWrites(baseItemUseCases, notifyLocalWrite);
+    const itemUseCases = wrapLocalWrites(itemUseCasesWithCookbooks, notifyLocalWrite);
     const { bookQuoteUseCases, movieQuoteUseCases } = quoteSync;
     const { programUseCases: fitnessProgramUseCases, workoutUseCases: fitnessWorkoutUseCases } =
       fitnessSync;
 
-    const searchUseCase = createSearchUseCase({ repository });
+    const searchUseCase = createSearchUseCase({
+      repository,
+      cookbooks: cookbookSync.cookbookUseCases,
+    });
 
     const readingSettingsUseCases = createReadingSettings({
       repository: createIndexedDbReadingGoalRepository(repository.meta),
@@ -197,6 +220,7 @@ function buildClientContext(): Promise<ClientContext> {
       readingSettingsUseCases,
       fitnessProgramUseCases,
       fitnessWorkoutUseCases,
+      cookbookUseCases: cookbookSync.cookbookUseCases,
       ensureFitnessCatalogSeeded: () => fitnessSync.ensureCatalogSeeded(),
       searchUseCase,
       sessionUseCases: wrappedSession,
@@ -244,6 +268,10 @@ export function getFitnessWorkoutUseCases(): Promise<FitnessWorkoutUseCases> {
   return getClientContext().then((ctx) => ctx.fitnessWorkoutUseCases);
 }
 
+export function getCookbookUseCases(): Promise<CookbookUseCases> {
+  return getClientContext().then((ctx) => ctx.cookbookUseCases);
+}
+
 export function ensureFitnessCatalogSeeded(): Promise<void> {
   return getClientContext().then((ctx) => ctx.ensureFitnessCatalogSeeded());
 }
@@ -269,6 +297,7 @@ export function subscribeSyncStatus(
 export function startClientSync(): Promise<void> {
   return getClientContext().then(() => {
     syncEngine?.resume();
+    cookbookSyncEngine?.resume();
     bookQuotesSyncEngine?.resume();
     movieQuotesSyncEngine?.resume();
     fitnessSyncEngine?.resume();

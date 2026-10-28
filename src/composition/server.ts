@@ -40,6 +40,11 @@ import {
   createMovieQuoteSyncService,
   type MovieQuoteSyncService,
 } from "@/application/server/movie-quote-sync-service";
+import { createPostgresCookbookRepository } from "@/adapters/postgres/cookbook-repository";
+import {
+  createCookbookSyncService,
+  type CookbookSyncService,
+} from "@/application/server/cookbook-sync-service";
 import {
   createFitnessSyncService,
   type FitnessSyncService,
@@ -60,6 +65,7 @@ export interface ServerContainer {
   readonly sync: SyncService;
   readonly bookQuoteSync: BookQuoteSyncService;
   readonly movieQuoteSync: MovieQuoteSyncService;
+  readonly cookbookSync: CookbookSyncService;
   readonly fitnessSync: FitnessSyncService;
   readonly lookupBook: LookupBook;
   readonly searchBooks: SearchBooks;
@@ -119,8 +125,10 @@ export function createServerContainer(
         });
 
   const items = createPostgresItemRepository(db);
-  const sync = createSyncService({ repository: items, now });
+  const cookbooks = createPostgresCookbookRepository(db);
+  const sync = createSyncService({ repository: items, cookbooks, now });
   const { bookQuoteSync, movieQuoteSync } = wireServerQuoteSync(db, items, now);
+  const cookbookSync = createCookbookSyncService({ cookbooks, now });
   const fitnessSync = createFitnessSyncService({
     programs: createPostgresFitnessProgramRepository(db),
     workouts: createPostgresFitnessWorkoutRepository(db),
@@ -150,6 +158,7 @@ export function createServerContainer(
     sync,
     bookQuoteSync,
     movieQuoteSync,
+    cookbookSync,
     fitnessSync,
     lookupBook,
     searchBooks,

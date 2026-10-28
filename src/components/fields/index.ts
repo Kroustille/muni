@@ -18,6 +18,7 @@ export { MultilineField, type MultilineFieldProps } from "./multiline-field";
 export {
   RecipeFields,
   recipeFieldValuesToExtra,
+  recipeSourcePayloadFromValues,
   emptyRecipeFieldValues,
   type RecipeFieldValues,
   type RecipeFieldsProps,

@@ -335,5 +335,13 @@
   "fitness.homeCard.weekDone": "{done} séance(s) cette semaine",
   "fitness.homeCard.next": "Prochaine : {title}",
   "fitness.inProgress.modal": "Une séance est déjà en cours. Terminez-la ou abandonnez-la avant d'en démarrer une nouvelle.",
-  "fitness.skip.note": "Note (optionnelle)"
+  "fitness.skip.note": "Note (optionnelle)",
+  "recipe.source.section": "Ouvrage source",
+  "recipe.source.cookbook": "Ouvrage",
+  "recipe.source.create": "Créer « {query} »",
+  "recipe.source.page": "Page(s)",
+  "recipe.source.help": "Référence bibliographique — distincte de votre liste de livres à lire.",
+  "recipe.source.author": "Auteur",
+  "recipe.source.isbn": "ISBN",
+  "recipe.source.missingCookbook": "Ouvrage introuvable (synchronisation en cours…)"
 }

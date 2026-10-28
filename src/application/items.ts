@@ -31,13 +31,25 @@ import type {
 } from "./music/upsert-from-catalog";
 import type { IdGenerator } from "./ports/id-generator";
 import type { ItemRepository, Unsubscribe } from "./ports/item-repository";
+import type { CookbookUseCases } from "./cookbooks/cookbook-use-cases";
 
-export type CreateItemExtra = Partial<Omit<NewItemInput, "id" | "type" | "title" | "createdAt">>;
+export type RecipeSourcePayload = {
+  cookbookId: string | null;
+  sourcePage: string | null;
+  pendingCookbookTitle?: string | null;
+  cookbookAuthor?: string | null;
+  cookbookIsbn?: string | null;
+};
+
+export type CreateItemExtra = Partial<Omit<NewItemInput, "id" | "type" | "title" | "createdAt">> & {
+  recipeSource?: RecipeSourcePayload;
+};
 
 export type ItemUseCasesDeps = {
   repository: ItemRepository;
   idGenerator: IdGenerator;
   now: () => number;
+  cookbooks?: CookbookUseCases;
 };
 
 export type ItemUseCases = {
@@ -60,6 +72,16 @@ export type ItemUseCases = {
   upsertMusicArtistFromCatalog(input: UpsertMusicArtistFromCatalogInput): Promise<Item>;
   upsertMusicTrackFromCatalog(input: UpsertMusicTrackFromCatalogInput): Promise<Item>;
   musicArtistSuggestions(prefix: string): Promise<string[]>;
+  createRecipe(
+    title: string,
+    extra?: Omit<CreateItemExtra, "recipeSource">,
+    source?: RecipeSourcePayload,
+  ): Promise<Item>;
+  updateRecipe(
+    id: string,
+    patch: ItemPatch,
+    source?: RecipeSourcePayload,
+  ): Promise<Item>;
 };
 
 const byNewest = (a: Item, b: Item): number =>
@@ -71,6 +93,7 @@ export function createItemUseCases({
   repository,
   idGenerator,
   now,
+  cookbooks,
 }: ItemUseCasesDeps): ItemUseCases {
   let queue: Promise<unknown> = Promise.resolve();
   const serialized = <T>(task: () => Promise<T>): Promise<T> => {
@@ -155,13 +178,52 @@ export function createItemUseCases({
     return updated;
   }
 
+  async function resolveRecipeSource(
+    source: RecipeSourcePayload | undefined,
+  ): Promise<{ cookbookId: string | null; sourcePage: string | null }> {
+    if (source === undefined || cookbooks === undefined) {
+      return { cookbookId: null, sourcePage: null };
+    }
+    let cookbookId = source.cookbookId;
+    let sourcePage = source.sourcePage?.trim() ? source.sourcePage.trim() : null;
+
+    if (source.pendingCookbookTitle?.trim()) {
+      const created = await cookbooks.upsertCookbook({
+        title: source.pendingCookbookTitle.trim(),
+        author: source.cookbookAuthor ?? null,
+        isbn: source.cookbookIsbn ?? null,
+      });
+      cookbookId = created.id;
+    } else if (cookbookId) {
+      const existing = await cookbooks.getCookbook(cookbookId);
+      if (existing !== undefined) {
+        await cookbooks.upsertCookbook({
+          id: cookbookId,
+          title: existing.title,
+          author:
+            source.cookbookAuthor !== undefined ? source.cookbookAuthor : existing.author,
+          isbn: source.cookbookIsbn !== undefined ? source.cookbookIsbn : existing.isbn,
+        });
+      }
+    }
+
+    if (!cookbookId) sourcePage = null;
+    return { cookbookId, sourcePage };
+  }
+
   return {
     createItem: (type, title, extra = {}) =>
       serialized(async () => {
+        const { recipeSource, ...rest } = extra;
+        let itemExtra = rest;
+        if (type === "recipe") {
+          const sourceFields = await resolveRecipeSource(recipeSource);
+          itemExtra = { ...itemExtra, ...sourceFields };
+        }
         const createdAt = new Date(now()).toISOString();
-        const item = newItem({ ...extra, id: idGenerator.newId(), type, title, createdAt });
+        const item = newItem({ ...itemExtra, id: idGenerator.newId(), type, title, createdAt });
         const stamp = await nextStamp();
-        const provided = Object.entries(extra)
+        const provided = Object.entries(itemExtra)
           .filter(([, value]) => value !== undefined && value !== null)
           .map(([key]) => key);
         const stamped: Item = {
@@ -173,6 +235,44 @@ export function createItemUseCases({
       }),
 
     updateItem: (id, patch) => serialized(() => patchItem(id, patch)),
+
+    createRecipe: (title, extra = {}, source) =>
+      serialized(async () => {
+        const sourceFields = await resolveRecipeSource(source);
+        const createdAt = new Date(now()).toISOString();
+        const item = newItem({
+          ...extra,
+          ...sourceFields,
+          id: idGenerator.newId(),
+          type: "recipe",
+          title,
+          createdAt,
+        });
+        const stamp = await nextStamp();
+        const provided = Object.entries({ ...extra, ...sourceFields })
+          .filter(([, value]) => value !== undefined && value !== null)
+          .map(([key]) => key);
+        const stamped: Item = {
+          ...item,
+          fieldsUpdatedAt: Object.fromEntries(["title", ...provided].map((key) => [key, stamp])),
+        };
+        await repository.put(stamped, { enqueue: true });
+        return stamped;
+      }),
+
+    updateRecipe: (id, patch, source) =>
+      serialized(async () => {
+        const sourceFields = await resolveRecipeSource(source);
+        const mergedPatch =
+          source === undefined
+            ? patch
+            : {
+                ...patch,
+                cookbookId: sourceFields.cookbookId,
+                sourcePage: sourceFields.sourcePage,
+              };
+        return patchItem(id, mergedPatch);
+      }),
 
     deleteItem: (id) =>
       serialized(async () => {

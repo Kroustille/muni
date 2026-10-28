@@ -69,11 +69,19 @@ export interface MuniDbSchema extends DBSchema {
   fitnessWorkoutOutbox: { key: string; value: { id: string } };
   fitnessSkipOutbox: { key: string; value: { id: string } };
   fitnessSettingsOutbox: { key: string; value: { id: string } };
+  cookbooks: {
+    key: string;
+    value: import("../../domain/cookbook").Cookbook;
+  };
+  cookbookOutbox: {
+    key: string;
+    value: { id: string };
+  };
 }
 
 export type MuniDb = IDBPDatabase<MuniDbSchema>;
 
-const DB_VERSION = 4;
+const DB_VERSION = 5;
 
 export function openMuniDb(name: string): Promise<MuniDb> {
   return openDB<MuniDbSchema>(name, DB_VERSION, {
@@ -108,6 +116,10 @@ export function openMuniDb(name: string): Promise<MuniDb> {
         db.createObjectStore("fitnessWorkoutOutbox", { keyPath: "id" });
         db.createObjectStore("fitnessSkipOutbox", { keyPath: "id" });
         db.createObjectStore("fitnessSettingsOutbox", { keyPath: "id" });
+      }
+      if (oldVersion < 5) {
+        db.createObjectStore("cookbooks", { keyPath: "id" });
+        db.createObjectStore("cookbookOutbox", { keyPath: "id" });
       }
     },
   });

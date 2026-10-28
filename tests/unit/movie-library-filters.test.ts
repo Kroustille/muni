@@ -58,6 +58,8 @@ function movie(tags: string[] | null, franchiseName: string | null): Item {
     musicBrainzRecordingId: null,
     spotifyUrl: null,
     soundcloudUrl: null,
+  cookbookId: null,
+  sourcePage: null,
   };
 }
 

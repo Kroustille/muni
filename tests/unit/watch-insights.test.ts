@@ -53,6 +53,8 @@ const movie: Item = {
   musicBrainzRecordingId: null,
   spotifyUrl: null,
   soundcloudUrl: null,
+cookbookId: null,
+sourcePage: null,
 };
 
 describe("watch insights", () => {

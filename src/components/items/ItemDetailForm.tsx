@@ -8,6 +8,7 @@ import {
   MusicTrackFields,
   type MusicTrackFieldValues,
   RecipeFields,
+  recipeSourcePayloadFromValues,
   type RecipeFieldValues,
   ShoppingFields,
   type ShoppingFieldValues,
@@ -26,9 +27,11 @@ import { t } from "@/i18n";
 import {
   type FieldValues,
   patchFromValues,
+  recipeValuesToPatch,
   validateFieldValues,
   valuesFromItem,
 } from "./item-detail-shared";
+import { getCookbookUseCases, getItemUseCases } from "@/composition/client";
 
 export type ItemDetailFormProps = {
   item: Item;
@@ -62,6 +65,28 @@ export function ItemDetailForm({
     setMovieItem(item);
   }, [item]);
 
+  useEffect(() => {
+    if (item.type !== "recipe" || item.cookbookId === null) return;
+    let cancelled = false;
+    void getCookbookUseCases().then(async (useCases) => {
+      const cookbook = await useCases.getCookbook(item.cookbookId!);
+      if (cancelled || cookbook === undefined) return;
+      setValues((current) => {
+        if ((current as RecipeFieldValues).cookbookQuery !== "") return current;
+        return {
+          ...(current as RecipeFieldValues),
+          cookbookQuery: cookbook.title,
+          cookbookAuthor: cookbook.author ?? "",
+          cookbookIsbn: cookbook.isbn ?? "",
+          sourceSectionOpen: true,
+        };
+      });
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [item.type, item.cookbookId, item.id]);
+
   const save = useCallback(async () => {
     const errors = validateFieldValues(item, values);
     if (errors.titleError || errors.artistError || errors.pagesReadError || errors.loanError) {
@@ -77,6 +102,17 @@ export function ItemDetailForm({
     setLoanError(undefined);
     setArtistError(undefined);
     try {
+      if (item.type === "recipe") {
+        const recipeValues = values as RecipeFieldValues;
+        const useCases = await getItemUseCases();
+        const updated = await useCases.updateRecipe(
+          item.id,
+          recipeValuesToPatch(recipeValues),
+          recipeSourcePayloadFromValues(recipeValues),
+        );
+        setValues(valuesFromItem(updated) as RecipeFieldValues);
+        return;
+      }
       const patch =
         item.type === "book"
           ? { ...patchFromValues(item, values), ...bookDiscoveryValuesToPatch(discoveryValues) }
@@ -149,6 +185,7 @@ export function ItemDetailForm({
             setTitleError(undefined);
           }}
           titleError={titleError}
+          defaultSourceCollapsed={item.cookbookId === null}
         />
       ) : null}
       {item.type === "music_artist" ? (

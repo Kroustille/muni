@@ -1,11 +1,14 @@
 "use client";
 
-import type { CreateItemExtra } from "@/application/items";
+import type { CreateItemExtra, RecipeSourcePayload } from "@/application/items";
 import type { Ingredient } from "@/domain/item";
+import type { Cookbook } from "@/domain/cookbook";
 import { Button } from "@/components/ui/Button";
 import { TextField } from "@/components/ui/TextField";
 import { t } from "@/i18n";
+import { RecipeSourceSection } from "@/components/recipe/recipe-source-section";
 
+import { CookbookCombobox } from "./cookbook-combobox";
 import { MultilineField } from "./multiline-field";
 
 export type RecipeFieldValues = {
@@ -13,6 +16,13 @@ export type RecipeFieldValues = {
   ingredients: Ingredient[];
   steps: string[];
   notes: string;
+  cookbookId: string | null;
+  cookbookQuery: string;
+  pendingCookbookTitle: string | null;
+  sourcePage: string;
+  cookbookAuthor: string;
+  cookbookIsbn: string;
+  sourceSectionOpen: boolean;
 };
 
 export const emptyRecipeFieldValues = (): RecipeFieldValues => ({
@@ -20,12 +30,20 @@ export const emptyRecipeFieldValues = (): RecipeFieldValues => ({
   ingredients: [],
   steps: [],
   notes: "",
+  cookbookId: null,
+  cookbookQuery: "",
+  pendingCookbookTitle: null,
+  sourcePage: "",
+  cookbookAuthor: "",
+  cookbookIsbn: "",
+  sourceSectionOpen: false,
 });
 
 export type RecipeFieldsProps = {
   values: RecipeFieldValues;
   onChange: (values: RecipeFieldValues) => void;
   titleError?: string;
+  defaultSourceCollapsed?: boolean;
 };
 
 function optionalText(value: string): string | null {
@@ -56,7 +74,30 @@ export function recipeFieldValuesToExtra(values: RecipeFieldValues): CreateItemE
   return extra;
 }
 
-export function RecipeFields({ values, onChange, titleError }: RecipeFieldsProps) {
+export function recipeSourcePayloadFromValues(values: RecipeFieldValues): RecipeSourcePayload {
+  return {
+    cookbookId: values.cookbookId,
+    sourcePage: optionalText(values.sourcePage),
+    pendingCookbookTitle: values.pendingCookbookTitle,
+    cookbookAuthor: optionalText(values.cookbookAuthor),
+    cookbookIsbn: optionalText(values.cookbookIsbn),
+  };
+}
+
+export function RecipeFields({
+  values,
+  onChange,
+  titleError,
+  defaultSourceCollapsed = true,
+}: RecipeFieldsProps) {
+  const sourceOpen =
+    values.sourceSectionOpen ||
+    (!defaultSourceCollapsed && values.cookbookId !== null) ||
+    values.cookbookQuery.trim() !== "";
+
+  const hasCookbookSelection =
+    values.cookbookId !== null || values.pendingCookbookTitle !== null;
+
   const updateIngredient = (index: number, patch: Partial<Ingredient>) => {
     const ingredients = values.ingredients.map((row, i) =>
       i === index ? { ...row, ...patch } : row,
@@ -69,6 +110,42 @@ export function RecipeFields({ values, onChange, titleError }: RecipeFieldsProps
     onChange({ ...values, steps });
   };
 
+  const handleCookbookSelect = (cookbook: Cookbook | null, pendingTitle: string | null) => {
+    if (pendingTitle) {
+      onChange({
+        ...values,
+        cookbookId: null,
+        pendingCookbookTitle: pendingTitle,
+        cookbookQuery: pendingTitle,
+        cookbookAuthor: "",
+        cookbookIsbn: "",
+        sourceSectionOpen: true,
+      });
+      return;
+    }
+    if (cookbook === null) {
+      onChange({
+        ...values,
+        cookbookId: null,
+        pendingCookbookTitle: null,
+        cookbookQuery: "",
+        sourcePage: "",
+        cookbookAuthor: "",
+        cookbookIsbn: "",
+      });
+      return;
+    }
+    onChange({
+      ...values,
+      cookbookId: cookbook.id,
+      pendingCookbookTitle: null,
+      cookbookQuery: cookbook.title,
+      cookbookAuthor: cookbook.author ?? "",
+      cookbookIsbn: cookbook.isbn ?? "",
+      sourceSectionOpen: true,
+    });
+  };
+
   return (
     <div className="flex flex-col gap-4">
       <TextField
@@ -78,6 +155,55 @@ export function RecipeFields({ values, onChange, titleError }: RecipeFieldsProps
         error={titleError}
         autoComplete="off"
       />
+
+      <details
+        className="rounded-lg border border-border p-3"
+        open={sourceOpen}
+        onToggle={(event) => {
+          onChange({
+            ...values,
+            sourceSectionOpen: (event.currentTarget as HTMLDetailsElement).open,
+          });
+        }}
+      >
+        <summary className="cursor-pointer font-medium text-foreground">
+          {t("recipe.source.section")}
+        </summary>
+        <div className="mt-3 flex flex-col gap-3">
+          <p className="text-sm text-muted">{t("recipe.source.help")}</p>
+          <CookbookCombobox
+            query={values.cookbookQuery}
+            selectedId={values.cookbookId}
+            onQueryChange={(cookbookQuery) =>
+              onChange({ ...values, cookbookQuery, sourceSectionOpen: true })
+            }
+            onSelect={handleCookbookSelect}
+          />
+          <TextField
+            label={t("recipe.source.page")}
+            value={values.sourcePage}
+            onChange={(event) => onChange({ ...values, sourcePage: event.target.value })}
+            disabled={!hasCookbookSelection}
+            autoComplete="off"
+          />
+          {hasCookbookSelection ? (
+            <>
+              <TextField
+                label={t("recipe.source.author")}
+                value={values.cookbookAuthor}
+                onChange={(event) => onChange({ ...values, cookbookAuthor: event.target.value })}
+                autoComplete="off"
+              />
+              <TextField
+                label={t("recipe.source.isbn")}
+                value={values.cookbookIsbn}
+                onChange={(event) => onChange({ ...values, cookbookIsbn: event.target.value })}
+                autoComplete="off"
+              />
+            </>
+          ) : null}
+        </div>
+      </details>
 
       <section role="group" aria-label={t("field.ingredients")} className="flex flex-col gap-2">
         <p className="text-sm text-muted">{t("field.ingredients")}</p>
@@ -137,6 +263,13 @@ export function RecipeFields({ values, onChange, titleError }: RecipeFieldsProps
           {t("action.addStep")}
         </Button>
       </section>
+
+      {values.cookbookId ? (
+        <RecipeSourceSection
+          cookbookId={values.cookbookId}
+          sourcePage={optionalText(values.sourcePage)}
+        />
+      ) : null}
 
       <MultilineField
         label={t("field.notes")}

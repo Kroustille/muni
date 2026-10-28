@@ -1,6 +1,8 @@
 import { merge } from "@/domain/merge";
 import { itemWireSchema, type ItemWire } from "@/domain/item";
 import type { ServerItemRepository } from "@/application/ports/server-item-repository";
+import type { ServerCookbookRepository } from "@/application/ports/cookbook-repository";
+import { assertRecipeCookbookRefs } from "./cookbook-sync-service";
 
 export type RowError = { id?: string; index?: number; message: string };
 
@@ -29,6 +31,7 @@ export type SyncService = {
 
 type SyncServiceDeps = {
   repository: ServerItemRepository;
+  cookbooks?: ServerCookbookRepository;
   now?: () => Date;
 };
 
@@ -87,12 +90,16 @@ function serverUpdatedAtIso(now: () => Date): string {
 
 export function createSyncService(deps: SyncServiceDeps): SyncService {
   const now = deps.now ?? (() => new Date());
-  const { repository } = deps;
+  const { repository, cookbooks } = deps;
 
   return {
     async push(userId, items) {
       assertUserId(userId);
       const validated = validatePushItems(items);
+
+      if (cookbooks !== undefined) {
+        await assertRecipeCookbookRefs(userId, validated, cookbooks);
+      }
 
       return repository.transaction(async (repo) => {
         const results: ItemWire[] = [];

@@ -59,6 +59,8 @@ function book(overrides: Partial<Item> = {}): Item {
     director: null,
     cast: null,
     soundcloudUrl: null,
+    cookbookId: null,
+    sourcePage: null,
     ...overrides,
   };
 }

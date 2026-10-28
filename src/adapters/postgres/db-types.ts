@@ -40,6 +40,18 @@ export interface BookQuotes {
   user_id: string;
 }
 
+export interface Cookbooks {
+  author: string | null;
+  created_at: Timestamp;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  isbn: string | null;
+  server_updated_at: Timestamp;
+  title: string;
+  user_id: string;
+}
+
 export interface CatalogCache {
   cache_key: string;
   fetched_at: Timestamp;
@@ -54,6 +66,7 @@ export interface Items {
   cast: Json | null;
   catalog_rating: Numeric | null;
   checked: Generated<boolean>;
+  cookbook_id: string | null;
   created_at: Timestamp;
   deleted_at: Timestamp | null;
   director: string | null;
@@ -88,6 +101,7 @@ export interface Items {
   series_position: Numeric | null;
   server_updated_at: Timestamp;
   soundcloud_url: string | null;
+  source_page: string | null;
   spotify_url: string | null;
   status: string | null;
   steps: Json | null;
@@ -206,6 +220,7 @@ export interface FitnessWorkoutLog {
 export interface DB {
   book_quotes: BookQuotes;
   catalog_cache: CatalogCache;
+  cookbooks: Cookbooks;
   fitness_program: FitnessProgram;
   fitness_skip_record: FitnessSkipRecord;
   fitness_user_settings: FitnessUserSettings;
