@@ -46,6 +46,8 @@
 |--------|----------|
 | **Heatmap accents** | **Multi-domain** per day — vertical micro-segments with domain accent tokens; legend + tooltip/a11y text; **not** binary single-accent MVP. |
 | **Heatmap mobile (2026-10-28)** | Mount on **all** viewports; **week-column** grid (7 weekday rows, weeks as columns) with **`overflow-x` horizontal scroll** on narrow widths — no `md+`-only gate. |
+| **Heatmap mobile window (2026-10-28)** | On **narrow** viewports (`< 768px`), heatmap shows **recent weeks only** — default **12 weeks** (**84 local calendar days**) ending today, **not** the full 365-day strip. **Desktop / wide** (≥ 768px) keeps **trailing 365 days** (OD-011-1). Same week-column layout; shorter horizontal scroll on mobile. |
+| **Period controls (2026-10-28)** | Replace row of period **toggle buttons** with a single **`<select>`** (French: **Jour**, **Semaine**, **Mois**, **Année**); optional **Aujourd’hui** / **Hier** shortcuts when **Jour** is selected. **◀ / ▶** prev/next unchanged within granularity. See [contracts/recap-period-controls.md](contracts/recap-period-controls.md). |
 
 ### Session 2026-10-28 (Valentin — Musique in recap, 011)
 
@@ -87,7 +89,7 @@ A signed-in user opens **Récap** and sees **this week** (ISO week, Monday–Sun
 
 ### User Story 2 - Monthly recap and period switcher (Priority: P1 — MVP Phase A)
 
-The user switches period to **Ce mois-ci** and sees the same domain grouping for the **current calendar month**. A **period control** (tabs or select) offers at least **Semaine** and **Mois**; navigation to **previous / next** period for the selected granularity is available so they can browse last month’s recap offline.
+The user switches period to **Ce mois-ci** and sees the same domain grouping for the **current calendar month**. A **period granularity** control (native **`<select>`**: **Jour**, **Semaine**, **Mois**, **Année** — French labels) sets the active type; **◀ / ▶** navigate **previous / next** period for that granularity so they can browse last month’s recap offline.
 
 **Why this priority**: Monthly view supports longer reflection alongside weekly, daily, and yearly in the same v1 shell.
 
@@ -163,7 +165,7 @@ The recap UI includes a **stable extension point** (e.g. empty domain sections h
 
 ### User Story 7 - Activity tracker (GitHub-style heatmap) (Priority: P2 — MVP Phase A)
 
-At the top of **`/recap`** (above period navigation), on **every viewport**, show a **calendar activity grid** (GitHub-contribution-style): one cell per **calendar day** in a visible range (default: trailing **12 months** / 365 local days ending today — **independent** of the selected list period; see OD-011-1). Layout: **week columns** (ISO **Monday–Sunday** rows, weeks left→right). On **narrow** viewports the grid sits in a **horizontally scrollable** region so ~365 days remain readable without shrinking cells below tap targets. Days with no recap-eligible events stay **neutral/empty**. Days with activity use **multi-domain accents** (see **Visual pattern** below). Recap lists and period controls unchanged below the heatmap.
+At the top of **`/recap`** (above period navigation), on **every viewport**, show a **calendar activity grid** (GitHub-contribution-style): one cell per **calendar day** in a visible range (**independent** of the selected list period; see OD-011-1 / OD-011-11). **Wide** viewports: trailing **365 local days** ending today. **Narrow** viewports: trailing **12 weeks** (**84 days**) ending today — recent activity only, not the full year strip. Layout: **week columns** (ISO **Monday–Sunday** rows, weeks left→right). On **narrow** viewports the grid sits in a **horizontally scrollable** region with legible cell size (no breakpoint-based unmount). Days with no recap-eligible events stay **neutral/empty**. Days with activity use **multi-domain accents** (see **Visual pattern** below). Recap lists and period controls unchanged below the heatmap.
 
 **Visual pattern (MVP — locked 2026-10-28; **Plantes** segment added 2026-10-28)**: Each active day cell is a small square subdivided into **vertical micro-segments** (equal-width columns, left → right). One segment appears **per recap domain** that had ≥ 1 eligible event that day, in the **same stable domain order** as recap list sections (Livres → Films & séries → Musique → Recettes → Entraînement → Plantes). A segment’s fill uses that domain’s **design-system accent token** (see FR-020). A single-domain day is a **full-cell** fill in that domain’s accent (no artificial split). **No intensity scale** by event count in MVP — presence only, not volume.
 
@@ -189,10 +191,10 @@ At the top of **`/recap`** (above period navigation), on **every viewport**, sho
 1. **Given** recap-eligible events from **one** domain on calendar day D, **When** `/recap` loads, **Then** cell D is a **single** full fill in that domain’s accent.
 2. **Given** events from **two or more** recap domains on the same day D, **When** heatmap renders, **Then** cell D shows **vertical micro-segments** (one per domain present), in stable domain order, each with the correct domain accent.
 3. **Given** no events on day D, **When** heatmap renders, **Then** D appears inactive (neutral).
-4. **Given** a narrow viewport (< 768px), **When** `/recap` loads, **Then** heatmap is **rendered** at the top with **horizontal scroll** for the week-column grid; weekly/monthly list UX below is unchanged.
+4. **Given** a narrow viewport (< 768px), **When** `/recap` loads, **Then** heatmap is **rendered** at the top with **horizontal scroll** for the week-column grid spanning **84 days** (12 weeks), not 365 cells; weekly/monthly list UX below is unchanged.
 5. **Given** an active day cell, **When** assistive tech focuses it, **Then** accessible name includes the **date** and a **text list of domains** with activity (e.g. “28 octobre 2026 — Livres, Entraînement”); optional total event count.
 6. **Given** the heatmap is visible, **When** the user views the grid, **Then** a **legend** maps each accent to its French domain label.
-7. **Given** user selects previous month/week in period control, **When** heatmap is visible, **Then** heatmap range stays the **fixed trailing 365-day window** (OD-011-1) — decoupled from list period.
+7. **Given** user selects previous month/week in period control, **When** heatmap is visible, **Then** heatmap range stays the **fixed trailing window** for the viewport (365 days wide, 84 days narrow — OD-011-1, OD-011-11) — decoupled from list period.
 
 **Activity day definition (normative)**: For each local calendar day, compute **`domainsPresent`**: the set of recap domains (FR-006) with **≥ 1** eligible event bucketed to that day. Day is **active** iff `domainsPresent` is non-empty. Same event sources as list aggregation (books `read`, films/séries watched, episode `watchedAt`, tracks `listened`, **012** composition **`finished`/`finishedAt`**, DJ **`performed`/`performedAt`**, **`practice_log.practicedAt`**, recipe `cookedDates` entries, fitness `completed`, plant care / vegetable milestones **`occurredAt`**). Multiple Musique event types on one day still yield **one** Musique segment.
 
@@ -230,8 +232,9 @@ At the top of **`/recap`** (above period navigation), on **every viewport**, sho
 - **FR-016**: Within a selected period, recap MUST render achievements **grouped by domain** in a stable domain order; within each domain section, lines MUST sort **newest event day first** (then title).
 - **FR-017**: Séries MUST emit **one recap line per episode** with `watchedAt` in period (no episode roll-up in MVP).
 - **FR-018**: Yearly (and all) period views MUST live entirely in **`/recap`** UX without requiring navigation to domain year-goal screens.
-- **FR-019**: On **all** viewports, **`/recap`** MUST show an **activity heatmap** at the top per User Story 7 whenever recap snapshot data is loaded; on narrow viewports the grid MUST use **week columns** with **horizontal scroll** (no breakpoint-based unmount).
+- **FR-019**: On **all** viewports, **`/recap`** MUST show an **activity heatmap** at the top per User Story 7 whenever recap snapshot data is loaded; on narrow viewports the grid MUST use **week columns** with **horizontal scroll** and a **84-day** trailing window (OD-011-11); on wide viewports **365-day** window (OD-011-1). No breakpoint-based unmount.
 - **FR-020**: Heatmap cells MUST encode **which recap domains** had activity each day using **vertical micro-segments** (MVP pattern in User Story 7): one segment per domain present, **stable domain order**, each segment filled with that domain’s **design-system accent token** (Livres, Films & séries, Musique, Recettes, Entraînement, Plantes — see User Story 7 table). Single-domain days MAY use a full-cell fill. Inactive days stay neutral. **No** event-count intensity scale in MVP. At most **6** segment colors per cell for current in-scope domains; additional domains MUST appear in tooltip and accessible name. A **French text legend** and per-cell domain listing MUST satisfy accessibility — **not color alone**.
+- **FR-021**: Period granularity MUST be chosen via a single **`<select>`** with French options **Jour**, **Semaine**, **Mois**, **Année** (not a row of toggle buttons). Prev/next chevrons MUST navigate within the selected granularity. Optional **Aujourd’hui** / **Hier** shortcuts MAY appear when **Jour** is selected. See [contracts/recap-period-controls.md](contracts/recap-period-controls.md).
 
 ### Key Entities *(conceptual — mostly derived)*
 
@@ -259,7 +262,7 @@ At the top of **`/recap`** (above period navigation), on **every viewport**, sho
 - Fitness **008** workout logs are synced and available locally before fitness lines appear in recap.
 - **012** music-practice entities are synced and available locally before composition / DJ / practice-log lines appear in recap; track **listened** lines still use **004** `items` only.
 - **Plants 013** care events and vegetable milestones are available locally before **Plantes** lines appear; **`plants-contributor`** MAY ship in 011 before 013 UI if fixtures/tests cover event shape.
-- Recap **activity heatmap** on `/recap` uses the same trailing window on mobile and desktop; narrow layouts scroll horizontally rather than hiding the grid.
+- Recap **activity heatmap** on `/recap` uses a **shorter trailing window on narrow viewports** (12 weeks) and **365 days on wide**; both scroll horizontally when needed rather than hiding the grid.
 
 ## Out of Scope (MVP)
 
@@ -276,7 +279,7 @@ At the top of **`/recap`** (above period navigation), on **every viewport**, sho
 
 | Phase | Periods | Entry | Recipe signal | Activity grid |
 |-------|---------|-------|---------------|-----------------|
-| **A (MVP v1)** | **Day + week + month + year** | Bottom-nav **Récap** + optional home teaser | **`cookedDates`** + UI (today **or backdated**) | **`/recap`** heatmap all viewports (**week-column grid**, multi-domain segments + legend; mobile scroll) |
+| **A (MVP v1)** | **Day + week + month + year** | Bottom-nav **Récap** + optional home teaser | **`cookedDates`** + UI (today **or backdated**) | **`/recap`** heatmap all viewports (**week-column grid**, multi-domain segments + legend; **84d** narrow / **365d** wide scroll) |
 | **B (optional)** | PR highlights, richer yearly layout | Same | — | Optional event-count intensity or range tweaks |
 
 **Justification**: All four periods ship together in v1 so `/recap` is a complete companion reflection surface (009 visibility) while copy stays **optional and non-guilt** (constitution capture speed). Yearly recap stays **standalone** in `/recap` (domain year goals unchanged elsewhere). Fitness PR highlights may follow in Phase B.
@@ -291,7 +294,7 @@ Desktop /recap (wide)                Mobile /recap (narrow)
 │ Récap                    │         │ Récap                    │
 │ [▮▮|▮□▮▮|□ week cols …]  │         │ ◀ scroll ▶ [▮|▮□|…]     │
 │ (multi-domain day cells) │         │ (same grid, horiz. scroll)│
-│ [Semaine ▼] ◀ … ▶        │         │ [Semaine ▼] ◀ … ▶        │
+│ [Semaine ▾ select] ◀ … ▶ │         │ [Semaine ▾] ◀ … ▶       │
 │                          │         │                          │
 │ Livres (2)               │         │ Livres (2)               │
 │  · Le Petit Prince — lun.│         │  · Le Petit Prince — lun.│

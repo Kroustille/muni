@@ -107,3 +107,25 @@ Honest boundaries for implementers and follow-on work. **Do not** treat complete
 | **Reading goals sync** | Annual goals are read/written via **IndexedDB** (`reading-goal-repository`). PostgreSQL `reading_goals` exists (migration `0010`) but goals are **not** included in item/quote sync push/pull yet — **local-only goals v1**; a second device will not converge goal targets until dedicated routes land. |
 | **Activity events** | Heatmap/streak derive from `fieldsUpdatedAt` / status (§13); no append-only `activity_events` table. |
 | **Work id on title search** | Title-search catalog hits may omit `workId` until ISBN/edition fetch (§8). |
+
+---
+
+## 17. Catalog coverage & fallback providers (2026-10-28)
+
+**Current stack (code)**: **Open Library** only — ISBN + title search via server adapter `open-library/book-catalog-lookup.ts`; client never calls third parties directly (X2). **MusicBrainz** is used for **music** (004), not books.
+
+**Do not** depend on [public-apis](https://github.com/public-apis/public-apis) as a runtime library — it is a link directory, not an API.
+
+**Gaps**: Obscure FR editions, recent releases slow to appear in OL, weak title-only matches for common words, no cover (by design N2).
+
+| Priority | Provider | Role | Keys / limits | Offline-first |
+|----------|----------|------|---------------|---------------|
+| **Primary** | Open Library | ISBN + title search, edition metadata | No key; polite rate limit; server cache TTL 24h | Lookup online only; manual add offline |
+| **Fallback (P2)** | [Google Books API](https://developers.google.com/books) | Title/ISBN when OL returns empty or low-confidence hit | API key server-side; ~1k/day free tier typical | Same as OL — server proxy only |
+| **Manual** | — | Title-only add, ISBN prefilled on scan fail | N/A | Always |
+
+**P1 (search quality)**: Normalize queries (accents, strip articles); retry ISBN-13 variant; expand merge rules for near-duplicate titles; surface “Aucun résultat — ajouter manuellement” with one tap.
+
+**P2 (enrichment)**: Chain `BookCatalogLookup`: try OL → on miss try Google Books → map to same `BookCatalogHit` shape; store provider id optionally for refresh. **Not** dual search UI — single search box.
+
+**FR additions**: See spec § Catalog search improvements (2026-10-28).

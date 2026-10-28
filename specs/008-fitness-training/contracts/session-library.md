@@ -9,7 +9,7 @@
 ## Surfaces
 
 - List of **séance templates** (title + exercise count summary).
-- Add template, edit template, delete template (soft delete + undo).
+- Add template, edit template, **delete template** per row: **Supprimer** → soft delete + **Annuler** undo (FR-050, FR-013) — immediate persist, not only on batch save exit.
 - Per template: **title** + ordered **catalog exercises** (optional default sets/reps/notes).
 - **No weekday chips** — scheduling is separate (**planifier** from home or future date picker).
 

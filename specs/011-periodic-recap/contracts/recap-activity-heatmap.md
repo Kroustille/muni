@@ -7,8 +7,8 @@
 | Viewport | Behavior |
 |----------|----------|
 | All widths | **Mount** at top of recap page above period navigation whenever `RecapSnapshot` is loaded (including empty trailing window — inactive cells only) |
-| Narrow (< 768px typical) | Same week-column grid; wrapper **`overflow-x: auto`** (horizontal scroll) so cell size stays legible; legend below grid (wrap OK) |
-| Wide (≥ 768px) | Same component; scroll optional if grid fits within page max width |
+| Narrow (< 768px typical) | Same week-column grid; **`overflow-x: auto`**; **84 local days** (12 weeks) ending today — not 365 columns |
+| Wide (≥ 768px) | Same component; **365 local days** ending today; scroll optional if grid fits within page max width |
 
 Do **not** gate mount on `useMediaQuery`, `md:`, or `useIsMobile`.
 
@@ -16,7 +16,8 @@ Do **not** gate mount on `useMediaQuery`, `md:`, or `useIsMobile`.
 
 ```typescript
 type RecapActivityHeatmapProps = {
-  days: RecapActivityDay[];  // 365 entries, ascending date
+  days: RecapActivityDay[];  // ascending date — length 365 (wide) or 84 (narrow)
+  viewportWindow: "365" | "84";  // derived from breakpoint; see OD-011-11
 };
 ```
 
@@ -66,7 +67,14 @@ Inactive cells: date only or omitted from tab order (product choice; prefer skip
 
 ## Independence from period switcher
 
-Heatmap always reflects **trailing 365 local days** (OD-011-1), **not** the selected week/month list period. Copy may clarify (“Activité des 12 derniers mois”) in i18n.
+Heatmap reflects a **fixed trailing window** ending today — **not** the selected week/month list period:
+
+| Viewport | Window |
+|----------|--------|
+| Wide (≥ 768px) | **365** local calendar days (OD-011-1) |
+| Narrow (< 768px) | **84** local calendar days — **12 weeks** (OD-011-11) |
+
+Copy MAY clarify in i18n (e.g. wide: « Activité des 12 derniers mois »; narrow: « Activité des 12 dernières semaines »).
 
 ## Testing
 

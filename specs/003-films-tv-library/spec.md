@@ -151,9 +151,25 @@ User opens stats (per month, tags, directors, film vs série) and an optional pr
 - Série with incomplete episode catalog: user can still mark episodes manually (plan defines minimal identity).
 - Streaming availability unavailable for a region or title: hide or show honest empty state; MUST NOT block save.
 
+### Session 2026-10-28 (catalog coverage)
+
+| Topic | Decision |
+|--------|----------|
+| **Primary** | **Wikidata** (unchanged) |
+| **Fallback (P2)** | **TMDB** title search when Wikidata insufficient; optional **OMDb** enrichment via `imdbId` |
+| **public-apis** | Not a runtime dependency |
+| **P1 / P2** | P1 = Wikidata tuning + UX; P2 = composite adapter + optional ids on item |
+
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
+
+**Catalog search improvements (2026-10-28)**
+
+- **FR-CAT01**: Catalog search MUST remain one UI with disambiguation list (M3).
+- **FR-CAT02**: Empty primary results MUST allow manual movie add without dead-end.
+- **FR-CAT03 (P2)**: Server MAY chain **TMDB** (and optionally **OMDb** when `imdbId` known) before not-found; hits MUST map to existing preview shape.
+- **FR-CAT04**: Keys and third-party calls MUST stay server-side (X2).
 
 **Phase A — Catalog**
 

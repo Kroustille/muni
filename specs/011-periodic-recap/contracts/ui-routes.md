@@ -21,9 +21,9 @@ Invalid query → fall back to defaults.
 
 ## Page layout (`RecapPage`)
 
-1. **Header**: title **Récap** + period granularity control (tabs or select: **Semaine**, **Mois**, **Aujourd’hui** / **Hier** (or day picker), **Cette année**).
-2. **Period navigation**: **◀ période précédente** / **période suivante ▶** with French label for active range.
-3. **Heatmap slot**: see [recap-activity-heatmap.md](recap-activity-heatmap.md) — always mounted when snapshot loaded; narrow viewports scroll horizontally.
+1. **Header**: title **Récap**.
+2. **Heatmap slot**: see [recap-activity-heatmap.md](recap-activity-heatmap.md) — always mounted when snapshot loaded; narrow viewports show **84-day** window + horizontal scroll.
+3. **Period controls**: granularity **`<select>`** (**Jour**, **Semaine**, **Mois**, **Année**) + optional day shortcuts + **◀ / ▶** prev/next — see [recap-period-controls.md](recap-period-controls.md).
 4. **Intro line**: celebratory/neutral one-liner (non-guilt).
 5. **Sections**: `RecapDomainSection` per non-empty domain; count in header **Livres (3)**.
 6. **Empty state**: neutral copy when `snapshot.empty` (US1 scenario 7).
@@ -47,7 +47,7 @@ Invalid query → fall back to defaults.
 
 ## i18n keys (minimum set)
 
-- `recap.nav`, `recap.title`, `recap.period.week`, `recap.period.month`, `recap.period.day`, `recap.period.year`
+- `recap.nav`, `recap.title`, `recap.period.granularity.day`, `recap.period.granularity.week`, `recap.period.granularity.month`, `recap.period.granularity.year`, `recap.period.dayToday`, `recap.period.dayYesterday`
 - `recap.prev`, `recap.next`, `recap.empty`, `recap.section.*` (per domain — **Musique** covers 004 + 012 line kinds)
 - `recap.music.line.listened`, `recap.music.line.compositionFinished`, `recap.music.line.djPerformed`, `recap.music.line.practiceSession`
 - `recap.homeTeaser.title`, `recap.homeTeaser.cta`
@@ -59,6 +59,7 @@ Invalid query → fall back to defaults.
 |----|---------|
 | FR-001 | `/recap` + French strings |
 | FR-004–FR-005 | Period controls |
+| FR-021 | Granularity `<select>` + prev/next |
 | FR-009 | Intro + empty states |
 | FR-010 | Nav + optional home teaser |
 | FR-018 | Standalone yearly UX |

@@ -99,3 +99,26 @@ Honest boundaries for implementers and follow-on work. **Do not** treat complete
 | **Streaming availability** | Port `StreamingAvailabilityLookup` with **no-op adapter** v1; `lookupMovieStreaming` caches adapter results (empty until a real provider is wired). `GET /api/movies/streaming` exists; UI **Où regarder** shows the honest empty state (OD-003-3). |
 | **Watch goals sync** | Same pattern as books: goals live in **IndexedDB**; `watch_goals` on Postgres is not on sync push/pull yet — **local-only goals v1**. |
 | **Episode progress e2e** | Episode mark/next-key logic is covered by **unit** tests (`movie-episode-progress.test.ts`, domain validation). There is **no** Playwright scenario for série detail → mark **épisode vu** → next episode (gap vs FR-B09 manual quickstart). |
+
+---
+
+## 18. Catalog coverage & fallback providers (2026-10-28)
+
+**Current stack (code)**: **Wikidata** — `wbsearchentities` + entity detail in `wikidata/movie-catalog-search.ts`; server cache; FR labels via `rdfs:label@fr`. **MusicBrainz** is **004**, not movies.
+
+**Do not** use [public-apis](https://github.com/public-apis/public-apis) as a runtime dependency.
+
+**Gaps**: Sparse Wikidata coverage for obscure titles; weak disambiguation for generic French titles; episode lists incomplete; no poster (by design).
+
+| Priority | Provider | Role | Keys / limits | Offline-first |
+|----------|----------|------|---------------|---------------|
+| **Primary** | Wikidata | Title search, film vs series, IMDb id, optional P444 rating | No key; cache 24h; polite UA | Online lookup; manual add offline |
+| **Fallback search (P2)** | [TMDB API](https://developer.themoviedb.org/docs) | Title search when Wikidata returns &lt; 3 hits or empty | API key server-side; rate limits per TMDB plan | Server proxy only |
+| **Enrichment (P2, optional)** | [OMDb API](http://www.omdbapi.com/) | Extra synopsis/rating when `imdbId` known from Wikidata/TMDB | API key; low daily quota on free tier | Server proxy; cache by imdbId |
+| **Manual** | — | Title-only movie add | N/A | Always |
+
+**P1**: Tune Wikidata search (language `fr`, type filters); better empty state; merge manual rows (M6).
+
+**P2**: `MovieCatalogSearch` composite: Wikidata first → TMDB fallback → unified `MovieSearchHit`; store `tmdbId` optional on item for refresh.
+
+**FR additions**: See [spec.md](spec.md) § Catalog search improvements (2026-10-28).

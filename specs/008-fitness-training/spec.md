@@ -50,6 +50,15 @@ Valentin **changed product direction** (2026-10-28). The spec below reflects the
 | **Séance libre** | Unplanned workouts merge into **“start any séance anytime”**: ad-hoc start without a saved template remains supported (French label **Séance libre** or equivalent). |
 | **Shipped code on `main`** | Implementation may still expose weekly-program UI from an earlier batch; **this spec is the target**. Migration intent is documented in [research.md](./research.md) §11. |
 
+### Session 2026-10-28 (library UX & set logging)
+
+| Topic | Decision |
+|--------|----------|
+| **Session picker on home** | Fitness home MUST let user **choose any séance template** from the library and **Démarrer** — not only today’s **planifiée** row or implicit “next”. UI: list or compact picker (**Choisir une séance**) above **Séance libre**. |
+| **Delete template** | **`/fitness/sessions`**: per-template **Supprimer** with **Annuler** undo toast (001 pattern FR-050) — not only “remove from draft on save”. Soft delete; past workout logs unchanged (FR-013). |
+| **Weighted set UX** | When catalog **`modality`** is **`strength`** and **`equipment`** implies external load (`barre`, `haltères`, `machine`, `câble`, `kettlebell`, `banc` with barbell/dumbbell patterns), set rows MUST **surface reps + charge** prominently; **cardio** / **mobility** rows MUST prioritize **durée** and MAY collapse or hide charge/reps until expanded. Saving still optional per FR-024. |
+| **Data model** | **`SetRow`** already has `reps`, `chargeKg`, `durationSeconds` — **no new fields**; UI rules + optional `catalogVersion` lookup at log time. |
+
 **French UI terms (locked for this module)**: **séance** (template and live workout context), **bibliothèque** or **Mes séances** (library surface — exact nav copy in planning), **planifier** (attach to a date), **Démarrer**, **Terminé**, **Passer** (skip a **scheduled** séance for that date).
 
 ## Product scope (phased)
@@ -82,6 +91,7 @@ A signed-in user **creates and maintains séances** in a personal library. Each 
 3. **Given** multiple séances, **When** the user reorders them in the library (if supported) or reorders exercises within one séance, **Then** order is stable after save.
 4. **Given** the user edits a template (rename, reorder exercises, change default hints), **When** they save, **Then** future starts use the updated template and **past logged workouts** still show what was actually performed.
 5. **Given** the user is offline, **When** they create or edit séance templates, **Then** changes are saved locally immediately.
+6. **Given** a saved séance template, **When** the user deletes it from **Mes séances**, **Then** it is soft-deleted with **Annuler** undo and historical workout logs remain visible.
 
 ---
 
@@ -101,6 +111,7 @@ The user opens the fitness area and can **Démarrer** training in three ways: (*
 4. **Given** today’s **planifiée** séance, **When** the user chooses **Passer** with an optional note, **Then** the date is recorded as skipped without a full log (linked to the scheduled instance / template id).
 5. **Given** no séance **planifiée** for today, **When** the user opens fitness home, **Then** they see a helpful empty state and can **Démarrer** any library séance or a **Séance libre** from clear entry points.
 6. **Given** the library, **When** the user **planifier** a séance on a future date they pick, **Then** only that date shows the scheduled item (not a recurring weekday rule).
+7. **Given** multiple séance templates in the library, **When** the user opens fitness home, **Then** they can **select any template** (picker or list) and **Démarrer** without it being **planifiée** for today.
 
 ### Phase B — Log & precision
 
@@ -119,6 +130,8 @@ During or after a workout, the user records **per-exercise** work: one or more *
 3. **Given** a workout log, **When** the user sets RPE on a set, **Then** only values 1–10 are accepted (integer).
 4. **Given** template exercises were pre-filled, **When** the user deletes an exercise or adds a new one, **Then** the log reflects the actual session, not the original template snapshot only (template is a starting point; log is truth for that day).
 5. **Given** the user is offline, **When** they log sets, **Then** all data is available immediately and syncs when online.
+6. **Given** a logged exercise whose catalog entry is **`strength`** with load-bearing **equipment**, **When** the user views set inputs, **Then** **reps** and **charge** fields are visible by default on each set row.
+7. **Given** a logged exercise whose catalog **`modality`** is **`cardio`** or **`mobility`**, **When** the user views set inputs, **Then** **durée** is the primary visible field and charge/reps MAY be secondary or hidden until expanded.
 
 ---
 
@@ -238,11 +251,12 @@ If the user enables **Suivi d’assiduité** in fitness settings, the app shows 
 
 **Daily use & logs**
 
-- **FR-020**: The fitness home MUST surface (**1**) any séance **planifiée** for **today’s** calendar date with actions to **Démarrer** or **Passer**, (**2**) clear access to **Démarrer** any library séance (**do now**), and (**3**) **Séance libre** when the user wants no template.
+- **FR-020**: The fitness home MUST surface (**1**) any séance **planifiée** for **today’s** calendar date with actions to **Démarrer** or **Passer**, (**2**) a **session picker** to **Démarrer** **any** library séance template (**do now**), and (**3**) **Séance libre** when the user wants no template.
 - **FR-021**: Starting from a séance template (scheduled or from library) MUST create a **workout log** linked to the **séance template id** and calendar date; **Séance libre** logs have no template link.
 - **FR-022**: A workout log MUST support status: **en cours**, **terminé**, or **abandonné** (abandoned logs do not count as completed for adherence).
 - **FR-023**: **Passer** on a **planifiée** séance for a given calendar date MUST record a **skip** entry with date, reference to the scheduled instance (or template + date), and optional note.
 - **FR-024**: Workout logs MUST contain ordered **logged exercises**, each with ordered **sets** supporting optional fields: repetitions (non-negative integer), charge (non-negative number with user’s preferred unit), durée (seconds or minutes — single convention in UI), optional distance **note** (free text for cardio), RPE (integer 1–10). Marking a workout **terminé** MUST NOT require every planned exercise to have at least one fully detailed set.
+- **FR-024a**: For each set row, the workout log UI MUST adapt visible inputs to the catalog exercise’s **`modality`** and **`equipment`**: **`strength`** with load-bearing equipment MUST show **reps** and **charge** by default; **`cardio`** and **`mobility`** MUST prioritize **durée** (duration-first). Fields remain optional on save unless domain validation rejects out-of-range values.
 - **FR-025**: Users MUST be able to add, edit, reorder, and remove exercises and sets during a workout.
 - **FR-026**: Adding an exercise MUST use a **catalog picker**: search matches **`nameFr`** and **`nameEn`** (case- and accent-insensitive substring); optional filters by **category**, **equipment**, and **modality**; **recently used** `exerciseId`s MUST be surfaced first when the search box is empty.
 - **FR-027**: The app MUST ship the MVP catalog **offline** (bundled seed or local store populated on first launch — see data model); users MUST NOT depend on network to list or search exercises.

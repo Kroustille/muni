@@ -108,6 +108,7 @@ Delivered on `main`: scan, title search, lookup routes, catalog fields, dedupe/m
 | OD-002-11 | Manual **work link** UX (pick sibling edition vs type work id) | **Open** — recommend “pick another edition in library” |
 | OD-002-12 | Quote sync: **separate `/api/sync/quotes`** vs bundled push | **Settled** — separate channel (smaller payloads, same LWW rules) |
 | OD-002-13 | Recommendations v1 **scoring weights** | **Open** — defaults in research.md §9; tune in hillclimb later |
+| OD-002-14 | Catalog **fallback provider** (2026-10-28) | **Settled** — Open Library primary; **Google Books** P2 server chain; see research.md §17, tasks T343–T347 |
 
 ## Project Structure
 

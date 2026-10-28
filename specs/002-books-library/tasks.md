@@ -268,6 +268,16 @@
 
 ---
 
+## Phase 18: Catalog search quality & fallback (2026-10-28)
+
+- [ ] T343 [P1] Unit tests chained lookup OL → empty → fallback stub in `tests/unit/open-library-fallback-chain.test.ts`
+- [ ] T344 [P1] Improve title/ISBN query normalization in Open Library adapter + search use case
+- [ ] T345 [P2] Implement optional **Google Books** server adapter + env `GOOGLE_BOOKS_API_KEY`; chain in composition (depends on T343)
+- [ ] T346 [P2] Integration test fallback route with mocked Google response in `tests/integration/books-catalog-routes.test.ts`
+- [ ] T347 [P1] E2e: empty OL fixture shows manual-add path without nested-form regression (cross-ref 001 T114)
+
+---
+
 ## Dependencies
 
 ### Phase A (catalog — complete)

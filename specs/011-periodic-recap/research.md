@@ -68,7 +68,7 @@ Books and movies already define **activity days**, streaks, and **year goals** o
 | **Domain colors** | Map each segment to the domain’s **design-system accent token**: book, movie, music_track, recipe list-type accents from 005 / `list-type-visual`; **Entraînement** uses fitness accent; **Plantes** uses **`#16a34a`** (OD-011-9). Shopping and other out-of-recap domains never appear. |
 | **Segment cap** | Max **6** visible segment colors per cell (in-scope domains through **Plantes**). Future domains overflow to **tooltip + accessible name only** (OD-011-10). |
 | **Accessibility** | **French legend** (label + swatch per domain); per-cell **tooltip/focus** lists domains (and optional `eventCount`); accessible name includes **date + domain names** — not color alone. |
-| **Range** | Default trailing **12 months** ending today unless plan ties range to selected period — spec allows either; plan must pick one |
+| **Range** | **Wide**: trailing **365** local days ending today (OD-011-1). **Narrow** (`< 768px`): trailing **84** days (**12 weeks**) ending today (OD-011-11) — recent months only, not full year strip. Independent of list period switcher in both cases. |
 | **Data** | Derived at read time from same aggregation as recap lists — **no new persisted heatmap table**; each day exposes `domainsPresent[]` ordered like list sections |
 
 **Rejected for MVP**: binary single-accent “on/off” cells (superseded by multi-domain segments); multi-hue **intensity** by event count (adds legend burden).
@@ -84,7 +84,8 @@ Recap aggregation MUST be driven by a **registry of domain contributors** (conce
 | Topic | Decision |
 |--------|----------|
 | MVP v1 periods | **Day, week, month, year** — all four in v1 (Valentin **2026-10-28**); fitness PR highlights optional post-v1 |
-| Heatmap window | **Trailing 365 local calendar days** ending today; **independent** of recap period switcher (OD-011-1) |
+| Heatmap window | **Wide**: trailing **365** local days ending today (OD-011-1). **Narrow**: **84** days / **12 weeks** (OD-011-11). Independent of recap period switcher |
+| Period UX | **`<select>`** granularity (Jour / Semaine / Mois / Année) + prev/next; see [recap-period-controls.md](contracts/recap-period-controls.md) |
 | Heatmap narrow layout | **Week-column grid** + **`overflow-x: auto`** on recap page — no viewport unmount (supersedes former `md` breakpoint gate, 2026-10-28) |
 | Fitness segment color | **`#0d9488`** (app accent / fitness shell) |
 | Domain order | Livres → Films & séries → Musique (004 + 012) → Recettes → Entraînement → Plantes (`book`, `movie`, `music_track`, `recipe`, `fitness`, `plants`) |

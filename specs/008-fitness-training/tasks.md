@@ -137,6 +137,17 @@
 
 ---
 
+## Phase 11: Session picker, library delete, modality set UX (2026-10-28 spec)
+
+- [ ] T881 [US2] Session picker on `fitness-home.tsx` — list or select + **Démarrer** any template (FR-020)
+- [ ] T882 [US2] E2e start from picker without planifiée row in `tests/e2e/fitness-today.spec.ts`
+- [ ] T883 [US1] Per-row **Supprimer** on `/fitness/sessions` with undo toast via `UndoDeleteProvider` (FR-050, session-library contract)
+- [ ] T884 [US1] E2e delete template + undo in `tests/e2e/fitness-sessions.spec.ts`
+- [ ] T885 [US3] `workout-log-editor.tsx` modality-aware set columns per FR-024a + unit tests in `tests/unit/fitness/set-input-layout.test.ts`
+- [ ] T886 [US3] E2e log strength exercise shows reps/charge; cardio shows duration-first in `tests/e2e/fitness-logging.spec.ts`
+
+---
+
 ## Dependency graph (summary)
 
 ```text

@@ -174,9 +174,28 @@ User opens stats (per month, tags/genres, authors, pages) and an optional year-i
 - Open Library returns partial metadata: save what is present; title required, others optional.
 - Duplicate ISBN on two different manual rows: prefer updating the row that already has that ISBN; merge heuristics for no-ISBN manual rows documented in plan (title + author normalization).
 
+### Session 2026-10-28 (catalog coverage)
+
+| Topic | Decision |
+|--------|----------|
+| **Primary provider** | **Open Library** (unchanged) — server proxy, cache, no client keys |
+| **Fallback provider (P2)** | **Google Books API** when OL returns no acceptable hit on title or ISBN lookup — server-side key only; same preview/merge UX |
+| **public-apis repo** | **Not** a dependency — reference list only |
+| **Offline** | Manual add unchanged; no offline catalog queue (X3) |
+| **Phasing** | **P1** search normalization + empty-state manual path; **P2** fallback adapter chain |
+
 ## Requirements *(mandatory)*
 
 ### Functional Requirements
+
+**Catalog search improvements (2026-10-28 — cross-phase)**
+
+- **FR-CAT01**: Title and ISBN catalog search MUST remain a **single** French UI entry point; results MUST still require user preview before save (Phase A rules).
+- **FR-CAT02**: When the primary provider returns **no** results, the app MUST offer **manual add** with clear copy (existing B10) without blocking the user.
+- **FR-CAT03 (P2)**: Server-side lookup MAY chain a **secondary provider** (Google Books) before declaring not found; merged hits MUST map to the same preview fields as Open Library.
+- **FR-CAT04**: All catalog HTTP calls MUST stay **server-side** (X2); API keys MUST NOT ship to the client.
+- **FR-CAT05**: Cached responses MUST respect TTL and provider attribution in server logs only (no user-visible provider branding required).
+
 
 - **FR-001**: Mobile MUST offer barcode scan on books list and book quick-add (N3).
 - **FR-002**: Scan UX MUST be continuous until a valid ISBN is read (B3).
@@ -236,6 +255,7 @@ User opens stats (per month, tags/genres, authors, pages) and an optional year-i
 
 ## Out of Scope
 
-- Cover images; Google Books fallback; offline lookup queue (X3); desktop ISBN barcode / manual ISBN lookup (B9).
+- Cover images; offline lookup queue (X3); desktop ISBN barcode / manual ISBN lookup (B9).
+- Importing the [public-apis](https://github.com/public-apis/public-apis) repository as a runtime dependency.
 - Custom shelves; physical shelf location; format flags; owned/borrowed library flags; public reviews; content-warning catalog; reading session timer; pages/hour or ETA; fractional ratings (see Session 2026-10-16).
 - Goodreads/CSV import (later); cross-list reading challenges (later, not book-only).

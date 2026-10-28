@@ -138,6 +138,19 @@
 
 ---
 
+## Phase 11: UX polish — mobile heatmap window & period select (2026-10-28 spec)
+
+**Goal**: OD-011-11 + FR-021.
+
+- [ ] T1197 [US7] `buildActivityDays` / snapshot accepts viewport window **`365` | `84`**; unit tests narrow vs wide day counts in `tests/unit/recap/activity-days.test.ts`
+- [ ] T1198 [US7] Wire breakpoint in recap page to pass **84-day** `activityDays` on narrow, **365** on wide (FR-019, OD-011-11)
+- [ ] T1199 [US7] Update heatmap i18n subtitle for narrow vs wide window copy
+- [ ] T1200 [US2] Refactor `recap-period-controls.tsx` to **`<select>`** granularity per [contracts/recap-period-controls.md](contracts/recap-period-controls.md) (FR-021)
+- [ ] T1201 [US2] E2e: period select + prev/next in `tests/e2e/recap.spec.ts`
+- [ ] T1202 [US7] E2e: narrow viewport heatmap ≈ **84** days in `tests/e2e/recap.spec.ts`
+
+---
+
 ## Dependencies & execution order
 
 ```text
@@ -157,4 +170,4 @@ Phase 10 last
 
 ## Task count
 
-**Total tasks**: **47** (T1101–T1196, T1115)
+**Total tasks**: **53** (T1101–T1202, T1115)

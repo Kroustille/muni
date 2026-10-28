@@ -82,3 +82,9 @@
 | **Tasks** | Regenerate or append migration tasks in [tasks.md](./tasks.md); e2e flows in [quickstart.md](./quickstart.md). |
 
 **Open questions for implement planning** — **Resolved 2026-10-28**: break-fast implementation on `main`; no program migration; IDB v9 fitness wipe; migration `0019_fitness_session_first`.
+
+## 12. Set logging UX by modality (2026-10-28)
+
+- **Decision**: UI-only rules on existing **`SetRow`** fields — no schema change. Helper `isLoadBearingStrength(entry)` = `modality === 'strength'` && equipment intersects `{ barre, haltères, machine, câble, kettlebell }` OR tagged barbell/dumbbell patterns in catalog.
+- **Rationale**: User request for visible reps/charge when weight matters; avoids four-column grid for plank/cardio rows.
+- **Alternatives**: Separate set types in jsonb (rejected — break-fast refactors OK but unnecessary); require charge for strength (rejected — FR-024 optional save).

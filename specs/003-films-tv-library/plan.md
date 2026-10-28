@@ -85,6 +85,7 @@ Watch goals repo, `deriveWatchActivityDays`, insights page under movies route, s
 | OD-003-3 | Streaming provider | Server route `GET /api/movies/streaming?imdbId=` stub → empty until provider chosen |
 | OD-003-4 | Mood/pace vocab | Same controlled keys as books (research.md §16 books) unless FR copy differs |
 | OD-003-5 | Série “Vu” | All episodes marked vu OR user explicit “Marquer la série comme vue” |
+| OD-003-6 | Catalog fallback (2026-10-28) | **Settled** — Wikidata primary; **TMDB** P2 search fallback; optional **OMDb** enrichment; research.md §18, tasks T401–T406 |
 
 ## Complexity Tracking
 

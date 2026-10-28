@@ -63,7 +63,8 @@ specs/011-periodic-recap/
 │   ├── ui-routes.md
 │   ├── bottom-nav.md
 │   ├── recipe-cooked-dates.md
-│   └── recap-activity-heatmap.md
+│   ├── recap-activity-heatmap.md
+│   └── recap-period-controls.md
 ├── checklists/requirements.md
 └── tasks.md
 ```
@@ -120,7 +121,8 @@ Aligned with spec **Phase A (MVP v1) → B (optional)**:
 
 | ID | Topic | Default |
 |----|--------|---------|
-| OD-011-1 | Heatmap date window | **Fixed trailing 365 local days** ending **today** — **does not** shrink/grow when user changes week/month period (list and heatmap decoupled; less jarring than sync-to-period) |
+| OD-011-1 | Heatmap date window (wide) | **Fixed trailing 365 local days** ending **today** on viewports **≥ 768px** — **does not** shrink/grow when user changes week/month period (list and heatmap decoupled) |
+| OD-011-11 | Heatmap date window (narrow) | **Fixed trailing 84 local days** (**12 weeks**) ending **today** on viewports **< 768px** — same decoupling; shorter scroll strip for mobile |
 | OD-011-2 | Heatmap narrow layout | **Week columns** + horizontal scroll — mount on all viewports (no `md` gate) |
 | OD-011-3 | Fitness heatmap accent | **`#0d9488`** — same as app `--accent` / fitness shell (not a list-type row) |
 | OD-011-4 | Default timezone | **`Europe/Paris`** — export `DEFAULT_RECAP_TIMEZONE` aliasing book/movie constants until user TZ preference |
@@ -130,6 +132,7 @@ Aligned with spec **Phase A (MVP v1) → B (optional)**:
 | OD-011-10 | Heatmap segment cap | **6** visible segment colors (`book`, `movie`, `music_track`, `recipe`, `fitness`, `plants`); future domains overflow to tooltip/a11y text only |
 | OD-011-6 | Bottom nav layout | **Home, Search \| + \| Récap, Settings** — Récap inserted post-FAB per [contracts/bottom-nav.md](contracts/bottom-nav.md) |
 | OD-011-7 | Home teaser | **Ship in MVP v1** behind simple predicate (≥0 achievements); gentle copy only |
+| OD-011-12 | Period granularity UI | **Native `<select>`** (FR labels) + chevron prev/next; optional Aujourd’hui/Hier when **Jour** — [recap-period-controls.md](contracts/recap-period-controls.md) |
 
 ## Complexity Tracking
 

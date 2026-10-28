@@ -65,3 +65,9 @@ All Technical Context items are resolved; no NEEDS CLARIFICATION remain.
 ## 14. Hosting and deployment
 - **Decision**: Docker Compose on a self-hosted VPS (assumption, not final): a multi-stage `Dockerfile` for the Next.js app (standalone output, non-root), PostgreSQL with a persistent volume, and a one-shot migration job before the app starts; configuration through environment variables validated at startup. Development compose adds Mailpit as the SMTP catcher.
 - **Not decided**: TLS reverse proxy, backups, SMTP provider.
+
+## 15. Nested HTML forms (2026-10-28)
+
+- **Decision**: **No** `form` descendants of another `form` in the live DOM. Catalog and quick-add flows MUST follow [contracts/nested-forms-ui.md](contracts/nested-forms-ui.md).
+- **Rationale**: HTML invalidity; broken submit on book/movie quick-add when catalog sheets open inside quick-add wrapper form.
+- **Alternatives**: Ignore (rejected — reproducible bug); only fix preview (insufficient — search sheet also nested).

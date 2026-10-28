@@ -115,6 +115,9 @@ Aligned with spec product phases **A → B → C → D**:
 | OD-008-4 | Build copy of catalog | `public/fitness/` static file + import in seed use case |
 | OD-008-5 | Phase D schema | Nullable `recovery` on workout log in migration 0014; UI in D tasks |
 | OD-008-6 | Legacy `fitness_program` | See research.md §11 — migration TBD in implement task |
+| OD-008-7 | Session home picker | List or select of all templates + **Démarrer** (2026-10-28) |
+| OD-008-8 | Template delete UX | Immediate soft delete + undo on `/fitness/sessions` (2026-10-28) |
+| OD-008-9 | Set row layout | Modality/equipment-driven visible fields (FR-024a); data model unchanged |
 
 ## Complexity Tracking
 
