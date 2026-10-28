@@ -9,6 +9,11 @@ import type {
   FitnessUserSettings,
   FitnessWorkoutLog,
 } from "../../domain/fitness/workout-log";
+import type { Plant } from "../../domain/plant";
+import type { PlantCareEvent } from "../../domain/plant-care-event";
+import type { PlantCareProfile } from "../../domain/plant-care-profile";
+import type { VegetableCulture } from "../../domain/vegetable-culture";
+import type { VegetableMilestone } from "../../domain/vegetable-milestone";
 import type { Item, ItemType } from "../../domain/item";
 import type { MetaKey, MetaValues } from "../../application/ports/item-repository";
 import type { DailyActivitySuggestionSnapshot } from "../../domain/activity-suggestion";
@@ -83,11 +88,21 @@ export interface MuniDbSchema extends DBSchema {
     key: string;
     value: DailyActivitySuggestionSnapshot;
   };
+  plants: { key: string; value: Plant };
+  plantCareEvents: { key: string; value: PlantCareEvent; indexes: { plantId: string } };
+  plantCareProfiles: { key: string; value: PlantCareProfile };
+  vegetableCultures: { key: string; value: VegetableCulture };
+  vegetableMilestones: { key: string; value: VegetableMilestone; indexes: { cultureId: string } };
+  plantsOutbox: { key: string; value: { id: string } };
+  plantCareEventOutbox: { key: string; value: { id: string } };
+  plantCareProfileOutbox: { key: string; value: { id: string } };
+  vegetableCultureOutbox: { key: string; value: { id: string } };
+  vegetableMilestoneOutbox: { key: string; value: { id: string } };
 }
 
 export type MuniDb = IDBPDatabase<MuniDbSchema>;
 
-const DB_VERSION = 6;
+const DB_VERSION = 7;
 
 export function openMuniDb(name: string): Promise<MuniDb> {
   return openDB<MuniDbSchema>(name, DB_VERSION, {
@@ -129,6 +144,20 @@ export function openMuniDb(name: string): Promise<MuniDb> {
       }
       if (oldVersion < 6) {
         db.createObjectStore("activity_suggestion_snapshot", { keyPath: "calendarDay" });
+      }
+      if (oldVersion < 7) {
+        db.createObjectStore("plants", { keyPath: "id" });
+        const careEvents = db.createObjectStore("plantCareEvents", { keyPath: "id" });
+        careEvents.createIndex("plantId", "plantId");
+        db.createObjectStore("plantCareProfiles", { keyPath: "id" });
+        db.createObjectStore("vegetableCultures", { keyPath: "id" });
+        const milestones = db.createObjectStore("vegetableMilestones", { keyPath: "id" });
+        milestones.createIndex("cultureId", "cultureId");
+        db.createObjectStore("plantsOutbox", { keyPath: "id" });
+        db.createObjectStore("plantCareEventOutbox", { keyPath: "id" });
+        db.createObjectStore("plantCareProfileOutbox", { keyPath: "id" });
+        db.createObjectStore("vegetableCultureOutbox", { keyPath: "id" });
+        db.createObjectStore("vegetableMilestoneOutbox", { keyPath: "id" });
       }
     },
   });

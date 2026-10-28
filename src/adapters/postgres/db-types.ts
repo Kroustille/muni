@@ -201,6 +201,67 @@ export interface FitnessUserSettings {
   user_id: string;
 }
 
+export interface Plant {
+  care_profile_id: string | null;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  location_tag: string;
+  notes: string | null;
+  seasonal_hints: Json;
+  server_updated_at: Timestamp;
+  title: string;
+  user_id: string;
+}
+
+export interface PlantCareEvent {
+  deleted_at: Timestamp | null;
+  event_type: string;
+  fields_updated_at: Json;
+  id: string;
+  notes: string | null;
+  occurred_at: Timestamp;
+  plant_id: string;
+  seasonal_hint_id: string | null;
+  server_updated_at: Timestamp;
+  user_id: string;
+}
+
+export interface PlantCareProfile {
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  seasonal_hints: Json;
+  server_updated_at: Timestamp;
+  title: string;
+  user_id: string;
+}
+
+export interface VegetableCulture {
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  location_note: string | null;
+  notes: string | null;
+  plant_id: string | null;
+  server_updated_at: Timestamp;
+  title: string;
+  user_id: string;
+  variety: string | null;
+}
+
+export interface VegetableMilestone {
+  culture_id: string;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  milestone_type: string;
+  notes: string | null;
+  occurred_at: Timestamp;
+  server_updated_at: Timestamp;
+  user_id: string;
+}
+
 export interface FitnessWorkoutLog {
   calendar_date: Timestamp;
   catalog_version: number;
@@ -222,6 +283,11 @@ export interface DB {
   book_quotes: BookQuotes;
   catalog_cache: CatalogCache;
   cookbooks: Cookbooks;
+  plant: Plant;
+  plant_care_event: PlantCareEvent;
+  plant_care_profile: PlantCareProfile;
+  vegetable_culture: VegetableCulture;
+  vegetable_milestone: VegetableMilestone;
   fitness_program: FitnessProgram;
   fitness_skip_record: FitnessSkipRecord;
   fitness_user_settings: FitnessUserSettings;
