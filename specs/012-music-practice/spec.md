@@ -1,4 +1,4 @@
-# Feature Specification: Music practice — compositions & DJ sets
+# Feature Specification: Music practice — compositions, DJ sets & instrument learning
 
 **Feature directory**: `specs/012-music-practice/`
 
@@ -8,7 +8,7 @@
 
 **Status**: Draft (specification only — no implementation authorized by this document)
 
-**Input**: Valentin wants to **track what he does in music** through **two distinct workflows**: (1) **music composition** — creating original work with its own lifecycle; (2) **DJ sets** — logging performances with a separate lifecycle. French UI, offline-first, companion tone (**no guilt**), aligned with Muni typed-domain patterns.
+**Input**: Valentin wants to **track what he does in music** through **three distinct workflows**: (1) **music composition** — creating original work with its own lifecycle; (2) **DJ sets** — logging performances with a separate lifecycle; (3) **instrument learning / apprentissage** — planning **technical exercises** (études, gammes, drills — user-named) and tracking **specific pieces or tracks being learned**, separate from the **004** listen-list and from **Workflow A** composition projects. French UI, offline-first, companion tone (**no guilt**), aligned with Muni typed-domain patterns.
 
 **Depends on**: Muni foundation (**001**) — auth, offline-first sync, French UI, quick-add capture speed, per-user privacy.
 
@@ -18,13 +18,15 @@
 
 **Serves**: [009](../009-experiences-achievements/spec.md) north star — **registering creative work and performance** as personal experience and achievement, without guilt copy or social feeds.
 
-**Future link to [011](../011-periodic-recap/spec.md)**: When 011 implementation adds or extends its **domain contributor registry**, **performed DJ sets** and **composition milestones** (user-marked “terminé” or equivalent) MAY feed recap lines — **not in scope for 012 v1 delivery**; 012 MUST persist clear **completion timestamps** on domain rows so 011 can subscribe later without redesign. Do **not** expand 011 spec or tasks in this change set.
+**Future link to [011](../011-periodic-recap/spec.md)**: When 011 implementation adds or extends its **domain contributor registry**, **performed DJ sets**, **composition milestones** (user-marked “terminé”), and **logged instrument practice sessions** (user-marked done with a calendar date) MAY feed recap lines — **not in scope for 012 v1 delivery**; 012 MUST persist clear **completion timestamps** (`finishedAt`, `performedAt`, **`practicedAt`** on practice logs) so 011 can subscribe later without redesign. Do **not** expand 011 spec or tasks in this change set.
 
 ## Decision summary (MVP)
 
 | Topic | Decision |
 |-------|----------|
-| **Two workflows** | **Separate typed lists** under one **Musique — pratique** area (hub with two tabs or equivalent — exact nav in planning): **Compositions** and **Sets DJ**. |
+| **Three workflows** | **Separate typed lists** under one **Musique — pratique** area (hub with three tabs or equivalent — exact nav in planning): **Compositions**, **Sets DJ**, and **Apprentissage** (instrument practice). |
+| **Apprentissage vs 004** | **004** = discovery and **listening** (`to_listen` / `listened`). **Apprentissage** = **learning/practice repertoire** and exercise planning. Optional **one-way** link from a **learning piece** row to a **004** `music_track` id (“the piece I’m learning”) — **does not** change track listen status. |
+| **Apprentissage vs composition** | **Composition** = original work lifecycle (Idée → Terminé). **Learning piece** = studying an existing work (score, transcription, cover) with **progress**, not production status. Same hub, **different entity types and screens**. |
 | **Capture speed** | Each workflow: **title required** to save; all other fields optional on first save (constitution II). |
 | **Audio** | **No in-app playback**, **no file upload/hosting** in v1 (same spirit as 004 MU-scope). Optional **external URL** (demo, recording on SoundCloud, etc.) as paste-only link. |
 | **004 cross-link** | **Optional** reference from a composition row or setlist line to an existing **music_track** row (by id) — **P2** for setlist lines; **P2** for composition “inspirations”. Never required; track detail need not mirror back in v1. |
@@ -99,6 +101,75 @@
 | **externalUrl** | No | Recording link (Mixcloud, SoundCloud, etc.) |
 
 **Out of scope v1**: Live BPM detection, Rekordbox/Ableton/Traktor library sync, waveform analysis, automatic track identification.
+
+## Workflow C — Instrument learning (Apprentissage)
+
+**Intent**: **Plan and log instrument practice** — user-defined **exercises** (études, gammes, drills), a **weekly or dated plan**, and **pieces/tracks being learned** with progress. Valentin is **learning instruments**; this workflow supports **scheduling**, **marking sessions done**, and **repertoire progress** without conflating **004 listening**, **composition projects**, or in-app audio.
+
+**UX note**: Prefer a **separate typed flow** from compositions (plan → done checkmarks, instrument name, exercise library) even though both live under **Musique — pratique**.
+
+### Practice instrument (registry)
+
+Simple user-scoped list of instruments the user practices (e.g. “Guitare”, “Piano”, “Basse”).
+
+| Field | Required | Notes |
+|-------|----------|--------|
+| **name** | Yes | Quick-add minimum; duplicate names allowed if user wants |
+| **notes** | No | Optional tuning, setup, teacher |
+
+### Exercise library entry
+
+User-authored **technical exercise** rows — not a shipped catalog (contrast **008** fitness catalog).
+
+| Field | Required | Notes |
+|-------|----------|--------|
+| **title** | Yes | e.g. “Gamme Do majeur”, “Exercice alternate picking” |
+| **instrumentId** | No | Link to practice instrument; filter library by instrument |
+| **category** | No | Free text or preset in planning (e.g. **Étude**, **Gamme**, **Drill**, **Autre**) — spec MVP: **free text** optional |
+| **notes** | No | Tempo target, book page, video link as text |
+
+### Practice plan (schedule)
+
+**Planning**: user builds a **practice plan** that assigns **exercise library entries** to **calendar dates** and/or **weekdays** (ISO Monday–Sunday), analogous in spirit to **[008](../008-fitness-training/spec.md)** weekday assignments but **user-named exercises only**.
+
+| Field | Required | Notes |
+|-------|----------|--------|
+| **name** | Yes | e.g. “Semaine guitare mars” |
+| **isActive** | Yes (default) | One **active** plan MVP (same pattern as 008 single active program) |
+| **assignments** | No | Ordered list: `{ exerciseId, weekdays[]?, specificDates[]?, sortOrder }` — at least one of weekdays or specificDates when row is used |
+
+**Today view (P1)**: Show exercises planned for **today** (weekday match + explicit date rows); user **marks done** → creates a **practice log** (below) without requiring duration or notes.
+
+### Practice log (session done)
+
+Lightweight completion record when user finishes planned or ad-hoc practice.
+
+| Field | Required | Notes |
+|-------|----------|--------|
+| **practicedAt** | Yes | Calendar date (default today; **backdate** allowed — recap-friendly) |
+| **instrumentId** | No | Which instrument; optional if exercise already linked |
+| **exerciseIds** | No | One or more library exercises touched this session |
+| **learningPieceId** | No | Optional link if session focused on a **learning piece** row |
+| **durationMinutes** | No | Integer optional |
+| **notes** | No | Free text |
+
+**Ad-hoc**: User MAY log practice **without** a plan assignment (free session with optional exercise/piece picks).
+
+### Learning piece (repertoire in progress)
+
+**Distinct from 004 listen-list**: tracks **what Valentin is learning to play**, not what he queued to listen.
+
+| Field | Required | Notes |
+|-------|----------|--------|
+| **title** | Yes | Piece name (may mirror a track title or be free text) |
+| **instrumentId** | No | Primary instrument for this piece |
+| **status** | Yes (default) | `learning` **En apprentissage**, `comfortable` **À l’aise**, `paused` **En pause**, `archived` **Archivé** (hidden from default list) |
+| **linkedTrackId** | No | **P2** — optional **004** `music_track` id as reference (“the recording I’m learning from”); **does not** set **`listened`** or alter 004 status |
+| **startedAt** | No | Optional calendar date |
+| **lastPracticedAt** | No | Updated when user logs practice linked to this piece or taps “pratiqué aujourd’hui” (**P1** manual on log or piece detail) |
+| **notes** | No | Sections, difficulty, teacher feedback |
+
+**Out of scope v1**: Sheet music PDF upload, automatic progress from MIDI, metronome, audio playback, mandatory MusicBrainz link.
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -182,12 +253,70 @@ On set detail, user optionally attaches a **004** track to a setlist line via se
 
 ---
 
+### Workflow C — Instrument learning
+
+### User Story C1 - Maintain an exercise library (Priority: P1)
+
+User quick-adds exercises with **title only**, optionally assigns **instrument** and **category**, offline. Library list supports local search on title.
+
+**Why this priority**: Named exercises are the vocabulary for planning (constitution III — typed list, not generic notes).
+
+**Independent Test**: Add “Gamme pentatonique”, airplane mode, reopen — row persists.
+
+**Acceptance Scenarios**:
+
+1. **Given** quick-add with title, **When** user saves, **Then** exercise appears in library with no guilt empty-state copy.
+2. **Given** an exercise, **When** user sets **instrument**, **Then** list filter by instrument shows only matching rows.
+
+---
+
+### User Story C2 - Plan exercises for the week (Priority: P1)
+
+User creates an **active plan**, assigns exercises to **weekdays** (and optionally specific dates), opens **today** view, and sees what is scheduled.
+
+**Why this priority**: Valentin asked to **plan** technical work, not only log ad hoc.
+
+**Independent Test**: Assign Monday + Wednesday exercises; fix “today” in test harness; verify today list.
+
+**Acceptance Scenarios**:
+
+1. **Given** active plan with Monday assignment, **When** user opens apprentissage on a Monday, **Then** planned exercises appear in stable order.
+2. **Given** planned exercise for today, **When** user marks **Fait**, **Then** a **practice log** exists with **practicedAt** today and linked **exerciseId**.
+
+---
+
+### User Story C3 - Track a piece being learned (Priority: P1)
+
+User adds a **learning piece** with title and instrument, updates **status** and **lastPracticedAt** via practice log or explicit action.
+
+**Why this priority**: Repertoire progress is separate from 004 **écouté** and composition **Terminé**.
+
+**Independent Test**: Create piece, log linked practice with backdated date, filter **En apprentissage**.
+
+**Acceptance Scenarios**:
+
+1. **Given** learning piece **En apprentissage**, **When** user logs practice linked to it with backdated **practicedAt**, **Then** **lastPracticedAt** reflects that date.
+2. **Given** piece with optional **004** link (**P2**), **When** user views detail, **Then** link opens track detail or external listen link per 004 — **listened** status unchanged.
+
+---
+
+### User Story C4 - Browse apprentissage and filter (Priority: P2)
+
+User filters exercises by instrument, pieces by status, sorts by last practiced or title; searches locally.
+
+**Independent Test**: Seed mixed statuses; filter **En apprentissage** only.
+
+---
+
 ### Edge Cases
 
 - **Duplicate titles** allowed (same venue on different dates).
 - **Backdated dates** in future for performed/finished — validation rejects or warns (planning: reject future **performedAt** / **finishedAt** beyond today in user timezone).
 - **Soft delete** restores composition or set with prior status and notes (foundation pattern).
 - **004 track deleted** while referenced — setlist/composition shows orphaned reference gracefully (French “piste supprimée”, link cleared on next edit optional).
+- **Learning piece linkedTrackId orphaned** — same graceful copy as composition/setlist P2 links.
+- **Plan change** — past **practice logs** retain what was done; future “today” uses new assignments (008 pattern).
+- **Mark done without plan** — ad-hoc **practice log** allowed with **practicedAt** only.
 
 ## Requirements *(mandatory)*
 
@@ -205,12 +334,25 @@ On set detail, user optionally attaches a **004** track to a setlist line via se
 - **FR-010**: List screens MUST support local search on title and filter by status (P1 compositions + DJ performed/planned at minimum).
 - **FR-011**: All strings user-facing in **French**; no guilt or streak-loss copy on these screens.
 - **FR-012**: Optional reference to **004** `music_track` ids on composition (**P2**) and setlist lines (**P2**) — one-way; no change to 004 track schema required in 012 v1.
-- **FR-013**: Persist **finishedAt** / **performedAt** and status transitions with timestamps suitable for a future **011** recap contributor (document only; no recap UI in 012).
+- **FR-013**: Persist **finishedAt** / **performedAt** / **practicedAt** and status transitions with timestamps suitable for a future **011** recap contributor (document only; no recap UI in 012).
+- **FR-014**: Introduce **practice_instrument** registry with **name** required; quick-add offline (Workflow C).
+- **FR-015**: Introduce **practice_exercise** library rows (title required; optional instrument, category, notes).
+- **FR-016**: Introduce **practice_plan** with one **active** plan MVP and assignments to weekdays and/or specific dates referencing **practice_exercise** ids.
+- **FR-017**: Introduce **practice_log** with required **practicedAt** (backdating allowed); optional links to exercises, instrument, **learning_piece**; ad-hoc logs without plan (**P1**).
+- **FR-018**: Introduce **learning_piece** with statuses `learning`, `comfortable`, `paused`, `archived` and French labels; **title** required on create.
+- **FR-019**: **Today** apprentissage view MUST list planned exercises for the current calendar day and allow **mark done** → **practice_log** (**P1**).
+- **FR-020**: Optional **linkedTrackId** on **learning_piece** (**P2**) — one-way to **004**; MUST NOT mutate 004 listen status.
+- **FR-021**: Apprentissage list screens MUST support local search (exercise + piece titles) and status/instrument filters (**P1** minimum on pieces by status).
 
 ### Key Entities
 
 - **Music composition**: title, status, startedAt?, finishedAt?, lastWorkedAt?, genreStyle?, tempoBpm?, mood?, notes?, externalUrl?, sessionNotes[], linkedTrackIds? (P2).
 - **DJ set**: title, status, performedAt? (required if performed), venue?, durationMinutes?, genreStyle?, bpmRange?, mood?, notes?, setlist[] (text line + optional trackId P2), externalUrl?.
+- **Practice instrument**: name, notes?.
+- **Practice exercise**: title, instrumentId?, category?, notes?.
+- **Practice plan**: name, isActive, assignments[] (exerciseId, weekdays?, specificDates?, sortOrder).
+- **Practice log**: practicedAt, instrumentId?, exerciseIds[], learningPieceId?, durationMinutes?, notes?.
+- **Learning piece**: title, instrumentId?, status, linkedTrackId? (P2), startedAt?, lastPracticedAt?, notes?.
 
 ## Success Criteria *(mandatory)*
 
@@ -220,12 +362,13 @@ On set detail, user optionally attaches a **004** track to a setlist line via se
 - **SC-002**: User can log a **Joué** set with date, venue, and three setlist lines **offline** and see them after reload.
 - **SC-003**: User can move a composition from **Idée** to **Terminé** with an optional backdated **finishedAt** without entering BPM, mood, or links.
 - **SC-004**: Default empty states and status copy pass **no guilt / no social comparison** review (009 bar).
+- **SC-005**: User can add an exercise and a learning piece with **title only**, mark **today’s** planned exercise **Fait** offline, and see **practice log** + updated **lastPracticedAt** on the piece after reload.
 
 ## Assumptions
 
 - Valentin is the primary user; scale stays within foundation “few thousand items” per domain.
-- **Navigation**: One shell entry **Musique — pratique** (or split from existing music nav) with **Compositions** and **Sets DJ** sub-areas — exact IA deferred to planning.
-- **011 recap**: Not implemented in 012; eligible events when added: **`dj_set` → `performed`** (timestamp **performedAt**), **`music_composition` → `finished`** (timestamp **finishedAt**). Planned/cancelled sets and idea/paused compositions are excluded unless product later expands.
+- **Navigation**: One shell entry **Musique — pratique** with **Compositions**, **Sets DJ**, and **Apprentissage** sub-areas — exact IA deferred to planning.
+- **011 recap**: Not implemented in 012; eligible events when added: **`dj_set` → `performed`** (**performedAt**), **`music_composition` → `finished`** (**finishedAt**), **`practice_log`** with **practicedAt** (and optionally **`learning_piece` → `comfortable`** if product expands). Planned/cancelled sets, idea/paused compositions, and archived pieces excluded unless product later expands.
 - BPM fields are **manual** user entry, not detected from audio.
 - DJ “home practice” counts as **`performed`** when the user says so — no separate “rehearsal” status in v1.
 
@@ -239,10 +382,12 @@ On set detail, user optionally attaches a **004** track to a setlist line via se
 - Social sharing, public profiles, or audience stats.
 - Merging 012 into **004** or reusing `music_track` rows as composition proxies.
 - Implementing or extending **011** recap aggregation in this feature’s delivery batch.
+- Exercise **catalog seed** or MusicBrainz-backed exercise types (user library only in v1).
+- Changing **004** `music_track` schema or listen status when linking from **learning_piece**.
 
 ## Future (not scheduled)
 
-- Recap contributor for compositions finished and sets performed ([011](../011-periodic-recap/spec.md)).
+- Recap contributor for compositions finished, sets performed, and **practice logs** ([011](../011-periodic-recap/spec.md)).
 - Rich setlist: BPM per track, energy curve, link to **004** artists.
 - Optional “released on” platform metadata; live-sync from DJ software.
 - Separate status **Répétition** for DJ practice vs public **Joué**.

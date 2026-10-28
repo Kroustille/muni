@@ -1,73 +1,72 @@
-# Research: Music practice — compositions & DJ sets (012)
+# Research: Music practice — compositions, DJ sets & instrument learning (012)
 
-**Date**: 2026-10-28
+**Date**: 2026-10-28 (apprentissage extension same date)
 
-**Purpose**: Compare **012** workflows to **004** music library and to each other; justify separate feature number; inform MVP fields and states.
+**Purpose**: Compare **012** workflows to **004** music library and to each other; justify separate feature number and **third workflow**; inform MVP fields, states, and planning artifacts.
 
 ## Why not extend 004?
 
 | Dimension | [004 Music library](../004-music-artists-tracks/spec.md) | **012 Music practice** (this feature) |
 |-----------|----------------------------------------------------------|----------------------------------------|
-| **User job** | Discover artists, queue tracks to listen, mark **écouté** | Create **original compositions**; log **DJ performances** |
-| **Primary entities** | `music_artist`, `music_track` | `music_composition`, `dj_set` |
-| **Catalog** | MusicBrainz search, MBIDs, optional Spotify/SC URLs | **No** catalog requirement; user-authored titles |
-| **Status model** | Track: `to_listen` / `listened`; artist: rating only | Composition: idea → … → terminé; DJ: prévu → joué / annulé |
-| **Completion signal** | **`listened`** on a **consumption** row | **`finished`** on a **work** row; **`performed`** on an **event** row |
-| **Typical fields** | Album, year, recording MBID | Session notes, setlist, venue, duration, BPM (manual) |
-| **011 recap today** | Listened **tracks** included ([011 research](../011-periodic-recap/research.md)) | **Future** contributor: finished compositions + performed sets (not in 012 v1 scope) |
+| **User job** | Discover artists, queue tracks to listen, mark **écouté** | Create **original compositions**; log **DJ performances**; **plan exercises** and track **pieces being learned** |
+| **Primary entities** | `music_artist`, `music_track` | `music_composition`, `dj_set`, `practice_*`, `learning_piece` |
+| **Catalog** | MusicBrainz search, MBIDs, optional Spotify/SC URLs | **No** catalog requirement for practice rows; user-authored titles |
+| **Status model** | Track: `to_listen` / `listened`; artist: rating only | Composition / DJ / learning-piece statuses per workflow |
+| **Completion signal** | **`listened`** on a **consumption** row | **`finished`**, **`performed`**, **`practice_log.practicedAt`**, learning **status** |
+| **Typical fields** | Album, year, recording MBID | Session notes, setlist, venue, exercise plan, instrument name |
+| **011 recap today** | Listened **tracks** included ([011 research](../011-periodic-recap/research.md)) | **Future** contributors: finished compositions, performed sets, **practice logs** (not in 012 v1 scope) |
 | **Analogy in Muni** | Books/films **library** | **[010](../010-recipe-source-book/spec.md) cookbooks** vs **[002](../002-books-library/spec.md) reading list** — same theme, different domain |
 
-**Conclusion**: Keep **012** as a **new numbered feature**. Optional **P2** links from 012 → 004 track ids are references only, like recipe → cookbook, not a merge.
+**Conclusion**: Keep **012** as a **new numbered feature**. Optional **P2** links from **learning_piece** / composition / setlist → 004 track ids are references only, like recipe → cookbook, not a merge.
+
+## Why apprentissage is not composition (Workflow C vs A)
+
+| Aspect | **Composition (A)** | **Instrument learning (C)** |
+|--------|---------------------|-----------------------------|
+| **Unit** | Original **project** (one piece you write) | **Exercises** + **existing repertoire** you study |
+| **Planning** | Session notes on a project | **Weekly/dated plan** + **mark done** logs |
+| **Progress** | Idée → Terminé on **your** work | **En apprentissage** on **someone else’s** piece |
+| **004 link** | Inspiration (P2) | “Piece I’m learning from” (P2) — still not **listened** |
+| **Closest Muni pattern** | Long-running creative row | **[008](../008-fitness-training/spec.md)** plan + completion logs |
+
+**Decision**: **Separate typed entities and screens** under the same **Musique — pratique** hub (three tabs).
 
 ## Alignment with [009](../009-experiences-achievements/spec.md)
 
 | 009 principle | 012 application |
 |---------------|-----------------|
-| Subjective novelty | “Terminé” / “Joué” mean **meaningful for Valentin**, not chart placement |
+| Subjective novelty | “Terminé” / “Joué” / “Fait” mean **meaningful for Valentin**, not chart placement |
 | Companion, not coach | No “days since last session” guilt; **En pause** is neutral |
-| Domains stay authoritative | Compositions and DJ sets own their models; 004 unchanged |
-| Capture speed | Title-only quick-add on both workflows |
+| Domains stay authoritative | Compositions, DJ sets, and apprentissage own their models; 004 unchanged |
+| Capture speed | Title-only quick-add on all create flows |
 
-## Workflow comparison (composition vs DJ set)
+## Workflow comparison (composition vs DJ set vs apprentissage)
 
-| Aspect | **Composition workflow** | **DJ set workflow** |
-|--------|--------------------------|---------------------|
-| **Unit of work** | A **project** (one piece over weeks) | An **event** (one night / one mix) |
-| **MVP statuses** | Idée, En cours, En pause, Terminé, Archivé | Prévu, Joué, Annulé |
-| **Required beyond title** | Nothing on create | **performedAt** when status = Joué |
-| **Time model** | startedAt, finishedAt, lastWorkedAt, session note dates | performedAt (single anchor), duration optional |
-| **Structured log** | Session notes (text + date) | Ordered setlist lines (text; optional track link P2) |
-| **Place** | N/A (studio context in notes) | **venue** optional |
-| **Tempo** | Optional single **tempoBpm** | Optional **bpmRange** (set energy) |
-| **External media** | Demo URL | Recording URL |
-| **Natural empty state** | “Aucune composition — une idée suffit pour commencer” | “Aucun set enregistré” |
-| **Achievement moment** | User marks **Terminé** | User marks **Joué** with date |
-| **Cancelled / abandoned** | **Archivé** or stay **En pause** | **Annulé** for planned gigs |
+| Aspect | **Composition** | **DJ set** | **Apprentissage** |
+|--------|-----------------|------------|-------------------|
+| **MVP anchor** | Project status | Event **performedAt** | **practicedAt** on logs + plan “today” |
+| **Structured log** | Session notes | Setlist lines | **practice_log** + exercise library |
+| **Planning** | — | Prévu → Joué | **practice_plan** weekdays/dates |
+| **Achievement moment** | **Terminé** | **Joué** | **Fait** on planned item / log session |
+| **Instrument** | — | — | **practice_instrument** name registry |
 
 ## Comparison to other Muni “practice” domains
 
-| Domain | Spec | Parallel to 012 |
-|--------|------|-----------------|
-| **Fitness** | [008](../008-fitness-training/spec.md) | Planned sessions + **completed** logs — closest pattern; 012 DJ **Joué** ≈ workout **Terminé** |
-| **Recipes** | 001 + [010](../010-recipe-source-book/spec.md) | **Cooked** dates (011) ≈ **performedAt**; provenance catalog ≈ optional 004 links |
-| **Books** | [002](../002-books-library/spec.md) | Long-running **reading** vs single **read** finish — composition **En cours** spans time like reading |
+| Domain | Spec | Parallel to 012 apprentissage |
+|--------|------|--------------------------------|
+| **Fitness** | [008](../008-fitness-training/spec.md) | Active program, weekday assignments, **completed** workout logs — **primary template** for plan + today + done |
+| **Recipes** | 001 + [010](../010-recipe-source-book/spec.md) | **Cooked** dates (011) ≈ **practicedAt** |
+| **Books** | [002](../002-books-library/spec.md) | **Learning piece** spans time like **reading** status, but separate entity from 004 listen |
 
 ## Field minimalism (MVP vs optional)
 
-| Field | Composition | DJ set | Tier |
-|-------|-------------|--------|------|
-| title | ✓ required | ✓ required | P1 |
-| status | ✓ | ✓ | P1 |
-| performedAt / finishedAt | finishedAt on Terminé | performedAt on Joué | P1 |
-| sessionNotes / setlist | sessionNotes[] | setlist[] text lines | P1 |
-| venue | — | optional | P1 |
-| durationMinutes | — | optional | P1 |
-| mood, genreStyle | optional | optional | P1 |
-| tempoBpm / bpmRange | optional | optional | P1 |
-| externalUrl | optional | optional | P1 |
-| notes (long) | optional | optional | P1 |
-| linkedTrackIds / setlist trackId | optional | optional | P2 |
-| startedAt, lastWorkedAt | optional | — | P1 / P2 auto |
+| Field | Composition | DJ set | Apprentissage | Tier |
+|-------|-------------|--------|---------------|------|
+| title / name | ✓ | ✓ | exercise + piece title | P1 |
+| plan + today | — | — | ✓ | P1 |
+| practicedAt | — | performedAt | ✓ on log | P1 |
+| instrument link | — | — | ✓ | P1 |
+| linkedTrackId | P2 | P2 setlist | P2 learning piece | P2 |
 
 ## Explicitly rejected for v1
 
@@ -75,15 +74,25 @@
 |------|--------|
 | Store MP3/WAV in Muni | Hosting, bandwidth, legal — out of charter |
 | Rekordbox/Ableton sync | Integration scope; YAGNI |
-| Reuse `music_track` for compositions | Wrong semantics; would collide with **listened** recap |
-| Single “music journal” note type | Violates typed lists principle (001 III) |
-| Mandatory link 004 ↔ 012 | Discovery library stays independent |
+| Reuse `music_track` for compositions or learning rows | Wrong semantics; would collide with **listened** recap |
+| Merge apprentissage into composition workflow | Different UX (plan/mark done vs project status) |
+| Shipped exercise catalog | Valentin wants **user-named** études/scales; unlike 008 curated catalog |
+| Mandatory link 004 ↔ learning piece | Discovery library stays independent |
 
-## Open product questions (for Valentin — pre-planning)
+## Planning decisions (locked for `/speckit-plan`)
 
-Captured here for `/speckit-clarify`; spec uses documented defaults until answered.
+| ID | Topic | Decision |
+|----|--------|----------|
+| PD-012-1 | Hub IA | **Musique — pratique** with tabs **Compositions**, **Sets DJ**, **Apprentissage** |
+| PD-012-2 | Sync channel | Dedicated **`/api/sync/music-practice/*`** (or split sub-routes) for all 012 persisted entities — mirror **008 fitness** + **010 cookbooks** |
+| PD-012-3 | Migration band | **`0016_music_practice_tables.ts`** after **0015** cookbooks (010); compositions, dj_set, instrument entities in one migration family |
+| PD-012-4 | Active plan | Exactly one **`isActive`** practice plan per user (MVP) |
+| PD-012-5 | 011 timing | Register **`practice_log`** contributor in follow-up 011 task — 012 only persists **practicedAt** |
+| PD-012-6 | Learning default status | **`learning` (En apprentissage)** on quick-add |
+| PD-012-7 | Mark done | Creates **`practice_log`**; updates **`learning_piece.lastPracticedAt`** when linked |
 
-1. **Navigation**: Single **Musique — pratique** hub vs two top-level nav items?
-2. **011 timing**: Register recap contributor in same release as 012 implementation or follow-up?
-3. **DJ rehearsal**: Is **Joué** at home enough, or need a distinct “répétition” status later?
-4. **Composition default status**: **Idée** vs **En cours** on quick-add?
+## Open product questions (for Valentin — optional clarify)
+
+1. **Apprentissage sub-nav**: Single screen with sections vs two sub-tabs (Plan / Répertoire)?
+2. **Comfortable status**: Should **`comfortable` (À l’aise)** ever feed 011 recap, or only **practice_log** dates?
+3. **Composition default status**: **Idée** vs **En cours** on quick-add (unchanged from prior research)?

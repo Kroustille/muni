@@ -1,4 +1,4 @@
-# Specification Quality Checklist: Music practice — compositions & DJ sets
+# Specification Quality Checklist: Music practice — compositions, DJ sets & instrument learning
 
 **Purpose**: Validate specification completeness and quality before proceeding to planning  
 **Created**: 2026-10-28  
@@ -31,5 +31,6 @@
 
 ## Notes
 
-- Validated 2026-10-28 against [spec.md](../spec.md) and [research.md](../research.md).
-- Ready for `/speckit-clarify` (optional, for navigation + recap timing) or `/speckit-plan`.
+- Validated 2026-10-28 against [spec.md](../spec.md) and [research.md](../research.md) (workflows A–B).
+- Extended **2026-10-28** with **Workflow C — Apprentissage** (exercise library, plan, practice logs, learning pieces); checklist re-validated same day.
+- Ready for `/speckit-clarify` (optional, for apprentissage sub-nav + recap timing) or `/speckit-plan`.
