@@ -68,6 +68,8 @@ function staleBook(id: string, title: string, days: number): Item {
     musicBrainzRecordingId: null,
     spotifyUrl: null,
     soundcloudUrl: null,
+    cookbookId: null,
+    sourcePage: null,
   };
 }
 

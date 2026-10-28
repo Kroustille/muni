@@ -76,6 +76,8 @@ function baseItem(type: Item["type"], id: string, overrides: Partial<Item> = {})
     musicBrainzRecordingId: null,
     spotifyUrl: null,
     soundcloudUrl: null,
+    cookbookId: null,
+    sourcePage: null,
     ...overrides,
   };
 }
