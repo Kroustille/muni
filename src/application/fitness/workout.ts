@@ -1,11 +1,12 @@
-import type { FitnessProgramRepository } from "@/application/ports/fitness-program-repository";
+import type { FitnessSessionTemplate } from "@/domain/fitness/session-template";
+import type { FitnessScheduledSession } from "@/domain/fitness/scheduled-session";
+import type { FitnessSessionTemplateRepository } from "@/application/ports/fitness-session-template-repository";
+import type { FitnessScheduledSessionRepository } from "@/application/ports/fitness-scheduled-session-repository";
 import type { FitnessSkipRepository } from "@/application/ports/fitness-skip-repository";
-import type { FitnessSettingsRepository } from "@/application/ports/fitness-settings-repository";
+import type { FitnessSettingsRepository, FitnessExerciseCatalogStore } from "@/application/ports/fitness-settings-repository";
 import type { FitnessWorkoutRepository } from "@/application/ports/fitness-workout-repository";
-import type { FitnessExerciseCatalogStore } from "@/application/ports/fitness-settings-repository";
 import type { IdGenerator } from "@/application/ports/id-generator";
 import type { MetaStore } from "@/application/ports/item-repository";
-import type { PlannedSession } from "@/domain/fitness/program";
 import {
   defaultFitnessUserSettings,
   fitnessSkipRecordSchema,
@@ -19,7 +20,8 @@ import { localCalendarDate } from "./today";
 
 export type FitnessWorkoutUseCasesDeps = {
   workouts: FitnessWorkoutRepository;
-  programs: FitnessProgramRepository;
+  templates: FitnessSessionTemplateRepository;
+  scheduled: FitnessScheduledSessionRepository;
   skips: FitnessSkipRepository;
   settings: FitnessSettingsRepository;
   catalog: FitnessExerciseCatalogStore;
@@ -32,11 +34,11 @@ export type FitnessWorkoutUseCases = {
   getWorkout(id: string): Promise<FitnessWorkoutLog | undefined>;
   listWorkouts(): Promise<FitnessWorkoutLog[]>;
   listSkips(): Promise<import("@/domain/fitness/workout-log").FitnessSkipRecord[]>;
-  startWorkoutFromPlan(plannedSession: PlannedSession): Promise<FitnessWorkoutLog>;
+  startWorkoutFromTemplate(template: FitnessSessionTemplate, scheduled?: FitnessScheduledSession): Promise<FitnessWorkoutLog>;
   startFreeWorkout(): Promise<FitnessWorkoutLog>;
   completeWorkout(id: string): Promise<FitnessWorkoutLog>;
   abandonWorkout(id: string): Promise<FitnessWorkoutLog>;
-  skipPlannedSession(plannedSessionId: string, note?: string): Promise<void>;
+  skipScheduledSession(scheduledSessionId: string, note?: string): Promise<void>;
   updateLoggedExercises(id: string, loggedExercises: LoggedExercise[]): Promise<FitnessWorkoutLog>;
   updateRecovery(id: string, recovery: FitnessWorkoutLog["recovery"]): Promise<FitnessWorkoutLog>;
   duplicateWorkoutAsTemplate(sourceId: string): Promise<FitnessWorkoutLog>;
@@ -55,12 +57,12 @@ async function ensureSettings(settings: FitnessSettingsRepository): Promise<void
   }
 }
 
-function exercisesFromPlan(
-  session: PlannedSession,
+function exercisesFromTemplate(
+  template: FitnessSessionTemplate,
   catalog: FitnessExerciseCatalogStore,
 ): Promise<LoggedExercise[]> {
   return Promise.all(
-    session.exercises.map(async (planned) => {
+    template.templateExercises.map(async (planned) => {
       const entry = await catalog.getById(planned.exerciseId);
       const nameFr = entry?.nameFr ?? planned.exerciseId;
       const setCount = planned.defaultSetCount ?? 1;
@@ -90,19 +92,20 @@ export function createFitnessWorkoutUseCases(deps: FitnessWorkoutUseCasesDeps): 
     listWorkouts: () => deps.workouts.list(),
     listSkips: () => deps.skips.list(),
 
-    async startWorkoutFromPlan(plannedSession) {
+    async startWorkoutFromTemplate(template, scheduled) {
       await assertSingleInProgress();
       await ensureSettings(deps.settings);
       const stamp = await hlc.nextFieldStamp();
       const version = await catalogVersion(deps.catalog);
       const calendarDate = localCalendarDate(deps.now());
-      const loggedExercises = await exercisesFromPlan(plannedSession, deps.catalog);
+      const loggedExercises = await exercisesFromTemplate(template, deps.catalog);
       const log = fitnessWorkoutLogSchema.parse({
         id: deps.idGenerator.newId(),
         status: "in_progress",
         calendarDate,
-        plannedSessionId: plannedSession.id,
-        title: plannedSession.title,
+        sessionTemplateId: template.id,
+        scheduledSessionId: scheduled?.id ?? null,
+        title: template.title,
         startedAt: new Date(deps.now()).toISOString(),
         completedAt: null,
         catalogVersion: version,
@@ -123,7 +126,8 @@ export function createFitnessWorkoutUseCases(deps: FitnessWorkoutUseCasesDeps): 
         id: deps.idGenerator.newId(),
         status: "in_progress",
         calendarDate: localCalendarDate(deps.now()),
-        plannedSessionId: null,
+        sessionTemplateId: null,
+        scheduledSessionId: null,
         title: "Séance libre",
         startedAt: new Date(deps.now()).toISOString(),
         completedAt: null,
@@ -162,15 +166,20 @@ export function createFitnessWorkoutUseCases(deps: FitnessWorkoutUseCasesDeps): 
       return deps.workouts.upsert(fitnessWorkoutLogSchema.parse(next) as FitnessWorkoutLog);
     },
 
-    async skipPlannedSession(plannedSessionId, note) {
+    async skipScheduledSession(scheduledSessionId, note) {
+      const scheduled = await deps.scheduled.get(scheduledSessionId);
+      if (scheduled === undefined || scheduled.deletedAt !== null) {
+        throw new Error("scheduled session not found");
+      }
       const stamp = await hlc.nextFieldStamp();
       const record = fitnessSkipRecordSchema.parse({
         id: deps.idGenerator.newId(),
-        calendarDate: localCalendarDate(deps.now()),
-        plannedSessionId,
+        calendarDate: scheduled.calendarDate,
+        scheduledSessionId,
+        sessionTemplateId: scheduled.sessionTemplateId,
         note: note?.trim() || null,
         deletedAt: null,
-        fieldsUpdatedAt: { plannedSessionId: stamp, calendarDate: stamp },
+        fieldsUpdatedAt: { scheduledSessionId: stamp, calendarDate: stamp },
       });
       await deps.skips.upsert(record);
     },
@@ -211,7 +220,8 @@ export function createFitnessWorkoutUseCases(deps: FitnessWorkoutUseCasesDeps): 
         id: deps.idGenerator.newId(),
         status: "in_progress",
         calendarDate: localCalendarDate(deps.now()),
-        plannedSessionId: null,
+        sessionTemplateId: null,
+        scheduledSessionId: null,
         title: source.title,
         startedAt: new Date(deps.now()).toISOString(),
         completedAt: null,

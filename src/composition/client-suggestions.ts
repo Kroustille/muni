@@ -1,5 +1,5 @@
 import { createIndexedDbActivitySuggestionStore } from "@/adapters/indexeddb/activity-suggestion-store";
-import { createIndexedDbFitnessProgramRepository } from "@/adapters/indexeddb/fitness-program-repository";
+import { createIndexedDbFitnessSessionTemplateRepository } from "@/adapters/indexeddb/fitness-session-template-repository";
 import { createIndexedDbFitnessSkipRepository } from "@/adapters/indexeddb/fitness-skip-repository";
 import { createIndexedDbFitnessWorkoutRepository } from "@/adapters/indexeddb/fitness-workout-repository";
 import type { MuniDb } from "@/adapters/indexeddb/db";
@@ -21,7 +21,7 @@ export function wireClientSuggestions(input: {
   const deps: SuggestionsDeps = {
     items: input.items,
     suggestionStore,
-    fitnessPrograms: createIndexedDbFitnessProgramRepository(input.db),
+    fitnessSessionTemplates: createIndexedDbFitnessSessionTemplateRepository(input.db),
     fitnessWorkouts: createIndexedDbFitnessWorkoutRepository(input.db),
     fitnessSkips: createIndexedDbFitnessSkipRepository(input.db),
     idGenerator: input.idGenerator,

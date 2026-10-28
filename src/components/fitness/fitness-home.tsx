@@ -4,17 +4,23 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import {
   ensureFitnessCatalogSeeded,
-  getFitnessProgramUseCases,
+  getFitnessScheduleUseCases,
+  getFitnessSessionTemplateUseCases,
   getFitnessWorkoutUseCases,
 } from "@/composition/client";
 import { buildWeekAdherenceView } from "@/domain/fitness/adherence";
-import type { FitnessProgram } from "@/domain/fitness/program";
+import type { FitnessSessionTemplate } from "@/domain/fitness/session-template";
+import type { FitnessScheduledSession } from "@/domain/fitness/scheduled-session";
 import type { FitnessSkipRecord, FitnessWorkoutLog } from "@/domain/fitness/workout-log";
-import { resolveTodaySessions, localCalendarDate, type TodayPlannedSession } from "@/application/fitness/today";
+import {
+  resolveTodayScheduledSessions,
+  localCalendarDate,
+  type TodayScheduledSession,
+} from "@/application/fitness/today";
 import { WeekAdherenceStrip } from "@/components/fitness/week-strip";
 import { t } from "@/i18n";
 
-function statusLabel(status: TodayPlannedSession["status"]): string {
+function statusLabel(status: TodayScheduledSession["status"]): string {
   switch (status) {
     case "todo":
       return t("fitness.today.todo");
@@ -30,22 +36,35 @@ function statusLabel(status: TodayPlannedSession["status"]): string {
 }
 
 export function FitnessHome() {
-  const [program, setProgram] = useState<FitnessProgram | undefined>();
+  const [templates, setTemplates] = useState<FitnessSessionTemplate[]>([]);
+  const [scheduled, setScheduled] = useState<FitnessScheduledSession[]>([]);
   const [logs, setLogs] = useState<FitnessWorkoutLog[]>([]);
   const [skips, setSkips] = useState<FitnessSkipRecord[]>([]);
-  const [today, setToday] = useState<TodayPlannedSession[]>([]);
+  const [today, setToday] = useState<TodayScheduledSession[]>([]);
   const [error, setError] = useState<string | null>(null);
 
   const refresh = async () => {
-    const programUseCases = await getFitnessProgramUseCases();
+    const templateUseCases = await getFitnessSessionTemplateUseCases();
+    const scheduleUseCases = await getFitnessScheduleUseCases();
     const workoutUseCases = await getFitnessWorkoutUseCases();
-    const active = await programUseCases.getActiveProgram();
+    const allTemplates = await templateUseCases.listTemplates();
+    const allScheduled = await scheduleUseCases.listScheduled();
     const allLogs = await workoutUseCases.listWorkouts();
     const allSkips = await workoutUseCases.listSkips();
-    setProgram(active);
+    const todayDate = localCalendarDate();
+    setTemplates(allTemplates);
+    setScheduled(allScheduled);
     setLogs(allLogs);
     setSkips(allSkips);
-    setToday(resolveTodaySessions(active, allLogs, allSkips, localCalendarDate()));
+    setToday(
+      resolveTodayScheduledSessions(
+        allScheduled,
+        allTemplates,
+        allLogs,
+        allSkips,
+        todayDate,
+      ),
+    );
   };
 
   useEffect(() => {
@@ -53,15 +72,16 @@ export function FitnessHome() {
   }, []);
 
   useEffect(() => {
-    setToday(resolveTodaySessions(program, logs, skips, localCalendarDate()));
-  }, [program, logs, skips]);
+    setToday(resolveTodayScheduledSessions(scheduled, templates, logs, skips, localCalendarDate()));
+  }, [templates, scheduled, logs, skips]);
 
-  const weekView = buildWeekAdherenceView(program ?? null, logs, skips, localCalendarDate());
+  const activeTemplates = templates.filter((t) => t.deletedAt === null);
+  const weekView = buildWeekAdherenceView(scheduled, templates, logs, skips, localCalendarDate());
 
-  const startSession = async (session: TodayPlannedSession) => {
+  const startSession = async (session: TodayScheduledSession) => {
     try {
       const workoutUseCases = await getFitnessWorkoutUseCases();
-      const log = await workoutUseCases.startWorkoutFromPlan(session.plannedSession);
+      const log = await workoutUseCases.startWorkoutFromTemplate(session.template, session.scheduled);
       window.location.assign(`/fitness/workout/${log.id}`);
     } catch (e) {
       if (e instanceof Error && e.message === "WORKOUT_IN_PROGRESS") {
@@ -82,15 +102,15 @@ export function FitnessHome() {
     }
   };
 
-  if (program === undefined) {
+  if (activeTemplates.length === 0) {
     return (
       <div className="mx-auto max-w-lg p-4" data-testid="fitness-home-empty">
         <p className="mb-4 text-muted">{t("fitness.home.empty")}</p>
         <Link
-          href="/fitness/program"
+          href="/fitness/sessions"
           className="inline-flex rounded-xl bg-accent px-4 py-3 text-sm font-medium text-accent-foreground"
         >
-          {t("fitness.home.createProgram")}
+          {t("fitness.home.createSessions")}
         </Link>
       </div>
     );
@@ -100,8 +120,8 @@ export function FitnessHome() {
     <div className="mx-auto max-w-lg space-y-4 p-4" data-testid="fitness-home">
       <header className="flex items-center justify-between">
         <h1 className="font-serif text-2xl font-semibold">{t("fitness.home.title")}</h1>
-        <Link href="/fitness/program" className="text-sm text-accent">
-          {t("fitness.home.editProgram")}
+        <Link href="/fitness/sessions" className="text-sm text-accent">
+          {t("fitness.home.editSessions")}
         </Link>
       </header>
       {error !== null && <p className="text-sm text-destructive">{error}</p>}
@@ -110,11 +130,11 @@ export function FitnessHome() {
         <ul className="space-y-2">
           {today.map((session) => (
             <li
-              key={session.plannedSession.id}
+              key={session.scheduled.id}
               className="flex items-center justify-between rounded-xl border border-border p-3"
             >
               <div>
-                <p className="font-medium">{session.plannedSession.title}</p>
+                <p className="font-medium">{session.template.title}</p>
                 <p className="text-xs text-muted">{statusLabel(session.status)}</p>
               </div>
               {session.status === "todo" && (
@@ -132,7 +152,7 @@ export function FitnessHome() {
                     className="rounded-lg border border-border px-3 py-2 text-xs"
                     onClick={async () => {
                       const workoutUseCases = await getFitnessWorkoutUseCases();
-                      await workoutUseCases.skipPlannedSession(session.plannedSession.id);
+                      await workoutUseCases.skipScheduledSession(session.scheduled.id);
                       await refresh();
                     }}
                   >

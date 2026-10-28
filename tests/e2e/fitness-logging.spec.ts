@@ -1,11 +1,10 @@
 import { expect, test } from "@playwright/test";
 import { signIn } from "./list-helpers";
+import { seedFitnessSessionLibrary } from "./fitness-helpers";
 
 test("logs sets offline", async ({ page, context }) => {
   await signIn(page);
-  await page.goto("/fitness/program");
-  await page.getByTestId("fitness-program-name").fill("Log");
-  await page.getByTestId("fitness-program-save").click();
+  await seedFitnessSessionLibrary(page, "Log");
   await page.goto("/fitness");
   await page.getByTestId("fitness-free-workout").click();
   await context.setOffline(true);

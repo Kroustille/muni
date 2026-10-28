@@ -8,7 +8,8 @@ import { SyncValidationError } from "@/application/server/sync-service";
 const PUSH_MAX = 500;
 
 const bodySchema = z.object({
-  programs: z.array(z.unknown()).optional(),
+  sessionTemplates: z.array(z.unknown()).optional(),
+  scheduledSessions: z.array(z.unknown()).optional(),
   workoutLogs: z.array(z.unknown()).optional(),
   skipRecords: z.array(z.unknown()).optional(),
   settings: z.array(z.unknown()).optional(),
@@ -31,7 +32,8 @@ export async function POST(request: Request): Promise<Response> {
   if (!parsed.success) return new Response(null, { status: 400 });
 
   const total =
-    (parsed.data.programs?.length ?? 0) +
+    (parsed.data.sessionTemplates?.length ?? 0) +
+    (parsed.data.scheduledSessions?.length ?? 0) +
     (parsed.data.workoutLogs?.length ?? 0) +
     (parsed.data.skipRecords?.length ?? 0) +
     (parsed.data.settings?.length ?? 0);

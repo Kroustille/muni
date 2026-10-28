@@ -1,10 +1,17 @@
 import {
-  fitnessProgramToWire,
-  fitnessProgramWireSchema,
-  mergeFitnessProgram,
-  wireToFitnessProgram,
-  type FitnessProgramWire,
-} from "@/domain/fitness/program";
+  fitnessSessionTemplateToWire,
+  fitnessSessionTemplateWireSchema,
+  mergeFitnessSessionTemplate,
+  wireToFitnessSessionTemplate,
+  type FitnessSessionTemplateWire,
+} from "@/domain/fitness/session-template";
+import {
+  fitnessScheduledSessionToWire,
+  fitnessScheduledSessionWireSchema,
+  mergeFitnessScheduledSession,
+  wireToFitnessScheduledSession,
+  type FitnessScheduledSessionWire,
+} from "@/domain/fitness/scheduled-session";
 import {
   fitnessSkipRecordToWire,
   fitnessSkipRecordWireSchema,
@@ -22,7 +29,8 @@ import {
   type FitnessUserSettingsWire,
   type FitnessWorkoutLogWire,
 } from "@/domain/fitness/workout-log";
-import type { ServerFitnessProgramRepository } from "@/application/ports/fitness-program-repository";
+import type { ServerFitnessSessionTemplateRepository } from "@/application/ports/fitness-session-template-repository";
+import type { ServerFitnessScheduledSessionRepository } from "@/application/ports/fitness-scheduled-session-repository";
 import type { ServerFitnessSkipRepository } from "@/application/ports/fitness-skip-repository";
 import type { ServerFitnessSettingsRepository } from "@/application/ports/fitness-settings-repository";
 import type { ServerFitnessWorkoutRepository } from "@/application/ports/fitness-workout-repository";
@@ -32,13 +40,15 @@ export type FitnessSyncService = {
   push(
     userId: string,
     body: {
-      programs: FitnessProgramWire[];
+      sessionTemplates: FitnessSessionTemplateWire[];
+      scheduledSessions: FitnessScheduledSessionWire[];
       workoutLogs: FitnessWorkoutLogWire[];
       skipRecords: FitnessSkipRecordWire[];
       settings: FitnessUserSettingsWire[];
     },
   ): Promise<{
-    programs: FitnessProgramWire[];
+    sessionTemplates: FitnessSessionTemplateWire[];
+    scheduledSessions: FitnessScheduledSessionWire[];
     workoutLogs: FitnessWorkoutLogWire[];
     skipRecords: FitnessSkipRecordWire[];
     settings: FitnessUserSettingsWire[];
@@ -48,7 +58,8 @@ export type FitnessSyncService = {
     since: string | null,
     limit: number,
   ): Promise<{
-    programs: FitnessProgramWire[];
+    sessionTemplates: FitnessSessionTemplateWire[];
+    scheduledSessions: FitnessScheduledSessionWire[];
     workoutLogs: FitnessWorkoutLogWire[];
     skipRecords: FitnessSkipRecordWire[];
     settings: FitnessUserSettingsWire[];
@@ -57,7 +68,8 @@ export type FitnessSyncService = {
 };
 
 type FitnessSyncServiceDeps = {
-  programs: ServerFitnessProgramRepository;
+  templates: ServerFitnessSessionTemplateRepository;
+  scheduled: ServerFitnessScheduledSessionRepository;
   workouts: ServerFitnessWorkoutRepository;
   skips: ServerFitnessSkipRepository;
   settings: ServerFitnessSettingsRepository;
@@ -108,18 +120,21 @@ function validateWireArray<T>(
 }
 
 export function validatePushFitness(body: {
-  programs?: unknown[];
+  sessionTemplates?: unknown[];
+  scheduledSessions?: unknown[];
   workoutLogs?: unknown[];
   skipRecords?: unknown[];
   settings?: unknown[];
 }): {
-  programs: FitnessProgramWire[];
+  sessionTemplates: FitnessSessionTemplateWire[];
+  scheduledSessions: FitnessScheduledSessionWire[];
   workoutLogs: FitnessWorkoutLogWire[];
   skipRecords: FitnessSkipRecordWire[];
   settings: FitnessUserSettingsWire[];
 } {
   return {
-    programs: validateWireArray(body.programs ?? [], "program", fitnessProgramWireSchema),
+    sessionTemplates: validateWireArray(body.sessionTemplates ?? [], "sessionTemplate", fitnessSessionTemplateWireSchema),
+    scheduledSessions: validateWireArray(body.scheduledSessions ?? [], "scheduledSession", fitnessScheduledSessionWireSchema),
     workoutLogs: validateWireArray(body.workoutLogs ?? [], "workout", fitnessWorkoutLogWireSchema),
     skipRecords: validateWireArray(body.skipRecords ?? [], "skip", fitnessSkipRecordWireSchema),
     settings: validateWireArray(body.settings ?? [], "settings", fitnessUserSettingsWireSchema),
@@ -130,125 +145,36 @@ function serverUpdatedAtIso(now: () => Date): string {
   return now().toISOString();
 }
 
-async function pushPrograms(
+async function pushMerged<TWire extends { id: string; server_updated_at?: string | null }, TDomain>(
   userId: string,
-  repo: ServerFitnessProgramRepository,
-  incoming: FitnessProgramWire[],
+  incoming: TWire[],
   now: () => Date,
-): Promise<FitnessProgramWire[]> {
-  return repo.transaction(async (programs) => {
-    const results: FitnessProgramWire[] = [];
+  repo: {
+    transaction: <R>(fn: (inner: typeof repo) => Promise<R>) => Promise<R>;
+    findByIds: (userId: string, ids: string[]) => Promise<TDomain[]>;
+    upsert: (userId: string, domain: TDomain) => Promise<TDomain>;
+  },
+  toWire: (domain: TDomain, serverUpdatedAt?: string | null) => TWire,
+  fromWire: (wire: TWire) => TDomain,
+  merge: (local: TWire, remote: TWire) => TWire,
+): Promise<TWire[]> {
+  return repo.transaction(async (inner) => {
+    const results: TWire[] = [];
     for (const row of incoming) {
-      const locked = await programs.findByIds(userId, [row.id]);
+      const locked = await inner.findByIds(userId, [row.id]);
       const existing = locked[0];
-      let merged: FitnessProgramWire;
+      let merged: TWire;
       if (!existing) {
         merged = { ...row, server_updated_at: serverUpdatedAtIso(now) };
       } else {
-        const existingWire = fitnessProgramToWire(existing);
+        const existingWire = toWire(existing);
         merged =
           JSON.stringify(row) === JSON.stringify(existingWire)
             ? { ...existingWire, server_updated_at: existingWire.server_updated_at ?? null }
-            : {
-                ...mergeFitnessProgram(row, existingWire),
-                server_updated_at: serverUpdatedAtIso(now),
-              };
+            : { ...merge(row, existingWire), server_updated_at: serverUpdatedAtIso(now) };
       }
-      const saved = await programs.upsert(userId, wireToFitnessProgram(merged));
-      results.push(fitnessProgramToWire(saved, merged.server_updated_at ?? null));
-    }
-    return results;
-  });
-}
-
-async function pushWorkouts(
-  userId: string,
-  repo: ServerFitnessWorkoutRepository,
-  incoming: FitnessWorkoutLogWire[],
-  now: () => Date,
-): Promise<FitnessWorkoutLogWire[]> {
-  return repo.transaction(async (workouts) => {
-    const results: FitnessWorkoutLogWire[] = [];
-    for (const row of incoming) {
-      const locked = await workouts.findByIds(userId, [row.id]);
-      const existing = locked[0];
-      let merged: FitnessWorkoutLogWire;
-      if (!existing) {
-        merged = { ...row, server_updated_at: serverUpdatedAtIso(now) };
-      } else {
-        const existingWire = fitnessWorkoutLogToWire(existing);
-        merged =
-          JSON.stringify(row) === JSON.stringify(existingWire)
-            ? { ...existingWire, server_updated_at: existingWire.server_updated_at ?? null }
-            : {
-                ...mergeFitnessWorkoutLog(row, existingWire),
-                server_updated_at: serverUpdatedAtIso(now),
-              };
-      }
-      const saved = await workouts.upsert(userId, wireToFitnessWorkoutLog(merged));
-      results.push(fitnessWorkoutLogToWire(saved, merged.server_updated_at ?? null));
-    }
-    return results;
-  });
-}
-
-async function pushSkips(
-  userId: string,
-  repo: ServerFitnessSkipRepository,
-  incoming: FitnessSkipRecordWire[],
-  now: () => Date,
-): Promise<FitnessSkipRecordWire[]> {
-  return repo.transaction(async (skips) => {
-    const results: FitnessSkipRecordWire[] = [];
-    for (const row of incoming) {
-      const locked = await skips.findByIds(userId, [row.id]);
-      const existing = locked[0];
-      let merged: FitnessSkipRecordWire;
-      if (!existing) {
-        merged = { ...row, server_updated_at: serverUpdatedAtIso(now) };
-      } else {
-        const existingWire = fitnessSkipRecordToWire(existing);
-        merged =
-          JSON.stringify(row) === JSON.stringify(existingWire)
-            ? { ...existingWire, server_updated_at: existingWire.server_updated_at ?? null }
-            : {
-                ...mergeFitnessSkipRecord(row, existingWire),
-                server_updated_at: serverUpdatedAtIso(now),
-              };
-      }
-      const saved = await skips.upsert(userId, wireToFitnessSkipRecord(merged));
-      results.push(fitnessSkipRecordToWire(saved, merged.server_updated_at ?? null));
-    }
-    return results;
-  });
-}
-
-async function pushSettings(
-  userId: string,
-  repo: ServerFitnessSettingsRepository,
-  incoming: FitnessUserSettingsWire[],
-  now: () => Date,
-): Promise<FitnessUserSettingsWire[]> {
-  return repo.transaction(async (settings) => {
-    const results: FitnessUserSettingsWire[] = [];
-    for (const row of incoming) {
-      const locked = await settings.findByIds(userId, [row.id]);
-      const existing = locked[0];
-      let merged: FitnessUserSettingsWire;
-      if (!existing) {
-        merged = { ...row, server_updated_at: serverUpdatedAtIso(now) };
-      } else {
-        const existingWire = fitnessUserSettingsToWire(existing);
-        merged =
-          JSON.stringify(row) === JSON.stringify(existingWire)
-            ? { ...existingWire, server_updated_at: existingWire.server_updated_at ?? null }
-            : {
-                ...mergeFitnessUserSettings(row, existingWire),
-                server_updated_at: serverUpdatedAtIso(now),
-              };
-      }
-      const saved = await settings.upsert(userId, wireToFitnessUserSettings(merged));
-      results.push(fitnessUserSettingsToWire(saved, merged.server_updated_at ?? null));
+      const saved = await inner.upsert(userId, fromWire(merged));
+      results.push(toWire(saved, merged.server_updated_at ?? null));
     }
     return results;
   });
@@ -261,36 +187,87 @@ export function createFitnessSyncService(deps: FitnessSyncServiceDeps): FitnessS
     async push(userId, body) {
       assertUserId(userId);
       const validated = validatePushFitness(body);
-      const [programs, workoutLogs, skipRecords, settings] = await Promise.all([
-        pushPrograms(userId, deps.programs, validated.programs, now),
-        pushWorkouts(userId, deps.workouts, validated.workoutLogs, now),
-        pushSkips(userId, deps.skips, validated.skipRecords, now),
-        pushSettings(userId, deps.settings, validated.settings, now),
+      const [sessionTemplates, scheduledSessions, workoutLogs, skipRecords, settings] = await Promise.all([
+        pushMerged(
+          userId,
+          validated.sessionTemplates,
+          now,
+          deps.templates,
+          fitnessSessionTemplateToWire,
+          wireToFitnessSessionTemplate,
+          mergeFitnessSessionTemplate,
+        ),
+        pushMerged(
+          userId,
+          validated.scheduledSessions,
+          now,
+          deps.scheduled,
+          fitnessScheduledSessionToWire,
+          wireToFitnessScheduledSession,
+          mergeFitnessScheduledSession,
+        ),
+        pushMerged(
+          userId,
+          validated.workoutLogs,
+          now,
+          deps.workouts,
+          fitnessWorkoutLogToWire,
+          wireToFitnessWorkoutLog,
+          mergeFitnessWorkoutLog,
+        ),
+        pushMerged(
+          userId,
+          validated.skipRecords,
+          now,
+          deps.skips,
+          fitnessSkipRecordToWire,
+          wireToFitnessSkipRecord,
+          mergeFitnessSkipRecord,
+        ),
+        pushMerged(
+          userId,
+          validated.settings,
+          now,
+          deps.settings,
+          fitnessUserSettingsToWire,
+          wireToFitnessUserSettings,
+          mergeFitnessUserSettings,
+        ),
       ]);
-      return { programs, workoutLogs, skipRecords, settings };
+      return { sessionTemplates, scheduledSessions, workoutLogs, skipRecords, settings };
     },
 
     async pull(userId, since, limit) {
       assertUserId(userId);
       const sinceDate = since === null ? null : new Date(since);
-      const [programs, workoutLogs, skipRecords, settings] = await Promise.all([
-        deps.programs.pullSince(userId, sinceDate, limit),
+      const [sessionTemplates, scheduledSessions, workoutLogs, skipRecords, settings] = await Promise.all([
+        deps.templates.pullSince(userId, sinceDate, limit),
+        deps.scheduled.pullSince(userId, sinceDate, limit),
         deps.workouts.pullSince(userId, sinceDate, limit),
         deps.skips.pullSince(userId, sinceDate, limit),
         deps.settings.pullSince(userId, sinceDate, limit),
       ]);
-      const programWires = programs.map((p) => fitnessProgramToWire(p));
+      const templateWires = sessionTemplates.map((p) => fitnessSessionTemplateToWire(p));
+      const scheduledWires = scheduledSessions.map((p) => fitnessScheduledSessionToWire(p));
       const workoutWires = workoutLogs.map((l) => fitnessWorkoutLogToWire(l));
       const skipWires = skipRecords.map((s) => fitnessSkipRecordToWire(s));
       const settingsWires = settings.map((s) => fitnessUserSettingsToWire(s));
       const cursors = [
-        ...programWires.map((w) => w.server_updated_at),
+        ...templateWires.map((w) => w.server_updated_at),
+        ...scheduledWires.map((w) => w.server_updated_at),
         ...workoutWires.map((w) => w.server_updated_at),
         ...skipWires.map((w) => w.server_updated_at),
         ...settingsWires.map((w) => w.server_updated_at),
       ].filter((c): c is string => typeof c === "string");
       const cursor = cursors.sort().at(-1) ?? since ?? "";
-      return { programs: programWires, workoutLogs: workoutWires, skipRecords: skipWires, settings: settingsWires, cursor };
+      return {
+        sessionTemplates: templateWires,
+        scheduledSessions: scheduledWires,
+        workoutLogs: workoutWires,
+        skipRecords: skipWires,
+        settings: settingsWires,
+        cursor,
+      };
     },
   };
 }

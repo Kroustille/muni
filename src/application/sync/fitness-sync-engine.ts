@@ -38,7 +38,8 @@ export function createFitnessSyncEngine(deps: {
       try {
         const payload = await deps.sync.collectPushPayload();
         const hasPush =
-          payload.programs.length +
+          payload.sessionTemplates.length +
+            payload.scheduledSessions.length +
             payload.workoutLogs.length +
             payload.skipRecords.length +
             payload.settings.length >
@@ -50,7 +51,8 @@ export function createFitnessSyncEngine(deps: {
               const merged = await deps.remote.push(payload);
               await deps.sync.applyRemote(merged);
               await deps.sync.clearOutboxes({
-                programIds: payload.programs.map((p) => p.id),
+                sessionTemplateIds: payload.sessionTemplates.map((p) => p.id),
+                scheduledSessionIds: payload.scheduledSessions.map((p) => p.id),
                 workoutIds: payload.workoutLogs.map((w) => w.id),
                 skipIds: payload.skipRecords.map((s) => s.id),
                 settingsIds: payload.settings.map((s) => s.id),

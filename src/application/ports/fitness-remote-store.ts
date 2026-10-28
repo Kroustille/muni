@@ -1,4 +1,5 @@
-import type { FitnessProgramWire } from "@/domain/fitness/program";
+import type { FitnessSessionTemplateWire } from "@/domain/fitness/session-template";
+import type { FitnessScheduledSessionWire } from "@/domain/fitness/scheduled-session";
 import type {
   FitnessSkipRecordWire,
   FitnessUserSettingsWire,
@@ -6,7 +7,8 @@ import type {
 } from "@/domain/fitness/workout-log";
 
 export type FitnessPullResult = {
-  programs: FitnessProgramWire[];
+  sessionTemplates: FitnessSessionTemplateWire[];
+  scheduledSessions: FitnessScheduledSessionWire[];
   workoutLogs: FitnessWorkoutLogWire[];
   skipRecords: FitnessSkipRecordWire[];
   settings: FitnessUserSettingsWire[];
@@ -15,7 +17,8 @@ export type FitnessPullResult = {
 
 export type FitnessRemoteStore = {
   push(body: {
-    programs: FitnessProgramWire[];
+    sessionTemplates: FitnessSessionTemplateWire[];
+    scheduledSessions: FitnessScheduledSessionWire[];
     workoutLogs: FitnessWorkoutLogWire[];
     skipRecords: FitnessSkipRecordWire[];
     settings: FitnessUserSettingsWire[];

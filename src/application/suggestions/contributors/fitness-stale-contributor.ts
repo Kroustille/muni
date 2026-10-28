@@ -6,17 +6,19 @@ export const fitnessStaleContributor: DomainStaleContributor = {
   domainId: "fitness",
   async listStaleCandidates(deps, ctx) {
     if (
-      deps.fitnessPrograms === undefined ||
+      deps.fitnessSessionTemplates === undefined ||
       deps.fitnessWorkouts === undefined ||
       deps.fitnessSkips === undefined
     ) {
       return [];
     }
 
-    const program = await deps.fitnessPrograms.getActive();
-    if (program === undefined || program.deletedAt !== null) {
+    const templates = (await deps.fitnessSessionTemplates.list()).filter((t) => t.deletedAt === null);
+    if (templates.length === 0) {
       return [];
     }
+
+    const primary = templates[0]!;
 
     const [logs, skips] = await Promise.all([
       deps.fitnessWorkouts.list(),
@@ -31,18 +33,18 @@ export const fitnessStaleContributor: DomainStaleContributor = {
     const lastCompletedDate = completed.map((log) => log.calendarDate).sort().at(-1);
     const resumeAnchor =
       lastCompletedDate ??
-      program.fieldsUpdatedAt.isActive?.slice(0, 10) ??
+      primary.fieldsUpdatedAt.title?.slice(0, 10) ??
       ctx.calendarDay;
 
     const resumeCandidate = makeCandidate(
       {
         domainId: "fitness",
-        itemId: program.id,
+        itemId: primary.id,
         kind: "resume_training",
-        title: program.name,
+        title: primary.title,
         subtitle: null,
         staleAnchorDate: resumeAnchor,
-        deepLink: buildItemDeepLink("fitness", program.id),
+        deepLink: buildItemDeepLink("fitness", primary.id),
         primaryActionKey: "suggestions.action.train",
         minStaleDays: 7,
       },
@@ -50,18 +52,23 @@ export const fitnessStaleContributor: DomainStaleContributor = {
     );
     if (resumeCandidate) candidates.push(resumeCandidate);
 
+    const templateById = new Map(templates.map((t) => [t.id, t]));
+
     for (const skip of skips) {
       if (skip.deletedAt !== null) continue;
-      const session = program.plannedSessions.find((s) => s.id === skip.plannedSessionId);
+      const template =
+        skip.sessionTemplateId === null
+          ? undefined
+          : templateById.get(skip.sessionTemplateId);
       const candidate = makeCandidate(
         {
           domainId: "fitness",
           itemId: skip.id,
           kind: "unblock_skipped",
-          title: session?.title ?? program.name,
+          title: template?.title ?? primary.title,
           subtitle: null,
           staleAnchorDate: skip.calendarDate,
-          deepLink: buildFitnessSkipDeepLink(program.id),
+          deepLink: buildFitnessSkipDeepLink(skip.id),
           primaryActionKey: "suggestions.action.train",
           minStaleDays: 3,
         },

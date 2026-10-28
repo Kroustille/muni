@@ -1,11 +1,10 @@
 import { expect, test } from "@playwright/test";
 import { signIn } from "./list-helpers";
+import { seedFitnessSessionLibrary } from "./fitness-helpers";
 
 test("duplicates workout from history", async ({ page }) => {
   await signIn(page);
-  await page.goto("/fitness/program");
-  await page.getByTestId("fitness-program-name").fill("Dup");
-  await page.getByTestId("fitness-program-save").click();
+  await seedFitnessSessionLibrary(page, "Dup");
   await page.goto("/fitness");
   await page.getByTestId("fitness-free-workout").click();
   await page.getByTestId("fitness-workout-complete").click();

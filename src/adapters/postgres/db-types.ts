@@ -78,14 +78,25 @@ export interface DjSet {
   venue: string | null;
 }
 
-export interface FitnessProgram {
+export interface FitnessScheduledSession {
+  calendar_date: Timestamp;
   deleted_at: Timestamp | null;
   fields_updated_at: Json;
   id: string;
-  is_active: boolean;
-  name: string;
-  planned_sessions: Json;
+  session_template_id: string;
+  sort_order: number;
   server_updated_at: Timestamp;
+  user_id: string;
+}
+
+export interface FitnessSessionTemplate {
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  server_updated_at: Timestamp;
+  sort_order: number;
+  template_exercises: Json;
+  title: string;
   user_id: string;
 }
 
@@ -95,7 +106,8 @@ export interface FitnessSkipRecord {
   fields_updated_at: Json;
   id: string;
   note: string | null;
-  planned_session_id: string;
+  scheduled_session_id: string;
+  session_template_id: string | null;
   server_updated_at: Timestamp;
   user_id: string;
 }
@@ -119,7 +131,8 @@ export interface FitnessWorkoutLog {
   fields_updated_at: Json;
   id: string;
   logged_exercises: Json;
-  planned_session_id: string | null;
+  scheduled_session_id: string | null;
+  session_template_id: string | null;
   recovery: Json | null;
   server_updated_at: Timestamp;
   started_at: Timestamp;
@@ -325,7 +338,8 @@ export interface DB {
   catalog_cache: CatalogCache;
   cookbooks: Cookbooks;
   dj_set: DjSet;
-  fitness_program: FitnessProgram;
+  fitness_scheduled_session: FitnessScheduledSession;
+  fitness_session_template: FitnessSessionTemplate;
   fitness_skip_record: FitnessSkipRecord;
   fitness_user_settings: FitnessUserSettings;
   fitness_workout_log: FitnessWorkoutLog;

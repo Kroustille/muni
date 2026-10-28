@@ -1,29 +1,34 @@
 import { describe, expect, it } from "vitest";
 
-import { localCalendarDate, resolveTodaySessions } from "@/application/fitness/today";
-import type { FitnessProgram } from "@/domain/fitness/program";
+import { localCalendarDate, resolveTodayScheduledSessions } from "@/application/fitness/today";
+import type { FitnessSessionTemplate } from "@/domain/fitness/session-template";
+import type { FitnessScheduledSession } from "@/domain/fitness/scheduled-session";
 
-const program: FitnessProgram = {
-  id: "11111111-2222-4333-8444-555555555555",
-  name: "Test",
-  isActive: true,
-  plannedSessions: [
-    {
-      id: "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
-      title: "Push",
-      weekdays: [1, 3, 5],
-      sortOrder: 0,
-      exercises: [],
-    },
-  ],
+const TEMPLATE_ID = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee";
+const SCHEDULED_ID = "bbbbbbbb-bbbb-4ccc-8ddd-eeeeeeeeeeee";
+
+const template: FitnessSessionTemplate = {
+  id: TEMPLATE_ID,
+  title: "Push",
+  sortOrder: 0,
+  templateExercises: [],
   deletedAt: null,
   fieldsUpdatedAt: {},
 };
 
 describe("today session resolution", () => {
-  it("returns planned sessions for weekday", () => {
+  it("returns scheduled sessions for calendar day", () => {
     const today = localCalendarDate();
-    const sessions = resolveTodaySessions(program, [], [], today);
-    expect(sessions.length).toBeGreaterThanOrEqual(0);
+    const scheduled: FitnessScheduledSession = {
+      id: SCHEDULED_ID,
+      calendarDate: today,
+      sessionTemplateId: TEMPLATE_ID,
+      sortOrder: 0,
+      deletedAt: null,
+      fieldsUpdatedAt: {},
+    };
+    const sessions = resolveTodayScheduledSessions([scheduled], [template], [], [], today);
+    expect(sessions).toHaveLength(1);
+    expect(sessions[0]?.template.title).toBe("Push");
   });
 });

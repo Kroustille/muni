@@ -1,4 +1,5 @@
-import type { FitnessProgram, PlannedSession } from "./program";
+import type { FitnessScheduledSession } from "./scheduled-session";
+import type { FitnessSessionTemplate } from "./session-template";
 import type { FitnessSkipRecord, FitnessWorkoutLog } from "./workout-log";
 
 /** Monday = 1 … Sunday = 7 (ISO weekday). */
@@ -38,7 +39,8 @@ export function datesInWeek(weekStartMonday: string): string[] {
 export type SessionDayStatus = "planned" | "completed" | "skipped" | "none";
 
 export type WeekAdherenceSession = {
-  plannedSessionId: string;
+  scheduledSessionId: string;
+  sessionTemplateId: string;
   title: string;
   calendarDate: string;
   status: SessionDayStatus;
@@ -52,51 +54,46 @@ export type WeekAdherenceView = {
   skippedCount: number;
 };
 
-function plannedSessionsForDate(program: FitnessProgram, calendarDate: string): PlannedSession[] {
-  const weekday = isoWeekdayFromCalendarDate(calendarDate);
-  return program.plannedSessions
-    .filter((s) => s.weekdays.includes(weekday))
-    .sort((a, b) => a.sortOrder - b.sortOrder);
-}
-
 export function buildWeekAdherenceView(
-  program: FitnessProgram | null,
+  scheduled: FitnessScheduledSession[],
+  templates: FitnessSessionTemplate[],
   logs: FitnessWorkoutLog[],
   skips: FitnessSkipRecord[],
   referenceDate: string,
 ): WeekAdherenceView {
   const weekStart = startOfWeekMonday(referenceDate);
-  const weekDates = datesInWeek(weekStart);
+  const weekDates = new Set(datesInWeek(weekStart));
+  const templateById = new Map(templates.filter((t) => t.deletedAt === null).map((t) => [t.id, t]));
   const sessions: WeekAdherenceSession[] = [];
 
-  if (program !== null && program.deletedAt === null) {
-    for (const date of weekDates) {
-      for (const planned of plannedSessionsForDate(program, date)) {
-        const completed = logs.some(
-          (l) =>
-            l.deletedAt === null &&
-            l.status === "completed" &&
-            l.calendarDate === date &&
-            l.plannedSessionId === planned.id,
-        );
-        const skipped = skips.some(
-          (s) =>
-            s.deletedAt === null && s.calendarDate === date && s.plannedSessionId === planned.id,
-        );
-        let status: SessionDayStatus = "planned";
-        if (completed) status = "completed";
-        else if (skipped) status = "skipped";
-        sessions.push({
-          plannedSessionId: planned.id,
-          title: planned.title,
-          calendarDate: date,
-          status,
-        });
-      }
-    }
+  for (const row of scheduled.filter((s) => s.deletedAt === null && weekDates.has(s.calendarDate))) {
+    const template = templateById.get(row.sessionTemplateId);
+    if (template === undefined) continue;
+    const completed = logs.some(
+      (l) =>
+        l.deletedAt === null &&
+        l.status === "completed" &&
+        l.calendarDate === row.calendarDate &&
+        l.scheduledSessionId === row.id,
+    );
+    const skipped = skips.some(
+      (s) => s.deletedAt === null && s.calendarDate === row.calendarDate && s.scheduledSessionId === row.id,
+    );
+    let status: SessionDayStatus = "planned";
+    if (completed) status = "completed";
+    else if (skipped) status = "skipped";
+    sessions.push({
+      scheduledSessionId: row.id,
+      sessionTemplateId: row.sessionTemplateId,
+      title: template.title,
+      calendarDate: row.calendarDate,
+      status,
+    });
   }
 
-  const plannedCount = sessions.filter((s) => s.status === "planned" || s.status === "completed" || s.status === "skipped").length;
+  sessions.sort((a, b) => a.calendarDate.localeCompare(b.calendarDate) || a.title.localeCompare(b.title));
+
+  const plannedCount = sessions.length;
   const completedCount = sessions.filter((s) => s.status === "completed").length;
   const skippedCount = sessions.filter((s) => s.status === "skipped").length;
 

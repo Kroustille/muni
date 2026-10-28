@@ -1,26 +1,18 @@
 import { describe, expect, it } from "vitest";
 
 import { fitnessStaleContributor } from "@/application/suggestions/contributors/fitness-stale-contributor";
-import type { FitnessProgram } from "@/domain/fitness/program";
+import type { FitnessSessionTemplate } from "@/domain/fitness/session-template";
 import type { FitnessSkipRecord, FitnessWorkoutLog } from "@/domain/fitness/workout-log";
 import { CALENDAR_DAY, TZ, dateOnlyDaysAgo } from "./fixtures";
 
-const PROGRAM_ID = "11111111-1111-4111-8111-111111111101";
-const SESSION_ID = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee";
+const TEMPLATE_ID = "11111111-1111-4111-8111-111111111101";
+const SCHEDULED_ID = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee";
 
-const program: FitnessProgram = {
-  id: PROGRAM_ID,
-  name: "Programme",
-  isActive: true,
-  plannedSessions: [
-    {
-      id: SESSION_ID,
-      title: "Push",
-      weekdays: [1, 3, 5],
-      sortOrder: 0,
-      exercises: [],
-    },
-  ],
+const template: FitnessSessionTemplate = {
+  id: TEMPLATE_ID,
+  title: "Push",
+  sortOrder: 0,
+  templateExercises: [],
   deletedAt: null,
   fieldsUpdatedAt: {},
 };
@@ -39,7 +31,8 @@ describe("fitnessStaleContributor", () => {
         id: "22222222-2222-4222-8222-222222222202",
         status: "completed",
         calendarDate: dateOnlyDaysAgo(10),
-        plannedSessionId: SESSION_ID,
+        sessionTemplateId: TEMPLATE_ID,
+        scheduledSessionId: SCHEDULED_ID,
         title: "Push",
         startedAt: dateOnlyDaysAgo(10) + "T08:00:00.000Z",
         completedAt: dateOnlyDaysAgo(10) + "T09:00:00.000Z",
@@ -52,8 +45,8 @@ describe("fitnessStaleContributor", () => {
     ];
 
     const deps = {
-      fitnessPrograms: {
-        getActive: async () => program,
+      fitnessSessionTemplates: {
+        list: async () => [template],
       },
       fitnessWorkouts: {
         list: async () => workouts,
@@ -72,7 +65,8 @@ describe("fitnessStaleContributor", () => {
       {
         id: "33333333-3333-4333-8333-333333333303",
         calendarDate: dateOnlyDaysAgo(5),
-        plannedSessionId: SESSION_ID,
+        scheduledSessionId: SCHEDULED_ID,
+        sessionTemplateId: TEMPLATE_ID,
         note: null,
         deletedAt: null,
         fieldsUpdatedAt: {},
@@ -80,8 +74,8 @@ describe("fitnessStaleContributor", () => {
     ];
 
     const deps = {
-      fitnessPrograms: {
-        getActive: async () => program,
+      fitnessSessionTemplates: {
+        list: async () => [template],
       },
       fitnessWorkouts: {
         list: async () => [] as FitnessWorkoutLog[],

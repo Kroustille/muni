@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 
 import { searchCatalogExercises } from "@/domain/fitness/catalog";
-import { fitnessProgramSchema, plannedSessionSchema } from "@/domain/fitness/program";
+import {
+  fitnessSessionTemplateSchema,
+  templateExerciseSchema,
+} from "@/domain/fitness/session-template";
 import {
   defaultFitnessUserSettings,
   fitnessWorkoutLogSchema,
@@ -10,23 +13,19 @@ import {
 } from "@/domain/fitness/workout-log";
 
 describe("fitness domain", () => {
-  it("validates program and planned session", () => {
-    const session = plannedSessionSchema.parse({
-      id: "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
-      title: "Push",
-      weekdays: [1, 3, 5],
-      sortOrder: 0,
-      exercises: [{ exerciseId: "bench-press" }],
+  it("validates session template", () => {
+    const exercise = templateExerciseSchema.parse({
+      exerciseId: "bench-press",
     });
-    const program = fitnessProgramSchema.parse({
+    const template = fitnessSessionTemplateSchema.parse({
       id: "11111111-2222-4333-8444-555555555555",
-      name: "Force",
-      isActive: true,
-      plannedSessions: [session],
+      title: "Force",
+      sortOrder: 0,
+      templateExercises: [exercise],
       deletedAt: null,
       fieldsUpdatedAt: {},
     });
-    expect(program.name).toBe("Force");
+    expect(template.title).toBe("Force");
   });
 
   it("rejects invalid RPE on set row", () => {
@@ -70,7 +69,8 @@ describe("fitness domain", () => {
       id: "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
       status: "in_progress",
       calendarDate: "2026-10-19",
-      plannedSessionId: null,
+      sessionTemplateId: null,
+      scheduledSessionId: null,
       title: "Séance libre",
       startedAt: "2026-10-19T10:00:00.000Z",
       completedAt: null,

@@ -17,6 +17,7 @@ import * as m0014FitnessTables from "./0014_fitness_tables";
 import * as m0015CookbooksAndRecipeSource from "./0015_cookbooks_and_recipe_source";
 import * as m0016RecipeCookedDates from "./0016_recipe_cooked_dates";
 import * as m0017MusicPracticeTables from "./0017_music_practice_tables";
+import * as m0018FitnessSessionFirst from "./0018_fitness_session_first";
 
 // Static registry: add each migration module here, keyed by its sortable name.
 const migrations: Record<string, Migration> = {
@@ -37,6 +38,7 @@ const migrations: Record<string, Migration> = {
   "0015_cookbooks_and_recipe_source": m0015CookbooksAndRecipeSource,
   "0016_recipe_cooked_dates": m0016RecipeCookedDates,
   "0017_music_practice_tables": m0017MusicPracticeTables,
+  "0018_fitness_session_first": m0018FitnessSessionFirst,
 };
 
 export const migrationProvider: MigrationProvider = {

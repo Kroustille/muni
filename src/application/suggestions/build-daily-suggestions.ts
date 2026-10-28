@@ -1,6 +1,6 @@
 import type { IdGenerator } from "@/application/ports/id-generator";
 import type { ItemRepository } from "@/application/ports/item-repository";
-import type { FitnessProgramRepository } from "@/application/ports/fitness-program-repository";
+import type { FitnessSessionTemplateRepository } from "@/application/ports/fitness-session-template-repository";
 import type { FitnessSkipRepository } from "@/application/ports/fitness-skip-repository";
 import type { FitnessWorkoutRepository } from "@/application/ports/fitness-workout-repository";
 import type { ActivitySuggestionStore } from "@/application/ports/activity-suggestion-store";
@@ -23,7 +23,7 @@ export type BuildSuggestionsTrigger =
 export type SuggestionsDeps = {
   items: ItemRepository;
   suggestionStore: ActivitySuggestionStore;
-  fitnessPrograms?: FitnessProgramRepository;
+  fitnessSessionTemplates?: FitnessSessionTemplateRepository;
   fitnessWorkouts?: FitnessWorkoutRepository;
   fitnessSkips?: FitnessSkipRepository;
   musicPractice?: MusicPracticeSuggestionPorts;

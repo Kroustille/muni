@@ -1,8 +1,9 @@
 import { describe, expect, it } from "vitest";
 
 import { createFitnessWorkoutUseCases } from "@/application/fitness/workout";
+import type { FitnessSessionTemplate } from "@/domain/fitness/session-template";
+import type { FitnessScheduledSession } from "@/domain/fitness/scheduled-session";
 import type { FitnessWorkoutLog } from "@/domain/fitness/workout-log";
-import type { PlannedSession } from "@/domain/fitness/program";
 
 function memoryWorkoutRepo() {
   const store = new Map<string, FitnessWorkoutLog>();
@@ -35,6 +36,24 @@ const catalog = {
   getById: async (id: string) => ({ id, nameFr: `Exercice ${id}`, muscleGroups: [] }),
 };
 
+const TEMPLATE: FitnessSessionTemplate = {
+  id: "11111111-1111-4111-8111-111111111111",
+  title: "Push",
+  sortOrder: 0,
+  templateExercises: [{ exerciseId: "ex-1", defaultSetCount: 2, targetReps: 8 }],
+  deletedAt: null,
+  fieldsUpdatedAt: {},
+};
+
+const SCHEDULED: FitnessScheduledSession = {
+  id: "22222222-2222-4222-8222-222222222222",
+  calendarDate: "2026-06-15",
+  sessionTemplateId: TEMPLATE.id,
+  sortOrder: 0,
+  deletedAt: null,
+  fieldsUpdatedAt: {},
+};
+
 describe("fitness workout use cases", () => {
   const now = () => Date.parse("2026-06-15T10:00:00.000Z");
   let idSeq = 0;
@@ -53,9 +72,27 @@ describe("fitness workout use cases", () => {
       upsert: async (row: unknown) => row,
       subscribe: () => () => undefined,
     };
+    const scheduled = {
+      get: async (id: string) => (id === SCHEDULED.id ? SCHEDULED : undefined),
+      list: async () => [SCHEDULED],
+      listForDate: async () => [SCHEDULED],
+      upsert: async (row: unknown) => row,
+      subscribe: () => () => undefined,
+      outbox: async () => [],
+      clearOutbox: async () => {},
+    };
+    const templates = {
+      get: async (id: string) => (id === TEMPLATE.id ? TEMPLATE : undefined),
+      list: async () => [TEMPLATE],
+      upsert: async (row: unknown) => row,
+      subscribe: () => () => undefined,
+      outbox: async () => [],
+      clearOutbox: async () => {},
+    };
     const uc = createFitnessWorkoutUseCases({
       workouts: workouts as never,
-      programs: { get: async () => undefined } as never,
+      templates: templates as never,
+      scheduled: scheduled as never,
       skips: skips as never,
       settings: settings as never,
       catalog: catalog as never,
@@ -75,20 +112,13 @@ describe("fitness workout use cases", () => {
     expect((await uc.listWorkouts()).length).toBe(1);
   });
 
-  it("starts from plan, updates sets, abandons, skips, duplicates, deletes", async () => {
+  it("starts from template, updates sets, abandons, skips, duplicates, deletes", async () => {
     const { uc, workouts } = createUc();
-    const session: PlannedSession = {
-      id: "11111111-1111-4111-8111-111111111111",
-      title: "Push",
-      weekdays: [1],
-      sortOrder: 0,
-      exercises: [{ exerciseId: "ex-1", defaultSetCount: 2, targetReps: 8 }],
-    };
-    const fromPlan = await uc.startWorkoutFromPlan(session);
+    const fromPlan = await uc.startWorkoutFromTemplate(TEMPLATE, SCHEDULED);
     expect(fromPlan.loggedExercises[0]?.sets).toHaveLength(2);
     await expect(uc.startFreeWorkout()).rejects.toThrow(/WORKOUT_IN_PROGRESS/);
     await uc.abandonWorkout(fromPlan.id);
-    await uc.skipPlannedSession("22222222-2222-4222-8222-222222222222", "  fatigue  ");
+    await uc.skipScheduledSession(SCHEDULED.id, "  fatigue  ");
     const free = await uc.startFreeWorkout();
     await uc.updateLoggedExercises(free.id, [
       {
@@ -111,7 +141,8 @@ describe("fitness workout use cases", () => {
       id: "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa",
       status: "completed",
       calendarDate: "2026-06-01",
-      plannedSessionId: null,
+      sessionTemplateId: null,
+      scheduledSessionId: null,
       title: "Remote",
       startedAt: "2026-06-01T10:00:00.000Z",
       completedAt: "2026-06-01T11:00:00.000Z",

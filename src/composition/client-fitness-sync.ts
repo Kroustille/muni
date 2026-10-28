@@ -5,10 +5,18 @@ import {
   createIndexedDbFitnessExerciseCatalogStore,
   createIndexedDbFitnessSettingsRepository,
 } from "../adapters/indexeddb/fitness-settings-repository";
-import { createIndexedDbFitnessProgramRepository } from "../adapters/indexeddb/fitness-program-repository";
+import { createIndexedDbFitnessSessionTemplateRepository } from "../adapters/indexeddb/fitness-session-template-repository";
+import { createIndexedDbFitnessScheduledSessionRepository } from "../adapters/indexeddb/fitness-scheduled-session-repository";
 import { createIndexedDbFitnessWorkoutRepository } from "../adapters/indexeddb/fitness-workout-repository";
 import { createIndexedDbFitnessSkipRepository } from "../adapters/indexeddb/fitness-skip-repository";
-import { createFitnessProgramUseCases, type FitnessProgramUseCases } from "../application/fitness/program";
+import {
+  createFitnessSessionTemplateUseCases,
+  type FitnessSessionTemplateUseCases,
+} from "../application/fitness/session-template";
+import {
+  createFitnessScheduleUseCases,
+  type FitnessScheduleUseCases,
+} from "../application/fitness/schedule";
 import { createFitnessWorkoutUseCases, type FitnessWorkoutUseCases } from "../application/fitness/workout";
 import { createFitnessSyncApply } from "../application/fitness/sync-apply";
 import { createFitnessSyncEngine } from "../application/sync/fitness-sync-engine";
@@ -22,7 +30,8 @@ import {
 
 export type ClientFitnessBundle = {
   fitnessEngine: PausableSyncEngine;
-  programUseCases: FitnessProgramUseCases;
+  sessionTemplateUseCases: FitnessSessionTemplateUseCases;
+  scheduleUseCases: FitnessScheduleUseCases;
   workoutUseCases: FitnessWorkoutUseCases;
   getUserSettings(): Promise<FitnessUserSettings | undefined>;
   upsertUserSettings(settings: FitnessUserSettings): Promise<FitnessUserSettings>;
@@ -30,13 +39,16 @@ export type ClientFitnessBundle = {
 };
 
 const MUTATION_METHODS = [
-  "createProgram",
-  "updateProgram",
-  "startWorkoutFromPlan",
+  "createTemplate",
+  "updateTemplate",
+  "deleteTemplate",
+  "planifier",
+  "unplanifier",
+  "startWorkoutFromTemplate",
   "startFreeWorkout",
   "completeWorkout",
   "abandonWorkout",
-  "skipPlannedSession",
+  "skipScheduledSession",
   "updateLoggedExercises",
   "updateRecovery",
   "duplicateWorkoutAsTemplate",
@@ -53,7 +65,8 @@ export function wireClientFitnessSync(deps: {
 }): ClientFitnessBundle {
   const fetchFn = deps.fetch ?? globalThis.fetch.bind(globalThis);
   const baseUrl = deps.baseUrl ?? "";
-  const programs = createIndexedDbFitnessProgramRepository(deps.db);
+  const templates = createIndexedDbFitnessSessionTemplateRepository(deps.db);
+  const scheduled = createIndexedDbFitnessScheduledSessionRepository(deps.db);
   const workouts = createIndexedDbFitnessWorkoutRepository(deps.db);
   const skips = createIndexedDbFitnessSkipRepository(deps.db);
   const settings = createIndexedDbFitnessSettingsRepository(deps.db);
@@ -62,10 +75,18 @@ export function wireClientFitnessSync(deps: {
   const idGenerator = createUuidIdGenerator();
   const now = () => Date.now();
 
-  const syncApply = createFitnessSyncApply({ programs, workouts, skips, settings });
+  const syncApply = createFitnessSyncApply({ templates, scheduled, workouts, skips, settings });
 
-  const baseProgram = createFitnessProgramUseCases({
-    programs,
+  const baseTemplates = createFitnessSessionTemplateUseCases({
+    templates,
+    meta: deps.items.meta,
+    idGenerator,
+    now,
+  });
+
+  const baseSchedule = createFitnessScheduleUseCases({
+    scheduled,
+    templates,
     meta: deps.items.meta,
     idGenerator,
     now,
@@ -73,7 +94,8 @@ export function wireClientFitnessSync(deps: {
 
   const baseWorkout = createFitnessWorkoutUseCases({
     workouts,
-    programs,
+    templates,
+    scheduled,
     skips,
     settings,
     catalog,
@@ -90,7 +112,11 @@ export function wireClientFitnessSync(deps: {
     sleep: (ms) => new Promise((resolve) => setTimeout(resolve, ms)),
   });
 
-  const wrapWrites = <T extends FitnessProgramUseCases | FitnessWorkoutUseCases>(useCases: T): T => {
+  const wrapWrites = <
+    T extends FitnessSessionTemplateUseCases | FitnessScheduleUseCases | FitnessWorkoutUseCases,
+  >(
+    useCases: T,
+  ): T => {
     const wrapped = { ...useCases };
     for (const key of MUTATION_METHODS) {
       const fn = (useCases as Record<string, unknown>)[key];
@@ -106,7 +132,8 @@ export function wireClientFitnessSync(deps: {
 
   return {
     fitnessEngine,
-    programUseCases: wrapWrites(baseProgram),
+    sessionTemplateUseCases: wrapWrites(baseTemplates),
+    scheduleUseCases: wrapWrites(baseSchedule),
     workoutUseCases: wrapWrites(baseWorkout),
     getUserSettings: () => settings.get(),
     upsertUserSettings: (row) => settings.upsert(row),
