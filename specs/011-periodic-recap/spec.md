@@ -6,7 +6,7 @@
 
 **Created**: 2026-10-28
 
-**Status**: Draft (specified; planning and implementation pending)
+**Status**: Specified — product decisions locked **2026-10-28** (Valentin); planning and implementation pending
 
 **Input**: Valentin wants a **read-only periodic recap** of what was done in Muni — finished books, watched films/séries, cooked recipes, completed fitness workouts, listened tracks, and extensible hooks for future domains — aggregated from **existing local data** and **explicit completion events**. French UI, offline-first, celebratory companion tone aligned with [009](../009-experiences-achievements/spec.md) (**no guilt**, no social comparison). Not a separate journal unless completion is already recorded in domain data.
 
@@ -27,6 +27,17 @@
 | Tone | Celebratory, optional empty states (“Rien de marqué cette semaine — et c’est ok”) — **no** guilt, streak loss, or comparison copy |
 | Notifications | **Out of scope** MVP (future optional prompt) |
 | Timezone | Local calendar boundaries; default **`Europe/Paris`** until user timezone exists |
+
+### Session 2026-10-28 (Valentin — locked)
+
+| Topic | Decision |
+|--------|----------|
+| **Navigation** | **Bottom navigation** includes a dedicated **Récap** item — **primary** access to `/recap` (not home-only). Accueil may still show an optional weekly teaser card. |
+| **Séries (TV)** | **One recap line per episode** in period lists (series title + episode key / French label). No weekly roll-up like “3 épisodes de …” in MVP. |
+| **Recipe cooked** | **Yes** — v1 MUST allow **backdating** « cuisiné » dates (user picks a calendar day, not only today). Same-day dedupe per recipe still applies. |
+| **Ordering within period** | **Grouped by domain** (Livres, Films & séries, Musique, Recettes, Entraînement, …). Within each section, lines ordered **newest first** (by event calendar day, then title). No global cross-domain sort that breaks domain blocks. |
+| **Yearly recap vs goals** | **Standalone** `/recap` experience for **all** periods (day/week/month/year). Yearly recap MUST **not** tie into or replace book/movie **year goal** screens (002/003); no required links between them. |
+| **Activity tracker (heatmap)** | **GitHub-style** calendar grid on **`/recap`**, **desktop only** (see User Story 7). |
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -60,25 +71,26 @@ The user switches period to **Ce mois-ci** and sees the same domain grouping for
 
 **Acceptance Scenarios**:
 
-1. **Given** events on different days in the current month, **When** the user selects **Mois**, **Then** all appear ordered by date (newest first within section or global — **default: newest first globally** with domain subheaders).
+1. **Given** events on different days in the current month, **When** the user selects **Mois**, **Then** achievements appear in **domain sections** (fixed domain order), each section listing lines **newest first** by event day.
 2. **Given** the user chooses **période précédente**, **When** viewing monthly recap, **Then** the month label updates and content reflects that month only.
 3. **Given** offline mode, **When** changing period, **Then** recap still renders from IndexedDB.
 
 ---
 
-### User Story 3 - Entry from home and dedicated route (Priority: P1 — MVP Phase A)
+### User Story 3 - Bottom nav and optional home teaser (Priority: P1 — MVP Phase A)
 
-The user discovers recap from **Accueil** via a compact **Récap de la semaine** card (summary: total achievements count + one highlight line or domain icons) and from navigation to **`/recap`** (French shell, bottom nav consistent with 001). Tapping the home card opens `/recap` with weekly period selected.
+The user opens **Récap** from the **bottom navigation** item (primary entry, same shell as 001). **Accueil** MAY show an optional compact **Récap de la semaine** card (count + highlight); tapping it opens `/recap` with weekly period selected — but recap MUST remain fully usable **without** visiting home first.
 
-**Why this priority**: Without discovery, recap is dead; home teaser matches 009’s “visibility over time” without a new primary module name.
+**Why this priority**: Recap is a first-class companion surface; bottom nav matches other domains and avoids burying reflection behind Accueil.
 
-**Independent Test**: Complete one achievement; home card shows non-zero count; tap opens full recap.
+**Independent Test**: From any tab, tap bottom-nav **Récap** — weekly recap loads offline. Optional: home card deep-links to same route.
 
 **Acceptance Scenarios**:
 
-1. **Given** at least one achievement this week, **When** the user views home, **Then** the recap card shows a **positive** summary (count ≥ 1).
-2. **Given** zero achievements this week, **When** the user views home, **Then** the card still invites gently (e.g. “Voir le récap”) without guilt copy.
-3. **Given** any screen, **When** the user navigates to **Récap**, **Then** `/recap` loads the full experience.
+1. **Given** signed-in user on any main screen, **When** they tap bottom-nav **Récap**, **Then** `/recap` loads with default weekly period.
+2. **Given** at least one achievement this week and home teaser enabled, **When** the user views home, **Then** the recap card shows a **positive** summary (count ≥ 1).
+3. **Given** zero achievements this week and home teaser enabled, **When** the user views home, **Then** the card still invites gently (e.g. “Voir le récap”) without guilt copy.
+4. **Given** home teaser absent or user never opens Accueil, **When** they use bottom-nav **Récap**, **Then** the full experience is unchanged.
 
 ---
 
@@ -99,16 +111,17 @@ The user selects **Aujourd’hui** or **Hier** (or a single-day picker) to see a
 
 ### User Story 5 - Yearly recap (Priority: P2 — MVP Phase B)
 
-The user selects **Cette année** (calendar year) to see aggregated achievements — similar sections, with **month sub-grouping** or month labels when volume is high. This complements but does **not** replace book/movie **year goals** screens in 002/003.
+The user selects **Cette année** (calendar year) inside **`/recap`** only — same domain-grouped layout as other periods, with **month labels** on lines or sub-grouping when volume is high. This is a **standalone** yearly reflection screen: it MUST **not** embed, redirect to, or depend on book/movie **year goal** UIs (002/003). Domain goal screens may continue to exist independently; recap does not surface goal progress bars or quota copy.
 
-**Why this priority**: Year boundary matters for life reflection; heavier UI and overlap with domain year-in-review → after weekly/monthly proven.
+**Why this priority**: Year boundary matters for life reflection; ship after weekly/monthly aggregation is proven.
 
-**Independent Test**: Seed finishes in January and December of same year; yearly view includes both; previous year navigation works.
+**Independent Test**: Seed finishes in January and December of same year; yearly view in `/recap` includes both; previous year navigation works; no navigation requirement to `/books/.../goals` or movie equivalents.
 
 **Acceptance Scenarios**:
 
-1. **Given** achievements across the year, **When** yearly recap is selected, **Then** all are listed with month indication.
-2. **Given** yearly recap, **When** shown, **Then** copy does **not** imply quotas or failed goals.
+1. **Given** achievements across the year, **When** yearly recap is selected in `/recap`, **Then** all appear in domain sections with month indication on each line (or month subheaders).
+2. **Given** yearly recap, **When** shown, **Then** copy does **not** imply quotas, failed goals, or comparison to domain year-goal targets.
+3. **Given** user on yearly recap, **When** browsing, **Then** they remain in `/recap` period UX — no mandatory link-out to domain year-goal screens.
 
 ---
 
@@ -121,6 +134,26 @@ The recap UI includes a **stable extension point** (e.g. empty domain sections h
 **Acceptance Scenarios**:
 
 1. **Given** a domain with zero events in period, **When** recap renders, **Then** that domain section is **omitted** (not an empty shaming block).
+
+---
+
+### User Story 7 - Activity tracker (GitHub-style heatmap) (Priority: P2 — MVP Phase A on desktop)
+
+On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activity grid** (GitHub-contribution-style): one cell per **calendar day** in a visible range (default: trailing **12 months** ending today, or aligned with selected period — planning picks one default). A day with at least one recap-eligible event is **filled** with the app accent color; days with no events stay neutral/empty. **Mobile / narrow viewports**: heatmap is **hidden** (not shown, not collapsed teaser) — recap lists and period controls remain; primary access stays bottom nav on mobile.
+
+**Why desktop-only**: Dense grids are hard to read and tap on narrow screens; duplicating GitHub’s desktop pattern without cramming the mobile récap list.
+
+**Independent Test**: Seed achievements on two days in the visible range; on desktop `/recap`, both days show filled cells; resize below breakpoint — heatmap absent, list unchanged. Screen reader: filled days expose count or “activité enregistrée” text, not color alone.
+
+**Acceptance Scenarios**:
+
+1. **Given** at least one recap-eligible event on calendar day D, **When** desktop `/recap` loads, **Then** cell for D is marked active (single accent level — **MVP: binary on/off**, no intensity scale).
+2. **Given** no events on day D, **When** heatmap renders, **Then** D appears inactive (neutral).
+3. **Given** viewport below recap heatmap breakpoint, **When** `/recap` loads, **Then** heatmap is not rendered; weekly/monthly list UX is unchanged.
+4. **Given** a filled day cell, **When** assistive tech focuses it, **Then** accessible name includes the date and that activity occurred (e.g. “28 octobre 2026 — activité enregistrée”); optional detail: total event count that day.
+5. **Given** user selects previous month/week in period control, **When** on desktop, **Then** heatmap range behavior follows planning default (fixed trailing window **or** sync to selected period — document in plan; spec requires heatmap presence on desktop recap).
+
+**Activity day definition (normative)**: A calendar day is **active** iff the **union** of all recap-eligible events (same set as FR-006) has **≥ 1** occurrence bucketed to that local calendar day (books `read`, films/séries watched, episode `watchedAt`, tracks `listened`, recipe `cookedDates` entries, fitness `completed`).
 
 ---
 
@@ -147,12 +180,17 @@ The recap UI includes a **stable extension point** (e.g. empty domain sections h
 - **FR-007**: Recap MUST **exclude** shopping check-offs, music **artist-only** rows, fitness **skipped/abandoned** sessions, and quote creation events.
 - **FR-008**: Each achievement line MUST show at minimum **domain**, **title** (or session title), and **calendar date** within the selected period.
 - **FR-009**: Section headers MUST use celebratory/neutral French copy; MUST NOT use guilt, loss, or social comparison language (009 anti-patterns).
-- **FR-010**: Home MUST show a **weekly summary card** linking to `/recap` as in User Story 3.
+- **FR-010**: Bottom navigation MUST include a **Récap** item routing to **`/recap`**. Accueil MAY show an optional weekly summary card linking to `/recap`; bottom nav remains the primary entry.
 - **FR-011**: Period boundaries MUST use the user’s **local timezone** (default Europe/Paris until a global preference exists).
-- **FR-012**: Recipe **`cookedDates`** MUST be populated only by an **explicit user action** (see research); recap MUST NOT infer cooks from edits to ingredients or steps.
+- **FR-012**: Recipe **`cookedDates`** MUST be populated only by an **explicit user action** (see research); user MUST be able to record a cook on **today or a past calendar day** (backdating) in v1; recap MUST NOT infer cooks from edits to ingredients or steps.
 - **FR-013**: Implementation MUST structure aggregation so **new domains** can register without changing recap route identity (extensibility).
 - **FR-014**: Recap MUST respect **soft delete**: achievements tied to soft-deleted sources do not appear.
 - **FR-015**: Optional **Phase B**: highlight **fitness personal records** logged in period as a subsection under **Entraînement** (non-blocking badges).
+- **FR-016**: Within a selected period, recap MUST render achievements **grouped by domain** in a stable domain order; within each domain section, lines MUST sort **newest event day first** (then title).
+- **FR-017**: Séries MUST emit **one recap line per episode** with `watchedAt` in period (no episode roll-up in MVP).
+- **FR-018**: Yearly (and all) period views MUST live entirely in **`/recap`** UX without requiring navigation to domain year-goal screens.
+- **FR-019**: On viewports **≥ desktop breakpoint** (planning defines px, e.g. `md`/`lg` aligned with 005), **`/recap`** MUST show an **activity heatmap** at the top per User Story 7; on narrower viewports the heatmap MUST NOT render.
+- **FR-020**: Heatmap cells MUST use **binary** active/inactive styling in MVP (single accent for active days); accessibility MUST convey activity via **text/labels**, not color alone.
 
 ### Key Entities *(conceptual — mostly derived)*
 
@@ -160,13 +198,14 @@ The recap UI includes a **stable extension point** (e.g. empty domain sections h
 - **RecapAchievement** (derived view model): `{ domainId, occurredOn, title, subtitle?, sourceItemId?, sourceWorkoutId?, sortInstant }` — built at read time.
 - **DomainRecapContributor** (conceptual registry): maps domain to rules for extracting `RecapAchievement[]` from local stores.
 - **Recipe item extension**: **`cookedDates`**: `string[]` ISO dates on recipe items (see [research.md](research.md)).
+- **RecapActivityDay** (derived): `{ calendarDate, eventCount, isActive }` — for heatmap; `isActive := eventCount ≥ 1` from union of FR-006 signals.
 
 ## Success Criteria *(mandatory)*
 
 ### Measurable Outcomes
 
 - **SC-001**: With **50 seeded achievements** in one month, recap screen becomes interactive (scrollable content visible) within **2 seconds** on a mid-tier mobile device offline.
-- **SC-002**: **100%** of acceptance scenarios for User Stories 1–3 pass in automated tests (unit tests for aggregation + one Playwright path for `/recap` weekly view offline).
+- **SC-002**: **100%** of acceptance scenarios for User Stories 1–3 and 7 (desktop heatmap path) pass in automated tests (unit tests for aggregation + one Playwright path for `/recap` weekly view offline + heatmap visible at desktop width).
 - **SC-003**: In a **no-guilt copy review**, all recap empty states and home card strings pass checklist: no streak loss, no “falling behind”, no mandatory journaling implied (aligned with 009).
 - **SC-004**: Users can switch week ↔ month and previous/next period in **≤ 3 taps** from `/recap`.
 - **SC-005**: After completing one eligible domain action (e.g. mark book read), the weekly recap count on home updates **without reload** when returning to home (same session).
@@ -174,10 +213,10 @@ The recap UI includes a **stable extension point** (e.g. empty domain sections h
 ## Assumptions
 
 - User timezone preference will eventually centralize; until then **Europe/Paris** matches 002/003 insights.
-- **`cookedDates`** on recipes is acceptable as a small 001 data-model extension (or bundled with first 011 implementation PR).
-- Domain year goals and heatmaps remain on book/movie screens; recap does not delete or hide them.
+- **`cookedDates`** on recipes is acceptable as a small 001 data-model extension (or bundled with first 011 implementation PR); v1 includes **backdated** cook dates.
+- Domain year goals and domain-specific activity heatmaps on book/movie screens **remain independent**; `/recap` yearly view is **standalone** and does not replace or link-require those screens.
 - Fitness **008** workout logs are synced and available locally before fitness lines appear in recap.
-- Valentin’s **no PR** workflow does not change spec content.
+- Recap **activity heatmap** on `/recap` is **desktop-only**; mobile users rely on period lists and bottom-nav **Récap** without a contribution grid.
 
 ## Out of Scope (MVP)
 
@@ -186,41 +225,41 @@ The recap UI includes a **stable extension point** (e.g. empty domain sections h
 - Unified **fil de vie** timeline with arbitrary filtering (009 future direction)
 - Editing achievements or manual “life moment” entries not tied to domain completion
 - Shopping, artist-only music rows, reading **activity** days that are not **finished read**
+- **Mobile / narrow viewport** rendering of the GitHub-style activity heatmap (explicitly out of scope — hidden)
 - Server-side pre-aggregation tables or new sync entities for recap alone
 - AI-generated narrative summaries
 
 ## Phased delivery summary
 
-| Phase | Periods | Entry | Recipe signal |
-|-------|---------|-------|----------------|
-| **A (MVP)** | Week + month | Home card + `/recap` | Ship **`cookedDates`** + UI action if not already present |
-| **B** | Day + year | Same | Same |
-| **C (optional)** | PR highlights, richer yearly layout | Same | — |
+| Phase | Periods | Entry | Recipe signal | Activity grid |
+|-------|---------|-------|---------------|-----------------|
+| **A (MVP)** | Week + month | Bottom-nav **Récap** + optional home teaser | **`cookedDates`** + UI (today **or backdated**) | Desktop **`/recap`** heatmap (binary cells) |
+| **B** | Day + year | Same `/recap` shell | Same | Same (desktop) |
+| **C (optional)** | PR highlights, richer yearly layout | Same | — | Optional intensity / range tweaks |
 
-**Justification**: Week + month first balances **009 visibility** with **constitution capture speed** (no new daily obligation). Daily and yearly add precision and long arc once aggregation is proven; yearly overlaps domain insights, so it follows second.
+**Justification**: Week + month first balances **009 visibility** with **constitution capture speed** (no new daily obligation). Daily and yearly add precision and long arc once aggregation is proven; yearly recap stays **standalone** in `/recap` (domain year goals unchanged elsewhere).
 
 ## UX sketch (informational)
 
 ```
-Accueil                          /recap
-┌─────────────────────┐          ┌──────────────────────────┐
-│ … list cards …      │          │ Récap    [Semaine ▼]     │
-│ ┌─────────────────┐ │          │ ◀ Semaine du 28 oct. ▶   │
-│ │ Récap semaine   │ │  ──────► │                          │
-│ │ 5 moments · …   │ │          │ Livres (2)               │
-│ └─────────────────┘ │          │  · Le Petit Prince — lun.│
-└─────────────────────┘          │ Films & séries (1)       │
-                                 │ Entraînement (2)         │
-                                 │ …                        │
-                                 └──────────────────────────┘
+Bottom nav: … | Accueil | … | Récap | …
+
+Desktop /recap (wide)                Mobile /recap (narrow)
+┌──────────────────────────┐         ┌──────────────────────────┐
+│ Récap    [Semaine ▼]     │         │ Récap    [Semaine ▼]     │
+│ [■■□■■■□ … heatmap …]    │         │ (no heatmap)             │
+│ ◀ Semaine du 28 oct. ▶   │         │ ◀ Semaine du 28 oct. ▶   │
+│                          │         │                          │
+│ Livres (2)               │         │ Livres (2)               │
+│  · Le Petit Prince — lun.│         │  · Le Petit Prince — lun.│
+│ Films & séries (1)       │         │ Films & séries (1)       │
+│  · S1E3 — Série X — mar. │         │  · S1E3 — Série X — mar. │
+│ Entraînement (2)         │         │ Entraînement (2)         │
+└──────────────────────────┘         └──────────────────────────┘
+
+Optional Accueil teaser card → same `/recap` route (weekly default).
 ```
 
-Bottom navigation: add **Récap** item or place under **Accueil** only for MVP — **default: dedicated nav item** if nav capacity allows; otherwise home card + overflow link (planning decision).
+## Resolved product questions (2026-10-28)
 
-## Open questions (product — max 5 for prioritization)
-
-1. **Navigation**: Dedicated bottom-nav **Récap** vs home-only entry until usage is proven?
-2. **Série episodes**: Show **each episode** as its own line vs roll up “3 épisodes de …” per week?
-3. **Recipe backdating**: Allow choosing a cook date other than today in v1 of `cookedDates`?
-4. **Ordering**: Global newest-first vs strict domain blocks with oldest-first within block?
-5. **Yearly overlap**: Should yearly recap **link** to book/movie year goal screens or stay fully self-contained?
+All former open questions are locked in **Clarifications → Session 2026-10-28 (Valentin)** and User Stories 3, 5, 7.

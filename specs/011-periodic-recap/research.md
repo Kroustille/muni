@@ -14,7 +14,7 @@
 |--------|------|----------------------|------------------------|-----------------|
 | **Books** | [002](../002-books-library/spec.md) | Status → **`read`** | `fieldsUpdatedAt.status` when entering `read`; year goals use **first** `read` in calendar year | Exclude `reading` / `paused` / `to_read` as “finished” |
 | **Films** | [003](../003-films-tv-library/spec.md) | Status → **`watched`** (film) | `watchedAt` if set, else status transition day | One finish per film row per transition |
-| **Séries** | 003 | Episode marked in **`episodeProgress`** | `watchedAt` on episode key `S{n}E{m}` | Each episode date is its own recap line (not a separate journal table) |
+| **Séries** | 003 | Episode marked in **`episodeProgress`** | `watchedAt` on episode key `S{n}E{m}` | **One recap line per episode** in period (locked 2026-10-28); no weekly roll-up |
 | **Séries (whole)** | 003 | Status → **`watched`** | Same as films | Distinct from per-episode lines |
 | **Music tracks** | [004](../004-music-artists-tracks/spec.md) | Status → **`listened`** | `fieldsUpdatedAt.status` when entering `listened` | **Music artists** have rating only — **no** `listened` status → **exclude artists** from recap counts unless product adds status later |
 | **Recipes** | [001](../001-typed-lists-companion/spec.md) | **None today** | — | Requires new explicit signal (see below) |
@@ -35,11 +35,10 @@
 
 **Proposed (MVP)**:
 
-1. Add an optional, explicit user action on recipe detail: **« Cuisiné aujourd’hui »** (or **« Marquer comme cuisinée »** with default today).
-2. Persist **`cookedDates`**: ordered array of **ISO calendar dates** (`YYYY-MM-DD`) on the recipe item — **one LWW JSON field** on `items` (constitution-aligned with `ingredients` / `steps`), append-only semantics in the use case (each tap appends today unless already present for that day — **same-day dedupe** avoids double-tap inflation).
-3. Recap counts **one achievement per date entry** in the period (same recipe cooked twice on two days → two lines or count 2).
-4. **Optional later**: allow picking another date (backfill) — **out of MVP** unless Valentin wants it in first slice.
-5. **Not** inferred from shopping check-offs or ingredient edits.
+1. Add an explicit user action on recipe detail: **« Cuisiné »** with default **today**, plus **date picker** (or equivalent) to **backdate** to any past calendar day in **v1**.
+2. Persist **`cookedDates`**: ordered array of **ISO calendar dates** (`YYYY-MM-DD`) on the recipe item — **one LWW JSON field** on `items` (constitution-aligned with `ingredients` / `steps`), append semantics in the use case (each confirmed action appends the chosen date unless already present for that day — **same-day dedupe** avoids double-tap inflation).
+3. Recap counts **one achievement per date entry** in the period (same recipe cooked twice on two days → two lines).
+4. **Not** inferred from shopping check-offs or ingredient edits.
 
 **Alternative rejected for recap accuracy**: single `lastCookedAt` only — cannot count multiple cooks in one week.
 
@@ -49,7 +48,21 @@
 
 ## Overlap with domain “insights” (002/003 Phase D)
 
-Books and movies already define **activity days**, streaks, and **year goals** on domain screens. Recap **does not replace** those; it **aggregates across domains** with a single companion narrative. Copy MUST avoid duplicating guilt-prone streak loss patterns from fitness (008 assiduity stays opt-in and fitness-local).
+Books and movies already define **activity days**, streaks, and **year goals** on domain screens. Recap **does not replace** those; it **aggregates across domains** with a single companion narrative in **`/recap`**. Yearly recap is **standalone** (no tie-in to book/movie goal screens). Copy MUST avoid duplicating guilt-prone streak loss patterns from fitness (008 assiduity stays opt-in and fitness-local).
+
+## Activity tracker (heatmap) — recap desktop
+
+**Product ask (Valentin 2026-10-28)**: GitHub-style grid at top of **`/recap`** on **desktop only**; hidden on mobile/narrow viewports (dense grid poor tap/read UX; list + bottom nav suffice).
+
+| Concept | Rule |
+|---------|------|
+| **Active day** | Local calendar day with **≥ 1** recap-eligible event (union of FR-006 / table above) |
+| **Color MVP** | **Binary**: inactive = neutral cell; active = single **accent** fill (no multi-level intensity in v1) |
+| **Range** | Default trailing **12 months** ending today unless plan ties range to selected period — spec allows either; plan must pick one |
+| **Accessibility** | Each cell exposes date + active state in **accessible name**; optional `eventCount`; do not rely on color alone |
+| **Data** | Derived at read time from same aggregation as recap lists — **no new persisted heatmap table** |
+
+**Rejected for MVP**: multi-hue intensity by event count (adds legend burden); showing heatmap on phone (Valentin: out of scope).
 
 ## Extensibility
 

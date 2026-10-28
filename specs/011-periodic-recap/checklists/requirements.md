@@ -31,5 +31,6 @@
 
 ## Notes
 
-- Recipe **`cookedDates`** is specified as a domain prerequisite in [research.md](../research.md); planning should sequence that field before or with Phase A recap UI.
+- Recipe **`cookedDates`** is specified as a domain prerequisite in [research.md](../research.md); planning should sequence that field before or with Phase A recap UI. **Backdating** cook dates is **in v1** (Valentin 2026-10-28).
+- Product decisions locked **2026-10-28**: bottom-nav **Récap**, domain-grouped ordering, standalone yearly `/recap`, desktop activity heatmap — see spec **Clarifications**.
 - Checklist validated 2026-10-28 — ready for `/speckit-plan`.
