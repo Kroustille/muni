@@ -11,4 +11,14 @@ test.describe("fitness today", () => {
     await expect(page.getByTestId("fitness-workout-editor")).toBeVisible();
     await page.getByTestId("fitness-workout-complete").click();
   });
+
+  test("starts workout from session picker without planifiée row", async ({ page }) => {
+    await signIn(page);
+    await seedFitnessSessionLibrary(page, "Picker séance");
+    await page.goto("/fitness");
+    await expect(page.getByTestId("fitness-session-picker-section")).toBeVisible();
+    await page.getByTestId("fitness-start-picked-session").click();
+    await expect(page.getByTestId("fitness-workout-editor")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Picker séance" })).toBeVisible();
+  });
 });

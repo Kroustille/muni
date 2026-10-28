@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   SessionLibraryEditor,
   draftsFromTemplates,
@@ -14,24 +14,20 @@ type DraftTemplate = SessionLibraryEditorProps["templates"][number];
 export default function FitnessSessionsPage() {
   const [templates, setTemplates] = useState<DraftTemplate[]>([]);
 
-  useEffect(() => {
-    void getFitnessSessionTemplateUseCases().then(async (uc) => {
-      const rows = await uc.listTemplates();
-      setTemplates(draftsFromTemplates(rows));
-    });
+  const loadTemplates = useCallback(async () => {
+    const uc = await getFitnessSessionTemplateUseCases();
+    const rows = await uc.listTemplates();
+    setTemplates(draftsFromTemplates(rows));
   }, []);
+
+  useEffect(() => {
+    void loadTemplates();
+  }, [loadTemplates]);
 
   const save = async () => {
     const uc = await getFitnessSessionTemplateUseCases();
     const existing = await uc.listTemplates();
     const existingIds = new Set(existing.filter((t) => t.deletedAt === null).map((t) => t.id));
-    const draftIds = new Set(templates.map((t) => t.id));
-
-    for (const id of existingIds) {
-      if (!draftIds.has(id)) {
-        await uc.deleteTemplate(id);
-      }
-    }
 
     for (const draft of templates) {
       if (draft.isNew || !existingIds.has(draft.id)) {
@@ -54,7 +50,12 @@ export default function FitnessSessionsPage() {
   return (
     <div className="mx-auto max-w-lg p-4">
       <h1 className="mb-4 font-serif text-2xl font-semibold">{t("fitness.sessions.title")}</h1>
-      <SessionLibraryEditor templates={templates} onTemplatesChange={setTemplates} onSave={save} />
+      <SessionLibraryEditor
+        templates={templates}
+        onTemplatesChange={setTemplates}
+        onSave={save}
+        onReload={() => void loadTemplates()}
+      />
     </div>
   );
 }

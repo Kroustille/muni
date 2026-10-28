@@ -42,6 +42,7 @@ export function FitnessHome() {
   const [skips, setSkips] = useState<FitnessSkipRecord[]>([]);
   const [today, setToday] = useState<TodayScheduledSession[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [pickedTemplateId, setPickedTemplateId] = useState<string>("");
 
   const refresh = async () => {
     const templateUseCases = await getFitnessSessionTemplateUseCases();
@@ -75,7 +76,23 @@ export function FitnessHome() {
     setToday(resolveTodayScheduledSessions(scheduled, templates, logs, skips, localCalendarDate()));
   }, [templates, scheduled, logs, skips]);
 
+  useEffect(() => {
+    const sorted = templates
+      .filter((t) => t.deletedAt === null)
+      .sort((a, b) => a.sortOrder - b.sortOrder || a.title.localeCompare(b.title, "fr"));
+    if (sorted.length === 0) {
+      setPickedTemplateId("");
+      return;
+    }
+    setPickedTemplateId((current) =>
+      sorted.some((t) => t.id === current) ? current : sorted[0]!.id,
+    );
+  }, [templates]);
+
   const activeTemplates = templates.filter((t) => t.deletedAt === null);
+  const sortedTemplates = [...activeTemplates].sort(
+    (a, b) => a.sortOrder - b.sortOrder || a.title.localeCompare(b.title, "fr"),
+  );
   const weekView = buildWeekAdherenceView(scheduled, templates, logs, skips, localCalendarDate());
 
   const startSession = async (session: TodayScheduledSession) => {
@@ -94,6 +111,20 @@ export function FitnessHome() {
     try {
       const workoutUseCases = await getFitnessWorkoutUseCases();
       const log = await workoutUseCases.startFreeWorkout();
+      window.location.assign(`/fitness/workout/${log.id}`);
+    } catch (e) {
+      if (e instanceof Error && e.message === "WORKOUT_IN_PROGRESS") {
+        setError(t("fitness.inProgress.modal"));
+      }
+    }
+  };
+
+  const startPickedTemplate = async (templateId: string) => {
+    const template = activeTemplates.find((row) => row.id === templateId);
+    if (template === undefined) return;
+    try {
+      const workoutUseCases = await getFitnessWorkoutUseCases();
+      const log = await workoutUseCases.startWorkoutFromTemplate(template);
       window.location.assign(`/fitness/workout/${log.id}`);
     } catch (e) {
       if (e instanceof Error && e.message === "WORKOUT_IN_PROGRESS") {
@@ -169,6 +200,35 @@ export function FitnessHome() {
           ))}
         </ul>
       </section>
+      {sortedTemplates.length > 0 && (
+        <section data-testid="fitness-session-picker-section">
+          <p className="mb-2 text-sm font-medium">{t("fitness.home.pickSession")}</p>
+          <div className="flex gap-2">
+            <select
+              className="min-w-0 flex-1 rounded-lg border border-border bg-background px-3 py-2 text-sm"
+              value={pickedTemplateId}
+              data-testid="fitness-session-picker"
+              onChange={(e) => setPickedTemplateId(e.target.value)}
+            >
+              {sortedTemplates.map((template) => (
+                <option key={template.id} value={template.id}>
+                  {template.title}
+                </option>
+              ))}
+            </select>
+            <button
+              type="button"
+              className="shrink-0 rounded-lg bg-accent px-3 py-2 text-xs font-medium text-accent-foreground"
+              data-testid="fitness-start-picked-session"
+              onClick={() => {
+                if (pickedTemplateId) void startPickedTemplate(pickedTemplateId);
+              }}
+            >
+              {t("fitness.action.start")}
+            </button>
+          </div>
+        </section>
+      )}
       <button
         type="button"
         className="w-full rounded-xl border border-border py-3 text-sm"

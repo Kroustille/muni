@@ -10,23 +10,31 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import { getItemUseCases } from "@/composition/client";
+import { getFitnessSessionTemplateUseCases, getItemUseCases } from "@/composition/client";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 import { t } from "@/i18n";
 
 const UNDO_MS = 5000;
 
+type PendingUndo =
+  | { kind: "items"; ids: string[] }
+  | { kind: "fitness-template"; templateId: string; onRestored?: () => void };
+
 type UndoDeleteContextValue = {
   deleteWithUndo: (itemId: string) => Promise<void>;
   deleteManyWithUndo: (itemIds: string[]) => Promise<void>;
+  deleteFitnessTemplateWithUndo: (
+    templateId: string,
+    options?: { onRestored?: () => void },
+  ) => Promise<void>;
   isPendingUndo: (itemId: string) => boolean;
 };
 
 const UndoDeleteContext = createContext<UndoDeleteContextValue | null>(null);
 
 export function UndoDeleteProvider({ children }: { children: ReactNode }) {
-  const [pendingIds, setPendingIds] = useState<string[] | null>(null);
+  const [pending, setPending] = useState<PendingUndo | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const clearTimer = useCallback(() => {
@@ -39,11 +47,11 @@ export function UndoDeleteProvider({ children }: { children: ReactNode }) {
   useEffect(() => () => clearTimer(), [clearTimer]);
 
   const startPending = useCallback(
-    (ids: string[]) => {
+    (next: PendingUndo) => {
       clearTimer();
-      setPendingIds(ids);
+      setPending(next);
       timerRef.current = setTimeout(() => {
-        setPendingIds(null);
+        setPending(null);
         timerRef.current = undefined;
       }, UNDO_MS);
     },
@@ -57,7 +65,7 @@ export function UndoDeleteProvider({ children }: { children: ReactNode }) {
       for (const id of itemIds) {
         await useCases.deleteItem(id);
       }
-      startPending(itemIds);
+      startPending({ kind: "items", ids: itemIds });
     },
     [startPending],
   );
@@ -69,34 +77,55 @@ export function UndoDeleteProvider({ children }: { children: ReactNode }) {
     [deleteManyWithUndo],
   );
 
+  const deleteFitnessTemplateWithUndo = useCallback(
+    async (templateId: string, options?: { onRestored?: () => void }) => {
+      const useCases = await getFitnessSessionTemplateUseCases();
+      await useCases.deleteTemplate(templateId);
+      startPending({ kind: "fitness-template", templateId, onRestored: options?.onRestored });
+    },
+    [startPending],
+  );
+
   const undo = useCallback(async () => {
-    if (pendingIds === null || pendingIds.length === 0) return;
+    if (pending === null) return;
     clearTimer();
-    const useCases = await getItemUseCases();
-    for (const id of pendingIds) {
-      await useCases.restoreItem(id);
+    if (pending.kind === "items") {
+      const useCases = await getItemUseCases();
+      for (const id of pending.ids) {
+        await useCases.restoreItem(id);
+      }
+    } else {
+      const useCases = await getFitnessSessionTemplateUseCases();
+      await useCases.restoreTemplate(pending.templateId);
+      pending.onRestored?.();
     }
-    setPendingIds(null);
-  }, [clearTimer, pendingIds]);
+    setPending(null);
+  }, [clearTimer, pending]);
 
   const value = useMemo(
     () => ({
       deleteWithUndo,
       deleteManyWithUndo,
-      isPendingUndo: (itemId: string) => pendingIds?.includes(itemId) ?? false,
+      deleteFitnessTemplateWithUndo,
+      isPendingUndo: (itemId: string) =>
+        pending?.kind === "items" ? (pending.ids.includes(itemId) ?? false) : false,
     }),
-    [deleteManyWithUndo, deleteWithUndo, pendingIds],
+    [deleteFitnessTemplateWithUndo, deleteManyWithUndo, deleteWithUndo, pending],
   );
 
   const toastMessage =
-    pendingIds !== null && pendingIds.length > 1
-      ? t("item.deletedMany").replace("{count}", String(pendingIds.length))
-      : t("item.deleted");
+    pending === null
+      ? ""
+      : pending.kind === "fitness-template"
+        ? t("fitness.sessions.deleted")
+        : pending.ids.length > 1
+          ? t("item.deletedMany").replace("{count}", String(pending.ids.length))
+          : t("item.deleted");
 
   return (
     <UndoDeleteContext.Provider value={value}>
       {children}
-      {pendingIds !== null && pendingIds.length > 0 ? (
+      {pending !== null ? (
         <Toast
           message={toastMessage}
           action={

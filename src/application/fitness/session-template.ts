@@ -24,6 +24,7 @@ export type FitnessSessionTemplateUseCases = {
     patch: { title?: string; templateExercises?: TemplateExercise[]; sortOrder?: number },
   ): Promise<FitnessSessionTemplate>;
   deleteTemplate(id: string): Promise<void>;
+  restoreTemplate(id: string): Promise<FitnessSessionTemplate>;
 };
 
 export function createFitnessSessionTemplateUseCases(
@@ -80,6 +81,19 @@ export function createFitnessSessionTemplateUseCases(
         deletedAt: new Date(deps.now()).toISOString(),
         fieldsUpdatedAt: { ...current.fieldsUpdatedAt, deletedAt: stamp },
       });
+    },
+
+    async restoreTemplate(id) {
+      const current = await deps.templates.get(id);
+      if (current === undefined) throw new Error("template not found");
+      const stamp = await hlc.nextFieldStamp();
+      return deps.templates.upsert(
+        fitnessSessionTemplateSchema.parse({
+          ...current,
+          deletedAt: null,
+          fieldsUpdatedAt: { ...current.fieldsUpdatedAt, deletedAt: stamp },
+        }) as FitnessSessionTemplate,
+      );
     },
   };
 }

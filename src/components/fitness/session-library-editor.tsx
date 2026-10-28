@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { FitnessSessionTemplate, TemplateExercise } from "@/domain/fitness/session-template";
 import { ExercisePicker } from "@/components/fitness/exercise-picker";
 import { rememberExerciseId } from "@/application/fitness/recent-exercises";
+import { useUndoDelete } from "@/components/UndoToast";
 import { t } from "@/i18n";
 
 type DraftTemplate = {
@@ -18,14 +19,17 @@ export type SessionLibraryEditorProps = {
   templates: DraftTemplate[];
   onTemplatesChange: (templates: DraftTemplate[]) => void;
   onSave: () => void;
+  onReload?: () => void;
 };
 
 export function SessionLibraryEditor({
   templates,
   onTemplatesChange,
   onSave,
+  onReload,
 }: SessionLibraryEditorProps) {
   const [pickerTemplateId, setPickerTemplateId] = useState<string | null>(null);
+  const { deleteFitnessTemplateWithUndo } = useUndoDelete();
 
   const addTemplate = () => {
     onTemplatesChange([
@@ -44,19 +48,39 @@ export function SessionLibraryEditor({
     onTemplatesChange(templates.map((row) => (row.id === id ? { ...row, ...patch } : row)));
   };
 
+  const removeTemplate = (template: DraftTemplate) => {
+    if (template.isNew) {
+      onTemplatesChange(templates.filter((row) => row.id !== template.id));
+      return;
+    }
+    void deleteFitnessTemplateWithUndo(template.id, { onRestored: () => onReload?.() }).then(() => {
+      onTemplatesChange(templates.filter((row) => row.id !== template.id));
+    });
+  };
+
   return (
     <div className="space-y-4" data-testid="fitness-session-library-editor">
       {templates.map((template) => (
         <section key={template.id} className="rounded-xl border border-border p-3">
-          <label className="block text-sm">
-            <span className="text-muted">{t("fitness.sessions.templateTitle")}</span>
-            <input
-              className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium"
-              value={template.title}
-              onChange={(e) => updateTemplate(template.id, { title: e.target.value })}
-              data-testid="fitness-session-template-title"
-            />
-          </label>
+          <div className="mb-2 flex items-start justify-between gap-2">
+            <label className="block flex-1 text-sm">
+              <span className="text-muted">{t("fitness.sessions.templateTitle")}</span>
+              <input
+                className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium"
+                value={template.title}
+                onChange={(e) => updateTemplate(template.id, { title: e.target.value })}
+                data-testid="fitness-session-template-title"
+              />
+            </label>
+            <button
+              type="button"
+              className="shrink-0 text-xs text-destructive"
+              data-testid="fitness-session-template-delete"
+              onClick={() => removeTemplate(template)}
+            >
+              {t("action.delete")}
+            </button>
+          </div>
           <ul className="mb-2 mt-2 space-y-1">
             {template.templateExercises.map((ex, index) => (
               <li key={`${template.id}-${ex.exerciseId}-${index}`} className="text-sm text-foreground">

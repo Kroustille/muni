@@ -42,6 +42,7 @@ const MUTATION_METHODS = [
   "createTemplate",
   "updateTemplate",
   "deleteTemplate",
+  "restoreTemplate",
   "planifier",
   "unplanifier",
   "startWorkoutFromTemplate",
