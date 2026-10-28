@@ -1,7 +1,7 @@
 import type { Item } from "@/domain/item";
 import type { DomainStaleContributor } from "@/application/suggestions/contributors/shared";
 import { makeCandidate } from "@/application/suggestions/contributors/shared";
-import { toLocalDateKey } from "@/application/shared/activity-days";
+import { fieldStampToLocalDateKey } from "@/application/shared/activity-days";
 
 export const musicTracksStaleContributor: DomainStaleContributor = {
   domainId: "music_track",
@@ -14,7 +14,8 @@ export const musicTracksStaleContributor: DomainStaleContributor = {
         continue;
       }
       const statusAt = item.fieldsUpdatedAt.status ?? item.createdAt;
-      const anchor = toLocalDateKey(statusAt, ctx.timeZone);
+      const anchor = fieldStampToLocalDateKey(statusAt, ctx.timeZone);
+      if (!anchor) continue;
       const candidate = makeCandidate(
         {
           domainId: "music_track",

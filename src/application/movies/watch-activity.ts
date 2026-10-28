@@ -3,8 +3,8 @@ import { statusesFor } from "@/domain/item";
 import {
   activityStatusTransitionStamp,
   DEFAULT_ACTIVITY_TIMEZONE,
+  addFieldStampActivityDay,
   deriveActivityDays,
-  toLocalDateKey,
   type ActivityDayRules,
 } from "@/application/shared/activity-days";
 
@@ -21,7 +21,7 @@ const watchActivityRules: ActivityDayRules<"movie"> = {
   collectActivityDays(item, days, timeZone) {
     const statusAt = item.fieldsUpdatedAt.status;
     if (statusAt && isMovieStatus(item.status)) {
-      days.add(toLocalDateKey(statusAt, timeZone));
+      addFieldStampActivityDay(days, statusAt, timeZone);
     }
 
     if (item.watchedAt) {
@@ -30,7 +30,7 @@ const watchActivityRules: ActivityDayRules<"movie"> = {
 
     const episodeAt = item.fieldsUpdatedAt.episodeProgress;
     if (episodeAt) {
-      days.add(toLocalDateKey(episodeAt, timeZone));
+      addFieldStampActivityDay(days, episodeAt, timeZone);
     }
 
     if (item.episodeProgress) {
@@ -40,12 +40,12 @@ const watchActivityRules: ActivityDayRules<"movie"> = {
     }
 
     if (item.status === "watched" && statusAt) {
-      days.add(toLocalDateKey(statusAt, timeZone));
+      addFieldStampActivityDay(days, statusAt, timeZone);
     }
 
     const watchedStamp = item.fieldsUpdatedAt.watched;
     if (watchedStamp) {
-      days.add(toLocalDateKey(watchedStamp, timeZone));
+      addFieldStampActivityDay(days, watchedStamp, timeZone);
     }
   },
 };

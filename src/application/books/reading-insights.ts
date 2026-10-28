@@ -1,5 +1,6 @@
 import type { Item } from "@/domain/item";
 import { DEFAULT_READING_TIMEZONE, deriveReadingActivityDays } from "./reading-activity";
+import { fieldStampToLocalDateKey } from "@/application/shared/activity-days";
 
 export type HeatmapCell = {
   date: string;
@@ -56,14 +57,9 @@ function yearBounds(year: number): { from: string; to: string } {
   return { from: `${year}-01-01`, to: `${year}-12-31` };
 }
 
-function timestampInYear(iso: string, year: number, timeZone: string): boolean {
-  const key = new Intl.DateTimeFormat("en-CA", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(new Date(iso));
-  return key.startsWith(`${year}-`);
+function timestampInYear(stamp: string, year: number, timeZone: string): boolean {
+  const key = fieldStampToLocalDateKey(stamp, timeZone);
+  return key != null && key.startsWith(`${year}-`);
 }
 
 /** Books whose first `read` stamp falls in `year` (FR-D01 progress). */

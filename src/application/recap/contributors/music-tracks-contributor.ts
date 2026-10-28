@@ -1,4 +1,4 @@
-import { toLocalDateKey } from "@/application/shared/activity-days";
+import { fieldStampToLocalDateKey, fieldStampToSortInstant } from "@/application/shared/activity-days";
 import type { RecapAchievement } from "@/domain/recap";
 import { recapDateInRange } from "@/application/recap/period";
 import type { DomainRecapContributor } from "@/application/recap/contributor-types";
@@ -15,12 +15,13 @@ export const musicTracksRecapContributor: DomainRecapContributor = {
         item.fieldsUpdatedAt.status ??
         item.fieldsUpdatedAt.listened ??
         item.createdAt;
-      const occurredOn = toLocalDateKey(instant, range.timeZone);
+      const occurredOn = fieldStampToLocalDateKey(instant, range.timeZone);
+      if (occurredOn == null) continue;
       if (!recapDateInRange(occurredOn, range.startDate, range.endDate)) continue;
       achievements.push({
         domainId: "music_track",
         occurredOn,
-        sortInstant: instant,
+        sortInstant: fieldStampToSortInstant(instant),
         title: item.title,
         subtitle: "Écouté",
         musicLineKind: "listened",

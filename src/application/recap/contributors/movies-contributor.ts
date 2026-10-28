@@ -1,4 +1,4 @@
-import { toLocalDateKey } from "@/application/shared/activity-days";
+import { fieldStampToLocalDateKey, fieldStampToSortInstant } from "@/application/shared/activity-days";
 import type { Item } from "@/domain/item";
 import type { RecapAchievement } from "@/domain/recap";
 import { recapDateInRange } from "@/application/recap/period";
@@ -39,8 +39,15 @@ export const moviesRecapContributor: DomainRecapContributor = {
       if (item.status === "watched") {
         const watchedStamp = item.fieldsUpdatedAt.watched ?? item.fieldsUpdatedAt.status;
         if (watchedStamp) {
-          const day = toLocalDateKey(watchedStamp, range.timeZone);
-          pushIfInRange(achievements, range, item, day, watchedStamp);
+          const day = fieldStampToLocalDateKey(watchedStamp, range.timeZone);
+          if (day == null) continue;
+          pushIfInRange(
+            achievements,
+            range,
+            item,
+            day,
+            fieldStampToSortInstant(watchedStamp),
+          );
         }
       }
 

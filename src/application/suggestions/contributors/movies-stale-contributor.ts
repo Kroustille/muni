@@ -1,7 +1,7 @@
 import { computeNextEpisode } from "@/application/movies/episode-progress";
 import type { DomainStaleContributor } from "@/application/suggestions/contributors/shared";
 import { makeCandidate } from "@/application/suggestions/contributors/shared";
-import { toLocalDateKey } from "@/application/shared/activity-days";
+import { fieldStampToLocalDateKey, toLocalDateKey } from "@/application/shared/activity-days";
 
 export const moviesStaleContributor: DomainStaleContributor = {
   domainId: "movie",
@@ -24,10 +24,12 @@ export const moviesStaleContributor: DomainStaleContributor = {
             Object.keys(progress).length === 0);
 
         if (hasIncomplete && watchedDates.length > 0) {
-          const anchor = watchedDates
-            .map((iso) => toLocalDateKey(iso, ctx.timeZone))
-            .sort()
-            .at(-1)!;
+          const keys = watchedDates
+            .map((iso) => fieldStampToLocalDateKey(iso, ctx.timeZone))
+            .filter((day): day is string => day != null)
+            .sort();
+          if (keys.length === 0) continue;
+          const anchor = keys.at(-1)!;
           const candidate = makeCandidate(
             {
               domainId: "movie",
@@ -48,7 +50,8 @@ export const moviesStaleContributor: DomainStaleContributor = {
 
         if (item.status === "to_watch" && Object.keys(progress).length === 0) {
           const statusAt = item.fieldsUpdatedAt.status ?? item.createdAt;
-          const anchor = toLocalDateKey(statusAt, ctx.timeZone);
+          const anchor = fieldStampToLocalDateKey(statusAt, ctx.timeZone);
+          if (!anchor) continue;
           const candidate = makeCandidate(
             {
               domainId: "movie",
@@ -70,7 +73,8 @@ export const moviesStaleContributor: DomainStaleContributor = {
 
       if (item.status === "to_watch") {
         const statusAt = item.fieldsUpdatedAt.status ?? item.createdAt;
-        const anchor = toLocalDateKey(statusAt, ctx.timeZone);
+        const anchor = fieldStampToLocalDateKey(statusAt, ctx.timeZone);
+        if (!anchor) continue;
         const candidate = makeCandidate(
           {
             domainId: "movie",

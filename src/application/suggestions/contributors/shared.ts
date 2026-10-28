@@ -3,7 +3,7 @@ import type { Item } from "@/domain/item";
 import { deriveReadingActivityDays } from "@/application/books/reading-activity";
 import type { SuggestionsDeps } from "@/application/suggestions/build-daily-suggestions";
 import { daysSinceLocalDate, maxLocalDate } from "@/application/suggestions/calendar";
-import { toLocalDateKey } from "@/application/shared/activity-days";
+import { fieldStampToLocalDateKey, toLocalDateKey } from "@/application/shared/activity-days";
 
 export type ContributorContext = {
   calendarDay: string;
@@ -28,7 +28,7 @@ export function bookActivityAnchor(item: Item, timeZone: string): string | null 
   }
   const statusTouch = item.fieldsUpdatedAt.status;
   if (statusTouch) {
-    return toLocalDateKey(statusTouch, timeZone);
+    return fieldStampToLocalDateKey(statusTouch, timeZone);
   }
   return toLocalDateKey(item.createdAt, timeZone);
 }

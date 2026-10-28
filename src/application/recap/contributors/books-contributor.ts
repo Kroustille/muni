@@ -1,4 +1,4 @@
-import { toLocalDateKey } from "@/application/shared/activity-days";
+import { fieldStampToLocalDateKey, fieldStampToSortInstant } from "@/application/shared/activity-days";
 import type { Item } from "@/domain/item";
 import type { RecapAchievement } from "@/domain/recap";
 import { recapDateInRange } from "@/application/recap/period";
@@ -18,12 +18,13 @@ export const booksRecapContributor: DomainRecapContributor = {
       if (item.deletedAt != null) continue;
       const instant = bookFinishedInstant(item);
       if (instant == null) continue;
-      const occurredOn = toLocalDateKey(instant, range.timeZone);
+      const occurredOn = fieldStampToLocalDateKey(instant, range.timeZone);
+      if (occurredOn == null) continue;
       if (!recapDateInRange(occurredOn, range.startDate, range.endDate)) continue;
       achievements.push({
         domainId: "book",
         occurredOn,
-        sortInstant: instant,
+        sortInstant: fieldStampToSortInstant(instant),
         title: item.title,
         sourceItemId: item.id,
         deepLinkHref: `/items/${item.id}`,

@@ -12,7 +12,7 @@ export const fitnessRecapContributor: DomainRecapContributor = {
       if (workout.deletedAt != null || workout.status !== "completed") continue;
       const instant = workout.completedAt ?? `${workout.calendarDate}T12:00:00.000Z`;
       const occurredOn = workout.completedAt
-        ? toLocalDateKey(workout.completedAt, range.timeZone)
+        ? (toLocalDateKey(workout.completedAt, range.timeZone) ?? workout.calendarDate)
         : workout.calendarDate;
       if (!recapDateInRange(occurredOn, range.startDate, range.endDate)) continue;
       achievements.push({

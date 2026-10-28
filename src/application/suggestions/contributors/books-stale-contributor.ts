@@ -1,6 +1,6 @@
 import type { DomainStaleContributor } from "@/application/suggestions/contributors/shared";
 import { bookActivityAnchor, makeCandidate } from "@/application/suggestions/contributors/shared";
-import { toLocalDateKey } from "@/application/shared/activity-days";
+import { fieldStampToLocalDateKey, toLocalDateKey } from "@/application/shared/activity-days";
 
 export const booksStaleContributor: DomainStaleContributor = {
   domainId: "book",
@@ -35,9 +35,9 @@ export const booksStaleContributor: DomainStaleContributor = {
       if (item.status === "to_read") {
         const statusAt = item.fieldsUpdatedAt.status;
         const anchor = statusAt
-          ? toLocalDateKey(statusAt, ctx.timeZone)
+          ? fieldStampToLocalDateKey(statusAt, ctx.timeZone)
           : toLocalDateKey(item.createdAt, ctx.timeZone);
-        const candidate = makeCandidate(
+        if (!anchor) continue;
           {
             domainId: "book",
             itemId: item.id,

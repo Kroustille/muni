@@ -35,4 +35,20 @@ describe("booksRecapContributor", () => {
     });
     expect(rows).toHaveLength(0);
   });
+
+  it("maps HLC read stamps to calendar days", async () => {
+    const deps = createRecapTestDeps();
+    const wallMs = Date.UTC(2026, 2, 10, 12, 0, 0);
+    const book = updateItem(makeItem({ type: "book", status: "read" }), {
+      fieldsUpdatedAt: { read: `${wallMs}-0-device` },
+    });
+    await deps.items.put(book, { enqueue: false });
+    const rows = await booksRecapContributor.collectAchievements(deps, {
+      startDate: "2026-03-01",
+      endDate: "2026-03-31",
+      timeZone: "Europe/Paris",
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0].occurredOn).toBe("2026-03-10");
+  });
 });

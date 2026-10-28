@@ -3,8 +3,8 @@ import { statusesFor } from "@/domain/item";
 import {
   activityStatusTransitionStamp,
   DEFAULT_ACTIVITY_TIMEZONE,
+  addFieldStampActivityDay,
   deriveActivityDays,
-  toLocalDateKey,
   type ActivityDayRules,
 } from "@/application/shared/activity-days";
 
@@ -21,21 +21,21 @@ const readingActivityRules: ActivityDayRules<"book"> = {
   collectActivityDays(item, days, timeZone) {
     const statusAt = item.fieldsUpdatedAt.status;
     if (statusAt && isBookStatus(item.status)) {
-      days.add(toLocalDateKey(statusAt, timeZone));
+      addFieldStampActivityDay(days, statusAt, timeZone);
     }
 
     const pagesAt = item.fieldsUpdatedAt.pagesRead;
     if (pagesAt) {
-      days.add(toLocalDateKey(pagesAt, timeZone));
+      addFieldStampActivityDay(days, pagesAt, timeZone);
     }
 
     if (item.status === "read" && statusAt) {
-      days.add(toLocalDateKey(statusAt, timeZone));
+      addFieldStampActivityDay(days, statusAt, timeZone);
     }
 
     const readAt = item.fieldsUpdatedAt.read;
     if (readAt) {
-      days.add(toLocalDateKey(readAt, timeZone));
+      addFieldStampActivityDay(days, readAt, timeZone);
     }
   },
 };
