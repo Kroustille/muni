@@ -112,6 +112,8 @@ Honest boundaries for implementers and follow-on work. **Do not** treat complete
 
 ## 17. Catalog coverage & fallback providers (2026-10-28)
 
+**Full index parse (26 Books APIs)**: [`docs/public-apis-books-films-investigation-2026-10-28.md`](/cursor/stores/self/docs/public-apis-books-films-investigation-2026-10-28.md).
+
 **Research index**: [public-apis/public-apis](https://github.com/public-apis/public-apis) is **not** integrated at runtime — it is a **curated link catalog** used here to discover HTTPS APIs in the **Books** and **Video** sections. Each candidate below is evaluated for Muni: **French UI** (metadata or labels usable in FR-first copy), **offline-first** (manual add always; network only for server-proxied lookup per X2/X3), **API keys**, **HTTPS**, and **ToS** fit for a self-hosted companion (no scraping, no client-side keys).
 
 **Baseline (shipped)**: **Open Library** — ISBN + title search via `open-library/book-catalog-lookup.ts`; server `catalog_cache`; client never calls third parties (X2). **MusicBrainz** serves **004**, not books.

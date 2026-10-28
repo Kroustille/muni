@@ -104,6 +104,8 @@ Honest boundaries for implementers and follow-on work. **Do not** treat complete
 
 ## 18. Catalog coverage & fallback providers (2026-10-28)
 
+**Full index parse (58 Video APIs + Entertainment/Anime notes)**: [`docs/public-apis-books-films-investigation-2026-10-28.md`](/cursor/stores/self/docs/public-apis-books-films-investigation-2026-10-28.md).
+
 **Research index**: [public-apis/public-apis](https://github.com/public-apis/public-apis) is used **only to discover** candidate APIs — **Video** section plus **Open Source Data** ([Wikidata](https://www.wikidata.org/w/api.php?action=help)). No runtime dependency on that repository.
 
 **Baseline (shipped)**: **Wikidata** — `wikidata/movie-catalog-search.ts`; FR labels via `rdfs:label@fr`; `imdbId`, optional `P444`; server cache (§6).
@@ -119,7 +121,8 @@ Honest boundaries for implementers and follow-on work. **Do not** treat complete
 | **Open Movie Database** | [Open Movie Database](http://www.omdbapi.com/) | apiKey | Yes | Unknown | EN-first; IMDb id lookup | Best after `imdbId` known | **P2 enrichment** (synopsis/rating), not primary search |
 | **IMDb-API** | [IMDb-API](https://imdb-api.com/) | apiKey | Yes | Unknown | Third-party IMDb mirror | Licensing unclear vs official | **Defer** — prefer Wikidata/TMDB |
 | **TVDB** | [TVDB](https://thetvdb.com/api-information) | apiKey | Yes | Unknown | Strong **série** episode metadata | Episode seed for FR-B08 | **P3 optional** — episode list enrichment only |
-| **TVMaze** | Listed; **HTTP only** | No | **No** | — | TV data | HTTPS requirement | **Reject** |
+| **TVMaze** | [TVMaze](https://www.tvmaze.com/api) — index lists HTTP | No | Yes (use `api.tvmaze.com`) | Yes | EN-first TV metadata | IMDb lookup; episode lists; CC BY-SA | **P2 optional** — série episode seed only; server HTTPS |
+| **Watchmode** | [Watchmode](https://api.watchmode.com/) | apiKey | Yes | Unknown | Streaming regions | Phase C streaming port | **Phase C** — `WATCHMODE_API_KEY`; not catalog search |
 | **Trakt / Simkl** | Video — social tracking | apiKey | Yes | Mixed | User-centric, not catalog-first | Wrong product shape | **Reject** for catalog MVP |
 
 Niche Video APIs (Breaking Bad quotes, SWAPI, etc.) are **not** general film/série catalog sources.
@@ -132,6 +135,8 @@ Niche Video APIs (Breaking Bad quotes, SWAPI, etc.) are **not** general film/sé
 | **Fallback P2** | TMDb (public-apis Video) | Server search when Wikidata &lt; threshold hits; map to `MovieSearchHit`; optional `tmdbId` on item |
 | **Enrichment P2** | OMDb (public-apis Video) | Given `imdbId`, optional extra fields — cache by id; respect daily quota |
 | **Enrichment P3 (optional)** | TVDB | Episode catalog seed for séries when Wikidata incomplete |
+| **Enrichment P3 (optional)** | TVMaze | Episode seed + `lookup?imdb=` when TVDB/TMDB episode data thin |
+| **Phase C** | Watchmode | Streaming availability (`§15`) |
 | **Always** | Manual add | Offline title-only (M7) |
 
 **P1**: Wikidata query tuning (`language=fr`, entity types); empty state; manual merge (M6).
