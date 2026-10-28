@@ -19,6 +19,7 @@ import * as m0016RecipeCookedDates from "./0016_recipe_cooked_dates";
 import * as m0017MusicPracticeTables from "./0017_music_practice_tables";
 import * as m0018PlantsGardenTables from "./0018_plants_garden_tables";
 import * as m0019FitnessSessionFirst from "./0019_fitness_session_first";
+import * as m0020FitnessScheduledSnapshots from "./0020_fitness_scheduled_snapshots";
 
 const migrations: Record<string, Migration> = {
   "0001_auth": m0001Auth,
@@ -40,6 +41,7 @@ const migrations: Record<string, Migration> = {
   "0017_music_practice_tables": m0017MusicPracticeTables,
   "0018_plants_garden_tables": m0018PlantsGardenTables,
   "0019_fitness_session_first": m0019FitnessSessionFirst,
+  "0020_fitness_scheduled_snapshots": m0020FitnessScheduledSnapshots,
 };
 
 export const migrationProvider: MigrationProvider = {

@@ -1,12 +1,6 @@
 import type { ExerciseCatalogEntry } from "@/domain/fitness/catalog";
 
-const LOAD_BEARING_EQUIPMENT = new Set([
-  "barre",
-  "haltères",
-  "machine",
-  "câble",
-  "kettlebell",
-]);
+const LOAD_BEARING_EQUIPMENT = new Set(["barre", "haltères", "machine", "câble", "kettlebell"]);
 
 export type SetField = "reps" | "charge" | "duration" | "rpe" | "distanceNote";
 
@@ -31,7 +25,7 @@ export function resolveSetInputLayout(entry: ExerciseCatalogEntry | undefined): 
   if (entry.modality === "cardio" || entry.modality === "mobility") {
     return {
       visibleFields: ["duration", "rpe"],
-      collapsedFields: ["reps", "charge"],
+      collapsedFields: ["reps", "charge", "distanceNote"],
     };
   }
 

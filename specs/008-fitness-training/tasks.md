@@ -145,6 +145,7 @@
 - [x] T884 [US1] E2e delete template + undo in `tests/e2e/fitness-sessions.spec.ts`
 - [x] T885 [US3] `workout-log-editor.tsx` modality-aware set columns per FR-024a + unit tests in `tests/unit/fitness/set-input-layout.test.ts`
 - [x] T886 [US3] E2e log strength exercise shows reps/charge; cardio shows duration-first in `tests/e2e/fitness-logging.spec.ts`
+- [x] T887 [US1/US2] Scheduled completion snapshots (`title_snapshot` on `fitness_scheduled_session`, skip title) + today/week resolve from workout log when template deleted (`scheduled-display.ts`, migration `0020`)
 
 ---
 

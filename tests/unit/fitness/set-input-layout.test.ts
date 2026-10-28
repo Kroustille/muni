@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  isLoadBearingStrength,
-  resolveSetInputLayout,
-} from "@/domain/fitness/set-input-layout";
+import { isLoadBearingStrength, resolveSetInputLayout } from "@/domain/fitness/set-input-layout";
 import type { ExerciseCatalogEntry } from "@/domain/fitness/catalog";
 
 const deadlift: ExerciseCatalogEntry = {
@@ -53,6 +50,6 @@ describe("set input layout", () => {
   it("is duration-first for cardio", () => {
     const layout = resolveSetInputLayout(run);
     expect(layout.visibleFields[0]).toBe("duration");
-    expect(layout.collapsedFields).toEqual(["reps", "charge"]);
+    expect(layout.collapsedFields).toEqual(["reps", "charge", "distanceNote"]);
   });
 });

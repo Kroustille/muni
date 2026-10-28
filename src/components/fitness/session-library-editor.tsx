@@ -3,6 +3,10 @@
 import { useState } from "react";
 import type { FitnessSessionTemplate, TemplateExercise } from "@/domain/fitness/session-template";
 import { ExercisePicker } from "@/components/fitness/exercise-picker";
+import {
+  exerciseNameFromCatalog,
+  useExerciseCatalogMap,
+} from "@/components/fitness/use-exercise-catalog";
 import { rememberExerciseId } from "@/application/fitness/recent-exercises";
 import { useUndoDelete } from "@/components/UndoToast";
 import { t } from "@/i18n";
@@ -29,6 +33,7 @@ export function SessionLibraryEditor({
   onReload,
 }: SessionLibraryEditorProps) {
   const [pickerTemplateId, setPickerTemplateId] = useState<string | null>(null);
+  const catalogById = useExerciseCatalogMap();
   const { deleteFitnessTemplateWithUndo } = useUndoDelete();
 
   const addTemplate = () => {
@@ -44,7 +49,10 @@ export function SessionLibraryEditor({
     ]);
   };
 
-  const updateTemplate = (id: string, patch: Partial<Pick<DraftTemplate, "title" | "templateExercises">>) => {
+  const updateTemplate = (
+    id: string,
+    patch: Partial<Pick<DraftTemplate, "title" | "templateExercises">>,
+  ) => {
     onTemplatesChange(templates.map((row) => (row.id === id ? { ...row, ...patch } : row)));
   };
 
@@ -55,6 +63,14 @@ export function SessionLibraryEditor({
     }
     void deleteFitnessTemplateWithUndo(template.id, { onRestored: () => onReload?.() }).then(() => {
       onTemplatesChange(templates.filter((row) => row.id !== template.id));
+    });
+  };
+
+  const removeExercise = (templateId: string, exerciseIndex: number) => {
+    const row = templates.find((s) => s.id === templateId);
+    if (row === undefined) return;
+    updateTemplate(templateId, {
+      templateExercises: row.templateExercises.filter((_, index) => index !== exerciseIndex),
     });
   };
 
@@ -83,8 +99,22 @@ export function SessionLibraryEditor({
           </div>
           <ul className="mb-2 mt-2 space-y-1">
             {template.templateExercises.map((ex, index) => (
-              <li key={`${template.id}-${ex.exerciseId}-${index}`} className="text-sm text-foreground">
-                {ex.exerciseId}
+              <li
+                key={`${template.id}-${ex.exerciseId}-${index}`}
+                className="flex items-center justify-between gap-2 text-sm text-foreground"
+              >
+                <span data-testid={`fitness-session-exercise-label-${ex.exerciseId}`}>
+                  {exerciseNameFromCatalog(catalogById, ex.exerciseId)}
+                </span>
+                <button
+                  type="button"
+                  className="shrink-0 text-xs text-destructive"
+                  data-testid="fitness-session-template-exercise-remove"
+                  aria-label={t("fitness.sessions.removeExercise")}
+                  onClick={() => removeExercise(template.id, index)}
+                >
+                  {t("fitness.sessions.removeExercise")}
+                </button>
               </li>
             ))}
           </ul>

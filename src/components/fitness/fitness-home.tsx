@@ -58,13 +58,7 @@ export function FitnessHome() {
     setLogs(allLogs);
     setSkips(allSkips);
     setToday(
-      resolveTodayScheduledSessions(
-        allScheduled,
-        allTemplates,
-        allLogs,
-        allSkips,
-        todayDate,
-      ),
+      resolveTodayScheduledSessions(allScheduled, allTemplates, allLogs, allSkips, todayDate),
     );
   };
 
@@ -96,9 +90,13 @@ export function FitnessHome() {
   const weekView = buildWeekAdherenceView(scheduled, templates, logs, skips, localCalendarDate());
 
   const startSession = async (session: TodayScheduledSession) => {
+    if (session.template === null) return;
     try {
       const workoutUseCases = await getFitnessWorkoutUseCases();
-      const log = await workoutUseCases.startWorkoutFromTemplate(session.template, session.scheduled);
+      const log = await workoutUseCases.startWorkoutFromTemplate(
+        session.template,
+        session.scheduled,
+      );
       window.location.assign(`/fitness/workout/${log.id}`);
     } catch (e) {
       if (e instanceof Error && e.message === "WORKOUT_IN_PROGRESS") {
@@ -165,7 +163,7 @@ export function FitnessHome() {
               className="flex items-center justify-between rounded-xl border border-border p-3"
             >
               <div>
-                <p className="font-medium">{session.template.title}</p>
+                <p className="font-medium">{session.title}</p>
                 <p className="text-xs text-muted">{statusLabel(session.status)}</p>
               </div>
               {session.status === "todo" && (
@@ -192,7 +190,10 @@ export function FitnessHome() {
                 </div>
               )}
               {session.status === "in_progress" && session.workoutId && (
-                <Link href={`/fitness/workout/${session.workoutId}`} className="text-sm text-accent">
+                <Link
+                  href={`/fitness/workout/${session.workoutId}`}
+                  className="text-sm text-accent"
+                >
                   {t("fitness.today.inProgress")}
                 </Link>
               )}

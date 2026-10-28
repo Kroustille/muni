@@ -78,6 +78,8 @@ All tables: composite PK `(user_id, id)`, `deleted_at`, `fields_updated_at` json
 | `calendarDate` | date | User-chosen explicit date (FR-014) |
 | `seanceTemplateId` | uuid | References `fitness_seance_template.id` |
 | `sortOrder` | number optional | When multiple scheduled on same date |
+| `titleSnapshot` | text null | Set at **terminé** or **passé** so day view survives template delete |
+| `templateExercisesSnapshot` | jsonb null | Optional planned exercise list frozen at **terminé** when log empty |
 
 ### fitness_workout_log
 
@@ -121,6 +123,7 @@ All tables: composite PK `(user_id, id)`, `deleted_at`, `fields_updated_at` json
 | `calendarDate` | date | |
 | `scheduledSeanceId` | uuid | Preferred link when skipping **planifiée** |
 | `seanceTemplateId` | uuid optional | Denormalized for display if schedule row deleted |
+| `titleSnapshot` | text null | French séance title at skip time |
 | `note` | text optional | |
 
 ## Legacy (shipped weekly-program shape — migrate away)

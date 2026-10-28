@@ -42,10 +42,12 @@ export default function FitnessWorkoutPage() {
       <WorkoutLogEditor
         workout={workout}
         prExerciseIds={prIds}
-        onUpdate={async (loggedExercises) => {
-          const uc = await getFitnessWorkoutUseCases();
-          const updated = await uc.updateLoggedExercises(workout.id, loggedExercises);
-          setWorkout(updated);
+        onUpdate={(loggedExercises) => {
+          setWorkout((prev) => (prev === undefined ? prev : { ...prev, loggedExercises }));
+          void getFitnessWorkoutUseCases().then(async (uc) => {
+            const updated = await uc.updateLoggedExercises(workout.id, loggedExercises);
+            setWorkout(updated);
+          });
         }}
         onComplete={async () => {
           const uc = await getFitnessWorkoutUseCases();

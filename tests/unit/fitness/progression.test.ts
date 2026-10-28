@@ -83,6 +83,8 @@ describe("fitness progression and adherence", () => {
         calendarDate: monday,
         sessionTemplateId: templateId,
         sortOrder: 0,
+        titleSnapshot: null,
+        templateExercisesSnapshot: null,
         deletedAt: null,
         fieldsUpdatedAt: {},
       },

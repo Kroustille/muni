@@ -1,5 +1,6 @@
 import type { FitnessScheduledSession } from "./scheduled-session";
 import type { FitnessSessionTemplate } from "./session-template";
+import { resolveScheduledSessionTitle, scheduledRowHasActivity } from "./scheduled-display";
 import type { FitnessSkipRecord, FitnessWorkoutLog } from "./workout-log";
 
 /** Monday = 1 … Sunday = 7 (ISO weekday). */
@@ -66,9 +67,15 @@ export function buildWeekAdherenceView(
   const templateById = new Map(templates.filter((t) => t.deletedAt === null).map((t) => [t.id, t]));
   const sessions: WeekAdherenceSession[] = [];
 
-  for (const row of scheduled.filter((s) => s.deletedAt === null && weekDates.has(s.calendarDate))) {
+  for (const row of scheduled.filter(
+    (s) => s.deletedAt === null && weekDates.has(s.calendarDate),
+  )) {
     const template = templateById.get(row.sessionTemplateId);
-    if (template === undefined) continue;
+    if (template === undefined && !scheduledRowHasActivity(row, logs, skips)) {
+      continue;
+    }
+    const title = resolveScheduledSessionTitle(row, template, logs, skips);
+    if (title === null) continue;
     const completed = logs.some(
       (l) =>
         l.deletedAt === null &&
@@ -77,7 +84,10 @@ export function buildWeekAdherenceView(
         l.scheduledSessionId === row.id,
     );
     const skipped = skips.some(
-      (s) => s.deletedAt === null && s.calendarDate === row.calendarDate && s.scheduledSessionId === row.id,
+      (s) =>
+        s.deletedAt === null &&
+        s.calendarDate === row.calendarDate &&
+        s.scheduledSessionId === row.id,
     );
     let status: SessionDayStatus = "planned";
     if (completed) status = "completed";
@@ -85,13 +95,15 @@ export function buildWeekAdherenceView(
     sessions.push({
       scheduledSessionId: row.id,
       sessionTemplateId: row.sessionTemplateId,
-      title: template.title,
+      title,
       calendarDate: row.calendarDate,
       status,
     });
   }
 
-  sessions.sort((a, b) => a.calendarDate.localeCompare(b.calendarDate) || a.title.localeCompare(b.title));
+  sessions.sort(
+    (a, b) => a.calendarDate.localeCompare(b.calendarDate) || a.title.localeCompare(b.title),
+  );
 
   const plannedCount = sessions.length;
   const completedCount = sessions.filter((s) => s.status === "completed").length;
@@ -112,9 +124,6 @@ export function countCompletedWorkoutsInWeek(
 ): number {
   const weekDates = new Set(datesInWeek(weekStartMonday));
   return logs.filter(
-    (l) =>
-      l.deletedAt === null &&
-      l.status === "completed" &&
-      weekDates.has(l.calendarDate),
+    (l) => l.deletedAt === null && l.status === "completed" && weekDates.has(l.calendarDate),
   ).length;
 }

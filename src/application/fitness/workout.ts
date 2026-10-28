@@ -3,7 +3,10 @@ import type { FitnessScheduledSession } from "@/domain/fitness/scheduled-session
 import type { FitnessSessionTemplateRepository } from "@/application/ports/fitness-session-template-repository";
 import type { FitnessScheduledSessionRepository } from "@/application/ports/fitness-scheduled-session-repository";
 import type { FitnessSkipRepository } from "@/application/ports/fitness-skip-repository";
-import type { FitnessSettingsRepository, FitnessExerciseCatalogStore } from "@/application/ports/fitness-settings-repository";
+import type {
+  FitnessSettingsRepository,
+  FitnessExerciseCatalogStore,
+} from "@/application/ports/fitness-settings-repository";
 import type { FitnessWorkoutRepository } from "@/application/ports/fitness-workout-repository";
 import type { IdGenerator } from "@/application/ports/id-generator";
 import type { MetaStore } from "@/application/ports/item-repository";
@@ -34,7 +37,10 @@ export type FitnessWorkoutUseCases = {
   getWorkout(id: string): Promise<FitnessWorkoutLog | undefined>;
   listWorkouts(): Promise<FitnessWorkoutLog[]>;
   listSkips(): Promise<import("@/domain/fitness/workout-log").FitnessSkipRecord[]>;
-  startWorkoutFromTemplate(template: FitnessSessionTemplate, scheduled?: FitnessScheduledSession): Promise<FitnessWorkoutLog>;
+  startWorkoutFromTemplate(
+    template: FitnessSessionTemplate,
+    scheduled?: FitnessScheduledSession,
+  ): Promise<FitnessWorkoutLog>;
   startFreeWorkout(): Promise<FitnessWorkoutLog>;
   completeWorkout(id: string): Promise<FitnessWorkoutLog>;
   abandonWorkout(id: string): Promise<FitnessWorkoutLog>;
@@ -78,7 +84,9 @@ function exercisesFromTemplate(
   );
 }
 
-export function createFitnessWorkoutUseCases(deps: FitnessWorkoutUseCasesDeps): FitnessWorkoutUseCases {
+export function createFitnessWorkoutUseCases(
+  deps: FitnessWorkoutUseCasesDeps,
+): FitnessWorkoutUseCases {
   const hlc = createFitnessHlc(deps.meta, deps.idGenerator, deps.now);
   const assertSingleInProgress = async (): Promise<void> => {
     const existing = await deps.workouts.getInProgress();
@@ -150,7 +158,42 @@ export function createFitnessWorkoutUseCases(deps: FitnessWorkoutUseCasesDeps): 
         completedAt: new Date(deps.now()).toISOString(),
         fieldsUpdatedAt: { ...current.fieldsUpdatedAt, status: stamp, completedAt: stamp },
       };
-      return deps.workouts.upsert(fitnessWorkoutLogSchema.parse(next) as FitnessWorkoutLog);
+      const saved = await deps.workouts.upsert(
+        fitnessWorkoutLogSchema.parse(next) as FitnessWorkoutLog,
+      );
+
+      if (saved.scheduledSessionId !== null) {
+        const scheduled = await deps.scheduled.get(saved.scheduledSessionId);
+        if (scheduled !== undefined && scheduled.deletedAt === null) {
+          let templateExercisesSnapshot = scheduled.templateExercisesSnapshot;
+          if (saved.sessionTemplateId !== null) {
+            const template = await deps.templates.get(saved.sessionTemplateId);
+            if (
+              saved.loggedExercises.length === 0 &&
+              template !== undefined &&
+              templateExercisesSnapshot === null
+            ) {
+              templateExercisesSnapshot = template.templateExercises;
+            }
+          }
+          const scheduledStamp = await hlc.nextFieldStamp();
+          const scheduledFields: Record<string, string> = {
+            ...scheduled.fieldsUpdatedAt,
+            titleSnapshot: scheduledStamp,
+          };
+          if (templateExercisesSnapshot !== scheduled.templateExercisesSnapshot) {
+            scheduledFields.templateExercisesSnapshot = scheduledStamp;
+          }
+          await deps.scheduled.upsert({
+            ...scheduled,
+            titleSnapshot: saved.title,
+            templateExercisesSnapshot,
+            fieldsUpdatedAt: scheduledFields,
+          });
+        }
+      }
+
+      return saved;
     },
 
     async abandonWorkout(id) {
@@ -171,17 +214,27 @@ export function createFitnessWorkoutUseCases(deps: FitnessWorkoutUseCasesDeps): 
       if (scheduled === undefined || scheduled.deletedAt !== null) {
         throw new Error("scheduled session not found");
       }
+      const template = await deps.templates.get(scheduled.sessionTemplateId);
+      const titleSnapshot = template?.title ?? scheduled.titleSnapshot ?? "Séance";
       const stamp = await hlc.nextFieldStamp();
       const record = fitnessSkipRecordSchema.parse({
         id: deps.idGenerator.newId(),
         calendarDate: scheduled.calendarDate,
         scheduledSessionId,
         sessionTemplateId: scheduled.sessionTemplateId,
+        titleSnapshot,
         note: note?.trim() || null,
         deletedAt: null,
-        fieldsUpdatedAt: { scheduledSessionId: stamp, calendarDate: stamp },
+        fieldsUpdatedAt: { scheduledSessionId: stamp, calendarDate: stamp, titleSnapshot: stamp },
       });
       await deps.skips.upsert(record);
+      if (scheduled.titleSnapshot === null) {
+        await deps.scheduled.upsert({
+          ...scheduled,
+          titleSnapshot,
+          fieldsUpdatedAt: { ...scheduled.fieldsUpdatedAt, titleSnapshot: stamp },
+        });
+      }
     },
 
     async updateLoggedExercises(id, loggedExercises) {

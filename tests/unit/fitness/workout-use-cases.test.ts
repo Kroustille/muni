@@ -10,7 +10,9 @@ function memoryWorkoutRepo() {
   return {
     get: (id: string) => Promise.resolve(store.get(id)),
     getInProgress: () =>
-      Promise.resolve([...store.values()].find((w) => w.status === "in_progress" && w.deletedAt === null)),
+      Promise.resolve(
+        [...store.values()].find((w) => w.status === "in_progress" && w.deletedAt === null),
+      ),
     list: () => Promise.resolve([...store.values()].filter((w) => w.deletedAt === null)),
     upsert: async (row: FitnessWorkoutLog, _opts?: { enqueue?: boolean }) => {
       store.set(row.id, row);
@@ -50,6 +52,8 @@ const SCHEDULED: FitnessScheduledSession = {
   calendarDate: "2026-06-15",
   sessionTemplateId: TEMPLATE.id,
   sortOrder: 0,
+  titleSnapshot: null,
+  templateExercisesSnapshot: null,
   deletedAt: null,
   fieldsUpdatedAt: {},
 };

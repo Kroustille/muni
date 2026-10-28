@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { mergeLwwWire } from "./merge-lww";
+import { templateExerciseSchema, type TemplateExercise } from "./session-template";
 
 const timestamp = z.iso.datetime({ offset: true });
 const calendarDate = z.string().regex(/^\d{4}-\d{2}-\d{2}$/);
@@ -10,6 +11,8 @@ export type FitnessScheduledSession = {
   calendarDate: string;
   sessionTemplateId: string;
   sortOrder: number;
+  titleSnapshot: string | null;
+  templateExercisesSnapshot: TemplateExercise[] | null;
   deletedAt: string | null;
   fieldsUpdatedAt: Record<string, string>;
 };
@@ -19,6 +22,8 @@ const scheduledShape = {
   calendarDate: calendarDate,
   sessionTemplateId: z.string().uuid(),
   sortOrder: z.number(),
+  titleSnapshot: z.string().trim().min(1).max(200).nullable().default(null),
+  templateExercisesSnapshot: z.array(templateExerciseSchema).nullable().default(null),
   deletedAt: timestamp.nullable(),
   fieldsUpdatedAt: z.record(z.string(), z.string()),
 };
@@ -29,6 +34,8 @@ const SNAKE: Partial<Record<keyof FitnessScheduledSession, string>> = {
   calendarDate: "calendar_date",
   sessionTemplateId: "session_template_id",
   sortOrder: "sort_order",
+  titleSnapshot: "title_snapshot",
+  templateExercisesSnapshot: "template_exercises_snapshot",
   deletedAt: "deleted_at",
   fieldsUpdatedAt: "fields_updated_at",
 };
@@ -46,6 +53,8 @@ export const fitnessScheduledSessionWireSchema = z.strictObject({
   calendar_date: scheduledShape.calendarDate,
   session_template_id: scheduledShape.sessionTemplateId,
   sort_order: scheduledShape.sortOrder,
+  title_snapshot: scheduledShape.titleSnapshot,
+  template_exercises_snapshot: scheduledShape.templateExercisesSnapshot,
   deleted_at: scheduledShape.deletedAt,
   fields_updated_at: scheduledShape.fieldsUpdatedAt,
   server_updated_at: timestamp.nullable().optional(),
@@ -68,7 +77,9 @@ export function fitnessScheduledSessionToWire(
   };
 }
 
-export function wireToFitnessScheduledSession(wire: FitnessScheduledSessionWire): FitnessScheduledSession {
+export function wireToFitnessScheduledSession(
+  wire: FitnessScheduledSessionWire,
+): FitnessScheduledSession {
   const { fields_updated_at, server_updated_at, ...rest } = wire;
   void server_updated_at;
   return fitnessScheduledSessionSchema.parse({
@@ -81,6 +92,8 @@ const MERGED_SCHEDULED_FIELDS = [
   "calendar_date",
   "session_template_id",
   "sort_order",
+  "title_snapshot",
+  "template_exercises_snapshot",
   "deleted_at",
 ] as const satisfies readonly (keyof FitnessScheduledSessionWire)[];
 

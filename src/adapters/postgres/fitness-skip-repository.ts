@@ -32,6 +32,7 @@ function toDomain(row: Selectable<FitnessSkipRecordRow>): FitnessSkipRecord {
     calendar_date: toCalendarDate(row.calendar_date),
     scheduled_session_id: row.scheduled_session_id,
     session_template_id: row.session_template_id,
+    title_snapshot: row.title_snapshot,
     note: row.note,
     deleted_at: row.deleted_at === null ? null : toIso(row.deleted_at),
     fields_updated_at: row.fields_updated_at as FitnessSkipRecordWire["fields_updated_at"],
@@ -51,6 +52,7 @@ function toRow(
     calendar_date: record.calendarDate,
     scheduled_session_id: record.scheduledSessionId,
     session_template_id: record.sessionTemplateId,
+    title_snapshot: record.titleSnapshot,
     note: record.note,
     deleted_at: record.deletedAt,
     fields_updated_at: wire.fields_updated_at,
@@ -83,7 +85,11 @@ function createRepo(db: DbOrTrx, inTransaction: boolean): ServerFitnessSkipRepos
       if (!inTransaction) throw new Error("upsert must run inside transaction");
       const wire = fitnessSkipRecordToWire(record);
       const serverUpdatedAt = wire.server_updated_at ?? new Date().toISOString();
-      const values = toRow(userId, { ...wire, server_updated_at: serverUpdatedAt }, serverUpdatedAt);
+      const values = toRow(
+        userId,
+        { ...wire, server_updated_at: serverUpdatedAt },
+        serverUpdatedAt,
+      );
       await db
         .insertInto("fitness_skip_record")
         .values(values)
@@ -92,6 +98,7 @@ function createRepo(db: DbOrTrx, inTransaction: boolean): ServerFitnessSkipRepos
             calendar_date: values.calendar_date,
             scheduled_session_id: values.scheduled_session_id,
             session_template_id: values.session_template_id,
+            title_snapshot: values.title_snapshot,
             note: values.note,
             deleted_at: values.deleted_at,
             fields_updated_at: values.fields_updated_at,

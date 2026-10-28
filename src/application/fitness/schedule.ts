@@ -2,7 +2,10 @@ import type { FitnessScheduledSessionRepository } from "@/application/ports/fitn
 import type { FitnessSessionTemplateRepository } from "@/application/ports/fitness-session-template-repository";
 import type { MetaStore } from "@/application/ports/item-repository";
 import type { IdGenerator } from "@/application/ports/id-generator";
-import { fitnessScheduledSessionSchema, type FitnessScheduledSession } from "@/domain/fitness/scheduled-session";
+import {
+  fitnessScheduledSessionSchema,
+  type FitnessScheduledSession,
+} from "@/domain/fitness/scheduled-session";
 import { createFitnessHlc } from "./hlc";
 
 export type FitnessScheduleUseCasesDeps = {
@@ -16,11 +19,16 @@ export type FitnessScheduleUseCasesDeps = {
 export type FitnessScheduleUseCases = {
   listScheduled(): Promise<FitnessScheduledSession[]>;
   listScheduledForDate(calendarDate: string): Promise<FitnessScheduledSession[]>;
-  planifier(input: { sessionTemplateId: string; calendarDate: string }): Promise<FitnessScheduledSession>;
+  planifier(input: {
+    sessionTemplateId: string;
+    calendarDate: string;
+  }): Promise<FitnessScheduledSession>;
   unplanifier(id: string): Promise<void>;
 };
 
-export function createFitnessScheduleUseCases(deps: FitnessScheduleUseCasesDeps): FitnessScheduleUseCases {
+export function createFitnessScheduleUseCases(
+  deps: FitnessScheduleUseCasesDeps,
+): FitnessScheduleUseCases {
   const hlc = createFitnessHlc(deps.meta, deps.idGenerator, deps.now);
   return {
     listScheduled: () => deps.scheduled.list(),
@@ -39,6 +47,8 @@ export function createFitnessScheduleUseCases(deps: FitnessScheduleUseCasesDeps)
         calendarDate: input.calendarDate,
         sessionTemplateId: input.sessionTemplateId,
         sortOrder: sameDay.length,
+        titleSnapshot: null,
+        templateExercisesSnapshot: null,
         deletedAt: null,
         fieldsUpdatedAt: { calendarDate: stamp, sessionTemplateId: stamp, sortOrder: stamp },
       }) as FitnessScheduledSession;

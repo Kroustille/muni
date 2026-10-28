@@ -114,7 +114,10 @@ export function fitnessWorkoutLogToWire(
 ): FitnessWorkoutLogWire {
   const { fieldsUpdatedAt, ...rest } = log;
   return {
-    ...(mapKeys(rest, snakeOf) as Omit<FitnessWorkoutLogWire, "fields_updated_at" | "server_updated_at">),
+    ...(mapKeys(rest, snakeOf) as Omit<
+      FitnessWorkoutLogWire,
+      "fields_updated_at" | "server_updated_at"
+    >),
     fields_updated_at: mapKeys(fieldsUpdatedAt, snakeOf),
     server_updated_at: serverUpdatedAt,
   };
@@ -165,6 +168,7 @@ export type FitnessSkipRecord = {
   calendarDate: string;
   scheduledSessionId: string;
   sessionTemplateId: string | null;
+  titleSnapshot: string | null;
   note: string | null;
   deletedAt: string | null;
   fieldsUpdatedAt: Record<string, string>;
@@ -175,6 +179,7 @@ const skipShape = {
   calendarDate: calendarDate,
   scheduledSessionId: z.string().uuid(),
   sessionTemplateId: z.string().uuid().nullable(),
+  titleSnapshot: z.string().trim().min(1).max(200).nullable().default(null),
   note: z.string().max(2000).nullable(),
   deletedAt: timestamp.nullable(),
   fieldsUpdatedAt: z.record(z.string(), z.string()),
@@ -186,11 +191,13 @@ const SKIP_SNAKE: Partial<Record<keyof FitnessSkipRecord, string>> = {
   calendarDate: "calendar_date",
   scheduledSessionId: "scheduled_session_id",
   sessionTemplateId: "session_template_id",
+  titleSnapshot: "title_snapshot",
   deletedAt: "deleted_at",
   fieldsUpdatedAt: "fields_updated_at",
 };
 
-const skipSnakeOf = (field: string): string => SKIP_SNAKE[field as keyof FitnessSkipRecord] ?? field;
+const skipSnakeOf = (field: string): string =>
+  SKIP_SNAKE[field as keyof FitnessSkipRecord] ?? field;
 const skipCamelOf = (field: string): string =>
   Object.fromEntries(Object.entries(SKIP_SNAKE).map(([c, s]) => [s, c]))[field] ?? field;
 
@@ -199,6 +206,7 @@ export const fitnessSkipRecordWireSchema = z.strictObject({
   calendar_date: skipShape.calendarDate,
   scheduled_session_id: skipShape.scheduledSessionId,
   session_template_id: skipShape.sessionTemplateId,
+  title_snapshot: skipShape.titleSnapshot,
   note: skipShape.note,
   deleted_at: skipShape.deletedAt,
   fields_updated_at: skipShape.fieldsUpdatedAt,
@@ -213,7 +221,10 @@ export function fitnessSkipRecordToWire(
 ): FitnessSkipRecordWire {
   const { fieldsUpdatedAt, ...rest } = record;
   return {
-    ...(mapKeys(rest, skipSnakeOf) as Omit<FitnessSkipRecordWire, "fields_updated_at" | "server_updated_at">),
+    ...(mapKeys(rest, skipSnakeOf) as Omit<
+      FitnessSkipRecordWire,
+      "fields_updated_at" | "server_updated_at"
+    >),
     fields_updated_at: mapKeys(fieldsUpdatedAt, skipSnakeOf),
     server_updated_at: serverUpdatedAt,
   };
@@ -232,6 +243,7 @@ const MERGED_SKIP_FIELDS = [
   "calendar_date",
   "scheduled_session_id",
   "session_template_id",
+  "title_snapshot",
   "note",
   "deleted_at",
 ] as const satisfies readonly (keyof FitnessSkipRecordWire)[];
@@ -328,7 +340,9 @@ export function mergeFitnessUserSettings(
   return mergeLwwWire(local, remote, MERGED_SETTINGS_FIELDS);
 }
 
-export function defaultFitnessUserSettings(id: string = FITNESS_SETTINGS_SINGLETON_ID): FitnessUserSettings {
+export function defaultFitnessUserSettings(
+  id: string = FITNESS_SETTINGS_SINGLETON_ID,
+): FitnessUserSettings {
   return fitnessUserSettingsSchema.parse({
     id,
     chargeUnit: "kg",

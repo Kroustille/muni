@@ -85,6 +85,8 @@ export interface FitnessScheduledSession {
   id: string;
   session_template_id: string;
   sort_order: number;
+  title_snapshot: string | null;
+  template_exercises_snapshot: Json | null;
   server_updated_at: Timestamp;
   user_id: string;
 }
@@ -108,6 +110,7 @@ export interface FitnessSkipRecord {
   note: string | null;
   scheduled_session_id: string;
   session_template_id: string | null;
+  title_snapshot: string | null;
   server_updated_at: Timestamp;
   user_id: string;
 }

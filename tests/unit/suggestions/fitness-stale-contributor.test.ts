@@ -67,6 +67,7 @@ describe("fitnessStaleContributor", () => {
         calendarDate: dateOnlyDaysAgo(5),
         scheduledSessionId: SCHEDULED_ID,
         sessionTemplateId: TEMPLATE_ID,
+        titleSnapshot: "Push",
         note: null,
         deletedAt: null,
         fieldsUpdatedAt: {},
@@ -87,6 +88,8 @@ describe("fitnessStaleContributor", () => {
 
     const candidates = await fitnessStaleContributor.listStaleCandidates(deps as never, ctx);
     expect(candidates.some((c) => c.kind === "unblock_skipped")).toBe(true);
-    expect(candidates.find((c) => c.kind === "unblock_skipped")?.deepLink).toContain("/fitness/workout/");
+    expect(candidates.find((c) => c.kind === "unblock_skipped")?.deepLink).toContain(
+      "/fitness/workout/",
+    );
   });
 });

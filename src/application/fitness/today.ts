@@ -1,12 +1,18 @@
 import type { FitnessSessionTemplate } from "@/domain/fitness/session-template";
 import type { FitnessScheduledSession } from "@/domain/fitness/scheduled-session";
+import {
+  resolveScheduledSessionTitle,
+  scheduledRowHasActivity,
+  workoutForScheduledOnDate,
+} from "@/domain/fitness/scheduled-display";
 import type { FitnessSkipRecord, FitnessWorkoutLog } from "@/domain/fitness/workout-log";
 
 export type TodaySessionStatus = "todo" | "in_progress" | "done" | "skipped" | "past";
 
 export type TodayScheduledSession = {
   scheduled: FitnessScheduledSession;
-  template: FitnessSessionTemplate;
+  title: string;
+  template: FitnessSessionTemplate | null;
   status: TodaySessionStatus;
   workoutId?: string;
 };
@@ -32,38 +38,46 @@ export function resolveTodayScheduledSessions(
     .filter((s) => s.deletedAt === null && s.calendarDate === calendarDate)
     .sort((a, b) => a.sortOrder - b.sortOrder)) {
     const template = templateById.get(row.sessionTemplateId);
-    if (template === undefined) continue;
-    const inProgress = logs.find(
-      (l) =>
-        l.deletedAt === null &&
-        l.status === "in_progress" &&
-        l.scheduledSessionId === row.id &&
-        l.calendarDate === calendarDate,
-    );
-    if (inProgress) {
-      rows.push({ scheduled: row, template, status: "in_progress", workoutId: inProgress.id });
+    if (template === undefined && !scheduledRowHasActivity(row, logs, skips)) {
       continue;
     }
-    const completed = logs.some(
-      (l) =>
-        l.deletedAt === null &&
-        l.status === "completed" &&
-        l.scheduledSessionId === row.id &&
-        l.calendarDate === calendarDate,
-    );
+    const title = resolveScheduledSessionTitle(row, template, logs, skips);
+    if (title === null) continue;
+
+    const linkedLog = workoutForScheduledOnDate(logs, row.id, calendarDate);
+    const inProgress =
+      linkedLog !== undefined && linkedLog.status === "in_progress" ? linkedLog : undefined;
+    if (inProgress) {
+      rows.push({
+        scheduled: row,
+        title,
+        template: template ?? null,
+        status: "in_progress",
+        workoutId: inProgress.id,
+      });
+      continue;
+    }
+    const completed = linkedLog !== undefined && linkedLog.status === "completed";
     if (completed) {
-      rows.push({ scheduled: row, template, status: "done" });
+      rows.push({
+        scheduled: row,
+        title,
+        template: template ?? null,
+        status: "done",
+        workoutId: linkedLog.id,
+      });
       continue;
     }
     const skipped = skips.some(
-      (s) => s.deletedAt === null && s.scheduledSessionId === row.id && s.calendarDate === calendarDate,
+      (s) =>
+        s.deletedAt === null && s.scheduledSessionId === row.id && s.calendarDate === calendarDate,
     );
     if (skipped) {
-      rows.push({ scheduled: row, template, status: "skipped" });
+      rows.push({ scheduled: row, title, template: template ?? null, status: "skipped" });
       continue;
     }
     const status: TodaySessionStatus = calendarDate < localCalendarDate() ? "past" : "todo";
-    rows.push({ scheduled: row, template, status });
+    rows.push({ scheduled: row, title, template: template ?? null, status });
   }
   return rows;
 }

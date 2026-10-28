@@ -22,7 +22,9 @@ export function HomeFitnessCard() {
       const templateUseCases = await getFitnessSessionTemplateUseCases();
       const scheduleUseCases = await getFitnessScheduleUseCases();
       const workoutUseCases = await getFitnessWorkoutUseCases();
-      const templates = (await templateUseCases.listTemplates()).filter((t) => t.deletedAt === null);
+      const templates = (await templateUseCases.listTemplates()).filter(
+        (t) => t.deletedAt === null,
+      );
       if (templates.length === 0) return;
       const scheduled = await scheduleUseCases.listScheduled();
       const logs = await workoutUseCases.listWorkouts();
@@ -37,7 +39,7 @@ export function HomeFitnessCard() {
         [],
         todayDate,
       );
-      const next = todaySessions.find((s) => s.status === "todo")?.template.title;
+      const next = todaySessions.find((s) => s.status === "todo")?.title;
       const parts = [t("fitness.homeCard.weekDone").replace("{done}", String(week.completedCount))];
       if (settings.adherenceTrackingEnabled && streak > 0) {
         parts.push(t("fitness.homeCard.streak").replace("{count}", String(streak)));

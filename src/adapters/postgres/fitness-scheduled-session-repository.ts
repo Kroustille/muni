@@ -32,6 +32,9 @@ function toDomain(row: Selectable<FitnessScheduledSessionRow>): FitnessScheduled
     calendar_date: toCalendarDate(row.calendar_date),
     session_template_id: row.session_template_id,
     sort_order: row.sort_order,
+    title_snapshot: row.title_snapshot,
+    template_exercises_snapshot:
+      row.template_exercises_snapshot as FitnessScheduledSessionWire["template_exercises_snapshot"],
     deleted_at: row.deleted_at === null ? null : toIso(row.deleted_at),
     fields_updated_at: row.fields_updated_at as FitnessScheduledSessionWire["fields_updated_at"],
     server_updated_at: toIso(row.server_updated_at),
@@ -50,6 +53,8 @@ function toRow(
     calendar_date: row.calendarDate,
     session_template_id: row.sessionTemplateId,
     sort_order: row.sortOrder,
+    title_snapshot: row.titleSnapshot,
+    template_exercises_snapshot: row.templateExercisesSnapshot,
     deleted_at: row.deletedAt,
     fields_updated_at: wire.fields_updated_at,
     server_updated_at: serverUpdatedAt,
@@ -81,7 +86,11 @@ function createRepo(db: DbOrTrx, inTransaction: boolean): ServerFitnessScheduled
       if (!inTransaction) throw new Error("upsert must run inside transaction");
       const wire = fitnessScheduledSessionToWire(scheduled);
       const serverUpdatedAt = wire.server_updated_at ?? new Date().toISOString();
-      const values = toRow(userId, { ...wire, server_updated_at: serverUpdatedAt }, serverUpdatedAt);
+      const values = toRow(
+        userId,
+        { ...wire, server_updated_at: serverUpdatedAt },
+        serverUpdatedAt,
+      );
       await db
         .insertInto("fitness_scheduled_session")
         .values(values)
@@ -90,6 +99,8 @@ function createRepo(db: DbOrTrx, inTransaction: boolean): ServerFitnessScheduled
             calendar_date: values.calendar_date,
             session_template_id: values.session_template_id,
             sort_order: values.sort_order,
+            title_snapshot: values.title_snapshot,
+            template_exercises_snapshot: values.template_exercises_snapshot,
             deleted_at: values.deleted_at,
             fields_updated_at: values.fields_updated_at,
             server_updated_at: values.server_updated_at,
