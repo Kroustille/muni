@@ -72,6 +72,17 @@ Books and movies already define **activity days**, streaks, and **year goals** o
 
 Recap aggregation MUST be driven by a **registry of domain contributors** (conceptual): each contributor declares event type, French label template, sort key, and how to read timestamps from local store. New domains (travel, restaurants, …) add a contributor without redesigning recap UI.
 
+## Planning decisions (2026-10-28 — locked in plan)
+
+| Topic | Decision |
+|--------|----------|
+| Heatmap window | **Trailing 365 local calendar days** ending today; **independent** of recap period switcher (OD-011-1) |
+| Heatmap breakpoint | **`md` (768px)** — hidden below, visible at sidebar layout widths |
+| Fitness segment color | **`#0d9488`** (app accent / fitness shell) |
+| Domain order | Livres → Films & séries → Musique → Recettes → Entraînement (`book`, `movie`, `music_track`, `recipe`, `fitness`) |
+| Bottom nav | **Récap** tab after FAB: Home, Search \| + \| Récap, Settings |
+| Aggregation API | Single `buildRecapSnapshot({ period, timeZone, deps })` in application layer; see [contracts/recap-aggregation-service.md](contracts/recap-aggregation-service.md) |
+
 ## References
 
 - Foundation: [001 spec](../001-typed-lists-companion/spec.md), [001 data-model](../001-typed-lists-companion/data-model.md)

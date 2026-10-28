@@ -1,0 +1,85 @@
+# Contract: Recap activity heatmap (desktop component)
+
+**Applies to**: `src/components/recap/recap-activity-heatmap.tsx`, consumed only from `/recap` (FR-019, User Story 7).
+
+## Visibility
+
+| Viewport | Behavior |
+|----------|----------|
+| `< md` (< 768px) | **Do not mount** component (no placeholder, no collapse teaser) |
+| `≥ md` | Render at top of recap page above period navigation |
+
+Use CSS/`useMediaQuery` consistent with `BottomNav` (`md:hidden`).
+
+## Data input
+
+```typescript
+type RecapActivityHeatmapProps = {
+  days: RecapActivityDay[];  // 365 entries, ascending date
+  domainAccents: Record<RecapDomainId, string>;  // hex or CSS var
+  domainLabelsFr: Record<RecapDomainId, string>;
+};
+```
+
+Built from `RecapSnapshot.activityDays` (see [recap-aggregation-service.md](recap-aggregation-service.md)).
+
+## Visual (FR-020 — locked)
+
+- GitHub-style **week-column grid** (weeks as columns, weekdays as rows) OR horizontal scroll month grid — implementation choice if week columns match books insights; must show **~365 days**.
+- **Inactive day**: neutral border/fill (`bg-muted` or equivalent).
+- **Active day, one domain**: **full cell** fill with that domain’s accent.
+- **Active day, multiple domains**: cell interior split into **vertical micro-segments** (equal width, left→right) in stable domain order; each segment uses domain accent from table:
+
+| Domain | Accent source |
+|--------|----------------|
+| `book` | `LIST_TYPE_VISUAL.book.accentColor` (`#9f1239`) |
+| `movie` | `LIST_TYPE_VISUAL.movie.accentColor` (`#4338ca`) |
+| `music_track` | `LIST_TYPE_VISUAL.music_track.accentColor` (`#0284c7`) |
+| `recipe` | `LIST_TYPE_VISUAL.recipe.accentColor` (`#c2410c`) |
+| `fitness` | `#0d9488` (OD-011-3) |
+
+- **No intensity scale** by `eventCount` in MVP (presence only).
+- **Max 5 segments** visible (all MVP domains fit); future overflow domains listed in text only.
+
+## Legend
+
+- Visible French **text legend** below or beside grid: domain label + swatch per in-scope domain.
+- Must not rely on color alone (FR-020).
+
+## Tooltip / focus
+
+Each active cell:
+
+- **Hover/focus tooltip**: date + comma-separated domain labels; optional `(N activités)` from `eventCount`.
+- **`aria-label` / accessible name**: e.g. `28 octobre 2026 — Livres, Entraînement` (localized date format).
+
+Inactive cells: date only or omitted from tab order (product choice; prefer skip roving tabindex on empty cells).
+
+## Test IDs
+
+| `data-testid` | Element |
+|---------------|---------|
+| `recap-activity-heatmap` | Root grid |
+| `recap-activity-heatmap-legend` | Legend |
+| `recap-activity-day-{YYYY-MM-DD}` | Cell (active or inactive) |
+
+## Independence from period switcher
+
+Heatmap always reflects **trailing 365 local days** (OD-011-1), **not** the selected week/month list period. Copy may clarify (“Activité des 12 derniers mois”) in i18n.
+
+## Testing
+
+- Unit: segment layout given `domainsPresent` permutations (1, 2, 5 domains).
+- Playwright desktop viewport: heatmap visible; multi-segment cell when seeded; narrow viewport hidden (US7 scenarios 1–4).
+- a11y: active cell accessible name includes domain names (scenario 5).
+
+## Reuse note
+
+Book/movie domain heatmaps (`reading-heatmap`, watch insights) remain **separate** UIs on domain screens. Recap heatmap is **multi-domain** and MUST NOT reuse single-accent `HeatmapCell` without extending for segments.
+
+## FR mapping
+
+| FR | Mechanism |
+|----|-----------|
+| FR-019 | Desktop-only mount |
+| FR-020 | Segments, legend, tooltip/a11y |
