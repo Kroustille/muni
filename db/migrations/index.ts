@@ -14,6 +14,7 @@ import * as m0011MovieLibraryFields from "./0011_movie_library_fields";
 import * as m0012MovieQuotes from "./0012_movie_quotes";
 import * as m0013UserWatchSettings from "./0013_user_watch_settings";
 import * as m0014FitnessTables from "./0014_fitness_tables";
+import * as m0015PlantsGardenTables from "./0015_plants_garden_tables";
 
 // Static registry: add each migration module here, keyed by its sortable name.
 const migrations: Record<string, Migration> = {
@@ -31,6 +32,7 @@ const migrations: Record<string, Migration> = {
   "0012_movie_quotes": m0012MovieQuotes,
   "0013_user_watch_settings": m0013UserWatchSettings,
   "0014_fitness_tables": m0014FitnessTables,
+  "0015_plants_garden_tables": m0015PlantsGardenTables,
 };
 
 export const migrationProvider: MigrationProvider = {

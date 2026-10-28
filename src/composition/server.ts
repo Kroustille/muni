@@ -44,10 +44,19 @@ import {
   createFitnessSyncService,
   type FitnessSyncService,
 } from "@/application/server/fitness-sync-service";
+import {
+  createPlantsGardenSyncService,
+  type PlantsGardenSyncService,
+} from "@/application/server/plants-garden-sync-service";
 import { createPostgresFitnessProgramRepository } from "@/adapters/postgres/fitness-program-repository";
 import { createPostgresFitnessWorkoutRepository } from "@/adapters/postgres/fitness-workout-repository";
 import { createPostgresFitnessSkipRepository } from "@/adapters/postgres/fitness-skip-repository";
 import { createPostgresFitnessSettingsRepository } from "@/adapters/postgres/fitness-settings-repository";
+import { createPostgresPlantsGardenPlantRepository } from "@/adapters/postgres/plants-garden-plant-repository";
+import { createPostgresPlantsGardenCareEventRepository } from "@/adapters/postgres/plants-garden-care-event-repository";
+import { createPostgresPlantsGardenCareProfileRepository } from "@/adapters/postgres/plants-garden-care-profile-repository";
+import { createPostgresPlantsGardenCultureRepository } from "@/adapters/postgres/plants-garden-culture-repository";
+import { createPostgresPlantsGardenMilestoneRepository } from "@/adapters/postgres/plants-garden-milestone-repository";
 import type { ServerItemRepository } from "@/application/ports/server-item-repository";
 import { createSyncService, type SyncService } from "@/application/server/sync-service";
 import { loadConfig, type ServerConfig } from "@/composition/config";
@@ -61,6 +70,7 @@ export interface ServerContainer {
   readonly bookQuoteSync: BookQuoteSyncService;
   readonly movieQuoteSync: MovieQuoteSyncService;
   readonly fitnessSync: FitnessSyncService;
+  readonly plantsGardenSync: PlantsGardenSyncService;
   readonly lookupBook: LookupBook;
   readonly searchBooks: SearchBooks;
   readonly searchMovies: SearchMovies;
@@ -128,6 +138,14 @@ export function createServerContainer(
     settings: createPostgresFitnessSettingsRepository(db),
     now,
   });
+  const plantsGardenSync = createPlantsGardenSyncService({
+    plants: createPostgresPlantsGardenPlantRepository(db),
+    careEvents: createPostgresPlantsGardenCareEventRepository(db),
+    careProfiles: createPostgresPlantsGardenCareProfileRepository(db),
+    cultures: createPostgresPlantsGardenCultureRepository(db),
+    milestones: createPostgresPlantsGardenMilestoneRepository(db),
+    now,
+  });
   const catalogCache = createPostgresCatalogCacheRepository(db);
   const bookCatalog = createOpenLibraryBookCatalogLookup({ cache: catalogCache });
   const lookupBook = createLookupBook({ catalog: bookCatalog });
@@ -151,6 +169,7 @@ export function createServerContainer(
     bookQuoteSync,
     movieQuoteSync,
     fitnessSync,
+    plantsGardenSync,
     lookupBook,
     searchBooks,
     searchMovies,
