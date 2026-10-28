@@ -104,21 +104,38 @@ Honest boundaries for implementers and follow-on work. **Do not** treat complete
 
 ## 18. Catalog coverage & fallback providers (2026-10-28)
 
-**Current stack (code)**: **Wikidata** — `wbsearchentities` + entity detail in `wikidata/movie-catalog-search.ts`; server cache; FR labels via `rdfs:label@fr`. **MusicBrainz** is **004**, not movies.
+**Research index**: [public-apis/public-apis](https://github.com/public-apis/public-apis) is used **only to discover** candidate APIs — **Video** section plus **Open Source Data** ([Wikidata](https://www.wikidata.org/w/api.php?action=help)). No runtime dependency on that repository.
 
-**Do not** use [public-apis](https://github.com/public-apis/public-apis) as a runtime dependency.
+**Baseline (shipped)**: **Wikidata** — `wikidata/movie-catalog-search.ts`; FR labels via `rdfs:label@fr`; `imdbId`, optional `P444`; server cache (§6).
 
-**Gaps**: Sparse Wikidata coverage for obscure titles; weak disambiguation for generic French titles; episode lists incomplete; no poster (by design).
+**Problem**: Missing titles — sparse Q-items, generic French title collisions, incomplete série episode seeds.
 
-| Priority | Provider | Role | Keys / limits | Offline-first |
-|----------|----------|------|---------------|---------------|
-| **Primary** | Wikidata | Title search, film vs series, IMDb id, optional P444 rating | No key; cache 24h; polite UA | Online lookup; manual add offline |
-| **Fallback search (P2)** | [TMDB API](https://developer.themoviedb.org/docs) | Title search when Wikidata returns &lt; 3 hits or empty | API key server-side; rate limits per TMDB plan | Server proxy only |
-| **Enrichment (P2, optional)** | [OMDb API](http://www.omdbapi.com/) | Extra synopsis/rating when `imdbId` known from Wikidata/TMDB | API key; low daily quota on free tier | Server proxy; cache by imdbId |
-| **Manual** | — | Title-only movie add | N/A | Always |
+### Candidates from public-apis **Video** (+ Wikidata)
 
-**P1**: Tune Wikidata search (language `fr`, type filters); better empty state; merge manual rows (M6).
+| Provider | public-apis entry | Auth | HTTPS | CORS | FR / metadata | Muni fit | Recommendation |
+|----------|-------------------|------|-------|------|---------------|----------|----------------|
+| **Wikidata** | Open Source Data (not Video table) | OAuth optional | Yes | — | Strong `@fr` labels (M1) | Keyless; legal | **Keep baseline** |
+| **TMDb** | [TMDb](https://www.themoviedb.org/documentation/api) — “Community-based movie data” | apiKey | Yes | Unknown | FR `language=fr-FR`; posters (we skip images L3) | Industry standard search | **P2 fallback search** |
+| **Open Movie Database** | [Open Movie Database](http://www.omdbapi.com/) | apiKey | Yes | Unknown | EN-first; IMDb id lookup | Best after `imdbId` known | **P2 enrichment** (synopsis/rating), not primary search |
+| **IMDb-API** | [IMDb-API](https://imdb-api.com/) | apiKey | Yes | Unknown | Third-party IMDb mirror | Licensing unclear vs official | **Defer** — prefer Wikidata/TMDB |
+| **TVDB** | [TVDB](https://thetvdb.com/api-information) | apiKey | Yes | Unknown | Strong **série** episode metadata | Episode seed for FR-B08 | **P3 optional** — episode list enrichment only |
+| **TVMaze** | Listed; **HTTP only** | No | **No** | — | TV data | HTTPS requirement | **Reject** |
+| **Trakt / Simkl** | Video — social tracking | apiKey | Yes | Mixed | User-centric, not catalog-first | Wrong product shape | **Reject** for catalog MVP |
 
-**P2**: `MovieCatalogSearch` composite: Wikidata first → TMDB fallback → unified `MovieSearchHit`; store `tmdbId` optional on item for refresh.
+Niche Video APIs (Breaking Bad quotes, SWAPI, etc.) are **not** general film/série catalog sources.
 
-**FR additions**: See [spec.md](spec.md) § Catalog search improvements (2026-10-28).
+### Recommended strategy
+
+| Priority | Provider | Role |
+|----------|----------|------|
+| **Primary** | Wikidata | Title search; film vs series; IMDb id |
+| **Fallback P2** | TMDb (public-apis Video) | Server search when Wikidata &lt; threshold hits; map to `MovieSearchHit`; optional `tmdbId` on item |
+| **Enrichment P2** | OMDb (public-apis Video) | Given `imdbId`, optional extra fields — cache by id; respect daily quota |
+| **Enrichment P3 (optional)** | TVDB | Episode catalog seed for séries when Wikidata incomplete |
+| **Always** | Manual add | Offline title-only (M7) |
+
+**P1**: Wikidata query tuning (`language=fr`, entity types); empty state; manual merge (M6).
+
+**P2**: Composite `MovieCatalogSearch` port: Wikidata → TMDB → unified preview; keys server-side (`TMDB_API_KEY`, optional `OMDB_API_KEY`).
+
+**FR**: [spec.md](spec.md) § Catalog search improvements (2026-10-28).

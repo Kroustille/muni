@@ -112,20 +112,36 @@ Honest boundaries for implementers and follow-on work. **Do not** treat complete
 
 ## 17. Catalog coverage & fallback providers (2026-10-28)
 
-**Current stack (code)**: **Open Library** only — ISBN + title search via server adapter `open-library/book-catalog-lookup.ts`; client never calls third parties directly (X2). **MusicBrainz** is used for **music** (004), not books.
+**Research index**: [public-apis/public-apis](https://github.com/public-apis/public-apis) is **not** integrated at runtime — it is a **curated link catalog** used here to discover HTTPS APIs in the **Books** and **Video** sections. Each candidate below is evaluated for Muni: **French UI** (metadata or labels usable in FR-first copy), **offline-first** (manual add always; network only for server-proxied lookup per X2/X3), **API keys**, **HTTPS**, and **ToS** fit for a self-hosted companion (no scraping, no client-side keys).
 
-**Do not** depend on [public-apis](https://github.com/public-apis/public-apis) as a runtime library — it is a link directory, not an API.
+**Baseline (shipped)**: **Open Library** — ISBN + title search via `open-library/book-catalog-lookup.ts`; server `catalog_cache`; client never calls third parties (X2). **MusicBrainz** serves **004**, not books.
 
-**Gaps**: Obscure FR editions, recent releases slow to appear in OL, weak title-only matches for common words, no cover (by design N2).
+**Problem**: Missing or weak titles — obscure FR editions, slow OL updates, noisy title-only queries, scan/ISBN edge cases.
 
-| Priority | Provider | Role | Keys / limits | Offline-first |
-|----------|----------|------|---------------|---------------|
-| **Primary** | Open Library | ISBN + title search, edition metadata | No key; polite rate limit; server cache TTL 24h | Lookup online only; manual add offline |
-| **Fallback (P2)** | [Google Books API](https://developers.google.com/books) | Title/ISBN when OL returns empty or low-confidence hit | API key server-side; ~1k/day free tier typical | Same as OL — server proxy only |
-| **Manual** | — | Title-only add, ISBN prefilled on scan fail | N/A | Always |
+### Candidates from public-apis **Books** (and close industry peers)
 
-**P1 (search quality)**: Normalize queries (accents, strip articles); retry ISBN-13 variant; expand merge rules for near-duplicate titles; surface “Aucun résultat — ajouter manuellement” with one tap.
+| Provider | public-apis entry | Auth | HTTPS | CORS (browser) | FR / metadata | Muni fit | Recommendation |
+|----------|-------------------|------|-------|----------------|---------------|----------|----------------|
+| **Open Library** | [Open Library](https://openlibrary.org/developers/api) — “Books, book covers…” | No | Yes | No (server OK) | Uneven FR; EN fallback per L4 | **Primary** — no key, aligns B1/X2 | **Keep baseline** |
+| **Google Books** | [Google Books](https://developers.google.com/books/) | OAuth / API key | Yes | Unknown | Good volume; FR via `langRestrict` | Server proxy; quota ~1k/day typical | **P2 fallback** when OL empty |
+| **Crossref** | [Crossref Metadata Search](https://github.com/CrossRef/rest-api-doc) | No | Yes | Unknown | Scholarly; weak consumer FR fiction | DOI/ISBN academic | **Defer** — wrong corpus for Valentin library |
+| **Gutendex** | [Gutendex](https://gutendex.com/) | No | Yes | Unknown | Public domain only | No modern ISBN library | **Reject** for catalog add |
+| **British National Bibliography** | Listed; **HTTP only** | No | **No** | Unknown | UK biblio | HTTPS violation for Muni | **Reject** |
+| **ISBNdb** | *Not listed* in public-apis Books table (2026-10) | apiKey | Yes | — | ISBN-centric; commercial ToS | Paid tiers; good ISBN hit rate | **P3 optional** if OL+Google still miss scans — evaluate ToS/cost separately |
 
-**P2 (enrichment)**: Chain `BookCatalogLookup`: try OL → on miss try Google Books → map to same `BookCatalogHit` shape; store provider id optionally for refresh. **Not** dual search UI — single search box.
+Other Books rows (religious corpora, Harry Potter trivia APIs, KDP niche tools) are **out of scope** for Muni’s general reading library.
 
-**FR additions**: See spec § Catalog search improvements (2026-10-28).
+### Recommended strategy (unchanged intent, clearer sourcing)
+
+| Priority | Provider | Role |
+|----------|----------|------|
+| **Primary** | Open Library | ISBN + title; 24h server cache |
+| **Fallback P2** | Google Books (public-apis Books) | Chained server lookup after OL miss; map to `BookCatalogHit` |
+| **Fallback P3 (optional)** | ISBNdb (outside public-apis index) | ISBN-only backfill for scan flow if product accepts paid key |
+| **Always** | Manual add | Offline; title-only OK (B8) |
+
+**P1 (search quality, no new provider)**: Query normalization (accents, articles); ISBN-13 retry; merge heuristics; empty → manual (B10).
+
+**P2 (implementation)**: Single search UI; `BookCatalogLookup` chain OL → Google Books; optional `googleVolumeId` on item for refresh. Keys in env only (`GOOGLE_BOOKS_API_KEY`).
+
+**FR**: [spec.md](spec.md) § Catalog search improvements (2026-10-28).

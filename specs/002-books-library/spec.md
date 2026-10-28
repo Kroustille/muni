@@ -180,7 +180,7 @@ User opens stats (per month, tags/genres, authors, pages) and an optional year-i
 |--------|----------|
 | **Primary provider** | **Open Library** (unchanged) — server proxy, cache, no client keys |
 | **Fallback provider (P2)** | **Google Books API** when OL returns no acceptable hit on title or ISBN lookup — server-side key only; same preview/merge UX |
-| **public-apis repo** | **Not** a dependency — reference list only |
+| **public-apis repo** | **Research index only** — discover provider URLs in Books/Video categories; **not** a runtime dependency |
 | **Offline** | Manual add unchanged; no offline catalog queue (X3) |
 | **Phasing** | **P1** search normalization + empty-state manual path; **P2** fallback adapter chain |
 
@@ -256,6 +256,6 @@ User opens stats (per month, tags/genres, authors, pages) and an optional year-i
 ## Out of Scope
 
 - Cover images; offline lookup queue (X3); desktop ISBN barcode / manual ISBN lookup (B9).
-- Importing the [public-apis](https://github.com/public-apis/public-apis) repository as a runtime dependency.
+- Importing the [public-apis](https://github.com/public-apis/public-apis) repository as code or a runtime dependency (using it as a **research index** in `research.md` is expected).
 - Custom shelves; physical shelf location; format flags; owned/borrowed library flags; public reviews; content-warning catalog; reading session timer; pages/hour or ETA; fractional ratings (see Session 2026-10-16).
 - Goodreads/CSV import (later); cross-list reading challenges (later, not book-only).

@@ -157,7 +157,7 @@ User opens stats (per month, tags, directors, film vs série) and an optional pr
 |--------|----------|
 | **Primary** | **Wikidata** (unchanged) |
 | **Fallback (P2)** | **TMDB** title search when Wikidata insufficient; optional **OMDb** enrichment via `imdbId` |
-| **public-apis** | Not a runtime dependency |
+| **public-apis** | **Research index only** (Books/Video categories in `research.md`) — not a runtime dependency |
 | **P1 / P2** | P1 = Wikidata tuning + UX; P2 = composite adapter + optional ids on item |
 
 ## Requirements *(mandatory)*
