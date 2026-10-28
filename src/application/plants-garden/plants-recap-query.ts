@@ -25,14 +25,15 @@ export function createPlantsRecapRepository(deps: PlantsRecapQueryDeps): PlantsR
         .map((event) => {
           const plant = plantById.get(event.plantId);
           if (plant === undefined) return null;
-          const deleted = plant.deletedAt !== null;
-          if (deleted) return null;
+          const parentDeleted = plant.deletedAt !== null;
+          if (parentDeleted) return null;
           return {
+            id: event.id,
+            plantId: plant.id,
             occurredAt: event.occurredAt,
             title: plant.title,
             subtitleKey: careEventRecapSubtitleKey(event.eventType),
-            plantId: plant.id,
-            deleted: false,
+            parentDeleted: false,
           };
         })
         .filter((row): row is NonNullable<typeof row> => row !== null);
@@ -41,20 +42,22 @@ export function createPlantsRecapRepository(deps: PlantsRecapQueryDeps): PlantsR
     async listMilestonesInRange(from, to) {
       const [milestones, cultures] = await Promise.all([
         deps.milestones.listInRange(from, to),
-        deps.cultures.list(),
+        deps.cultures.list(true),
       ]);
       const cultureById = new Map(cultures.map((c) => [c.id, c]));
       return milestones
         .map((milestone) => {
           const culture = cultureById.get(milestone.cultureId);
           if (culture === undefined) return null;
-          if (culture.deletedAt !== null) return null;
+          const parentDeleted = culture.deletedAt !== null;
+          if (parentDeleted) return null;
           return {
+            id: milestone.id,
+            cultureId: culture.id,
             occurredAt: milestone.occurredAt,
             title: culture.title,
             subtitleKey: milestoneRecapSubtitleKey(milestone.milestoneType),
-            cultureId: culture.id,
-            deleted: false,
+            parentDeleted: false,
           };
         })
         .filter((row): row is NonNullable<typeof row> => row !== null);

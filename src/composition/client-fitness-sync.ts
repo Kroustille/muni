@@ -8,6 +8,10 @@ import {
 import { createIndexedDbFitnessProgramRepository } from "../adapters/indexeddb/fitness-program-repository";
 import { createIndexedDbFitnessWorkoutRepository } from "../adapters/indexeddb/fitness-workout-repository";
 import { createIndexedDbFitnessSkipRepository } from "../adapters/indexeddb/fitness-skip-repository";
+import {
+  defaultFitnessUserSettings,
+  type FitnessUserSettings,
+} from "../domain/fitness/workout-log";
 import { createFitnessProgramUseCases, type FitnessProgramUseCases } from "../application/fitness/program";
 import { createFitnessWorkoutUseCases, type FitnessWorkoutUseCases } from "../application/fitness/workout";
 import { createFitnessSyncApply } from "../application/fitness/sync-apply";
@@ -23,6 +27,8 @@ export type ClientFitnessBundle = {
   fitnessEngine: PausableSyncEngine;
   programUseCases: FitnessProgramUseCases;
   workoutUseCases: FitnessWorkoutUseCases;
+  getUserSettings(): Promise<FitnessUserSettings>;
+  saveUserSettings(settings: FitnessUserSettings): Promise<FitnessUserSettings>;
   ensureCatalogSeeded(): Promise<void>;
 };
 
@@ -105,6 +111,12 @@ export function wireClientFitnessSync(deps: {
     fitnessEngine,
     programUseCases: wrapWrites(baseProgram),
     workoutUseCases: wrapWrites(baseWorkout),
+    getUserSettings: async () => (await settings.get()) ?? defaultFitnessUserSettings(),
+    saveUserSettings: async (row) => {
+      const saved = await settings.upsert(row);
+      deps.onLocalWrite();
+      return saved;
+    },
     ensureCatalogSeeded: () =>
       seedExerciseCatalogIfNeeded({
         catalog,

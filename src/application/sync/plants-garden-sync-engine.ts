@@ -1,7 +1,7 @@
 import type { ItemRepository, MetaKey } from "../ports/item-repository";
 import { RemoteStoreError } from "../ports/remote-store";
 import type { PlantsGardenSyncApply } from "../plants-garden/sync-apply";
-import type { PlantsGardenRemoteStore } from "@/adapters/http/plants-garden-remote-store";
+import type { PlantsGardenRemoteStore } from "../ports/plants-garden-remote-store";
 
 const PUSH_ATTEMPTS = 2;
 const BACKOFF_MS = 1_000;

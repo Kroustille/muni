@@ -16,6 +16,7 @@ import type { CookbookUseCases } from "../application/cookbooks/cookbook-use-cas
 import { runSyncEngines, type PausableSyncEngine } from "./sync-run";
 import type { FitnessProgramUseCases } from "../application/fitness/program";
 import type { FitnessWorkoutUseCases } from "../application/fitness/workout";
+import type { FitnessUserSettings } from "../domain/fitness/workout-log";
 import type { PlantUseCases } from "../application/plants-garden/plant-use-cases";
 import type { RecordCareEventUseCases } from "../application/plants-garden/record-care-event";
 import type { CultureUseCases } from "../application/plants-garden/culture-use-cases";
@@ -46,6 +47,8 @@ export type ClientContext = {
   fitnessProgramUseCases: FitnessProgramUseCases;
   fitnessWorkoutUseCases: FitnessWorkoutUseCases;
   cookbookUseCases: CookbookUseCases;
+  getFitnessUserSettings(): Promise<FitnessUserSettings>;
+  saveFitnessUserSettings(settings: FitnessUserSettings): Promise<FitnessUserSettings>;
   plantUseCases: PlantUseCases;
   recordCareEventUseCases: RecordCareEventUseCases;
   cultureUseCases: CultureUseCases;
@@ -216,7 +219,7 @@ function buildClientContext(): Promise<ClientContext> {
 
     const itemUseCases = wrapLocalWrites(itemUseCasesWithCookbooks, notifyLocalWrite);
     const { bookQuoteUseCases, movieQuoteUseCases } = quoteSync;
-    const { programUseCases: fitnessProgramUseCases, workoutUseCases: fitnessWorkoutUseCases } =
+    const { programUseCases: fitnessProgramUseCases, workoutUseCases: fitnessWorkoutUseCases, getUserSettings, saveUserSettings } =
       fitnessSync;
     const {
       plantUseCases,
@@ -264,6 +267,8 @@ function buildClientContext(): Promise<ClientContext> {
       fitnessProgramUseCases,
       fitnessWorkoutUseCases,
       cookbookUseCases: cookbookSync.cookbookUseCases,
+      getFitnessUserSettings: getUserSettings,
+      saveFitnessUserSettings: saveUserSettings,
       plantUseCases,
       recordCareEventUseCases,
       cultureUseCases,
@@ -318,6 +323,16 @@ export function getFitnessWorkoutUseCases(): Promise<FitnessWorkoutUseCases> {
 
 export function getCookbookUseCases(): Promise<CookbookUseCases> {
   return getClientContext().then((ctx) => ctx.cookbookUseCases);
+}
+
+export function getFitnessUserSettings(): Promise<FitnessUserSettings> {
+  return getClientContext().then((ctx) => ctx.getFitnessUserSettings());
+}
+
+export function saveFitnessUserSettings(
+  settings: FitnessUserSettings,
+): Promise<FitnessUserSettings> {
+  return getClientContext().then((ctx) => ctx.saveFitnessUserSettings(settings));
 }
 
 export function getPlantUseCases(): Promise<PlantUseCases> {

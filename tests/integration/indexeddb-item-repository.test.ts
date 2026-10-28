@@ -34,7 +34,17 @@ describe("IndexedDB schema", () => {
       "movieQuoteOutbox",
       "movieQuotes",
       "outbox",
+      "plantCareEventOutbox",
+      "plantCareEvents",
+      "plantCareProfileOutbox",
+      "plantCareProfiles",
+      "plants",
+      "plantsOutbox",
       "quoteOutbox",
+      "vegetableCultureOutbox",
+      "vegetableCultures",
+      "vegetableMilestoneOutbox",
+      "vegetableMilestones",
     ]);
     db.close();
   });

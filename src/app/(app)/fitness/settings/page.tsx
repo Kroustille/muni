@@ -1,9 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { openMuniDb } from "@/adapters/indexeddb/db";
-import { createIndexedDbFitnessSettingsRepository } from "@/adapters/indexeddb/fitness-settings-repository";
-import { MUNI_DB_NAME } from "@/composition/client";
+import { getFitnessUserSettings, saveFitnessUserSettings } from "@/composition/client";
 import { defaultFitnessUserSettings, type FitnessUserSettings } from "@/domain/fitness/workout-log";
 import { t } from "@/i18n";
 
@@ -11,17 +9,11 @@ export default function FitnessSettingsPage() {
   const [settings, setSettings] = useState<FitnessUserSettings>(defaultFitnessUserSettings());
 
   useEffect(() => {
-    void openMuniDb(MUNI_DB_NAME).then(async (db) => {
-      const repo = createIndexedDbFitnessSettingsRepository(db);
-      const row = await repo.get();
-      if (row) setSettings(row);
-    });
+    void getFitnessUserSettings().then(setSettings);
   }, []);
 
   const save = async () => {
-    const db = await openMuniDb(MUNI_DB_NAME);
-    const repo = createIndexedDbFitnessSettingsRepository(db);
-    await repo.upsert(settings);
+    await saveFitnessUserSettings(settings);
   };
 
   return (

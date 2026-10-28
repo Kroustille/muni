@@ -19,7 +19,7 @@ function toDomain(row: Selectable<PlantCareProfileRow>): PlantCareProfile {
   return wireToPlantCareProfile({
     id: row.id,
     title: row.title,
-    seasonal_hints: row.seasonal_hints as PlantCareProfileWire["seasonal_hints"],
+    seasonal_hints: Array.isArray(row.seasonal_hints) ? (row.seasonal_hints as PlantCareProfileWire["seasonal_hints"]) : [],
     deleted_at: row.deleted_at === null ? null : toIso(row.deleted_at),
     fields_updated_at: row.fields_updated_at as PlantCareProfileWire["fields_updated_at"],
     server_updated_at: toIso(row.server_updated_at),

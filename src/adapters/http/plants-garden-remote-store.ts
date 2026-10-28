@@ -1,29 +1,7 @@
-import type { PlantWire } from "@/domain/plant";
-import type { PlantCareEventWire } from "@/domain/plant-care-event";
-import type { PlantCareProfileWire } from "@/domain/plant-care-profile";
-import type { VegetableCultureWire } from "@/domain/vegetable-culture";
-import type { VegetableMilestoneWire } from "@/domain/vegetable-milestone";
+import type { PlantsGardenPullResult, PlantsGardenRemoteStore } from "@/application/ports/plants-garden-remote-store";
 import { RemoteStoreError, type RowError } from "@/application/ports/remote-store";
 
-export type PlantsGardenPullResult = {
-  plants: PlantWire[];
-  careEvents: PlantCareEventWire[];
-  careProfiles: PlantCareProfileWire[];
-  cultures: VegetableCultureWire[];
-  milestones: VegetableMilestoneWire[];
-  cursor: string;
-};
-
-export type PlantsGardenRemoteStore = {
-  push(body: {
-    plants: PlantWire[];
-    careEvents: PlantCareEventWire[];
-    careProfiles: PlantCareProfileWire[];
-    cultures: VegetableCultureWire[];
-    milestones: VegetableMilestoneWire[];
-  }): Promise<PlantsGardenPullResult>;
-  pull(since: string | null, limit: number): Promise<PlantsGardenPullResult>;
-};
+export type { PlantsGardenPullResult, PlantsGardenRemoteStore };
 
 export function createHttpPlantsGardenRemoteStore(deps: {
   fetch: typeof globalThis.fetch;

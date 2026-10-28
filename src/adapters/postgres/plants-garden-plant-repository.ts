@@ -10,6 +10,10 @@ function toIso(value: Date | string): string {
   return value instanceof Date ? value.toISOString() : new Date(value).toISOString();
 }
 
+function normalizeJsonArray<T>(value: unknown): T[] {
+  return Array.isArray(value) ? (value as T[]) : [];
+}
+
 function toDomain(row: Selectable<PlantRow>): Plant {
   return wireToPlant({
     id: row.id,
@@ -17,7 +21,7 @@ function toDomain(row: Selectable<PlantRow>): Plant {
     location_tag: row.location_tag as PlantWire["location_tag"],
     notes: row.notes,
     care_profile_id: row.care_profile_id,
-    seasonal_hints: row.seasonal_hints as PlantWire["seasonal_hints"],
+    seasonal_hints: normalizeJsonArray(row.seasonal_hints),
     deleted_at: row.deleted_at === null ? null : toIso(row.deleted_at),
     fields_updated_at: row.fields_updated_at as PlantWire["fields_updated_at"],
     server_updated_at: toIso(row.server_updated_at),

@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getFitnessProgramUseCases, getFitnessWorkoutUseCases } from "@/composition/client";
-import { createIndexedDbFitnessSettingsRepository } from "@/adapters/indexeddb/fitness-settings-repository";
-import { openMuniDb } from "@/adapters/indexeddb/db";
-import { MUNI_DB_NAME } from "@/composition/client";
+import {
+  getFitnessProgramUseCases,
+  getFitnessUserSettings,
+  getFitnessWorkoutUseCases,
+} from "@/composition/client";
 import { computeAdherenceStreak } from "@/application/fitness/adherence-streak";
 import { buildWeekAdherenceView } from "@/domain/fitness/adherence";
-import { defaultFitnessUserSettings } from "@/domain/fitness/workout-log";
 import { localCalendarDate, plannedSessionsForToday } from "@/application/fitness/today";
 import { t } from "@/i18n";
 
@@ -22,9 +22,7 @@ export function HomeFitnessCard() {
       const program = await programUseCases.getActiveProgram();
       if (program === undefined) return;
       const logs = await workoutUseCases.listWorkouts();
-      const db = await openMuniDb(MUNI_DB_NAME);
-      const settingsRepo = createIndexedDbFitnessSettingsRepository(db);
-      const settings = (await settingsRepo.get()) ?? defaultFitnessUserSettings();
+      const settings = await getFitnessUserSettings();
       const week = buildWeekAdherenceView(program, logs, [], localCalendarDate());
       const streak = computeAdherenceStreak(logs, settings);
       const todaySessions = plannedSessionsForToday(program, localCalendarDate());
