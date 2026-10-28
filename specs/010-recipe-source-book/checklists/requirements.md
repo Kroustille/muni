@@ -31,5 +31,6 @@
 
 ## Notes
 
-- Validation pass 1 (2026-10-28): All items pass. MVP model **Option A** locked in spec and [research.md](../research.md). P2 search called out in FR-009 / User Story 4.
-- Ready for `/speckit-clarify` (optional product confirmations) or `/speckit-plan`.
+- Validation pass 1 (2026-10-28): All items pass. MVP was **legacy Option A** (inline fields).
+- Validation pass 2 (2026-10-28): All items pass after **cookbook catalog + single combobox** decision (manual search/create only; `cookbookId` + page on recipe; distinct from `002`). P2 search in FR-011 / User Story 6. Open questions reduced (orphan page-only resolved; orphan cookbooks acceptable in MVP).
+- Ready for `/speckit-clarify` (optional: cookbook edit surface) or `/speckit-plan`.
