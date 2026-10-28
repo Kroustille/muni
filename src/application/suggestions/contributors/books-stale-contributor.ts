@@ -38,6 +38,7 @@ export const booksStaleContributor: DomainStaleContributor = {
           ? fieldStampToLocalDateKey(statusAt, ctx.timeZone)
           : toLocalDateKey(item.createdAt, ctx.timeZone);
         if (!anchor) continue;
+        const candidate = makeCandidate(
           {
             domainId: "book",
             itemId: item.id,
