@@ -344,7 +344,6 @@
   "recipe.source.author": "Auteur",
   "recipe.source.isbn": "ISBN",
   "recipe.source.missingCookbook": "Ouvrage introuvable (synchronisation en cours…)",
-<<<<<<< HEAD
   "suggestions.title": "Idées pour plus tard",
   "suggestions.subtitle": "Sans obligation — tu choisis.",
   "suggestions.intro": "Deux idées pour te remettre en route — sans obligation.",
@@ -379,8 +378,7 @@
   "suggestions.kind.prepare_dj_set": "Préparer le set",
   "suggestions.kind.practice_session": "Séance de pratique",
   "suggestions.kind.water_plant": "Arroser",
-  "suggestions.kind.potager_milestone": "Noter une étape"
-=======
+  "suggestions.kind.potager_milestone": "Noter une étape",
   "recap.nav": "Récap",
   "recap.title": "Récap",
   "recap.intro": "Un aperçu de ce que vous avez accompli — sans pression.",
@@ -413,5 +411,4 @@
   "recipe.cooked.action": "Cuisiné",
   "recipe.cooked.pickDate": "Choisir une date",
   "recipe.cooked.date": "Date"
->>>>>>> dde1c1c (feat(recap): periodic récap MVP with heatmap and recipe cookedDates)
 }
