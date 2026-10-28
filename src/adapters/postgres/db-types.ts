@@ -59,6 +59,75 @@ export interface CatalogCache {
   provider: string;
 }
 
+export interface DjSet {
+  bpm_range: string | null;
+  deleted_at: Timestamp | null;
+  duration_minutes: number | null;
+  external_url: string | null;
+  fields_updated_at: Json;
+  genre_style: string | null;
+  id: string;
+  mood: string | null;
+  notes: string | null;
+  performed_at: Timestamp | null;
+  server_updated_at: Timestamp;
+  setlist: Json;
+  status: string;
+  title: string;
+  user_id: string;
+  venue: string | null;
+}
+
+export interface FitnessProgram {
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  is_active: boolean;
+  name: string;
+  planned_sessions: Json;
+  server_updated_at: Timestamp;
+  user_id: string;
+}
+
+export interface FitnessSkipRecord {
+  calendar_date: Timestamp;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  note: string | null;
+  planned_session_id: string;
+  server_updated_at: Timestamp;
+  user_id: string;
+}
+
+export interface FitnessUserSettings {
+  adherence_min_workouts_per_week: number;
+  adherence_tracking_enabled: boolean;
+  charge_unit: string;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  server_updated_at: Timestamp;
+  user_id: string;
+}
+
+export interface FitnessWorkoutLog {
+  calendar_date: Timestamp;
+  catalog_version: number;
+  completed_at: Timestamp | null;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  logged_exercises: Json;
+  planned_session_id: string | null;
+  recovery: Json | null;
+  server_updated_at: Timestamp;
+  started_at: Timestamp;
+  status: string;
+  title: string;
+  user_id: string;
+}
+
 export interface Items {
   album: string | null;
   artist: string | null;
@@ -116,6 +185,21 @@ export interface Items {
   work_id: string | null;
 }
 
+export interface LearningPiece {
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  instrument_id: string | null;
+  last_practiced_at: Timestamp | null;
+  linked_track_id: string | null;
+  notes: string | null;
+  server_updated_at: Timestamp;
+  started_at: Timestamp | null;
+  status: string;
+  title: string;
+  user_id: string;
+}
+
 export interface MagicLinkTokens {
   consumed_at: Timestamp | null;
   email: string;
@@ -133,6 +217,74 @@ export interface MovieQuotes {
   movie_item_id: string;
   server_updated_at: Timestamp;
   text: string;
+  user_id: string;
+}
+
+export interface MusicComposition {
+  deleted_at: Timestamp | null;
+  external_url: string | null;
+  fields_updated_at: Json;
+  finished_at: Timestamp | null;
+  genre_style: string | null;
+  id: string;
+  last_worked_at: Timestamp | null;
+  linked_track_ids: string[] | null;
+  mood: string | null;
+  notes: string | null;
+  server_updated_at: Timestamp;
+  session_notes: Json;
+  started_at: Timestamp | null;
+  status: string;
+  tempo_bpm: number | null;
+  title: string;
+  user_id: string;
+}
+
+export interface PracticeExercise {
+  category: string | null;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  instrument_id: string | null;
+  notes: string | null;
+  server_updated_at: Timestamp;
+  title: string;
+  user_id: string;
+}
+
+export interface PracticeInstrument {
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  name: string;
+  notes: string | null;
+  server_updated_at: Timestamp;
+  user_id: string;
+}
+
+export interface PracticeLog {
+  deleted_at: Timestamp | null;
+  duration_minutes: number | null;
+  exercise_ids: string[];
+  fields_updated_at: Json;
+  id: string;
+  instrument_id: string | null;
+  learning_piece_id: string | null;
+  notes: string | null;
+  practice_kind: string;
+  practiced_at: Timestamp;
+  server_updated_at: Timestamp;
+  user_id: string;
+}
+
+export interface PracticePlan {
+  assignments: Json;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  is_active: boolean;
+  name: string;
+  server_updated_at: Timestamp;
   user_id: string;
 }
 
@@ -168,67 +320,24 @@ export interface WatchGoals {
   year: number;
 }
 
-export interface FitnessProgram {
-  deleted_at: Timestamp | null;
-  fields_updated_at: Json;
-  id: string;
-  is_active: boolean;
-  name: string;
-  planned_sessions: Json;
-  server_updated_at: Timestamp;
-  user_id: string;
-}
-
-export interface FitnessSkipRecord {
-  calendar_date: Timestamp;
-  deleted_at: Timestamp | null;
-  fields_updated_at: Json;
-  id: string;
-  note: string | null;
-  planned_session_id: string;
-  server_updated_at: Timestamp;
-  user_id: string;
-}
-
-export interface FitnessUserSettings {
-  adherence_min_workouts_per_week: number;
-  adherence_tracking_enabled: boolean;
-  charge_unit: string;
-  deleted_at: Timestamp | null;
-  fields_updated_at: Json;
-  id: string;
-  server_updated_at: Timestamp;
-  user_id: string;
-}
-
-export interface FitnessWorkoutLog {
-  calendar_date: Timestamp;
-  catalog_version: number;
-  completed_at: Timestamp | null;
-  deleted_at: Timestamp | null;
-  fields_updated_at: Json;
-  id: string;
-  logged_exercises: Json;
-  planned_session_id: string | null;
-  recovery: Json | null;
-  server_updated_at: Timestamp;
-  started_at: Timestamp;
-  status: string;
-  title: string;
-  user_id: string;
-}
-
 export interface DB {
   book_quotes: BookQuotes;
   catalog_cache: CatalogCache;
   cookbooks: Cookbooks;
+  dj_set: DjSet;
   fitness_program: FitnessProgram;
   fitness_skip_record: FitnessSkipRecord;
   fitness_user_settings: FitnessUserSettings;
   fitness_workout_log: FitnessWorkoutLog;
   items: Items;
+  learning_piece: LearningPiece;
   magic_link_tokens: MagicLinkTokens;
   movie_quotes: MovieQuotes;
+  music_composition: MusicComposition;
+  practice_exercise: PracticeExercise;
+  practice_instrument: PracticeInstrument;
+  practice_log: PracticeLog;
+  practice_plan: PracticePlan;
   reading_goals: ReadingGoals;
   sessions: Sessions;
   users: Users;

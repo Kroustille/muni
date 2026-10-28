@@ -11,10 +11,19 @@ import { wireClientQuoteSync } from "./client-quote-sync";
 import { wireClientCookbookSync } from "./client-cookbook-sync";
 import { wireClientFitnessSync } from "./client-fitness-sync";
 import { wireClientSuggestions } from "./client-suggestions";
+import { wireClientMusicPracticeSync } from "./client-music-practice-sync";
 import type { CookbookUseCases } from "../application/cookbooks/cookbook-use-cases";
 import { runSyncEngines, type PausableSyncEngine } from "./sync-run";
 import type { FitnessProgramUseCases } from "../application/fitness/program";
 import type { FitnessWorkoutUseCases } from "../application/fitness/workout";
+import type { FitnessUserSettings } from "../domain/fitness/workout-log";
+import type { MusicCompositionUseCases } from "../application/music-practice/composition";
+import type { DjSetUseCases } from "../application/music-practice/dj-set";
+import type { PracticeInstrumentUseCases } from "../application/music-practice/instrument";
+import type { PracticeExerciseUseCases } from "../application/music-practice/exercise";
+import type { PracticePlanUseCases } from "../application/music-practice/plan";
+import type { PracticeLogUseCases } from "../application/music-practice/practice-log";
+import type { LearningPieceUseCases } from "../application/music-practice/learning-piece";
 import type { BookQuoteUseCases } from "../application/books/book-quotes";
 import type { MovieQuoteUseCases } from "../application/movies/movie-quotes";
 import { createReadingSettings, type ReadingSettingsUseCases } from "../application/books/reading-settings";
@@ -41,6 +50,15 @@ export type ClientContext = {
   fitnessProgramUseCases: FitnessProgramUseCases;
   fitnessWorkoutUseCases: FitnessWorkoutUseCases;
   cookbookUseCases: CookbookUseCases;
+  getFitnessUserSettings(): Promise<FitnessUserSettings | undefined>;
+  upsertFitnessUserSettings(settings: FitnessUserSettings): Promise<FitnessUserSettings>;
+  musicCompositionUseCases: MusicCompositionUseCases;
+  djSetUseCases: DjSetUseCases;
+  practiceInstrumentUseCases: PracticeInstrumentUseCases;
+  practiceExerciseUseCases: PracticeExerciseUseCases;
+  practicePlanUseCases: PracticePlanUseCases;
+  practiceLogUseCases: PracticeLogUseCases;
+  learningPieceUseCases: LearningPieceUseCases;
   ensureFitnessCatalogSeeded(): Promise<void>;
   searchUseCase: SearchUseCase;
   sessionUseCases: SessionUseCases;
@@ -58,6 +76,7 @@ let bookQuotesSyncEngine: PausableSyncEngine | undefined;
 let movieQuotesSyncEngine: PausableSyncEngine | undefined;
 let fitnessSyncEngine: PausableSyncEngine | undefined;
 let cookbookSyncEngine: PausableSyncEngine | undefined;
+let musicPracticeSyncEngine: PausableSyncEngine | undefined;
 let syncStarted = false;
 
 function publishSyncStatus(next: SyncStatusState): void {
@@ -151,23 +170,40 @@ function buildClientContext(): Promise<ClientContext> {
     });
     fitnessSyncEngine = fitnessSync.fitnessEngine;
 
+    const musicPracticeSync = wireClientMusicPracticeSync({
+      db,
+      items: repository,
+      pullLimit: SYNC_PULL_LIMIT,
+      onLocalWrite: notifyLocalWrite,
+    });
+    musicPracticeSyncEngine = musicPracticeSync.musicPracticeEngine;
+
     async function runSync(): Promise<void> {
       const cookbookEngine = cookbookSyncEngine;
       const engine = syncEngine;
       const quoteEngine = bookQuotesSyncEngine;
       const movieQuoteEngine = movieQuotesSyncEngine;
       const fitnessEngine = fitnessSyncEngine;
+      const musicPracticeEngine = musicPracticeSyncEngine;
       if (
         cookbookEngine === undefined ||
         engine === undefined ||
         quoteEngine === undefined ||
         movieQuoteEngine === undefined ||
-        fitnessEngine === undefined
+        fitnessEngine === undefined ||
+        musicPracticeEngine === undefined
       ) {
         return;
       }
       await runSyncEngines({
-        engines: [cookbookEngine, engine, quoteEngine, movieQuoteEngine, fitnessEngine],
+        engines: [
+          cookbookEngine,
+          engine,
+          quoteEngine,
+          movieQuoteEngine,
+          fitnessEngine,
+          musicPracticeEngine,
+        ],
         connectivity,
         onStatus: publishSyncStatus,
         onPauseScheduler: () => syncScheduler?.pause(),
@@ -191,6 +227,15 @@ function buildClientContext(): Promise<ClientContext> {
     const { bookQuoteUseCases, movieQuoteUseCases } = quoteSync;
     const { programUseCases: fitnessProgramUseCases, workoutUseCases: fitnessWorkoutUseCases } =
       fitnessSync;
+    const {
+      compositionUseCases: musicCompositionUseCases,
+      djSetUseCases,
+      instrumentUseCases: practiceInstrumentUseCases,
+      exerciseUseCases: practiceExerciseUseCases,
+      planUseCases: practicePlanUseCases,
+      logUseCases: practiceLogUseCases,
+      learningPieceUseCases,
+    } = musicPracticeSync;
 
     const searchUseCase = createSearchUseCase({
       repository,
@@ -231,6 +276,15 @@ function buildClientContext(): Promise<ClientContext> {
       fitnessProgramUseCases,
       fitnessWorkoutUseCases,
       cookbookUseCases: cookbookSync.cookbookUseCases,
+      getFitnessUserSettings: () => fitnessSync.getUserSettings(),
+      upsertFitnessUserSettings: (settings) => fitnessSync.upsertUserSettings(settings),
+      musicCompositionUseCases,
+      djSetUseCases,
+      practiceInstrumentUseCases,
+      practiceExerciseUseCases,
+      practicePlanUseCases,
+      practiceLogUseCases,
+      learningPieceUseCases,
       ensureFitnessCatalogSeeded: () => fitnessSync.ensureCatalogSeeded(),
       searchUseCase,
       sessionUseCases: wrappedSession,
@@ -283,6 +337,44 @@ export function getCookbookUseCases(): Promise<CookbookUseCases> {
   return getClientContext().then((ctx) => ctx.cookbookUseCases);
 }
 
+export function getFitnessUserSettings(): Promise<FitnessUserSettings | undefined> {
+  return getClientContext().then((ctx) => ctx.getFitnessUserSettings());
+}
+
+export function upsertFitnessUserSettings(
+  settings: FitnessUserSettings,
+): Promise<FitnessUserSettings> {
+  return getClientContext().then((ctx) => ctx.upsertFitnessUserSettings(settings));
+}
+
+export function getMusicCompositionUseCases(): Promise<MusicCompositionUseCases> {
+  return getClientContext().then((ctx) => ctx.musicCompositionUseCases);
+}
+
+export function getDjSetUseCases(): Promise<DjSetUseCases> {
+  return getClientContext().then((ctx) => ctx.djSetUseCases);
+}
+
+export function getPracticeInstrumentUseCases(): Promise<PracticeInstrumentUseCases> {
+  return getClientContext().then((ctx) => ctx.practiceInstrumentUseCases);
+}
+
+export function getPracticeExerciseUseCases(): Promise<PracticeExerciseUseCases> {
+  return getClientContext().then((ctx) => ctx.practiceExerciseUseCases);
+}
+
+export function getPracticePlanUseCases(): Promise<PracticePlanUseCases> {
+  return getClientContext().then((ctx) => ctx.practicePlanUseCases);
+}
+
+export function getPracticeLogUseCases(): Promise<PracticeLogUseCases> {
+  return getClientContext().then((ctx) => ctx.practiceLogUseCases);
+}
+
+export function getLearningPieceUseCases(): Promise<LearningPieceUseCases> {
+  return getClientContext().then((ctx) => ctx.learningPieceUseCases);
+}
+
 export function ensureFitnessCatalogSeeded(): Promise<void> {
   return getClientContext().then((ctx) => ctx.ensureFitnessCatalogSeeded());
 }
@@ -316,6 +408,7 @@ export function startClientSync(): Promise<void> {
     bookQuotesSyncEngine?.resume();
     movieQuotesSyncEngine?.resume();
     fitnessSyncEngine?.resume();
+    musicPracticeSyncEngine?.resume();
     syncScheduler?.resume();
     if (!syncStarted) {
       syncStarted = true;

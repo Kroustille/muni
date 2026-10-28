@@ -1,7 +1,7 @@
 import type { ItemRepository, MetaKey } from "../ports/item-repository";
 import { RemoteStoreError } from "../ports/remote-store";
 import type { FitnessSyncApply } from "../fitness/sync-apply";
-import type { FitnessRemoteStore } from "@/adapters/http/fitness-remote-store";
+import type { FitnessRemoteStore } from "../ports/fitness-remote-store";
 
 const PUSH_ATTEMPTS = 2;
 const BACKOFF_MS = 1_000;

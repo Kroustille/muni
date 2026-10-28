@@ -8,6 +8,7 @@ import {
   type FitnessProgramWire,
 } from "@/domain/fitness/program";
 import type { DB, FitnessProgram as FitnessProgramRow } from "./db-types";
+import { toJsonArray } from "./json-row-utils";
 
 type DbOrTrx = Kysely<DB> | Transaction<DB>;
 
@@ -20,7 +21,7 @@ function toDomain(row: Selectable<FitnessProgramRow>): FitnessProgram {
     id: row.id,
     name: row.name,
     is_active: row.is_active,
-    planned_sessions: row.planned_sessions as FitnessProgramWire["planned_sessions"],
+    planned_sessions: toJsonArray(row.planned_sessions) as FitnessProgramWire["planned_sessions"],
     deleted_at: row.deleted_at === null ? null : toIso(row.deleted_at),
     fields_updated_at: row.fields_updated_at as FitnessProgramWire["fields_updated_at"],
     server_updated_at: toIso(row.server_updated_at),

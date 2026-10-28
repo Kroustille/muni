@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { openMuniDb } from "@/adapters/indexeddb/db";
-import { createIndexedDbFitnessSettingsRepository } from "@/adapters/indexeddb/fitness-settings-repository";
-import { MUNI_DB_NAME } from "@/composition/client";
+import {
+  getFitnessUserSettings,
+  upsertFitnessUserSettings,
+} from "@/composition/client";
 import { defaultFitnessUserSettings, type FitnessUserSettings } from "@/domain/fitness/workout-log";
 import { t } from "@/i18n";
 
@@ -11,17 +12,13 @@ export default function FitnessSettingsPage() {
   const [settings, setSettings] = useState<FitnessUserSettings>(defaultFitnessUserSettings());
 
   useEffect(() => {
-    void openMuniDb(MUNI_DB_NAME).then(async (db) => {
-      const repo = createIndexedDbFitnessSettingsRepository(db);
-      const row = await repo.get();
+    void getFitnessUserSettings().then((row) => {
       if (row) setSettings(row);
     });
   }, []);
 
   const save = async () => {
-    const db = await openMuniDb(MUNI_DB_NAME);
-    const repo = createIndexedDbFitnessSettingsRepository(db);
-    await repo.upsert(settings);
+    await upsertFitnessUserSettings(settings);
   };
 
   return (
@@ -49,7 +46,12 @@ export default function FitnessSettingsPage() {
         />
         {t("fitness.settings.adherence")}
       </label>
-      <button type="button" className="rounded-xl bg-accent px-4 py-3 text-sm text-accent-foreground" onClick={save}>
+      <button
+        type="button"
+        className="rounded-lg bg-primary px-4 py-2 text-primary-foreground"
+        onClick={() => void save()}
+        data-testid="fitness-settings-save"
+      >
         {t("fitness.action.save")}
       </button>
     </div>
