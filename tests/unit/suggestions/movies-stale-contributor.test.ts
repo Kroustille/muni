@@ -58,6 +58,7 @@ function movie(overrides: Partial<Item> = {}): Item {
     soundcloudUrl: null,
     cookbookId: null,
     sourcePage: null,
+    cookedDates: null,
     ...overrides,
   };
 }

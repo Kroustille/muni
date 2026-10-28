@@ -78,6 +78,7 @@ function baseItem(type: Item["type"], id: string, overrides: Partial<Item> = {})
     soundcloudUrl: null,
     cookbookId: null,
     sourcePage: null,
+    cookedDates: null,
     ...overrides,
   };
 }

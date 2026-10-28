@@ -70,6 +70,7 @@ function staleBook(id: string, title: string, days: number): Item {
     soundcloudUrl: null,
     cookbookId: null,
     sourcePage: null,
+    cookedDates: null,
   };
 }
 
