@@ -54,15 +54,19 @@ Books and movies already define **activity days**, streaks, and **year goals** o
 
 **Product ask (Valentin 2026-10-28)**: GitHub-style grid at top of **`/recap`** on **desktop only**; hidden on mobile/narrow viewports (dense grid poor tap/read UX; list + bottom nav suffice).
 
+**Correction (Valentin 2026-10-28)**: Day cells MUST support **multiple domain accents** when several recap domains had eligible activity on the **same calendar day** — not a single global accent for “any activity.”
+
 | Concept | Rule |
 |---------|------|
 | **Active day** | Local calendar day with **≥ 1** recap-eligible event (union of FR-006 / table above) |
-| **Color MVP** | **Binary**: inactive = neutral cell; active = single **accent** fill (no multi-level intensity in v1) |
+| **Visual MVP** | **Vertical micro-segments** inside each day cell: one equal-width column per **domain present** that day, left → right in **stable recap domain order** (Livres, Films & séries, Musique, Recettes, Entraînement). **Single-domain** day = full-cell fill in that domain’s accent. **No** intensity scale by event count in v1. |
+| **Domain colors** | Map each segment to the domain’s **design-system accent token**: book, movie, music_track, recipe list-type accents from 005 / `list-type-visual`; **Entraînement** uses fitness accent token (planning). Shopping and other out-of-recap domains never appear. |
+| **Segment cap** | Max **5** visible segment colors per cell (matches in-scope recap domains). If extensibility adds more contributors later, overflow domains appear in **tooltip + accessible name only** — not as extra strip colors beyond cap. |
+| **Accessibility** | **French legend** (label + swatch per domain); per-cell **tooltip/focus** lists domains (and optional `eventCount`); accessible name includes **date + domain names** — not color alone. |
 | **Range** | Default trailing **12 months** ending today unless plan ties range to selected period — spec allows either; plan must pick one |
-| **Accessibility** | Each cell exposes date + active state in **accessible name**; optional `eventCount`; do not rely on color alone |
-| **Data** | Derived at read time from same aggregation as recap lists — **no new persisted heatmap table** |
+| **Data** | Derived at read time from same aggregation as recap lists — **no new persisted heatmap table**; each day exposes `domainsPresent[]` ordered like list sections |
 
-**Rejected for MVP**: multi-hue intensity by event count (adds legend burden); showing heatmap on phone (Valentin: out of scope).
+**Rejected for MVP**: binary single-accent “on/off” cells (superseded by multi-domain segments); multi-hue **intensity** by event count (adds legend burden); showing heatmap on phone (Valentin: out of scope).
 
 ## Extensibility
 

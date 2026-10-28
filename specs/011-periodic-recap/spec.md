@@ -37,7 +37,13 @@
 | **Recipe cooked** | **Yes** — v1 MUST allow **backdating** « cuisiné » dates (user picks a calendar day, not only today). Same-day dedupe per recipe still applies. |
 | **Ordering within period** | **Grouped by domain** (Livres, Films & séries, Musique, Recettes, Entraînement, …). Within each section, lines ordered **newest first** (by event calendar day, then title). No global cross-domain sort that breaks domain blocks. |
 | **Yearly recap vs goals** | **Standalone** `/recap` experience for **all** periods (day/week/month/year). Yearly recap MUST **not** tie into or replace book/movie **year goal** screens (002/003); no required links between them. |
-| **Activity tracker (heatmap)** | **GitHub-style** calendar grid on **`/recap`**, **desktop only** (see User Story 7). |
+| **Activity tracker (heatmap)** | **GitHub-style** calendar grid on **`/recap`**, **desktop only** (see User Story 7). Each day cell shows **one accent per recap domain** with activity that day (**multi-segment** cells — not a single global accent). |
+
+### Session 2026-10-28 (Valentin — heatmap correction)
+
+| Topic | Decision |
+|--------|----------|
+| **Heatmap accents** | **Multi-domain** per day — vertical micro-segments with domain accent tokens; legend + tooltip/a11y text; **not** binary single-accent MVP. Mobile heatmap remains **hidden**. |
 
 ## User Scenarios & Testing *(mandatory)*
 
@@ -139,21 +145,39 @@ The recap UI includes a **stable extension point** (e.g. empty domain sections h
 
 ### User Story 7 - Activity tracker (GitHub-style heatmap) (Priority: P2 — MVP Phase A on desktop)
 
-On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activity grid** (GitHub-contribution-style): one cell per **calendar day** in a visible range (default: trailing **12 months** ending today, or aligned with selected period — planning picks one default). A day with at least one recap-eligible event is **filled** with the app accent color; days with no events stay neutral/empty. **Mobile / narrow viewports**: heatmap is **hidden** (not shown, not collapsed teaser) — recap lists and period controls remain; primary access stays bottom nav on mobile.
+On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activity grid** (GitHub-contribution-style): one cell per **calendar day** in a visible range (default: trailing **12 months** ending today, or aligned with selected period — planning picks one default). Days with no recap-eligible events stay **neutral/empty**. Days with activity use **multi-domain accents** (see **Visual pattern** below). **Mobile / narrow viewports**: heatmap is **hidden** (not shown, not collapsed teaser) — recap lists and period controls remain; primary access stays bottom nav on mobile.
+
+**Visual pattern (MVP — locked 2026-10-28)**: Each active day cell is a small square subdivided into **vertical micro-segments** (equal-width columns, left → right). One segment appears **per recap domain** that had ≥ 1 eligible event that day, in the **same stable domain order** as recap list sections (Livres → Films & séries → Musique → Recettes → Entraînement). A segment’s fill uses that domain’s **design-system accent token** (see FR-020). A single-domain day is a **full-cell** fill in that domain’s accent (no artificial split). **No intensity scale** by event count in MVP — presence only, not volume.
+
+**Domain → accent (normative for heatmap)** — tokens from [005](../005-design-system/spec.md) / `list-type-visual` where applicable; fitness uses the **Entraînement** accent defined in planning (005 extension or fitness shell token):
+
+| Recap domain | Accent source |
+|--------------|----------------|
+| Livres | Book list-type accent |
+| Films & séries | Movie list-type accent |
+| Musique (tracks) | Music track list-type accent |
+| Recettes | Recipe list-type accent |
+| Entraînement | Fitness domain accent (planning) |
+
+**Segment cap**: At most **5** visible segments per cell (one per in-scope domain). Future domains beyond the cap MUST still appear in **tooltip and accessible name**; overflow domains MUST NOT rely on extra strip colors alone (text lists all domains).
+
+**Legend & tooltip**: Desktop heatmap MUST include a **text legend** (French domain labels + swatches). Each cell MUST expose a **tooltip or equivalent** on hover/focus listing active domains for that date (and optional total event count). Color MUST NOT be the only channel for which domains fired.
 
 **Why desktop-only**: Dense grids are hard to read and tap on narrow screens; duplicating GitHub’s desktop pattern without cramming the mobile récap list.
 
-**Independent Test**: Seed achievements on two days in the visible range; on desktop `/recap`, both days show filled cells; resize below breakpoint — heatmap absent, list unchanged. Screen reader: filled days expose count or “activité enregistrée” text, not color alone.
+**Independent Test**: Seed a book finish and a workout on day D1, only a film on D2; on desktop `/recap`, D1 shows **two** vertical segments (book + fitness accents), D2 shows one (film); resize below breakpoint — heatmap absent, list unchanged. Screen reader: active days name **domains** explicitly, not color alone.
 
 **Acceptance Scenarios**:
 
-1. **Given** at least one recap-eligible event on calendar day D, **When** desktop `/recap` loads, **Then** cell for D is marked active (single accent level — **MVP: binary on/off**, no intensity scale).
-2. **Given** no events on day D, **When** heatmap renders, **Then** D appears inactive (neutral).
-3. **Given** viewport below recap heatmap breakpoint, **When** `/recap` loads, **Then** heatmap is not rendered; weekly/monthly list UX is unchanged.
-4. **Given** a filled day cell, **When** assistive tech focuses it, **Then** accessible name includes the date and that activity occurred (e.g. “28 octobre 2026 — activité enregistrée”); optional detail: total event count that day.
-5. **Given** user selects previous month/week in period control, **When** on desktop, **Then** heatmap range behavior follows planning default (fixed trailing window **or** sync to selected period — document in plan; spec requires heatmap presence on desktop recap).
+1. **Given** recap-eligible events from **one** domain on calendar day D, **When** desktop `/recap` loads, **Then** cell D is a **single** full fill in that domain’s accent.
+2. **Given** events from **two or more** recap domains on the same day D, **When** heatmap renders, **Then** cell D shows **vertical micro-segments** (one per domain present), in stable domain order, each with the correct domain accent.
+3. **Given** no events on day D, **When** heatmap renders, **Then** D appears inactive (neutral).
+4. **Given** viewport below recap heatmap breakpoint, **When** `/recap` loads, **Then** heatmap is not rendered; weekly/monthly list UX is unchanged.
+5. **Given** an active day cell, **When** assistive tech focuses it, **Then** accessible name includes the **date** and a **text list of domains** with activity (e.g. “28 octobre 2026 — Livres, Entraînement”); optional total event count.
+6. **Given** the heatmap is visible, **When** the user views the grid, **Then** a **legend** maps each accent to its French domain label.
+7. **Given** user selects previous month/week in period control, **When** on desktop, **Then** heatmap range behavior follows planning default (fixed trailing window **or** sync to selected period — document in plan; spec requires heatmap presence on desktop recap).
 
-**Activity day definition (normative)**: A calendar day is **active** iff the **union** of all recap-eligible events (same set as FR-006) has **≥ 1** occurrence bucketed to that local calendar day (books `read`, films/séries watched, episode `watchedAt`, tracks `listened`, recipe `cookedDates` entries, fitness `completed`).
+**Activity day definition (normative)**: For each local calendar day, compute **`domainsPresent`**: the set of recap domains (FR-006) with **≥ 1** eligible event bucketed to that day. Day is **active** iff `domainsPresent` is non-empty. Same event sources as list aggregation (books `read`, films/séries watched, episode `watchedAt`, tracks `listened`, recipe `cookedDates` entries, fitness `completed`).
 
 ---
 
@@ -190,7 +214,7 @@ On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activ
 - **FR-017**: Séries MUST emit **one recap line per episode** with `watchedAt` in period (no episode roll-up in MVP).
 - **FR-018**: Yearly (and all) period views MUST live entirely in **`/recap`** UX without requiring navigation to domain year-goal screens.
 - **FR-019**: On viewports **≥ desktop breakpoint** (planning defines px, e.g. `md`/`lg` aligned with 005), **`/recap`** MUST show an **activity heatmap** at the top per User Story 7; on narrower viewports the heatmap MUST NOT render.
-- **FR-020**: Heatmap cells MUST use **binary** active/inactive styling in MVP (single accent for active days); accessibility MUST convey activity via **text/labels**, not color alone.
+- **FR-020**: Heatmap cells MUST encode **which recap domains** had activity each day using **vertical micro-segments** (MVP pattern in User Story 7): one segment per domain present, **stable domain order**, each segment filled with that domain’s **design-system accent token** (Livres, Films & séries, Musique, Recettes, Entraînement — see User Story 7 table). Single-domain days MAY use a full-cell fill. Inactive days stay neutral. **No** event-count intensity scale in MVP. At most **5** segment colors per cell; additional domains MUST appear in tooltip and accessible name. A **French text legend** and per-cell domain listing MUST satisfy accessibility — **not color alone**.
 
 ### Key Entities *(conceptual — mostly derived)*
 
@@ -198,7 +222,7 @@ On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activ
 - **RecapAchievement** (derived view model): `{ domainId, occurredOn, title, subtitle?, sourceItemId?, sourceWorkoutId?, sortInstant }` — built at read time.
 - **DomainRecapContributor** (conceptual registry): maps domain to rules for extracting `RecapAchievement[]` from local stores.
 - **Recipe item extension**: **`cookedDates`**: `string[]` ISO dates on recipe items (see [research.md](research.md)).
-- **RecapActivityDay** (derived): `{ calendarDate, eventCount, isActive }` — for heatmap; `isActive := eventCount ≥ 1` from union of FR-006 signals.
+- **RecapActivityDay** (derived): `{ calendarDate, eventCount, domainsPresent: DomainId[], isActive }` — for heatmap; `domainsPresent` ordered per FR-016 domain order; `isActive := domainsPresent.length ≥ 1`; `eventCount` optional for tooltip/a11y.
 
 ## Success Criteria *(mandatory)*
 
@@ -233,9 +257,9 @@ On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activ
 
 | Phase | Periods | Entry | Recipe signal | Activity grid |
 |-------|---------|-------|---------------|-----------------|
-| **A (MVP)** | Week + month | Bottom-nav **Récap** + optional home teaser | **`cookedDates`** + UI (today **or backdated**) | Desktop **`/recap`** heatmap (binary cells) |
+| **A (MVP)** | Week + month | Bottom-nav **Récap** + optional home teaser | **`cookedDates`** + UI (today **or backdated**) | Desktop **`/recap`** heatmap (**multi-domain vertical segments** + legend) |
 | **B** | Day + year | Same `/recap` shell | Same | Same (desktop) |
-| **C (optional)** | PR highlights, richer yearly layout | Same | — | Optional intensity / range tweaks |
+| **C (optional)** | PR highlights, richer yearly layout | Same | — | Optional event-count intensity or range tweaks |
 
 **Justification**: Week + month first balances **009 visibility** with **constitution capture speed** (no new daily obligation). Daily and yearly add precision and long arc once aggregation is proven; yearly recap stays **standalone** in `/recap` (domain year goals unchanged elsewhere).
 
@@ -247,7 +271,8 @@ Bottom nav: … | Accueil | … | Récap | …
 Desktop /recap (wide)                Mobile /recap (narrow)
 ┌──────────────────────────┐         ┌──────────────────────────┐
 │ Récap    [Semaine ▼]     │         │ Récap    [Semaine ▼]     │
-│ [■■□■■■□ … heatmap …]    │         │ (no heatmap)             │
+│ [▮▮|▮□▮▮|□ … heatmap …]  │         │ (no heatmap)             │
+│ (multi-domain day cells) │         │                          │
 │ ◀ Semaine du 28 oct. ▶   │         │ ◀ Semaine du 28 oct. ▶   │
 │                          │         │                          │
 │ Livres (2)               │         │ Livres (2)               │
