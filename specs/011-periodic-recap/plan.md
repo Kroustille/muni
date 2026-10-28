@@ -28,9 +28,9 @@ Ship a **read-only cross-domain Récap** at **`/recap`**: derive **`RecapAchieve
 
 **Performance Goals**: SC-001 — 50 achievements in one month interactive within 2s offline on mid-tier mobile; design aggregation to scan items + fitness logs once per snapshot (O(n) domains)
 
-**Constraints**: Read-only recap rows (optional deep link to detail); soft-deleted sources excluded (FR-014); shopping / artist-only / skipped workouts excluded; ISO weeks Monday-start; heatmap **no intensity scale**; max **5** segment colors per cell
+**Constraints**: Read-only recap rows (optional deep link to detail); soft-deleted sources excluded (FR-014); shopping / artist-only / skipped workouts excluded; ISO weeks Monday-start; heatmap **no intensity scale**; max **6** segment colors per cell (OD-011-10)
 
-**Scale/Scope**: Up to ~500 events per period (spec edge case); 5 in-scope recap domains MVP; extensibility via contributor registry (US6)
+**Scale/Scope**: Up to ~500 events per period (spec edge case); **6** in-scope recap domains MVP (through **Plantes**); extensibility via contributor registry (US6)
 
 ## Constitution Check
 
@@ -83,6 +83,7 @@ src/application/recap/
     music-practice-contributor.ts     # 012 finishedAt, performedAt, practice_log
     recipes-contributor.ts
     fitness-contributor.ts
+    plants-contributor.ts
   recap-activity-days.ts               # heatmap derivation from achievements
 src/application/recipes/record-cooked.ts
 src/app/(app)/recap/page.tsx
@@ -123,8 +124,10 @@ Aligned with spec **Phase A (MVP v1) → B (optional)**:
 | OD-011-2 | Heatmap breakpoint | **`md` (768px)** — match `BottomNav` `md:hidden` / sidebar `md:flex` |
 | OD-011-3 | Fitness heatmap accent | **`#0d9488`** — same as app `--accent` / fitness shell (not a list-type row) |
 | OD-011-4 | Default timezone | **`Europe/Paris`** — export `DEFAULT_RECAP_TIMEZONE` aliasing book/movie constants until user TZ preference |
-| OD-011-5 | Stable domain order | `book` → `movie` → `music_track` → `recipe` → `fitness` (French **Musique** = 004 + 012 events; one heatmap segment) |
+| OD-011-5 | Stable domain order | `book` → `movie` → `music_track` → `recipe` → `fitness` → `plants` (French **Musique** = 004 + 012 events; one heatmap segment) |
 | OD-011-8 | **012 gate** | Implement **`music-practice-contributor`** only after **012** Phase 2 checkpoint (repos + local stores); track contributor may ship earlier |
+| OD-011-9 | Plants heatmap accent | **`#16a34a`** — plants shell token (005 extension) |
+| OD-011-10 | Heatmap segment cap | **6** visible segment colors (`book`, `movie`, `music_track`, `recipe`, `fitness`, `plants`); future domains overflow to tooltip/a11y text only |
 | OD-011-6 | Bottom nav layout | **Home, Search \| + \| Récap, Settings** — Récap inserted post-FAB per [contracts/bottom-nav.md](contracts/bottom-nav.md) |
 | OD-011-7 | Home teaser | **Ship in MVP v1** behind simple predicate (≥0 achievements); gentle copy only |
 

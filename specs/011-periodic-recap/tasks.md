@@ -26,8 +26,9 @@
 - [ ] T1107 Recipe detail UI: **Cuisiné** + backdate picker in recipe detail route/components (depends on T1106)
 - [ ] T1108 Unit tests ISO week/month/day/year bounds + prev/next in `tests/unit/recap/period.test.ts`
 - [ ] T1109 Implement `src/application/recap/period.ts` (depends on T1108)
-- [ ] T1110 Unit tests per domain contributor (books, movies/episodes, music tracks, **music practice 012**, recipes, fitness) in `tests/unit/recap/*-contributor.test.ts`
+- [ ] T1110 Unit tests per domain contributor (books, movies/episodes, music tracks, **music practice 012**, recipes, fitness, **plants**) in `tests/unit/recap/*-contributor.test.ts`
 - [ ] T1111 Implement `src/application/recap/contributors/*.ts` + registry per [contracts/recap-aggregation-service.md](contracts/recap-aggregation-service.md) (depends on T1110, T1106, **012** repos for practice contributor)
+- [ ] T1115 [P] Unit tests + `plants-contributor.ts` for care events and vegetable milestones per [013](../013-plants-garden/research.md) (depends on T1110; may stub plant repo until 013 ships)
 - [ ] T1112 Unit tests snapshot grouping, sort, empty-section omission, soft-delete in `tests/unit/recap/build-recap-snapshot.test.ts`
 - [ ] T1113 Implement `buildRecapSnapshot`, `buildActivityDays` in `src/application/recap/build-recap-snapshot.ts` + `recap-activity-days.ts` (depends on T1111, T1112, T1109)
 - [ ] T1114 Unit tests heatmap window (365 days) and multi-domain `domainsPresent` in `tests/unit/recap/activity-days.test.ts` (depends on T1113)
@@ -83,7 +84,7 @@
 
 - [ ] T1150 [US7] Implement `recap-activity-heatmap.tsx` per [contracts/recap-activity-heatmap.md](contracts/recap-activity-heatmap.md)
 - [ ] T1151 [US7] Mount heatmap only at `md+` in `recap-page.tsx` (depends on T1150)
-- [ ] T1152 [US7] Unit tests segment rendering for 1 / 2 / 5 domains in `tests/unit/recap/heatmap-segments.test.ts`
+- [ ] T1152 [US7] Unit tests segment rendering for 1 / 2 / 6 domains in `tests/unit/recap/heatmap-segments.test.ts`
 - [ ] T1153 [US7] E2e desktop heatmap visible + mobile hidden in `tests/e2e/recap.spec.ts` (depends on T1151)
 
 ---
@@ -155,4 +156,4 @@ Phase 10 last
 
 ## Task count
 
-**Total tasks**: **46** (T1101–T1196)
+**Total tasks**: **47** (T1101–T1196, T1115)

@@ -38,9 +38,10 @@ Built from `RecapSnapshot.activityDays` (see [recap-aggregation-service.md](reca
 | `music_track` | `LIST_TYPE_VISUAL.music_track.accentColor` (`#0284c7`) |
 | `recipe` | `LIST_TYPE_VISUAL.recipe.accentColor` (`#c2410c`) |
 | `fitness` | `#0d9488` (OD-011-3) |
+| `plants` | `#16a34a` (OD-011-9 — plants shell / 005 extension) |
 
 - **No intensity scale** by `eventCount` in MVP (presence only).
-- **Max 5 segments** visible (all MVP domains fit); future overflow domains listed in text only.
+- **Max 6 segments** visible (in-scope domains through **Plantes**); future overflow domains listed in text only (OD-011-10).
 
 ## Legend
 

@@ -10,7 +10,7 @@
 
 **Input**: Valentin wants a **read-only periodic recap** of what was done in Muni — finished books, watched films/séries, cooked recipes, completed fitness workouts, **Musique** (tracks **écoutés** plus **012** practice completions), and extensible hooks for future domains — aggregated from **existing local data** and **explicit completion events**. French UI, offline-first, celebratory companion tone aligned with [009](../009-experiences-achievements/spec.md) (**no guilt**, no social comparison). Not a separate journal unless completion is already recorded in domain data.
 
-**Depends on**: Foundation (**001**), books (**002**), films & TV (**003**), music tracks (**004**), fitness (**008**), music practice (**012**) for composition / DJ / apprentissage recap lines. **Recipe cooked signal** is a **prerequisite slice** (see [research.md](research.md)) — may ship in 001/010 amendment or as first task of 011 implementation. **Recommended after** fitness (**008**), **012** music-practice stores locally available, and any in-flight **010** cookbook-source work are stable enough to avoid merge thrash; recap itself does not require 010 for cookbook metadata.
+**Depends on**: Foundation (**001**), books (**002**), films & TV (**003**), music tracks (**004**), fitness (**008**), music practice (**012**) for composition / DJ / apprentissage recap lines, plants & garden (**013**) for **Plantes** care and potager milestones. **Recipe cooked signal** is a **prerequisite slice** (see [research.md](research.md)) — may ship in 001/010 amendment or as first task of 011 implementation. **Recommended after** fitness (**008**), **012** music-practice stores locally available, **013** plant stores (or stubbed contributor tests), and any in-flight **010** cookbook-source work are stable enough to avoid merge thrash; recap itself does not require 010 for cookbook metadata.
 
 **Serves**: [009](../009-experiences-achievements/spec.md) north star (visibility of discovery and milestones over time) without implementing 009’s non-scheduled “fil de vie” or new experience entities.
 
@@ -35,7 +35,7 @@
 | **Navigation** | **Bottom navigation** includes a dedicated **Récap** item — **primary** access to `/recap` (not home-only). Accueil may still show an optional weekly teaser card. |
 | **Séries (TV)** | **One recap line per episode** in period lists (series title + episode key / French label). No weekly roll-up like “3 épisodes de …” in MVP. |
 | **Recipe cooked** | **Yes** — v1 MUST allow **backdating** « cuisiné » dates (user picks a calendar day, not only today). Same-day dedupe per recipe still applies. |
-| **Ordering within period** | **Grouped by domain** (Livres, Films & séries, Musique, Recettes, Entraînement, …). Within each section, lines ordered **newest first** (by event calendar day, then title). No global cross-domain sort that breaks domain blocks. |
+| **Ordering within period** | **Grouped by domain** (Livres, Films & séries, Musique, Recettes, Entraînement, Plantes, …). Within each section, lines ordered **newest first** (by event calendar day, then title). No global cross-domain sort that breaks domain blocks. |
 | **Yearly recap vs goals** | **Standalone** `/recap` experience for **all** periods (day/week/month/year). Yearly recap MUST **not** tie into or replace book/movie **year goal** screens (002/003); no required links between them. |
 | **Activity tracker (heatmap)** | **GitHub-style** calendar grid on **`/recap`**, **desktop only** (see User Story 7). Each day cell shows **one accent per recap domain** with activity that day (**multi-segment** cells — not a single global accent). |
 | **MVP v1 periods** | **Day, week, month, and year** — all four granularities ship in **v1** (not deferred to Phase B). Optional fitness PR highlights remain post-v1. |
@@ -76,7 +76,8 @@ A signed-in user opens **Récap** and sees **this week** (ISO week, Monday–Sun
 7. **Given** a **012** **`practice_log`** with **`practicedAt`** this week (from **Fait** or ad-hoc), **When** recap loads, **Then** it appears under **Musique** (séance de pratique + date; optional exercise/piece title in subtitle).
 8. **Given** a recipe with **`cookedDates`** containing a date this week, **When** recap loads, **Then** it appears under **Recettes** (one line per date entry in period).
 9. **Given** a fitness workout log with status **`completed`** and **`completedAt`** this week, **When** recap loads, **Then** it appears under **Entraînement** with session title and day.
-10. **Given** no qualifying events in the week, **When** recap loads, **Then** a **neutral, non-guilt** empty state appears (no “you failed” framing).
+10. **Given** a **`plant_care_event`** or **vegetable milestone** with **`occurredAt`** this week ([013](../013-plants-garden/spec.md)), **When** recap loads, **Then** it appears under **Plantes** with plant or culture title and care/milestone label.
+11. **Given** no qualifying events in the week, **When** recap loads, **Then** a **neutral, non-guilt** empty state appears (no “you failed” framing).
 
 ---
 
@@ -160,7 +161,7 @@ The recap UI includes a **stable extension point** (e.g. empty domain sections h
 
 On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activity grid** (GitHub-contribution-style): one cell per **calendar day** in a visible range (default: trailing **12 months** ending today, or aligned with selected period — planning picks one default). Days with no recap-eligible events stay **neutral/empty**. Days with activity use **multi-domain accents** (see **Visual pattern** below). **Mobile / narrow viewports**: heatmap is **hidden** (not shown, not collapsed teaser) — recap lists and period controls remain; primary access stays bottom nav on mobile.
 
-**Visual pattern (MVP — locked 2026-10-28)**: Each active day cell is a small square subdivided into **vertical micro-segments** (equal-width columns, left → right). One segment appears **per recap domain** that had ≥ 1 eligible event that day, in the **same stable domain order** as recap list sections (Livres → Films & séries → Musique → Recettes → Entraînement). A segment’s fill uses that domain’s **design-system accent token** (see FR-020). A single-domain day is a **full-cell** fill in that domain’s accent (no artificial split). **No intensity scale** by event count in MVP — presence only, not volume.
+**Visual pattern (MVP — locked 2026-10-28; **Plantes** segment added 2026-10-28)**: Each active day cell is a small square subdivided into **vertical micro-segments** (equal-width columns, left → right). One segment appears **per recap domain** that had ≥ 1 eligible event that day, in the **same stable domain order** as recap list sections (Livres → Films & séries → Musique → Recettes → Entraînement → Plantes). A segment’s fill uses that domain’s **design-system accent token** (see FR-020). A single-domain day is a **full-cell** fill in that domain’s accent (no artificial split). **No intensity scale** by event count in MVP — presence only, not volume.
 
 **Domain → accent (normative for heatmap)** — tokens from [005](../005-design-system/spec.md) / `list-type-visual` where applicable; fitness uses the **Entraînement** accent defined in planning (005 extension or fitness shell token):
 
@@ -171,8 +172,9 @@ On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activ
 | Musique (004 écouté + 012 practice) | Music track list-type accent (single segment for all Musique events) |
 | Recettes | Recipe list-type accent |
 | Entraînement | Fitness domain accent (planning) |
+| Plantes | Plants domain accent (planning — see [013](../013-plants-garden/research.md)) |
 
-**Segment cap**: At most **5** visible segments per cell (one per in-scope domain). Future domains beyond the cap MUST still appear in **tooltip and accessible name**; overflow domains MUST NOT rely on extra strip colors alone (text lists all domains).
+**Segment cap**: At most **6** visible segments per cell (one per in-scope recap domain through **Plantes**). **Future domains** (e.g. **012** music practice) beyond the cap MUST still appear in **tooltip and accessible name**; overflow domains MUST NOT rely on extra strip colors alone (text lists all domains). When contributor count exceeds **6**, planning MUST either raise cap or adopt overflow-only rule (OD-011-8).
 
 **Legend & tooltip**: Desktop heatmap MUST include a **text legend** (French domain labels + swatches). Each cell MUST expose a **tooltip or equivalent** on hover/focus listing active domains for that date (and optional total event count). Color MUST NOT be the only channel for which domains fired.
 
@@ -190,7 +192,7 @@ On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activ
 6. **Given** the heatmap is visible, **When** the user views the grid, **Then** a **legend** maps each accent to its French domain label.
 7. **Given** user selects previous month/week in period control, **When** on desktop, **Then** heatmap range behavior follows planning default (fixed trailing window **or** sync to selected period — document in plan; spec requires heatmap presence on desktop recap).
 
-**Activity day definition (normative)**: For each local calendar day, compute **`domainsPresent`**: the set of recap domains (FR-006) with **≥ 1** eligible event bucketed to that day. Day is **active** iff `domainsPresent` is non-empty. Same event sources as list aggregation (books `read`, films/séries watched, episode `watchedAt`, tracks `listened`, **012** composition **`finished`/`finishedAt`**, DJ **`performed`/`performedAt`**, **`practice_log.practicedAt`**, recipe `cookedDates` entries, fitness `completed`). Multiple Musique event types on one day still yield **one** Musique segment.
+**Activity day definition (normative)**: For each local calendar day, compute **`domainsPresent`**: the set of recap domains (FR-006) with **≥ 1** eligible event bucketed to that day. Day is **active** iff `domainsPresent` is non-empty. Same event sources as list aggregation (books `read`, films/séries watched, episode `watchedAt`, tracks `listened`, **012** composition **`finished`/`finishedAt`**, DJ **`performed`/`performedAt`**, **`practice_log.practicedAt`**, recipe `cookedDates` entries, fitness `completed`, plant care / vegetable milestones **`occurredAt`**). Multiple Musique event types on one day still yield **one** Musique segment.
 
 ---
 
@@ -213,7 +215,7 @@ On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activ
 - **FR-003**: Recap MUST compute from **local on-device data** (IndexedDB and local fitness stores) without requiring network.
 - **FR-004**: **MVP v1** MUST support **daily** (single calendar day), **weekly** (ISO), **monthly**, and **yearly** (calendar year) periods with previous/next navigation for the selected granularity.
 - **FR-005**: All four period types MUST use the **same aggregation rules** (FR-006, FR-016); only period boundaries and labels differ.
-- **FR-006**: Recap MUST include achievements from: books **`read`**, films/séries **`watched`** and **episode `watchedAt`**, **Musique** — music tracks **`listened`**; **`music_composition`** with status **`finished`** bucketed by **`finishedAt`**; **`dj_set`** with status **`performed`** bucketed by **`performedAt`**; **`practice_log`** rows bucketed by **`practicedAt`** ([012](../012-music-practice/spec.md)); recipes with **`cookedDates`** in period; fitness workouts **`completed`**.
+- **FR-006**: Recap MUST include achievements from: books **`read`**, films/séries **`watched`** and **episode `watchedAt`**, **Musique** — music tracks **`listened`**; **`music_composition`** with status **`finished`** bucketed by **`finishedAt`**; **`dj_set`** with status **`performed`** bucketed by **`performedAt`**; **`practice_log`** rows bucketed by **`practicedAt`** ([012](../012-music-practice/spec.md)); recipes with **`cookedDates`** in period; fitness workouts **`completed`**; **plant care events** and **vegetable milestones** with **`occurredAt`** in period ([013](../013-plants-garden/research.md) § Recap signals).
 - **FR-007**: Recap MUST **exclude** shopping check-offs, music **artist-only** rows, **012** non-**Terminé** compositions, **Prévu**/**Annulé** DJ sets, **`practice_plan`** assignments without a **`practice_log`**, **learning_piece** status changes without a log date, fitness **skipped/abandoned** sessions, and quote creation events.
 - **FR-008**: Each achievement line MUST show at minimum **domain**, **title** (or session title), and **calendar date** within the selected period.
 - **FR-009**: Section headers MUST use celebratory/neutral French copy; MUST NOT use guilt, loss, or social comparison language (009 anti-patterns).
@@ -227,7 +229,7 @@ On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activ
 - **FR-017**: Séries MUST emit **one recap line per episode** with `watchedAt` in period (no episode roll-up in MVP).
 - **FR-018**: Yearly (and all) period views MUST live entirely in **`/recap`** UX without requiring navigation to domain year-goal screens.
 - **FR-019**: On viewports **≥ desktop breakpoint** (planning defines px, e.g. `md`/`lg` aligned with 005), **`/recap`** MUST show an **activity heatmap** at the top per User Story 7; on narrower viewports the heatmap MUST NOT render.
-- **FR-020**: Heatmap cells MUST encode **which recap domains** had activity each day using **vertical micro-segments** (MVP pattern in User Story 7): one segment per domain present, **stable domain order**, each segment filled with that domain’s **design-system accent token** (Livres, Films & séries, Musique, Recettes, Entraînement — see User Story 7 table). Single-domain days MAY use a full-cell fill. Inactive days stay neutral. **No** event-count intensity scale in MVP. At most **5** segment colors per cell; additional domains MUST appear in tooltip and accessible name. A **French text legend** and per-cell domain listing MUST satisfy accessibility — **not color alone**.
+- **FR-020**: Heatmap cells MUST encode **which recap domains** had activity each day using **vertical micro-segments** (MVP pattern in User Story 7): one segment per domain present, **stable domain order**, each segment filled with that domain’s **design-system accent token** (Livres, Films & séries, Musique, Recettes, Entraînement, Plantes — see User Story 7 table). Single-domain days MAY use a full-cell fill. Inactive days stay neutral. **No** event-count intensity scale in MVP. At most **6** segment colors per cell for current in-scope domains; additional domains MUST appear in tooltip and accessible name. A **French text legend** and per-cell domain listing MUST satisfy accessibility — **not color alone**.
 
 ### Key Entities *(conceptual — mostly derived)*
 
@@ -254,6 +256,7 @@ On **desktop-width** viewports, the top of **`/recap`** shows a **calendar activ
 - Domain year goals and domain-specific activity heatmaps on book/movie screens **remain independent**; `/recap` yearly view is **standalone** and does not replace or link-require those screens.
 - Fitness **008** workout logs are synced and available locally before fitness lines appear in recap.
 - **012** music-practice entities are synced and available locally before composition / DJ / practice-log lines appear in recap; track **listened** lines still use **004** `items` only.
+- **Plants 013** care events and vegetable milestones are available locally before **Plantes** lines appear; **`plants-contributor`** MAY ship in 011 before 013 UI if fixtures/tests cover event shape.
 - Recap **activity heatmap** on `/recap` is **desktop-only**; mobile users rely on period lists and bottom-nav **Récap** without a contribution grid.
 
 ## Out of Scope (MVP)
