@@ -39,7 +39,8 @@ export type FitnessWorkoutLog = {
   id: string;
   status: WorkoutStatus;
   calendarDate: string;
-  plannedSessionId: string | null;
+  sessionTemplateId: string | null;
+  scheduledSessionId: string | null;
   title: string;
   startedAt: string;
   completedAt: string | null;
@@ -54,7 +55,8 @@ const workoutShape = {
   id: z.uuid(),
   status: workoutStatusSchema,
   calendarDate: calendarDate,
-  plannedSessionId: z.string().uuid().nullable(),
+  sessionTemplateId: z.string().uuid().nullable(),
+  scheduledSessionId: z.string().uuid().nullable(),
   title: z.string().trim().min(1).max(200),
   startedAt: timestamp,
   completedAt: timestamp.nullable(),
@@ -69,7 +71,8 @@ export const fitnessWorkoutLogSchema = z.strictObject(workoutShape);
 
 const SNAKE: Partial<Record<keyof FitnessWorkoutLog, string>> = {
   calendarDate: "calendar_date",
-  plannedSessionId: "planned_session_id",
+  sessionTemplateId: "session_template_id",
+  scheduledSessionId: "scheduled_session_id",
   startedAt: "started_at",
   completedAt: "completed_at",
   catalogVersion: "catalog_version",
@@ -90,7 +93,8 @@ export const fitnessWorkoutLogWireSchema = z.strictObject({
   id: workoutShape.id,
   status: workoutShape.status,
   calendar_date: workoutShape.calendarDate,
-  planned_session_id: workoutShape.plannedSessionId,
+  session_template_id: workoutShape.sessionTemplateId,
+  scheduled_session_id: workoutShape.scheduledSessionId,
   title: workoutShape.title,
   started_at: workoutShape.startedAt,
   completed_at: workoutShape.completedAt,
@@ -128,7 +132,8 @@ export function wireToFitnessWorkoutLog(wire: FitnessWorkoutLogWire): FitnessWor
 const MERGED_WORKOUT_FIELDS = [
   "status",
   "calendar_date",
-  "planned_session_id",
+  "session_template_id",
+  "scheduled_session_id",
   "title",
   "started_at",
   "completed_at",
@@ -158,7 +163,8 @@ export function validateLoggedExercises(exercises: LoggedExercise[]): string | n
 export type FitnessSkipRecord = {
   id: string;
   calendarDate: string;
-  plannedSessionId: string;
+  scheduledSessionId: string;
+  sessionTemplateId: string | null;
   note: string | null;
   deletedAt: string | null;
   fieldsUpdatedAt: Record<string, string>;
@@ -167,7 +173,8 @@ export type FitnessSkipRecord = {
 const skipShape = {
   id: z.uuid(),
   calendarDate: calendarDate,
-  plannedSessionId: z.string().uuid(),
+  scheduledSessionId: z.string().uuid(),
+  sessionTemplateId: z.string().uuid().nullable(),
   note: z.string().max(2000).nullable(),
   deletedAt: timestamp.nullable(),
   fieldsUpdatedAt: z.record(z.string(), z.string()),
@@ -177,7 +184,8 @@ export const fitnessSkipRecordSchema = z.strictObject(skipShape);
 
 const SKIP_SNAKE: Partial<Record<keyof FitnessSkipRecord, string>> = {
   calendarDate: "calendar_date",
-  plannedSessionId: "planned_session_id",
+  scheduledSessionId: "scheduled_session_id",
+  sessionTemplateId: "session_template_id",
   deletedAt: "deleted_at",
   fieldsUpdatedAt: "fields_updated_at",
 };
@@ -189,7 +197,8 @@ const skipCamelOf = (field: string): string =>
 export const fitnessSkipRecordWireSchema = z.strictObject({
   id: skipShape.id,
   calendar_date: skipShape.calendarDate,
-  planned_session_id: skipShape.plannedSessionId,
+  scheduled_session_id: skipShape.scheduledSessionId,
+  session_template_id: skipShape.sessionTemplateId,
   note: skipShape.note,
   deleted_at: skipShape.deletedAt,
   fields_updated_at: skipShape.fieldsUpdatedAt,
@@ -221,7 +230,8 @@ export function wireToFitnessSkipRecord(wire: FitnessSkipRecordWire): FitnessSki
 
 const MERGED_SKIP_FIELDS = [
   "calendar_date",
-  "planned_session_id",
+  "scheduled_session_id",
+  "session_template_id",
   "note",
   "deleted_at",
 ] as const satisfies readonly (keyof FitnessSkipRecordWire)[];

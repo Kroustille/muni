@@ -15,7 +15,8 @@ import { wireClientMusicPracticeSync } from "./client-music-practice-sync";
 import { wireClientPlantsGardenSync } from "./client-plants-garden-sync";
 import type { CookbookUseCases } from "../application/cookbooks/cookbook-use-cases";
 import { runSyncEngines, type PausableSyncEngine } from "./sync-run";
-import type { FitnessProgramUseCases } from "../application/fitness/program";
+import type { FitnessScheduleUseCases } from "../application/fitness/schedule";
+import type { FitnessSessionTemplateUseCases } from "../application/fitness/session-template";
 import type { FitnessWorkoutUseCases } from "../application/fitness/workout";
 import type { FitnessUserSettings } from "../domain/fitness/workout-log";
 import type { MusicCompositionUseCases } from "../application/music-practice/composition";
@@ -52,7 +53,8 @@ export type ClientContext = {
   bookQuoteUseCases: BookQuoteUseCases;
   movieQuoteUseCases: MovieQuoteUseCases;
   readingSettingsUseCases: ReadingSettingsUseCases;
-  fitnessProgramUseCases: FitnessProgramUseCases;
+  fitnessSessionTemplateUseCases: FitnessSessionTemplateUseCases;
+  fitnessScheduleUseCases: FitnessScheduleUseCases;
   fitnessWorkoutUseCases: FitnessWorkoutUseCases;
   cookbookUseCases: CookbookUseCases;
   getFitnessUserSettings(): Promise<FitnessUserSettings | undefined>;
@@ -246,8 +248,11 @@ function buildClientContext(): Promise<ClientContext> {
 
     const itemUseCases = wrapLocalWrites(itemUseCasesWithCookbooks, notifyLocalWrite);
     const { bookQuoteUseCases, movieQuoteUseCases } = quoteSync;
-    const { programUseCases: fitnessProgramUseCases, workoutUseCases: fitnessWorkoutUseCases } =
-      fitnessSync;
+    const {
+      sessionTemplateUseCases: fitnessSessionTemplateUseCases,
+      scheduleUseCases: fitnessScheduleUseCases,
+      workoutUseCases: fitnessWorkoutUseCases,
+    } = fitnessSync;
     const {
       compositionUseCases: musicCompositionUseCases,
       djSetUseCases,
@@ -300,7 +305,8 @@ function buildClientContext(): Promise<ClientContext> {
       bookQuoteUseCases,
       movieQuoteUseCases,
       readingSettingsUseCases,
-      fitnessProgramUseCases,
+      fitnessSessionTemplateUseCases,
+      fitnessScheduleUseCases,
       fitnessWorkoutUseCases,
       cookbookUseCases: cookbookSync.cookbookUseCases,
       getFitnessUserSettings: () => fitnessSync.getUserSettings(),
@@ -356,8 +362,12 @@ export function getReadingSettingsUseCases(): Promise<ReadingSettingsUseCases> {
   return getClientContext().then((ctx) => ctx.readingSettingsUseCases);
 }
 
-export function getFitnessProgramUseCases(): Promise<FitnessProgramUseCases> {
-  return getClientContext().then((ctx) => ctx.fitnessProgramUseCases);
+export function getFitnessSessionTemplateUseCases(): Promise<FitnessSessionTemplateUseCases> {
+  return getClientContext().then((ctx) => ctx.fitnessSessionTemplateUseCases);
+}
+
+export function getFitnessScheduleUseCases(): Promise<FitnessScheduleUseCases> {
+  return getClientContext().then((ctx) => ctx.fitnessScheduleUseCases);
 }
 
 export function getFitnessWorkoutUseCases(): Promise<FitnessWorkoutUseCases> {

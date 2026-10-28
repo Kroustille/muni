@@ -57,7 +57,8 @@ import {
   createPlantsGardenSyncService,
   type PlantsGardenSyncService,
 } from "@/application/server/plants-garden-sync-service";
-import { createPostgresFitnessProgramRepository } from "@/adapters/postgres/fitness-program-repository";
+import { createPostgresFitnessSessionTemplateRepository } from "@/adapters/postgres/fitness-session-template-repository";
+import { createPostgresFitnessScheduledSessionRepository } from "@/adapters/postgres/fitness-scheduled-session-repository";
 import { createPostgresFitnessWorkoutRepository } from "@/adapters/postgres/fitness-workout-repository";
 import { createPostgresFitnessSkipRepository } from "@/adapters/postgres/fitness-skip-repository";
 import { createPostgresFitnessSettingsRepository } from "@/adapters/postgres/fitness-settings-repository";
@@ -152,7 +153,8 @@ export function createServerContainer(
   const { bookQuoteSync, movieQuoteSync } = wireServerQuoteSync(db, items, now);
   const cookbookSync = createCookbookSyncService({ cookbooks, now });
   const fitnessSync = createFitnessSyncService({
-    programs: createPostgresFitnessProgramRepository(db),
+    templates: createPostgresFitnessSessionTemplateRepository(db),
+    scheduled: createPostgresFitnessScheduledSessionRepository(db),
     workouts: createPostgresFitnessWorkoutRepository(db),
     skips: createPostgresFitnessSkipRepository(db),
     settings: createPostgresFitnessSettingsRepository(db),

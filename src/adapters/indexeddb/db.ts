@@ -1,5 +1,4 @@
 import { openDB, type DBSchema, type IDBPDatabase } from "idb";
-
 import type { BookQuote } from "../../domain/book-quote";
 import type { LearningPiece } from "../../domain/learning-piece";
 import type { MusicComposition } from "../../domain/music-composition";
@@ -10,7 +9,8 @@ import type { PracticeLog } from "../../domain/practice-log";
 import type { PracticePlan } from "../../domain/practice-plan";
 import type { MovieQuote } from "../../domain/movie-quote";
 import type { StoredCatalogExercise } from "../../domain/fitness/catalog";
-import type { FitnessProgram } from "../../domain/fitness/program";
+import type { FitnessSessionTemplate } from "../../domain/fitness/session-template";
+import type { FitnessScheduledSession } from "../../domain/fitness/scheduled-session";
 import type {
   FitnessSkipRecord,
   FitnessUserSettings,
@@ -58,9 +58,14 @@ export interface MuniDbSchema extends DBSchema {
     key: MetaKey;
     value: MetaValues[MetaKey];
   };
-  fitnessPrograms: {
+  fitnessSessionTemplates: {
     key: string;
-    value: FitnessProgram;
+    value: FitnessSessionTemplate;
+  };
+  fitnessScheduledSessions: {
+    key: string;
+    value: FitnessScheduledSession;
+    indexes: { calendarDate: string };
   };
   fitnessWorkoutLogs: {
     key: string;
@@ -79,7 +84,8 @@ export interface MuniDbSchema extends DBSchema {
     key: string;
     value: StoredCatalogExercise;
   };
-  fitnessProgramOutbox: { key: string; value: { id: string } };
+  fitnessSessionTemplateOutbox: { key: string; value: { id: string } };
+  fitnessScheduledSessionOutbox: { key: string; value: { id: string } };
   fitnessWorkoutOutbox: { key: string; value: { id: string } };
   fitnessSkipOutbox: { key: string; value: { id: string } };
   fitnessSettingsOutbox: { key: string; value: { id: string } };
@@ -123,7 +129,7 @@ export interface MuniDbSchema extends DBSchema {
 
 export type MuniDb = IDBPDatabase<MuniDbSchema>;
 
-const DB_VERSION = 8;
+const DB_VERSION = 9;
 
 export function openMuniDb(name: string): Promise<MuniDb> {
   return openDB<MuniDbSchema>(name, DB_VERSION, {
@@ -147,17 +153,18 @@ export function openMuniDb(name: string): Promise<MuniDb> {
         db.createObjectStore("movieQuoteOutbox", { keyPath: "id" });
       }
       if (oldVersion < 4) {
-        db.createObjectStore("fitnessPrograms", { keyPath: "id" });
-        const workouts = db.createObjectStore("fitnessWorkoutLogs", { keyPath: "id" });
+        const legacyDb = db as unknown as IDBPDatabase<Record<string, unknown>>;
+        legacyDb.createObjectStore("fitnessPrograms", { keyPath: "id" });
+        const workouts = legacyDb.createObjectStore("fitnessWorkoutLogs", { keyPath: "id" });
         workouts.createIndex("status", "status");
         workouts.createIndex("calendarDate", "calendarDate");
-        db.createObjectStore("fitnessSkipRecords", { keyPath: "id" });
-        db.createObjectStore("fitnessUserSettings", { keyPath: "id" });
-        db.createObjectStore("fitnessExerciseCatalog", { keyPath: "id" });
-        db.createObjectStore("fitnessProgramOutbox", { keyPath: "id" });
-        db.createObjectStore("fitnessWorkoutOutbox", { keyPath: "id" });
-        db.createObjectStore("fitnessSkipOutbox", { keyPath: "id" });
-        db.createObjectStore("fitnessSettingsOutbox", { keyPath: "id" });
+        legacyDb.createObjectStore("fitnessSkipRecords", { keyPath: "id" });
+        legacyDb.createObjectStore("fitnessUserSettings", { keyPath: "id" });
+        legacyDb.createObjectStore("fitnessExerciseCatalog", { keyPath: "id" });
+        legacyDb.createObjectStore("fitnessProgramOutbox", { keyPath: "id" });
+        legacyDb.createObjectStore("fitnessWorkoutOutbox", { keyPath: "id" });
+        legacyDb.createObjectStore("fitnessSkipOutbox", { keyPath: "id" });
+        legacyDb.createObjectStore("fitnessSettingsOutbox", { keyPath: "id" });
       }
       if (oldVersion < 5) {
         db.createObjectStore("cookbooks", { keyPath: "id" });
@@ -195,6 +202,30 @@ export function openMuniDb(name: string): Promise<MuniDb> {
         db.createObjectStore("plantCareProfileOutbox", { keyPath: "id" });
         db.createObjectStore("vegetableCultureOutbox", { keyPath: "id" });
         db.createObjectStore("vegetableMilestoneOutbox", { keyPath: "id" });
+      }
+      if (oldVersion < 9) {
+        const legacyDb = db as unknown as IDBPDatabase<Record<string, unknown>>;
+        for (const name of [
+          "fitnessPrograms",
+          "fitnessProgramOutbox",
+          "fitnessWorkoutLogs",
+          "fitnessWorkoutOutbox",
+          "fitnessSkipRecords",
+          "fitnessSkipOutbox",
+        ]) {
+          if (legacyDb.objectStoreNames.contains(name)) legacyDb.deleteObjectStore(name);
+        }
+        db.createObjectStore("fitnessSessionTemplates", { keyPath: "id" });
+        const scheduled = db.createObjectStore("fitnessScheduledSessions", { keyPath: "id" });
+        scheduled.createIndex("calendarDate", "calendarDate");
+        const workouts = db.createObjectStore("fitnessWorkoutLogs", { keyPath: "id" });
+        workouts.createIndex("status", "status");
+        workouts.createIndex("calendarDate", "calendarDate");
+        db.createObjectStore("fitnessSkipRecords", { keyPath: "id" });
+        db.createObjectStore("fitnessSessionTemplateOutbox", { keyPath: "id" });
+        db.createObjectStore("fitnessScheduledSessionOutbox", { keyPath: "id" });
+        db.createObjectStore("fitnessWorkoutOutbox", { keyPath: "id" });
+        db.createObjectStore("fitnessSkipOutbox", { keyPath: "id" });
       }
     },
   });

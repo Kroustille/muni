@@ -1,8 +1,13 @@
 import {
-  fitnessProgramToWire,
-  wireToFitnessProgram,
-  type FitnessProgramWire,
-} from "@/domain/fitness/program";
+  fitnessSessionTemplateToWire,
+  wireToFitnessSessionTemplate,
+  type FitnessSessionTemplateWire,
+} from "@/domain/fitness/session-template";
+import {
+  fitnessScheduledSessionToWire,
+  wireToFitnessScheduledSession,
+  type FitnessScheduledSessionWire,
+} from "@/domain/fitness/scheduled-session";
 import {
   fitnessSkipRecordToWire,
   fitnessUserSettingsToWire,
@@ -14,44 +19,50 @@ import {
   type FitnessUserSettingsWire,
   type FitnessWorkoutLogWire,
 } from "@/domain/fitness/workout-log";
-import type { FitnessProgramRepository } from "@/application/ports/fitness-program-repository";
+import type { FitnessSessionTemplateRepository } from "@/application/ports/fitness-session-template-repository";
+import type { FitnessScheduledSessionRepository } from "@/application/ports/fitness-scheduled-session-repository";
 import type { FitnessSkipRepository } from "@/application/ports/fitness-skip-repository";
 import type { FitnessSettingsRepository } from "@/application/ports/fitness-settings-repository";
 import type { FitnessWorkoutRepository } from "@/application/ports/fitness-workout-repository";
 
-export type FitnessSyncApplyDeps = {
-  programs: FitnessProgramRepository;
-  workouts: FitnessWorkoutRepository;
-  skips: FitnessSkipRepository;
-  settings: FitnessSettingsRepository;
-};
-
 export type FitnessSyncApply = {
   applyRemote(payload: {
-    programs: FitnessProgramWire[];
+    sessionTemplates: FitnessSessionTemplateWire[];
+    scheduledSessions: FitnessScheduledSessionWire[];
     workoutLogs: FitnessWorkoutLogWire[];
     skipRecords: FitnessSkipRecordWire[];
     settings: FitnessUserSettingsWire[];
   }): Promise<void>;
   collectPushPayload(): Promise<{
-    programs: FitnessProgramWire[];
+    sessionTemplates: FitnessSessionTemplateWire[];
+    scheduledSessions: FitnessScheduledSessionWire[];
     workoutLogs: FitnessWorkoutLogWire[];
     skipRecords: FitnessSkipRecordWire[];
     settings: FitnessUserSettingsWire[];
   }>;
   clearOutboxes(payload: {
-    programIds: string[];
+    sessionTemplateIds: string[];
+    scheduledSessionIds: string[];
     workoutIds: string[];
     skipIds: string[];
     settingsIds: string[];
   }): Promise<void>;
 };
 
-export function createFitnessSyncApply(deps: FitnessSyncApplyDeps): FitnessSyncApply {
+export function createFitnessSyncApply(deps: {
+  templates: FitnessSessionTemplateRepository;
+  scheduled: FitnessScheduledSessionRepository;
+  workouts: FitnessWorkoutRepository;
+  skips: FitnessSkipRepository;
+  settings: FitnessSettingsRepository;
+}): FitnessSyncApply {
   return {
     async applyRemote(payload) {
-      for (const wire of payload.programs) {
-        await deps.programs.upsert(wireToFitnessProgram(wire), { enqueue: false });
+      for (const wire of payload.sessionTemplates) {
+        await deps.templates.upsert(wireToFitnessSessionTemplate(wire), { enqueue: false });
+      }
+      for (const wire of payload.scheduledSessions) {
+        await deps.scheduled.upsert(wireToFitnessScheduledSession(wire), { enqueue: false });
       }
       for (const wire of payload.workoutLogs) {
         await deps.workouts.upsert(wireToFitnessWorkoutLog(wire), { enqueue: false });
@@ -65,14 +76,18 @@ export function createFitnessSyncApply(deps: FitnessSyncApplyDeps): FitnessSyncA
     },
 
     async collectPushPayload() {
-      const [programIds, workoutIds, skipIds, settingsIds] = await Promise.all([
-        deps.programs.outbox(),
+      const [templateIds, scheduledIds, workoutIds, skipIds, settingsIds] = await Promise.all([
+        deps.templates.outbox(),
+        deps.scheduled.outbox(),
         deps.workouts.outbox(),
         deps.skips.outbox(),
         deps.settings.outbox(),
       ]);
-      const programs = (
-        await Promise.all(programIds.map((id) => deps.programs.get(id)))
+      const sessionTemplates = (
+        await Promise.all(templateIds.map((id) => deps.templates.get(id)))
+      ).filter((p): p is NonNullable<typeof p> => p !== undefined);
+      const scheduledSessions = (
+        await Promise.all(scheduledIds.map((id) => deps.scheduled.get(id)))
       ).filter((p): p is NonNullable<typeof p> => p !== undefined);
       const workoutLogs = (
         await Promise.all(workoutIds.map((id) => deps.workouts.get(id)))
@@ -83,7 +98,8 @@ export function createFitnessSyncApply(deps: FitnessSyncApplyDeps): FitnessSyncA
       const settingsRow = settingsIds.length > 0 ? await deps.settings.get() : undefined;
       const settings = settingsRow !== undefined ? [settingsRow] : [];
       return {
-        programs: programs.map((p) => fitnessProgramToWire(p)),
+        sessionTemplates: sessionTemplates.map((p) => fitnessSessionTemplateToWire(p)),
+        scheduledSessions: scheduledSessions.map((p) => fitnessScheduledSessionToWire(p)),
         workoutLogs: workoutLogs.map((l) => fitnessWorkoutLogToWire(l)),
         skipRecords: skipRecords.map((s) => fitnessSkipRecordToWire(s)),
         settings: settings.map((s) => fitnessUserSettingsToWire(s)),
@@ -92,7 +108,8 @@ export function createFitnessSyncApply(deps: FitnessSyncApplyDeps): FitnessSyncA
 
     async clearOutboxes(payload) {
       await Promise.all([
-        deps.programs.clearOutbox(payload.programIds),
+        deps.templates.clearOutbox(payload.sessionTemplateIds),
+        deps.scheduled.clearOutbox(payload.scheduledSessionIds),
         deps.workouts.clearOutbox(payload.workoutIds),
         deps.skips.clearOutbox(payload.skipIds),
         deps.settings.clearOutbox(payload.settingsIds),

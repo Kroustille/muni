@@ -1,11 +1,12 @@
-import type { FitnessProgram, PlannedSession } from "@/domain/fitness/program";
-import { isoWeekdayFromCalendarDate } from "@/domain/fitness/adherence";
+import type { FitnessSessionTemplate } from "@/domain/fitness/session-template";
+import type { FitnessScheduledSession } from "@/domain/fitness/scheduled-session";
 import type { FitnessSkipRecord, FitnessWorkoutLog } from "@/domain/fitness/workout-log";
 
 export type TodaySessionStatus = "todo" | "in_progress" | "done" | "skipped" | "past";
 
-export type TodayPlannedSession = {
-  plannedSession: PlannedSession;
+export type TodayScheduledSession = {
+  scheduled: FitnessScheduledSession;
+  template: FitnessSessionTemplate;
   status: TodaySessionStatus;
   workoutId?: string;
 };
@@ -18,49 +19,51 @@ export function localCalendarDate(nowMs: number = Date.now()): string {
   return `${yy}-${mm}-${dd}`;
 }
 
-export function plannedSessionsForToday(program: FitnessProgram, calendarDate: string): PlannedSession[] {
-  const weekday = isoWeekdayFromCalendarDate(calendarDate);
-  return program.plannedSessions
-    .filter((s) => s.weekdays.includes(weekday))
-    .sort((a, b) => a.sortOrder - b.sortOrder);
-}
-
-export function resolveTodaySessions(
-  program: FitnessProgram | undefined,
+export function resolveTodayScheduledSessions(
+  scheduled: FitnessScheduledSession[],
+  templates: FitnessSessionTemplate[],
   logs: FitnessWorkoutLog[],
   skips: FitnessSkipRecord[],
   calendarDate: string,
-): TodayPlannedSession[] {
-  if (program === undefined || program.deletedAt !== null) return [];
-  const planned = plannedSessionsForToday(program, calendarDate);
-  return planned.map((session) => {
+): TodayScheduledSession[] {
+  const templateById = new Map(templates.filter((t) => t.deletedAt === null).map((t) => [t.id, t]));
+  const rows: TodayScheduledSession[] = [];
+  for (const row of scheduled
+    .filter((s) => s.deletedAt === null && s.calendarDate === calendarDate)
+    .sort((a, b) => a.sortOrder - b.sortOrder)) {
+    const template = templateById.get(row.sessionTemplateId);
+    if (template === undefined) continue;
     const inProgress = logs.find(
       (l) =>
         l.deletedAt === null &&
         l.status === "in_progress" &&
-        l.plannedSessionId === session.id &&
+        l.scheduledSessionId === row.id &&
         l.calendarDate === calendarDate,
     );
     if (inProgress) {
-      return { plannedSession: session, status: "in_progress", workoutId: inProgress.id };
+      rows.push({ scheduled: row, template, status: "in_progress", workoutId: inProgress.id });
+      continue;
     }
     const completed = logs.some(
       (l) =>
         l.deletedAt === null &&
         l.status === "completed" &&
-        l.plannedSessionId === session.id &&
+        l.scheduledSessionId === row.id &&
         l.calendarDate === calendarDate,
     );
-    if (completed) return { plannedSession: session, status: "done" };
+    if (completed) {
+      rows.push({ scheduled: row, template, status: "done" });
+      continue;
+    }
     const skipped = skips.some(
-      (s) =>
-        s.deletedAt === null &&
-        s.plannedSessionId === session.id &&
-        s.calendarDate === calendarDate,
+      (s) => s.deletedAt === null && s.scheduledSessionId === row.id && s.calendarDate === calendarDate,
     );
-    if (skipped) return { plannedSession: session, status: "skipped" };
-    const status: TodaySessionStatus =
-      calendarDate < localCalendarDate() ? "past" : "todo";
-    return { plannedSession: session, status };
-  });
+    if (skipped) {
+      rows.push({ scheduled: row, template, status: "skipped" });
+      continue;
+    }
+    const status: TodaySessionStatus = calendarDate < localCalendarDate() ? "past" : "todo";
+    rows.push({ scheduled: row, template, status });
+  }
+  return rows;
 }

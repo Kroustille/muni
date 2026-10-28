@@ -2,14 +2,16 @@ import { describe, expect, it } from "vitest";
 
 import { buildWeekAdherenceView, isoWeekdayFromCalendarDate } from "@/domain/fitness/adherence";
 import { derivePersonalRecords, isPersonalRecordOnSave } from "@/domain/fitness/progression";
-import type { FitnessProgram } from "@/domain/fitness/program";
+import type { FitnessScheduledSession } from "@/domain/fitness/scheduled-session";
+import type { FitnessSessionTemplate } from "@/domain/fitness/session-template";
 import type { FitnessWorkoutLog } from "@/domain/fitness/workout-log";
 
 const baseLog = (overrides: Partial<FitnessWorkoutLog>): FitnessWorkoutLog => ({
   id: overrides.id ?? "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
   status: "completed",
   calendarDate: "2026-10-13",
-  plannedSessionId: null,
+  sessionTemplateId: null,
+  scheduledSessionId: null,
   title: "Test",
   startedAt: "2026-10-13T10:00:00.000Z",
   completedAt: "2026-10-13T11:00:00.000Z",
@@ -62,26 +64,32 @@ describe("fitness progression and adherence", () => {
   });
 
   it("builds week adherence counts", () => {
-    const program: FitnessProgram = {
-      id: "11111111-2222-4333-8444-555555555555",
-      name: "PPL",
-      isActive: true,
-      plannedSessions: [
-        {
-          id: "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee",
-          title: "Lundi",
-          weekdays: [1],
-          sortOrder: 0,
-          exercises: [],
-        },
-      ],
-      deletedAt: null,
-      fieldsUpdatedAt: {},
-    };
+    const templateId = "aaaaaaaa-bbbb-4ccc-8ddd-eeeeeeeeeeee";
+    const scheduledId = "cccccccc-cccc-4ccc-8ccc-cccccccccccc";
+    const templates: FitnessSessionTemplate[] = [
+      {
+        id: templateId,
+        title: "Lundi",
+        sortOrder: 0,
+        templateExercises: [],
+        deletedAt: null,
+        fieldsUpdatedAt: {},
+      },
+    ];
     const monday = "2026-10-12";
+    const scheduled: FitnessScheduledSession[] = [
+      {
+        id: scheduledId,
+        calendarDate: monday,
+        sessionTemplateId: templateId,
+        sortOrder: 0,
+        deletedAt: null,
+        fieldsUpdatedAt: {},
+      },
+    ];
     expect(isoWeekdayFromCalendarDate(monday)).toBe(1);
-    const view = buildWeekAdherenceView(program, [], [], monday);
-    expect(view.plannedCount).toBeGreaterThanOrEqual(1);
+    const view = buildWeekAdherenceView(scheduled, templates, [], [], monday);
+    expect(view.plannedCount).toBe(1);
     expect(view.completedCount).toBe(0);
   });
 });

@@ -9,24 +9,32 @@ import { InMemoryItemRepository } from "../../helpers/in-memory-item-repository"
 describe("fitness sync engine", () => {
   it("pushes payload, clears outbox, and stores pull cursor", async () => {
     const metaRepo = new InMemoryItemRepository();
-    const programs = {
+    const templates = {
       get: async () => undefined,
       list: async () => [],
       upsert: async (row: unknown) => row,
       subscribe: () => () => undefined,
       outbox: async () => ["11111111-1111-4111-8111-111111111111"],
       clearOutbox: vi.fn(async () => {}),
-      getActive: async () => undefined,
     };
-    const programRow = {
+    const templateRow = {
       id: "11111111-1111-4111-8111-111111111111",
-      name: "Force",
-      isActive: true,
+      title: "Force",
+      sortOrder: 0,
+      templateExercises: [],
       deletedAt: null,
-      plannedSessions: [],
-      fieldsUpdatedAt: { name: "s" },
+      fieldsUpdatedAt: { title: "s" },
     };
-    programs.get = async () => programRow as never;
+    templates.get = async () => templateRow as never;
+    const scheduled = {
+      get: async () => undefined,
+      list: async () => [],
+      listForDate: async () => [],
+      upsert: async (row: unknown) => row,
+      subscribe: () => () => undefined,
+      outbox: async () => [],
+      clearOutbox: async () => {},
+    };
     const workouts = {
       get: async () => undefined,
       getInProgress: async () => undefined,
@@ -50,7 +58,8 @@ describe("fitness sync engine", () => {
       outbox: async () => [],
     };
     const sync = createFitnessSyncApply({
-      programs: programs as never,
+      templates: templates as never,
+      scheduled: scheduled as never,
       workouts: workouts as never,
       skips: skips as never,
       settings: settings as never,
@@ -58,7 +67,8 @@ describe("fitness sync engine", () => {
     const remote: FitnessRemoteStore = {
       push: async (payload) => ({ ...payload, cursor: "c1" }),
       pull: async () => ({
-        programs: [],
+        sessionTemplates: [],
+        scheduledSessions: [],
         workoutLogs: [],
         skipRecords: [],
         settings: [],
@@ -73,28 +83,36 @@ describe("fitness sync engine", () => {
       sleep: async () => {},
     });
     await engine.run();
-    expect(programs.clearOutbox).toHaveBeenCalled();
+    expect(templates.clearOutbox).toHaveBeenCalled();
     expect(await metaRepo.meta.get("fitnessPullCursor")).toBe("c2");
   });
 
   it("records validation quarantine rows", async () => {
     const metaRepo = new InMemoryItemRepository();
     const sync = createFitnessSyncApply({
-      programs: {
+      templates: {
         get: async () => ({
           id: "11111111-1111-4111-8111-111111111111",
-          name: "P",
-          isActive: true,
+          title: "P",
+          sortOrder: 0,
+          templateExercises: [],
           deletedAt: null,
-          plannedSessions: [],
-          fieldsUpdatedAt: { name: "s" },
+          fieldsUpdatedAt: { title: "s" },
         }),
         list: async () => [],
         upsert: async (row: unknown) => row,
         subscribe: () => () => undefined,
         outbox: async () => ["11111111-1111-4111-8111-111111111111"],
         clearOutbox: async () => {},
-        getActive: async () => undefined,
+      } as never,
+      scheduled: {
+        get: async () => undefined,
+        list: async () => [],
+        listForDate: async () => [],
+        upsert: async (row: unknown) => row,
+        subscribe: () => () => undefined,
+        outbox: async () => [],
+        clearOutbox: async () => {},
       } as never,
       workouts: {
         get: async () => undefined,
@@ -126,7 +144,8 @@ describe("fitness sync engine", () => {
           throw new RemoteStoreError("validation", [{ index: 0, id: "bad", message: "invalid" }]);
         },
         pull: async () => ({
-          programs: [],
+          sessionTemplates: [],
+          scheduledSessions: [],
           workoutLogs: [],
           skipRecords: [],
           settings: [],

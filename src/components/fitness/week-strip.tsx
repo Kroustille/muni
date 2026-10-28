@@ -13,7 +13,7 @@ export function WeekAdherenceStrip({ view }: { view: WeekAdherenceView }) {
       <ul className="mt-2 flex flex-wrap gap-1">
         {view.sessions.map((session) => (
           <li
-            key={`${session.calendarDate}-${session.plannedSessionId}`}
+            key={`${session.calendarDate}-${session.scheduledSessionId}`}
             className={`rounded-full px-2 py-0.5 text-xs ${
               session.status === "completed"
                 ? "bg-accent/20 text-accent"

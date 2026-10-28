@@ -2,11 +2,16 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { getFitnessProgramUseCases, getFitnessUserSettings, getFitnessWorkoutUseCases } from "@/composition/client";
+import {
+  getFitnessScheduleUseCases,
+  getFitnessSessionTemplateUseCases,
+  getFitnessUserSettings,
+  getFitnessWorkoutUseCases,
+} from "@/composition/client";
 import { computeAdherenceStreak } from "@/application/fitness/adherence-streak";
 import { buildWeekAdherenceView } from "@/domain/fitness/adherence";
 import { defaultFitnessUserSettings } from "@/domain/fitness/workout-log";
-import { localCalendarDate, plannedSessionsForToday } from "@/application/fitness/today";
+import { localCalendarDate, resolveTodayScheduledSessions } from "@/application/fitness/today";
 import { t } from "@/i18n";
 
 export function HomeFitnessCard() {
@@ -14,16 +19,25 @@ export function HomeFitnessCard() {
 
   useEffect(() => {
     void (async () => {
-      const programUseCases = await getFitnessProgramUseCases();
+      const templateUseCases = await getFitnessSessionTemplateUseCases();
+      const scheduleUseCases = await getFitnessScheduleUseCases();
       const workoutUseCases = await getFitnessWorkoutUseCases();
-      const program = await programUseCases.getActiveProgram();
-      if (program === undefined) return;
+      const templates = (await templateUseCases.listTemplates()).filter((t) => t.deletedAt === null);
+      if (templates.length === 0) return;
+      const scheduled = await scheduleUseCases.listScheduled();
       const logs = await workoutUseCases.listWorkouts();
       const settings = (await getFitnessUserSettings()) ?? defaultFitnessUserSettings();
-      const week = buildWeekAdherenceView(program, logs, [], localCalendarDate());
+      const todayDate = localCalendarDate();
+      const week = buildWeekAdherenceView(scheduled, templates, logs, [], todayDate);
       const streak = computeAdherenceStreak(logs, settings);
-      const todaySessions = plannedSessionsForToday(program, localCalendarDate());
-      const next = todaySessions[0]?.title;
+      const todaySessions = resolveTodayScheduledSessions(
+        scheduled,
+        templates,
+        logs,
+        [],
+        todayDate,
+      );
+      const next = todaySessions.find((s) => s.status === "todo")?.template.title;
       const parts = [t("fitness.homeCard.weekDone").replace("{done}", String(week.completedCount))];
       if (settings.adherenceTrackingEnabled && streak > 0) {
         parts.push(t("fitness.homeCard.streak").replace("{count}", String(streak)));

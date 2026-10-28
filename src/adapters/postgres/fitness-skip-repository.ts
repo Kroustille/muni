@@ -30,7 +30,8 @@ function toDomain(row: Selectable<FitnessSkipRecordRow>): FitnessSkipRecord {
   return wireToFitnessSkipRecord({
     id: row.id,
     calendar_date: toCalendarDate(row.calendar_date),
-    planned_session_id: row.planned_session_id,
+    scheduled_session_id: row.scheduled_session_id,
+    session_template_id: row.session_template_id,
     note: row.note,
     deleted_at: row.deleted_at === null ? null : toIso(row.deleted_at),
     fields_updated_at: row.fields_updated_at as FitnessSkipRecordWire["fields_updated_at"],
@@ -48,7 +49,8 @@ function toRow(
     user_id: userId,
     id: record.id,
     calendar_date: record.calendarDate,
-    planned_session_id: record.plannedSessionId,
+    scheduled_session_id: record.scheduledSessionId,
+    session_template_id: record.sessionTemplateId,
     note: record.note,
     deleted_at: record.deletedAt,
     fields_updated_at: wire.fields_updated_at,
@@ -88,7 +90,8 @@ function createRepo(db: DbOrTrx, inTransaction: boolean): ServerFitnessSkipRepos
         .onConflict((oc) =>
           oc.columns(["user_id", "id"]).doUpdateSet({
             calendar_date: values.calendar_date,
-            planned_session_id: values.planned_session_id,
+            scheduled_session_id: values.scheduled_session_id,
+            session_template_id: values.session_template_id,
             note: values.note,
             deleted_at: values.deleted_at,
             fields_updated_at: values.fields_updated_at,
