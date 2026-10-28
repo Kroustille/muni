@@ -59,6 +59,56 @@ export interface CatalogCache {
   provider: string;
 }
 
+export interface FitnessProgram {
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  is_active: boolean;
+  name: string;
+  planned_sessions: Json;
+  server_updated_at: Timestamp;
+  user_id: string;
+}
+
+export interface FitnessSkipRecord {
+  calendar_date: Timestamp;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  note: string | null;
+  planned_session_id: string;
+  server_updated_at: Timestamp;
+  user_id: string;
+}
+
+export interface FitnessUserSettings {
+  adherence_min_workouts_per_week: number;
+  adherence_tracking_enabled: boolean;
+  charge_unit: string;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  server_updated_at: Timestamp;
+  user_id: string;
+}
+
+export interface FitnessWorkoutLog {
+  calendar_date: Timestamp;
+  catalog_version: number;
+  completed_at: Timestamp | null;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  id: string;
+  logged_exercises: Json;
+  planned_session_id: string | null;
+  recovery: Json | null;
+  server_updated_at: Timestamp;
+  started_at: Timestamp;
+  status: string;
+  title: string;
+  user_id: string;
+}
+
 export interface Items {
   album: string | null;
   artist: string | null;
@@ -136,71 +186,6 @@ export interface MovieQuotes {
   user_id: string;
 }
 
-export interface ReadingGoals {
-  fields_updated_at: Json;
-  server_updated_at: Timestamp;
-  target_count: number;
-  user_id: string;
-  year: number;
-}
-
-export interface Sessions {
-  created_at: Generated<Timestamp>;
-  expires_at: Timestamp;
-  id: string;
-  last_seen_at: Generated<Timestamp>;
-  token_hash: string;
-  user_id: string;
-}
-
-export interface Users {
-  created_at: Generated<Timestamp>;
-  email: string;
-  google_sub: string | null;
-  id: string;
-}
-
-export interface WatchGoals {
-  fields_updated_at: Json;
-  server_updated_at: Timestamp;
-  target_count: number;
-  user_id: string;
-  year: number;
-}
-
-export interface FitnessProgram {
-  deleted_at: Timestamp | null;
-  fields_updated_at: Json;
-  id: string;
-  is_active: boolean;
-  name: string;
-  planned_sessions: Json;
-  server_updated_at: Timestamp;
-  user_id: string;
-}
-
-export interface FitnessSkipRecord {
-  calendar_date: Timestamp;
-  deleted_at: Timestamp | null;
-  fields_updated_at: Json;
-  id: string;
-  note: string | null;
-  planned_session_id: string;
-  server_updated_at: Timestamp;
-  user_id: string;
-}
-
-export interface FitnessUserSettings {
-  adherence_min_workouts_per_week: number;
-  adherence_tracking_enabled: boolean;
-  charge_unit: string;
-  deleted_at: Timestamp | null;
-  fields_updated_at: Json;
-  id: string;
-  server_updated_at: Timestamp;
-  user_id: string;
-}
-
 export interface Plant {
   care_profile_id: string | null;
   deleted_at: Timestamp | null;
@@ -237,6 +222,30 @@ export interface PlantCareProfile {
   user_id: string;
 }
 
+export interface ReadingGoals {
+  fields_updated_at: Json;
+  server_updated_at: Timestamp;
+  target_count: number;
+  user_id: string;
+  year: number;
+}
+
+export interface Sessions {
+  created_at: Generated<Timestamp>;
+  expires_at: Timestamp;
+  id: string;
+  last_seen_at: Generated<Timestamp>;
+  token_hash: string;
+  user_id: string;
+}
+
+export interface Users {
+  created_at: Generated<Timestamp>;
+  email: string;
+  google_sub: string | null;
+  id: string;
+}
+
 export interface VegetableCulture {
   deleted_at: Timestamp | null;
   fields_updated_at: Json;
@@ -262,32 +271,26 @@ export interface VegetableMilestone {
   user_id: string;
 }
 
-export interface FitnessWorkoutLog {
-  calendar_date: Timestamp;
-  catalog_version: number;
-  completed_at: Timestamp | null;
-  deleted_at: Timestamp | null;
+export interface WatchGoals {
   fields_updated_at: Json;
-  id: string;
-  logged_exercises: Json;
-  planned_session_id: string | null;
-  recovery: Json | null;
   server_updated_at: Timestamp;
-  started_at: Timestamp;
-  status: string;
-  title: string;
+  target_count: number;
   user_id: string;
+  year: number;
 }
 
 export interface DB {
   book_quotes: BookQuotes;
   catalog_cache: CatalogCache;
+<<<<<<< HEAD
   cookbooks: Cookbooks;
   plant: Plant;
   plant_care_event: PlantCareEvent;
   plant_care_profile: PlantCareProfile;
   vegetable_culture: VegetableCulture;
   vegetable_milestone: VegetableMilestone;
+=======
+>>>>>>> 89d1713 (chore(db): regenerate Kysely types after plants migration)
   fitness_program: FitnessProgram;
   fitness_skip_record: FitnessSkipRecord;
   fitness_user_settings: FitnessUserSettings;
@@ -295,8 +298,13 @@ export interface DB {
   items: Items;
   magic_link_tokens: MagicLinkTokens;
   movie_quotes: MovieQuotes;
+  plant: Plant;
+  plant_care_event: PlantCareEvent;
+  plant_care_profile: PlantCareProfile;
   reading_goals: ReadingGoals;
   sessions: Sessions;
   users: Users;
+  vegetable_culture: VegetableCulture;
+  vegetable_milestone: VegetableMilestone;
   watch_goals: WatchGoals;
 }
