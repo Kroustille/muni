@@ -1,35 +1,40 @@
-# Specification Quality Checklist: Experiences & achievements — discovery companion
+# Vision document quality checklist: Experiences & achievements (009)
 
-**Purpose**: Validate specification completeness and quality before proceeding to planning  
+**Purpose**: Validate that `spec.md` reads as a **product north star**, not an implementation or delivery spec  
 **Created**: 2026-10-28  
-**Feature**: [spec.md](../spec.md)
+**Updated**: 2026-10-28 (vision-only scope)  
+**Document**: [spec.md](../spec.md)
 
-## Content Quality
+## Vision clarity
 
-- [x] No implementation details (languages, frameworks, APIs)
-- [x] Focused on user value and business needs
-- [x] Written for non-technical stakeholders
-- [x] All mandatory sections completed
+- [x] Title and opening state **Product vision / North star** and **not a delivery spec**
+- [x] North star paragraph is understandable without reading other specs
+- [x] **Principles** table covers tone, privacy, domains, and subjective novelty
+- [x] **What success looks like** is qualitative and longitudinal (not sprint metrics)
+- [x] **How existing features serve the vision** maps 002–008+ without prescribing new modules
 
-## Requirement Completeness
+## Scope discipline
 
-- [x] No [NEEDS CLARIFICATION] markers remain
-- [x] Requirements are testable and unambiguous
-- [x] Success criteria are measurable
-- [x] Success criteria are technology-agnostic (no implementation details)
-- [x] All acceptance scenarios are defined
-- [x] Edge cases are identified
-- [x] Scope is clearly bounded
-- [x] Dependencies and assumptions identified
+- [x] **Out of scope for this document** explicitly lists screens, entities, sync, timeline, home cards
+- [x] No phased MVP (A–D), user stories, acceptance scenarios, or FR-xxx implementation requirements
+- [x] **Future directions (not scheduled)** is a short bullet list — not a backlog
+- [x] No `[NEEDS CLARIFICATION]` markers; open questions labeled as future prioritization only
 
-## Feature Readiness
+## Alignment & tone
 
-- [x] All functional requirements have clear acceptance criteria
-- [x] User scenarios cover primary flows
-- [x] Feature meets measurable outcomes defined in Success Criteria
-- [x] No implementation details leak into specification
+- [x] Anti-patterns (no guilt, no social comparison, no novelty streaks) preserved as vision principles
+- [x] Fitness streak exception (008 opt-in) referenced correctly — not duplicated globally
+- [x] French-first / companion tone referenced without mandating new UI strings in this doc
+- [x] Assumptions state **009 is vision only — no 009 implementation planned**
+
+## Stakeholder readiness
+
+- [x] Readable by non-engineers (no APIs, frameworks, or schema detail)
+- [x] Domain owners can use the doc to judge whether a **feature spec** serves the north star
+- [x] Clear pointer: implementation lives in **001** and domain specs, not 009
 
 ## Notes
 
-- Validation pass 1 (2026-10-28): All items pass. Open product questions for Valentin listed at end of spec (not `[NEEDS CLARIFICATION]` markers).
-- Recommended next step: **`/speckit-clarify`** on questions 1–2 (library integration + unified capture) before **`/speckit-plan`**, unless Valentin accepts assumed defaults in **Assumptions**.
+- Validation pass 2 (2026-10-28): All items pass after Valentin clarification — 009 is north star only.
+- **Planning N/A** for 009: no `tasks.md` or `plan.md` — vision document only.
+- Recommended next step for **features**: work from domain specs (008, 010, …); use 009 only when framing or reviewing product fit.
