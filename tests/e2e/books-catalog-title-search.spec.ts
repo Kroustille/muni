@@ -2,6 +2,9 @@ import { expect, test } from "@playwright/test";
 import fr from "../../src/i18n/fr.json";
 import { openList, signIn } from "./list-helpers";
 
+// Serwist routes /api/* through the service worker, which bypasses page.route mocks.
+test.use({ serviceWorkers: "block" });
+
 const t = (key: keyof typeof fr): string => fr[key];
 
 test.describe("books title catalog search (desktop)", () => {
@@ -39,19 +42,17 @@ test.describe("books title catalog search (desktop)", () => {
     await openList(page, "books");
     await page.getByRole("button", { name: t("books.catalog.search") }).click();
     await page.getByLabel(t("books.catalog.search.placeholder")).fill("1984");
-    await page.waitForResponse(
-      (res) => res.url().includes("/api/books/search") && res.ok(),
-      { timeout: 15_000 },
-    );
+    await page.waitForResponse((res) => res.url().includes("/api/books/search") && res.ok(), {
+      timeout: 15_000,
+    });
 
     const result = page.getByRole("listitem").filter({ hasText: "1984" });
     await expect(result).toBeVisible({ timeout: 10_000 });
     await result.getByRole("button").click();
 
-    await expect(page.getByLabel(t("field.synopsis"))).toHaveValue(
-      "Dans un monde totalitaire.",
-      { timeout: 10_000 },
-    );
+    await expect(page.getByLabel(t("field.synopsis"))).toHaveValue("Dans un monde totalitaire.", {
+      timeout: 10_000,
+    });
     await page.getByRole("button", { name: t("action.save") }).click();
     await expect(page.getByRole("link", { name: "1984" })).toBeVisible({ timeout: 10_000 });
   });

@@ -1,5 +1,8 @@
 import { expect, test } from "@playwright/test";
 
+// Serwist routes /api/* through the service worker, which bypasses page.route mocks.
+test.use({ serviceWorkers: "block" });
+
 test.describe("movies catalog search", () => {
   test("search, preview, and save from mocked API", async ({ page }) => {
     await page.route("**/api/movies/search*", async (route) => {

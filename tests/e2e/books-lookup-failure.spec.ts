@@ -1,5 +1,8 @@
 import { expect, test } from "@playwright/test";
 
+// Serwist routes /api/* through the service worker, which bypasses page.route mocks.
+test.use({ serviceWorkers: "block" });
+
 test.describe("books lookup failure (mobile)", () => {
   test.use({ viewport: { width: 390, height: 844 }, isMobile: true });
 

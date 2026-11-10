@@ -1,5 +1,14 @@
 import { expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
-import { addItem, locators, openItem, openList, selectors, signIn, t } from "./list-helpers";
+import {
+  addItem,
+  locators,
+  saveItem,
+  openItem,
+  openList,
+  selectors,
+  signIn,
+  t,
+} from "./list-helpers";
 
 const mailpit = process.env.MAILPIT_URL ?? "http://localhost:8025";
 
@@ -98,12 +107,12 @@ test("same-field conflict resolves to the latest edit on both devices", async ({
   await openList(pageA, "books");
   await openItem(pageA, title);
   await pageA.getByLabel(selectors.fieldNotes).fill(earlierNote);
-  await pageA.getByRole("button", { name: selectors.actionSave }).click();
+  await saveItem(pageA);
 
   await openList(pageB, "books");
   await openItem(pageB, title);
   await pageB.getByLabel(selectors.fieldNotes).fill(laterNote);
-  await pageB.getByRole("button", { name: selectors.actionSave }).click();
+  await saveItem(pageB);
 
   await contextA.setOffline(false);
   await contextB.setOffline(false);

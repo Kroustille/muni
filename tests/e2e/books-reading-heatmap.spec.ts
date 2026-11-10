@@ -1,6 +1,15 @@
 import { expect, test } from "@playwright/test";
 
-import { addItem, locators, openItem, openList, selectors, signIn, t } from "./list-helpers";
+import {
+  addItem,
+  locators,
+  saveItem,
+  openItem,
+  openList,
+  selectors,
+  signIn,
+  t,
+} from "./list-helpers";
 
 test.describe("book reading heatmap", () => {
   test("lights activity after pages read update", async ({ page }) => {
@@ -12,7 +21,7 @@ test.describe("book reading heatmap", () => {
 
     await page.getByLabel(t("field.status")).selectOption({ label: t("status.reading") });
     await page.getByLabel(t("books.pagesRead")).fill("15");
-    await page.getByRole("button", { name: selectors.actionSave }).click();
+    await saveItem(page);
 
     await page.goto("/books/insights");
     await expect(page.getByTestId("reading-heatmap")).toBeVisible();

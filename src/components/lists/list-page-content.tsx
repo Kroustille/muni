@@ -110,15 +110,11 @@ function editionGroupLabel(count: number): string {
   return t("books.editions.count").replace("{count}", String(count));
 }
 
-type BookListEntry =
-  | { kind: "single"; item: Item }
-  | { kind: "group"; group: BookWorkGroup };
+type BookListEntry = { kind: "single"; item: Item } | { kind: "group"; group: BookWorkGroup };
 
 function bookListEntries(items: Item[]): BookListEntry[] {
   return groupBooksByWork(items).map((group) =>
-    group.items.length === 1
-      ? { kind: "single", item: group.items[0]! }
-      : { kind: "group", group },
+    group.items.length === 1 ? { kind: "single", item: group.items[0]! } : { kind: "group", group },
   );
 }
 
@@ -346,9 +342,7 @@ export function ListPageContent({
           <ListQuickAddButton itemType={itemType} />
           {route === "books" ? (
             <>
-              {isMobile ? (
-                <BookCatalogFlow onSaved={refreshList} showDefaultTrigger />
-              ) : null}
+              {isMobile ? <BookCatalogFlow onSaved={refreshList} showDefaultTrigger /> : null}
               <BookTitleCatalogFlow onSaved={refreshList} />
               {bookLibraryUi ? (
                 <button
@@ -378,11 +372,7 @@ export function ListPageContent({
         </div>
       </div>
       {showStatusFilter ? (
-        <StatusFilter
-          itemType={itemType}
-          value={statusFilter}
-          onChange={setStatusFilter}
-        />
+        <StatusFilter itemType={itemType} value={statusFilter} onChange={setStatusFilter} />
       ) : null}
       {bookLibraryUi && route === "books" ? (
         <BookTagSeriesFilters
@@ -646,5 +636,14 @@ export function ListPageContent({
 export function ListPageFromParam({ routeParam }: { routeParam: string | undefined }) {
   const route = typeof routeParam === "string" && isListRoute(routeParam) ? routeParam : null;
   if (route === null) notFound();
-  return <ListPageContent route={route} />;
+  // Navigation links to /lists/*, so the typed list pages carry the full
+  // library UI (filters, tags, series, work grouping) for books and movies.
+  return (
+    <ListPageContent
+      route={route}
+      groupBooksByWork={route === "books"}
+      bookLibraryUi={route === "books"}
+      movieLibraryUi={route === "movies"}
+    />
+  );
 }

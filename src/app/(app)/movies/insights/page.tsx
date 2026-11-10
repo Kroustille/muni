@@ -53,7 +53,7 @@ export default function MovieInsightsPage() {
     <main className="mx-auto flex max-w-3xl flex-col gap-8 p-4 pb-20">
       <div className="flex items-center justify-between gap-4">
         <h1 className="text-2xl font-semibold">{t("movies.insights.stats")}</h1>
-        <Link href="/movies" className="text-sm text-accent underline">
+        <Link href="/lists/movies" className="text-sm text-accent underline">
           {t("list.movies")}
         </Link>
       </div>

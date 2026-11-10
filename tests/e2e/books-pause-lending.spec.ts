@@ -1,7 +1,16 @@
 import { expect, test } from "@playwright/test";
 
 import fr from "../../src/i18n/fr.json";
-import { addItem, locators, openItem, openList, selectors, signIn, t } from "./list-helpers";
+import {
+  addItem,
+  locators,
+  saveItem,
+  openItem,
+  openList,
+  selectors,
+  signIn,
+  t,
+} from "./list-helpers";
 
 test.describe("book pause and lending", () => {
   test("pause with pages read, lend, and return", async ({ page }) => {
@@ -15,7 +24,7 @@ test.describe("book pause and lending", () => {
     await page.getByLabel(t("books.pagesRead")).fill("120");
     await page.getByLabel(t("books.loan.to")).fill("Alex");
     await page.getByLabel(t("books.loan.since")).fill("2026-03-10");
-    await page.getByRole("button", { name: selectors.actionSave }).click();
+    await saveItem(page);
 
     await page.reload();
     await expect(page.getByLabel(t("field.status"))).toHaveValue("paused");
@@ -27,7 +36,7 @@ test.describe("book pause and lending", () => {
     await expect(page.getByLabel(t("books.loan.to"))).toHaveValue("");
 
     await page.getByLabel(t("field.status")).selectOption({ label: selectors.statusReading });
-    await page.getByRole("button", { name: selectors.actionSave }).click();
+    await saveItem(page);
     await page.reload();
     await expect(page.getByLabel(t("field.status"))).toHaveValue("reading");
   });

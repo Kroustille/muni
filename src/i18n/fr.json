@@ -91,6 +91,7 @@
   "search.placeholder": "Rechercher dans toutes les listes",
   "search.empty": "Aucun résultat.",
   "item.deleted": "Élément supprimé",
+  "item.saved": "Modifications enregistrées",
   "item.deletedMany": "{count} éléments supprimés",
   "settings.title": "Réglages",
   "settings.appearance": "Apparence",

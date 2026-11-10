@@ -1,4 +1,5 @@
 import type { BookMood, Item } from "@/domain/item";
+import { fieldStampToEpochMs } from "@/application/shared/activity-days";
 
 export type SuggestMoviesOptions = {
   now?: Date;
@@ -9,7 +10,8 @@ function isWatchedInLastYear(item: Item, cutoff: Date): boolean {
   if (item.type !== "movie" || item.status !== "watched") return false;
   const watchedAt = item.fieldsUpdatedAt.watched ?? item.fieldsUpdatedAt.status;
   if (!watchedAt) return true;
-  return new Date(watchedAt) >= cutoff;
+  const ms = fieldStampToEpochMs(watchedAt);
+  return ms == null ? true : ms >= cutoff.getTime();
 }
 
 function mostRecentWatchedMood(movies: readonly Item[]): BookMood | null {

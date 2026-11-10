@@ -50,8 +50,7 @@ export function CookbookCombobox({
   }, [query]);
 
   const trimmed = query.trim();
-  const showCreate =
-    trimmed.length > 0 && exactTitleMatch(allCookbooks, trimmed) === undefined;
+  const showCreate = trimmed.length > 0 && exactTitleMatch(allCookbooks, trimmed) === undefined;
   const showList = expanded && (options.length > 0 || showCreate);
 
   return (
@@ -87,25 +86,24 @@ export function CookbookCombobox({
               className="cursor-pointer px-3 py-2 text-sm hover:bg-surface"
               onMouseDown={(event) => {
                 event.preventDefault();
+                // onSelect also sets the query; a second state update from the
+                // same render would overwrite the selection with stale values.
                 onSelect(cookbook, null);
-                onQueryChange(cookbook.title);
                 setExpanded(false);
               }}
             >
               {cookbook.title}
-              {cookbook.author ? (
-                <span className="text-muted"> — {cookbook.author}</span>
-              ) : null}
+              {cookbook.author ? <span className="text-muted"> — {cookbook.author}</span> : null}
             </li>
           ))}
           {showCreate ? (
             <li
               role="option"
+              aria-selected={false}
               className="cursor-pointer px-3 py-2 text-sm font-medium text-accent hover:bg-surface"
               onMouseDown={(event) => {
                 event.preventDefault();
                 onSelect(null, trimmed);
-                onQueryChange(trimmed);
                 setExpanded(false);
               }}
             >

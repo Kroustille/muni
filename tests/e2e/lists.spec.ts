@@ -3,6 +3,7 @@ import {
   addItem,
   listPath,
   locators,
+  saveItem,
   openItem,
   mailpitUrl,
   openList,
@@ -23,7 +24,7 @@ test("checks off a shopping item on the list", async ({ page }) => {
 
   const checkbox = locators.shoppingCheck(page, name);
   await expect(checkbox).not.toBeChecked();
-  await checkbox.check();
+  await checkbox.click();
   await expect(checkbox).toBeChecked();
 
   await page.reload();
@@ -102,12 +103,15 @@ test("edits a recipe and persists ingredients and steps after reload", async ({ 
   await ingredientRows.nth(0).getByLabel(t("field.quantity")).fill("250 g");
   await ingredientRows.nth(0).getByLabel(t("field.name")).fill("farine");
 
-  await page.getByRole("button", { name: selectors.addStep }).click();
   const stepFields = page.getByRole("group", { name: selectors.fieldSteps }).getByRole("textbox");
+  if ((await stepFields.count()) === 0) {
+    await page.getByRole("button", { name: selectors.addStep }).click();
+  }
   await stepFields.nth(0).fill("Mélanger la pâte");
+  await page.getByRole("button", { name: selectors.addStep }).click();
   await stepFields.nth(1).fill("Cuire à la poêle");
 
-  await page.getByRole("button", { name: selectors.actionSave }).click();
+  await saveItem(page);
 
   await page.reload();
   await expect(page.getByLabel(selectors.fieldNotes)).toHaveValue("Pour le goûter");
@@ -127,6 +131,7 @@ test("deletes an item and restores it with Undo", async ({ page }) => {
   await page.getByRole("button", { name: selectors.actionDelete }).click();
   await expect(page.getByText(selectors.itemDeleted)).toBeVisible();
   await locators.undoButton(page).click();
+  await expect(page.getByText(selectors.itemDeleted)).toBeHidden();
 
   await page.goto(listPath("movies"));
   await expect(locators.itemLink(page, title)).toBeVisible();

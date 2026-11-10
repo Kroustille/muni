@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import {
   addItem,
   locators,
+  saveItem,
   openItem,
   mailpitUrl,
   openList,
@@ -76,7 +77,7 @@ test("does not match notes, only title or name", async ({ page, context }) => {
   await openList(page, "books");
   await openItem(page, title);
   await page.getByLabel(t("field.notes")).fill("motsecretintrouvable");
-  await page.getByRole("button", { name: selectors.actionSave }).click();
+  await saveItem(page);
 
   await context.setOffline(true);
   await openSearch(page);

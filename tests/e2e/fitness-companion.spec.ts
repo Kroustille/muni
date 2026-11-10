@@ -1,8 +1,11 @@
 import { expect, test } from "@playwright/test";
 import { signIn } from "./list-helpers";
+import { seedFitnessSessionLibrary } from "./fitness-helpers";
 
 test("recovery and adherence settings", async ({ page }) => {
   await signIn(page);
+  // The Accueil fitness card only appears once the user has session templates.
+  await seedFitnessSessionLibrary(page, "Companion");
   await page.goto("/fitness/settings");
   await page.getByTestId("fitness-adherence-toggle").check();
   await page.getByRole("button", { name: /Enregistrer/i }).click();

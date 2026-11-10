@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import fr from "../../src/i18n/fr.json";
 import {
   locators,
+  saveItem,
   openItem,
   openQuickAddType,
   selectors,
@@ -14,7 +15,7 @@ const t = (key: keyof typeof fr): string => fr[key];
 test.describe("movies tags and franchise filters", () => {
   test("assign tag and franchise on detail", async ({ page }) => {
     await signIn(page);
-    await page.goto("/movies");
+    await page.goto("/lists/movies");
 
     const title = `Tag Franchise ${Date.now()}`;
 
@@ -31,7 +32,7 @@ test.describe("movies tags and franchise filters", () => {
     await page.getByRole("button", { name: t("books.tags.add") }).click();
     await page.getByLabel(t("movies.franchise.name")).fill("Ma saga");
     await page.getByLabel(t("movies.franchise.order")).fill("2");
-    await page.getByRole("button", { name: selectors.actionSave }).click();
+    await saveItem(page);
     await page.reload();
     await expect(page.getByLabel(t("movies.franchise.name"))).toHaveValue("Ma saga");
     await expect(page.getByLabel(t("movies.franchise.order"))).toHaveValue("2");

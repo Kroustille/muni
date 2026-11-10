@@ -1,4 +1,5 @@
 import type { BookMood, Item } from "@/domain/item";
+import { fieldStampToEpochMs } from "@/application/shared/activity-days";
 
 export type SuggestBooksOptions = {
   now?: Date;
@@ -9,7 +10,8 @@ function isReadInLastYear(item: Item, cutoff: Date): boolean {
   if (item.type !== "book" || item.status !== "read") return false;
   const readAt = item.fieldsUpdatedAt.read ?? item.fieldsUpdatedAt.status;
   if (!readAt) return true;
-  return new Date(readAt) >= cutoff;
+  const ms = fieldStampToEpochMs(readAt);
+  return ms == null ? true : ms >= cutoff.getTime();
 }
 
 function mostRecentReadMood(books: readonly Item[]): BookMood | null {
@@ -47,9 +49,7 @@ export function suggestBooks(books: readonly Item[], options: SuggestBooksOption
 
   const targetMood = mostRecentReadMood(bookItems);
 
-  const candidates = bookItems.filter(
-    (item) => item.status === "to_read" || item.status === null,
-  );
+  const candidates = bookItems.filter((item) => item.status === "to_read" || item.status === null);
 
   const scored = candidates
     .map((book) => {

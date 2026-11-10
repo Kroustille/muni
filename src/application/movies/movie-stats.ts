@@ -1,4 +1,5 @@
 import type { Item } from "@/domain/item";
+import { fieldStampToEpochMs } from "@/application/shared/activity-days";
 import { DEFAULT_WATCH_TIMEZONE } from "./watch-activity";
 import {
   countMoviesFinishedInYear,
@@ -25,14 +26,18 @@ export type MovieYearInReview = {
 };
 
 function localYear(iso: string, timeZone: string): number {
+  const ms = fieldStampToEpochMs(iso);
+  if (ms == null) return Number.NaN;
   return Number(
-    new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric" }).format(new Date(iso)),
+    new Intl.DateTimeFormat("en-CA", { timeZone, year: "numeric" }).format(new Date(ms)),
   );
 }
 
 function localMonth(iso: string, timeZone: string): number {
+  const ms = fieldStampToEpochMs(iso);
+  if (ms == null) return Number.NaN;
   return Number(
-    new Intl.DateTimeFormat("en-CA", { timeZone, month: "numeric" }).format(new Date(iso)),
+    new Intl.DateTimeFormat("en-CA", { timeZone, month: "numeric" }).format(new Date(ms)),
   );
 }
 

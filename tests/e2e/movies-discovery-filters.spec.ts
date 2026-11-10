@@ -3,6 +3,7 @@ import fr from "../../src/i18n/fr.json";
 import {
   listPath,
   locators,
+  saveItem,
   openQuickAddType,
   selectors,
   signIn,
@@ -37,7 +38,7 @@ test.describe("movies discovery filters", () => {
 
     await locators.itemLink(page, tagged).click();
     await page.getByLabel(t("movies.discovery.mood")).selectOption(t("books.mood.joyeux"));
-    await page.getByRole("button", { name: selectors.actionSave }).click();
+    await saveItem(page);
 
     await page.getByRole("button", { name: t("movies.discovery.filters") }).click();
     await page.getByLabel(t("movies.discovery.mood")).selectOption(t("books.mood.joyeux"));

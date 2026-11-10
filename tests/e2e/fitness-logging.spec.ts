@@ -7,6 +7,9 @@ test("logs sets offline", async ({ page, context }) => {
   await seedFitnessSessionLibrary(page, "Log");
   await page.goto("/fitness");
   await page.getByTestId("fitness-free-workout").click();
+  // Go offline only once the editor has loaded: offline route changes are not
+  // supported yet (the service worker does not cache route data).
+  await expect(page.getByTestId("fitness-workout-editor")).toBeVisible();
   await context.setOffline(true);
   await page.getByRole("button", { name: /Ajouter un exercice/i }).click();
   await page.getByTestId("fitness-exercise-search").fill("deadlift");

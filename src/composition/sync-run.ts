@@ -21,19 +21,24 @@ export async function runSyncEngines(deps: SyncRunLoopDeps): Promise<void> {
     return;
   }
   onStatus("syncing");
-  try {
-    for (const engine of engines) {
+  // Run every engine even if one fails, so a single broken domain (e.g. a
+  // rejected endpoint) cannot block sync for all other domains.
+  let anyFailed = false;
+  for (const engine of engines) {
+    try {
       await engine.run();
+    } catch {
+      anyFailed = true;
     }
-    const anyPaused = engines.some((engine) => engine.paused);
-    if (anyPaused) {
-      onPauseScheduler();
-      onStatus("paused");
-    } else {
-      onStatus("idle");
-    }
-  } catch {
+  }
+  const anyPaused = engines.some((engine) => engine.paused);
+  if (anyPaused) {
+    onPauseScheduler();
+    onStatus("paused");
+  } else if (anyFailed) {
     onStatus(connectivity.isOnline() ? "idle" : "offline");
+  } else {
+    onStatus("idle");
   }
 }
 

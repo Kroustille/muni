@@ -17,7 +17,10 @@ async function seedStaleBookAndRecipe(page: Page): Promise<void> {
       openReq.onerror = () => reject(openReq.error);
       openReq.onsuccess = () => {
         const db = openReq.result;
-        const tx = db.transaction("items", "readwrite");
+        const tx = db.transaction(["items", "activity_suggestion_snapshot"], "readwrite");
+        // signIn lands on Accueil, which already computed today's (empty)
+        // snapshot; drop it so the next visit recomputes with the seeded items.
+        tx.objectStore("activity_suggestion_snapshot").clear();
         const store = tx.objectStore("items");
         const oldIso = "2025-06-01T10:00:00.000Z";
         const req = store.openCursor();

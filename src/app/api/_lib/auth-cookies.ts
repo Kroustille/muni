@@ -56,7 +56,11 @@ export function absoluteRedirectUrl(appUrl: string, path: string): string {
   return new URL(path.replace(/^\//, ""), base).href;
 }
 
-export function redirectResponse(appUrl: string, path: string, init?: { cookies?: string[] }): Response {
+export function redirectResponse(
+  appUrl: string,
+  path: string,
+  init?: { cookies?: string[] },
+): Response {
   const headers = new Headers({ Location: absoluteRedirectUrl(appUrl, path) });
   for (const cookie of init?.cookies ?? []) {
     headers.append("Set-Cookie", cookie);
@@ -66,7 +70,11 @@ export function redirectResponse(appUrl: string, path: string, init?: { cookies?
 
 export function isSameOriginRequest(request: Request, appUrl: string): boolean {
   const origin = request.headers.get("origin");
-  if (!origin) return false;
+  if (!origin) {
+    // Browsers omit Origin on same-origin GET requests but always send the
+    // forbidden (non-scriptable) Sec-Fetch-Site header; require it explicitly.
+    return request.headers.get("sec-fetch-site") === "same-origin";
+  }
   try {
     return new URL(origin).origin === new URL(appUrl).origin;
   } catch {

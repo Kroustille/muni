@@ -1,7 +1,5 @@
-"use client";
-
-import { ListPageContent } from "@/components/lists/list-page-content";
+import { redirect } from "next/navigation";
 
 export default function MoviesPage() {
-  return <ListPageContent route="movies" movieLibraryUi />;
+  redirect("/lists/movies");
 }

@@ -60,6 +60,7 @@ export function ItemDetailForm({
   const [loanError, setLoanError] = useState<string | undefined>();
   const [artistError, setArtistError] = useState<string | undefined>();
   const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
   const [movieItem, setMovieItem] = useState(item);
 
   useEffect(() => {
@@ -98,6 +99,7 @@ export function ItemDetailForm({
       return;
     }
     setSaving(true);
+    setSaved(false);
     setTitleError(undefined);
     setPagesReadError(undefined);
     setLoanError(undefined);
@@ -112,6 +114,7 @@ export function ItemDetailForm({
           recipeSourcePayloadFromValues(recipeValues),
         );
         setValues(valuesFromItem(updated) as RecipeFieldValues);
+        setSaved(true);
         return;
       }
       const patch =
@@ -126,6 +129,7 @@ export function ItemDetailForm({
       if (updated.type === "book") {
         setDiscoveryValues(itemToBookDiscoveryValues(updated));
       }
+      setSaved(true);
     } finally {
       setSaving(false);
     }
@@ -137,7 +141,11 @@ export function ItemDetailForm({
   };
 
   return (
-    <form className={`flex flex-col ${compact ? "gap-4" : "gap-6"}`} onSubmit={onSubmit}>
+    <form
+      className={`flex flex-col ${compact ? "gap-4" : "gap-6"}`}
+      onSubmit={onSubmit}
+      onChange={() => setSaved(false)}
+    >
       {item.type === "shopping" ? (
         <ShoppingFields
           values={values as ShoppingFieldValues}
@@ -237,6 +245,9 @@ export function ItemDetailForm({
           </Button>
         ) : null}
       </div>
+      <p role="status" className="min-h-5 text-sm text-muted" data-testid="item-save-status">
+        {saved ? t("item.saved") : null}
+      </p>
     </form>
   );
 }

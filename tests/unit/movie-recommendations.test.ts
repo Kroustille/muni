@@ -72,8 +72,41 @@ describe("suggestMovies", () => {
       movie({ id: "c", status: "to_watch", tags: ["nolan"] }),
       movie({ id: "x", status: "to_watch", tags: ["other"] }),
     ];
-    const picks = suggestMovies(items, { now: new Date("2026-06-01T00:00:00.000Z"), random: () => 0 });
+    const picks = suggestMovies(items, {
+      now: new Date("2026-06-01T00:00:00.000Z"),
+      random: () => 0,
+    });
     expect(picks.map((i) => i.id)).toContain("c");
     expect(picks.map((i) => i.id)).not.toContain("x");
+  });
+});
+
+describe("suggestMovies with HLC field stamps", () => {
+  const now = new Date("2026-06-01T00:00:00.000Z");
+
+  it("treats a recent HLC watch stamp as recently watched", () => {
+    const items = [
+      movie({
+        id: "w",
+        status: "watched",
+        tags: ["nolan"],
+        fieldsUpdatedAt: { watched: `${Date.UTC(2026, 1, 1)}-0-device-a` },
+      }),
+      movie({ id: "c", status: "to_watch", tags: ["nolan"] }),
+    ];
+    expect(suggestMovies(items, { now, random: () => 0 }).map((i) => i.id)).toContain("c");
+  });
+
+  it("ignores HLC watch stamps older than a year", () => {
+    const items = [
+      movie({
+        id: "w",
+        status: "watched",
+        tags: ["nolan"],
+        fieldsUpdatedAt: { watched: `${Date.UTC(2024, 1, 1)}-0-device-a` },
+      }),
+      movie({ id: "c", status: "to_watch", tags: ["nolan"] }),
+    ];
+    expect(suggestMovies(items, { now, random: () => 0 }).map((i) => i.id)).not.toContain("c");
   });
 });

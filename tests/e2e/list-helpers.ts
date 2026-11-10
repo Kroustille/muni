@@ -85,6 +85,12 @@ export async function openItem(page: Page, title: string): Promise<void> {
   await expect(page).toHaveURL(/\/items\//);
 }
 
+/** Saves the item detail form and waits until the write is confirmed. */
+export async function saveItem(page: Page): Promise<void> {
+  await page.getByRole("button", { name: selectors.actionSave, exact: true }).click();
+  await expect(page.getByTestId("item-save-status")).toHaveText(t("item.saved"));
+}
+
 async function readMagicLink(email: string): Promise<string> {
   const deadline = Date.now() + 15_000;
   while (Date.now() < deadline) {
@@ -151,6 +157,8 @@ export const openQuickAdd = openQuickAddType;
 
 export async function submitQuickAdd(page: Page): Promise<void> {
   await locators.quickAddSubmit(page).click();
+  // The sheet closes only after the local write completes.
+  await expect(page.getByRole("dialog")).toHaveCount(0);
 }
 
 export async function addItem(page: Page, kind: ItemKind, title: string): Promise<void> {

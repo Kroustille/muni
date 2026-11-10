@@ -74,3 +74,17 @@ describe("computeMovieStats", () => {
     expect(review.moviesWatched).toBe(1);
   });
 });
+
+describe("movie stats with HLC field stamps", () => {
+  const hlc = `${Date.UTC(2026, 2, 10, 10)}-0-device-a`;
+
+  it("buckets HLC-stamped watches by month without throwing", () => {
+    const stats = computeMovieStats([movie({ fieldsUpdatedAt: { watched: hlc } })], 2026);
+    expect(stats.finishedByMonth[2].count).toBe(1);
+  });
+
+  it("ignores unparseable stamps instead of crashing", () => {
+    const stats = computeMovieStats([movie({ fieldsUpdatedAt: { watched: "garbage" } })], 2026);
+    expect(stats.finishedByMonth.reduce((sum, row) => sum + row.count, 0)).toBe(0);
+  });
+});

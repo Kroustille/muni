@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { addItem, openItem, openList, selectors, signIn, t } from "./list-helpers";
+import { addItem, openItem, openList, saveItem, signIn, t } from "./list-helpers";
 
 test.describe("movie watch heatmap", () => {
   test("lights activity after marking a film as watched", async ({ page }) => {
@@ -11,7 +11,7 @@ test.describe("movie watch heatmap", () => {
     await openItem(page, title);
 
     await page.getByLabel(t("field.status")).selectOption({ label: t("status.watched") });
-    await page.getByRole("button", { name: selectors.actionSave }).click();
+    await saveItem(page);
 
     await page.goto("/movies/insights");
     const heatmap = page.getByTestId("watch-heatmap");

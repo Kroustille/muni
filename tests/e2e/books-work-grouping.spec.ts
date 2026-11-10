@@ -2,6 +2,9 @@ import { expect, test } from "@playwright/test";
 import fr from "../../src/i18n/fr.json";
 import { signIn } from "./list-helpers";
 
+// Serwist routes /api/* through the service worker, which bypasses page.route mocks.
+test.use({ serviceWorkers: "block" });
+
 const t = (key: keyof typeof fr): string => fr[key];
 
 const WORK_ID = "OL45804W";

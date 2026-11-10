@@ -140,6 +140,15 @@ export async function fillQuickAdd(
 
 export async function submitQuickAdd(page: Page): Promise<void> {
   await locators.submitButton(page).click();
+  // The sheet closes only after the local write; wait for it (or for the
+  // validation error) so a following navigation cannot race the save.
+  await expect
+    .poll(
+      async () =>
+        (await page.getByRole("dialog").count()) === 0 ||
+        (await locators.validationError(page).isVisible()),
+    )
+    .toBe(true);
 }
 
 async function tap(locator: Locator, taps: { count: number }): Promise<void> {

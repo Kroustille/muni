@@ -3,6 +3,7 @@ import fr from "../../src/i18n/fr.json";
 import {
   listPath,
   locators,
+  saveItem,
   openQuickAddType,
   selectors,
   signIn,
@@ -33,7 +34,7 @@ test.describe("movies recommendations", () => {
     await locators
       .rowStatus(locators.listRow(page, watchedTitle))
       .selectOption(t("status.watched"));
-    await page.getByRole("button", { name: selectors.actionSave }).click();
+    await saveItem(page);
 
     for (const title of pool) {
       await openQuickAddType(page, "movie");

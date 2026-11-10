@@ -19,9 +19,7 @@ test.describe("recap", () => {
     await page.goto("/recap");
     await expect(page.getByTestId("recap-activity-heatmap")).toBeVisible();
     await expect(page.getByTestId("recap-activity-heatmap-legend")).toBeVisible();
-    await expect(
-      page.getByRole("heading", { name: fr["recap.heatmap.title"] }),
-    ).toBeVisible();
+    await expect(page.getByRole("heading", { name: fr["recap.heatmap.title"] })).toBeVisible();
 
     await page.setViewportSize(devices["iPhone 13"].viewport);
     await page.goto("/recap");
@@ -56,7 +54,9 @@ test.describe("recap", () => {
 
     const labelBefore = await page.locator("p.text-center.text-sm.font-medium").textContent();
     await page.getByTestId("recap-period-prev").click();
-    await expect(page.locator("p.text-center.text-sm.font-medium")).not.toHaveText(labelBefore ?? "");
+    await expect(page.locator("p.text-center.text-sm.font-medium")).not.toHaveText(
+      labelBefore ?? "",
+    );
     await page.getByTestId("recap-period-next").click();
   });
 
@@ -69,7 +69,9 @@ test.describe("recap", () => {
   test("daily view uses single day period", async ({ page }) => {
     await page.goto("/recap?period=day");
     await page.getByTestId("recap-period-day-yesterday").click();
-    await expect(page.getByText(fr["recap.empty"]).or(page.locator("section"))).toBeVisible();
+    await expect(
+      page.getByText(fr["recap.empty"]).or(page.locator("section")).first(),
+    ).toBeVisible();
   });
 
   test("yearly period control", async ({ page }) => {

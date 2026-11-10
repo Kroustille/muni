@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import fr from "../../src/i18n/fr.json";
 import {
   locators,
+  saveItem,
   openList,
   openQuickAddType,
   selectors,
@@ -34,7 +35,7 @@ test.describe("books discovery filters", () => {
 
     await locators.itemLink(page, tagged).click();
     await page.getByLabel(t("books.discovery.mood")).selectOption(t("books.mood.joyeux"));
-    await page.getByRole("button", { name: selectors.actionSave }).click();
+    await saveItem(page);
 
     await page.getByRole("button", { name: t("books.discovery.filters") }).click();
     await page.getByLabel(t("books.discovery.mood")).selectOption(t("books.mood.joyeux"));
