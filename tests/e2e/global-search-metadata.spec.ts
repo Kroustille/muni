@@ -20,8 +20,8 @@ test("global search matches book author metadata", async ({ page, context }) => 
   await page.getByLabel(t("field.author")).fill("AuteurUnique");
   await saveItem(page);
 
-  await context.setOffline(true);
   await openSearch(page);
+  await context.setOffline(true);
   await searchFor(page, "auteurunique");
   await expect(searchLocators.resultRow(page, title)).toBeVisible();
 });

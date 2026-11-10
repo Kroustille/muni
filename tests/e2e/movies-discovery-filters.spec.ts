@@ -41,9 +41,10 @@ test.describe("movies discovery filters", () => {
     await saveItem(page);
 
     await page.getByRole("button", { name: t("movies.discovery.filters") }).click();
-    await page.getByLabel(t("movies.discovery.mood")).selectOption(t("books.mood.joyeux"));
-    await page.getByRole("button", { name: "movie-disc-tag" }).click();
-    await page.getByRole("button", { name: t("action.close") }).click();
+    const filters = page.getByRole("dialog");
+    await filters.getByLabel(t("movies.discovery.mood")).selectOption(t("books.mood.joyeux"));
+    await filters.getByRole("button", { name: "movie-disc-tag" }).click();
+    await filters.getByRole("button", { name: t("action.close") }).click();
 
     await expect(locators.itemLink(page, tagged)).toBeVisible();
     await expect(locators.itemLink(page, other)).toHaveCount(0);

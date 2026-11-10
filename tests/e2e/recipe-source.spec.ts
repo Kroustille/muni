@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 import fr from "../../src/i18n/fr.json";
-import { locators, openQuickAdd, signIn, submitQuickAdd } from "./list-helpers";
+import { openItem, openQuickAdd, signIn, submitQuickAdd } from "./list-helpers";
 
 test("add recipe with cookbook source and page", async ({ page }) => {
   await signIn(page);
@@ -8,13 +8,14 @@ test("add recipe with cookbook source and page", async ({ page }) => {
   await page.getByLabel(fr["field.title"]).fill("Crêpes");
   await page.getByText(fr["recipe.source.section"]).click();
   await page.getByLabel(fr["recipe.source.cookbook"]).fill("Grand Livre");
-  await page.getByRole("option", { name: fr["recipe.source.create"].replace("{query}", "Grand Livre") }).click();
+  await page
+    .getByRole("option", { name: fr["recipe.source.create"].replace("{query}", "Grand Livre") })
+    .click();
   await page.getByLabel(fr["recipe.source.page"]).fill("42");
   await submitQuickAdd(page);
-  await page.getByRole("link", { name: "Crêpes" }).click();
-  await expect(page.getByText(fr["recipe.source.section"])).toBeVisible();
-  await expect(page.getByText("Grand Livre")).toBeVisible();
-  await expect(page.getByText("42")).toBeVisible();
+  await openItem(page, "Crêpes");
+  await expect(page.getByLabel(fr["recipe.source.cookbook"])).toHaveValue("Grand Livre");
+  await expect(page.getByLabel(fr["recipe.source.page"])).toHaveValue("42");
 });
 
 test("search finds recipes by cookbook title", async ({ page }) => {
@@ -24,7 +25,9 @@ test("search finds recipes by cookbook title", async ({ page }) => {
   await page.getByText(fr["recipe.source.section"]).click();
   await page.getByLabel(fr["recipe.source.cookbook"]).fill("Desserts faciles");
   await page
-    .getByRole("option", { name: fr["recipe.source.create"].replace("{query}", "Desserts faciles") })
+    .getByRole("option", {
+      name: fr["recipe.source.create"].replace("{query}", "Desserts faciles"),
+    })
     .click();
   await submitQuickAdd(page);
 
@@ -36,7 +39,7 @@ test("search finds recipes by cookbook title", async ({ page }) => {
   await submitQuickAdd(page);
 
   await page.goto("/search");
-  await page.getByLabel(fr["nav.search"]).fill("dessert");
+  await page.getByPlaceholder(fr["search.placeholder"]).fill("dessert");
   await expect(page.getByRole("link", { name: "Tarte A" })).toBeVisible();
   await expect(page.getByRole("link", { name: "Tarte B" })).toBeVisible();
 });

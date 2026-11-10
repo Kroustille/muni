@@ -13,6 +13,12 @@ test.describe("fitness session library", () => {
     // needs the network today, so verify persistence after reconnecting.
     await context.setOffline(false);
     await page.goto("/fitness/sessions");
-    await expect(page.getByText("Force 3x")).toBeVisible();
+    await expect
+      .poll(() =>
+        page
+          .getByTestId("fitness-session-template-title")
+          .evaluateAll((els) => els.map((el) => (el as HTMLInputElement).value)),
+      )
+      .toContain("Force 3x");
   });
 });

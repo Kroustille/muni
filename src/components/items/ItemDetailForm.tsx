@@ -19,6 +19,13 @@ import {
   itemToBookDiscoveryValues,
 } from "@/components/items/BookDetailSections";
 import { MovieDetailSections } from "@/components/items/MovieDetailSections";
+import {
+  MovieDiscoveryFields,
+  type MovieDiscoveryFieldValues,
+  emptyMovieDiscoveryFieldValues,
+  itemToMovieDiscoveryValues,
+  movieDiscoveryValuesToPatch,
+} from "@/components/movies/movie-discovery-fields";
 import { RecipeCookedActions } from "@/components/recipes/recipe-cooked-actions";
 import { bookDiscoveryValuesToPatch } from "@/components/books/book-discovery-fields";
 import type { BookDiscoveryFieldValues } from "@/components/books/book-discovery-fields";
@@ -54,6 +61,9 @@ export function ItemDetailForm({
   const [values, setValues] = useState<FieldValues>(() => valuesFromItem(item));
   const [discoveryValues, setDiscoveryValues] = useState<BookDiscoveryFieldValues>(() =>
     item.type === "book" ? itemToBookDiscoveryValues(item) : emptyBookDiscoveryFieldValues(),
+  );
+  const [movieDiscoveryValues, setMovieDiscoveryValues] = useState<MovieDiscoveryFieldValues>(() =>
+    item.type === "movie" ? itemToMovieDiscoveryValues(item) : emptyMovieDiscoveryFieldValues(),
   );
   const [titleError, setTitleError] = useState<string | undefined>();
   const [pagesReadError, setPagesReadError] = useState<string | undefined>();
@@ -120,11 +130,17 @@ export function ItemDetailForm({
       const patch =
         item.type === "book"
           ? { ...patchFromValues(item, values), ...bookDiscoveryValuesToPatch(discoveryValues) }
-          : patchFromValues(item, values);
+          : item.type === "movie"
+            ? {
+                ...patchFromValues(item, values),
+                ...movieDiscoveryValuesToPatch(movieDiscoveryValues),
+              }
+            : patchFromValues(item, values);
       const updated = await onSave(patch);
       setValues(valuesFromItem(updated));
       if (updated.type === "movie") {
         setMovieItem(updated);
+        setMovieDiscoveryValues(itemToMovieDiscoveryValues(updated));
       }
       if (updated.type === "book") {
         setDiscoveryValues(itemToBookDiscoveryValues(updated));
@@ -133,7 +149,7 @@ export function ItemDetailForm({
     } finally {
       setSaving(false);
     }
-  }, [item, onSave, values, discoveryValues]);
+  }, [item, onSave, values, discoveryValues, movieDiscoveryValues]);
 
   const onSubmit = (event: FormEvent) => {
     event.preventDefault();
@@ -175,16 +191,19 @@ export function ItemDetailForm({
         />
       ) : null}
       {item.type === "movie" ? (
-        <MovieDetailSections
-          movieItem={movieItem as Item & { type: "movie" }}
-          values={values}
-          onValuesChange={setValues}
-          onMovieItemChange={setMovieItem}
-          onSave={onSave}
-          tagSuggestions={tagSuggestions}
-          titleError={titleError}
-          onClearTitleError={() => setTitleError(undefined)}
-        />
+        <>
+          <MovieDetailSections
+            movieItem={movieItem as Item & { type: "movie" }}
+            values={values}
+            onValuesChange={setValues}
+            onMovieItemChange={setMovieItem}
+            onSave={onSave}
+            tagSuggestions={tagSuggestions}
+            titleError={titleError}
+            onClearTitleError={() => setTitleError(undefined)}
+          />
+          <MovieDiscoveryFields values={movieDiscoveryValues} onChange={setMovieDiscoveryValues} />
+        </>
       ) : null}
       {item.type === "recipe" ? (
         <>

@@ -55,7 +55,7 @@ test.describe("movie episode progress smoke", () => {
     await openItem(page, "Série Fixture");
 
     await expect(page.getByRole("heading", { name: t("movies.episodes.title") })).toBeVisible();
-    await page.getByRole("button", { name: "S1E1" }).click();
+    await page.getByRole("button", { name: "S1E1" }).first().click();
     await expect(page.getByTestId("next-episode-banner")).toContainText("S1E2");
     await page.reload();
     await expect(page.getByRole("button", { name: /^S1E1/ })).toContainText("✓");

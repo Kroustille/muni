@@ -73,17 +73,14 @@ test("keeps the same snapshot when revisiting Accueil same day", async ({ page }
   await seedStaleBookAndRecipe(page);
   await page.goto("/");
   await expect(page.getByTestId("activity-suggestions-card")).toBeVisible({ timeout: 15_000 });
-  const firstTitles = await page
-    .getByTestId("activity-suggestions-card")
-    .locator("li p")
-    .allTextContents();
+  const firstRows = page.getByTestId("activity-suggestions-card").locator("li p");
+  await expect(firstRows).toHaveCount(2);
+  const firstTitles = await firstRows.allTextContents();
   await page.goto("/lists/books");
   await page.goto("/");
-  const secondTitles = await page
-    .getByTestId("activity-suggestions-card")
-    .locator("li p")
-    .allTextContents();
-  expect(secondTitles).toEqual(firstTitles);
+  await expect(page.getByTestId("activity-suggestions-card").locator("li p")).toHaveText(
+    firstTitles,
+  );
 });
 
 test("dismisses a row without backfill until refresh", async ({ page }) => {
@@ -105,7 +102,14 @@ test("primary action navigates to item detail", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByTestId("activity-suggestions-card")).toBeVisible({ timeout: 15_000 });
   await page
-    .getByRole("button", { name: new RegExp(fr["suggestions.action.open"]) })
+    .getByTestId("activity-suggestions-card")
+    .getByRole("button", {
+      name: new RegExp(
+        ["open", "start", "cook", "train"]
+          .map((key) => fr[`suggestions.action.${key}` as keyof typeof fr])
+          .join("|"),
+      ),
+    })
     .first()
     .click();
   await expect(page).toHaveURL(/\/items\//);

@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { signIn } from "./list-helpers";
 
 // Serwist routes /api/* through the service worker, which bypasses page.route mocks.
 test.use({ serviceWorkers: "block" });
@@ -40,6 +41,7 @@ test.describe("movies catalog search", () => {
       });
     });
 
+    await signIn(page);
     await page.goto("/lists/movies");
     await page.getByRole("button", { name: "Rechercher dans le catalogue" }).click();
     await page.getByLabel("Titre du film ou de la série").fill("Amélie");

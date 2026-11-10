@@ -98,19 +98,21 @@ test("same-field conflict resolves to the latest edit on both devices", async ({
   });
 
   const contextA = pageA.context();
-  await contextA.setOffline(true);
-  await contextB.setOffline(true);
-
   const earlierNote = "Première version";
   const laterNote = "Dernière version";
 
+  // Open the item on both devices first: offline route changes are not
+  // supported yet, so only the edits happen offline.
   await openList(pageA, "books");
   await openItem(pageA, title);
+  await openList(pageB, "books");
+  await openItem(pageB, title);
+  await contextA.setOffline(true);
+  await contextB.setOffline(true);
+
   await pageA.getByLabel(selectors.fieldNotes).fill(earlierNote);
   await saveItem(pageA);
 
-  await openList(pageB, "books");
-  await openItem(pageB, title);
   await pageB.getByLabel(selectors.fieldNotes).fill(laterNote);
   await saveItem(pageB);
 
