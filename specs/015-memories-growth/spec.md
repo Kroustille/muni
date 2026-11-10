@@ -6,7 +6,7 @@
 
 **Created**: 2026-11-10
 
-**Status**: Draft — product decisions from Valentin **2026-11-10**; clarification, planning and tasks pending
+**Status**: Planned — product decisions from Valentin **2026-11-10**; [plan](plan.md), [research](research.md), [data model](data-model.md), [contracts](contracts/) and [tasks](tasks.md) **2026-11-11** (T1501–T1584); implementation pending. Spec "Defaults proposed" are resolved in [research.md](research.md).
 
 **Input**: Valentin wants Muni to **really be an app to not forget good memories and experiences, and that allows each user to improve themselves**. This promotes the [009](../009-experiences-achievements/spec.md) north star from vision to delivery: memories become first-class, the existing domain data (books, films, music, recipes, fitness, plants, practice) feeds a **life timeline**, past moments **resurface**, and users can set **personal goals** and earn **private achievements**.
 
