@@ -8,7 +8,13 @@ test.describe("fitness session library", () => {
     await page.getByRole("button", { name: /Ajouter une séance/i }).click();
     await page.getByTestId("fitness-session-template-title").fill("Force 3x");
     await context.setOffline(true);
+    // Save writes locally, then navigates to /fitness; wait for that navigation
+    // request so reconnecting cannot interrupt the write.
+    const leaving = page.waitForRequest(
+      (request) => request.isNavigationRequest() && new URL(request.url()).pathname === "/fitness",
+    );
     await page.getByTestId("fitness-session-library-save").click();
+    await leaving;
     // The template is written locally while offline. The post-save route change
     // needs the network today, so verify persistence after reconnecting.
     await context.setOffline(false);
