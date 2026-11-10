@@ -6,7 +6,7 @@
 
 **Created**: 2026-10-28
 
-**Status**: Vision (stable framing — not a delivery spec)
+**Status**: Vision (stable framing — not a delivery spec). **Delivery now scoped in [015 — Souvenirs & progression](../015-memories-growth/spec.md)** (Valentin, 2026-11-10): souvenirs, fil de vie, ce jour-là, objectifs, réalisations. The "out of scope" and "future directions" lists below are superseded by 015 where they overlap; principles and anti-patterns here remain binding.
 
 **Document role**: This folder holds Muni’s **product north star**. It explains *why* the life companion exists and how ongoing work in typed domains serves that goal. It does **not** authorize or schedule new app modules, screens, entities, or sync tables.
 
