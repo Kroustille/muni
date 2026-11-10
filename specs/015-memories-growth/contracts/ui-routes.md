@@ -7,12 +7,12 @@
 | Route | Screen | Story |
 |---|---|---|
 | `/souvenirs` | Hub, default tab **Fil de vie** | US2 |
-| `/souvenirs?tab=liste` | Tab **Souvenirs** — souvenirs only, newest first, favourites filter | US1 |
+| `/souvenirs/liste` | Tab **Souvenirs** — souvenirs only, newest first, favourites filter | US1 |
 | `/souvenirs/[id]` | Souvenir detail/edit (title, date, text, mood, lieu, favori, liens) | US1 |
 | `/progression` | Hub, default tab **Objectifs** (active, then completed this year, archived collapsed) | US3 |
 | `/progression/objectifs/nouveau` | New goal form | US3 |
 | `/progression/objectifs/[id]` | Goal detail: progress, check-ins, reflection | US3 |
-| `/progression?tab=realisations` | Tab **Réalisations** — earned list, newest first, + manual | US5 |
+| `/progression/realisations` | Tab **Réalisations** — earned list, newest first, + manual | US5 |
 | `/progression/realisations/[id]` | Réalisation detail (manual editable; auto read-only except delete) | US5 |
 
 ## Navigation

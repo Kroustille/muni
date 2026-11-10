@@ -1,5 +1,15 @@
 import type { LucideIcon } from "lucide-react";
-import { CalendarRange, Dumbbell, Home, Leaf, Music, Search, Settings } from "lucide-react";
+import {
+  BookHeart,
+  CalendarRange,
+  Dumbbell,
+  Home,
+  Leaf,
+  Music,
+  Search,
+  Settings,
+  Sprout,
+} from "lucide-react";
 import type { ItemType } from "@/domain/item";
 import type { MessageKey } from "@/i18n";
 
@@ -52,6 +62,18 @@ export type FeatureNavItem = {
 };
 
 export const FEATURE_NAV: FeatureNavItem[] = [
+  {
+    href: "/souvenirs",
+    labelKey: "memories.nav",
+    icon: BookHeart,
+    match: (p) => p === "/souvenirs" || p.startsWith("/souvenirs/"),
+  },
+  {
+    href: "/progression",
+    labelKey: "progression.nav",
+    icon: Sprout,
+    match: (p) => p === "/progression" || p.startsWith("/progression/"),
+  },
   {
     href: "/fitness",
     labelKey: "fitness.nav",

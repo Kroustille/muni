@@ -17,6 +17,8 @@ describe("IndexedDB schema", () => {
     const db = await openMuniDb(freshName());
     expect([...db.objectStoreNames].sort()).toEqual(
       [
+        "achievementOutbox",
+        "achievements",
         "activity_suggestion_snapshot",
         "bookQuotes",
         "cookbookOutbox",
@@ -32,7 +34,12 @@ describe("IndexedDB schema", () => {
         "fitnessUserSettings",
         "fitnessWorkoutLogs",
         "fitnessWorkoutOutbox",
+        "goalCheckinOutbox",
+        "goalCheckins",
+        "goalOutbox",
+        "goals",
         "items",
+        "memoriesPrefs",
         "meta",
         "movieQuoteOutbox",
         "movieQuotes",
@@ -50,6 +57,7 @@ describe("IndexedDB schema", () => {
         "musicPracticeLogs",
         "musicPracticePlanOutbox",
         "musicPracticePlans",
+        "onThisDayDismissal",
         "outbox",
         "plantCareEventOutbox",
         "plantCareEvents",
@@ -58,6 +66,8 @@ describe("IndexedDB schema", () => {
         "plants",
         "plantsOutbox",
         "quoteOutbox",
+        "souvenirOutbox",
+        "souvenirs",
         "vegetableCultureOutbox",
         "vegetableCultures",
         "vegetableMilestoneOutbox",

@@ -57,6 +57,11 @@ import {
   createPlantsGardenSyncService,
   type PlantsGardenSyncService,
 } from "@/application/server/plants-garden-sync-service";
+import {
+  createMemoriesGrowthSyncService,
+  type MemoriesGrowthSyncService,
+} from "@/application/server/memories-growth-sync-service";
+import { createPostgresMemoriesGrowthRepositories } from "@/adapters/postgres/memories-growth-repositories";
 import { createPostgresFitnessSessionTemplateRepository } from "@/adapters/postgres/fitness-session-template-repository";
 import { createPostgresFitnessScheduledSessionRepository } from "@/adapters/postgres/fitness-scheduled-session-repository";
 import { createPostgresFitnessWorkoutRepository } from "@/adapters/postgres/fitness-workout-repository";
@@ -90,13 +95,16 @@ export interface ServerContainer {
   readonly fitnessSync: FitnessSyncService;
   readonly musicPracticeSync: MusicPracticeSyncService;
   readonly plantsGardenSync: PlantsGardenSyncService;
+  readonly memoriesGrowthSync: MemoriesGrowthSyncService;
   readonly lookupBook: LookupBook;
   readonly searchBooks: SearchBooks;
   readonly searchMovies: SearchMovies;
   readonly fetchMovieCatalogDetail: FetchMovieCatalogDetail;
   readonly searchMusicArtists: SearchMusicArtists;
   readonly searchMusicTracks: SearchMusicTracks;
-  readonly lookupMovieStreaming: (imdbId: string) => Promise<import("@/domain/item").StreamingProvider[]>;
+  readonly lookupMovieStreaming: (
+    imdbId: string,
+  ) => Promise<import("@/domain/item").StreamingProvider[]>;
   readonly destroy: () => Promise<void>;
 }
 
@@ -178,6 +186,10 @@ export function createServerContainer(
     milestones: createPostgresPlantsGardenMilestoneRepository(db),
     now,
   });
+  const memoriesGrowthSync = createMemoriesGrowthSyncService({
+    ...createPostgresMemoriesGrowthRepositories(db),
+    now,
+  });
   const catalogCache = createPostgresCatalogCacheRepository(db);
   const bookCatalog = createOpenLibraryBookCatalogLookup({ cache: catalogCache });
   const lookupBook = createLookupBook({ catalog: bookCatalog });
@@ -204,6 +216,7 @@ export function createServerContainer(
     fitnessSync,
     musicPracticeSync,
     plantsGardenSync,
+    memoriesGrowthSync,
     lookupBook,
     searchBooks,
     searchMovies,

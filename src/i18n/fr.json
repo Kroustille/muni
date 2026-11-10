@@ -542,5 +542,17 @@
   "plants.seasonal.season.autumn": "Automne",
   "plants.seasonal.done": "Fait",
   "plants.notFound": "Plante introuvable",
-  "plants.culture.notFound": "Culture introuvable"
+  "plants.culture.notFound": "Culture introuvable",
+  "memories.nav": "Souvenirs",
+  "memories.title": "Souvenirs",
+  "memories.tab.timeline": "Fil de vie",
+  "memories.tab.list": "Souvenirs",
+  "memories.timeline.empty": "Votre fil de vie se remplit au fil de ce que vous vivez et notez ici.",
+  "memories.list.empty": "Un titre et une date suffisent pour garder un bon moment.",
+  "progression.nav": "Progression",
+  "progression.title": "Progression",
+  "progression.tab.goals": "Objectifs",
+  "progression.tab.achievements": "Réalisations",
+  "progression.goals.empty": "Fixez-vous une intention, à votre rythme.",
+  "progression.achievements.empty": "Vos réalisations apparaîtront ici au fil du temps."
 }

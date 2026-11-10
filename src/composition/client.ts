@@ -13,6 +13,7 @@ import { wireClientFitnessSync } from "./client-fitness-sync";
 import { wireClientSuggestions } from "./client-suggestions";
 import { wireClientMusicPracticeSync } from "./client-music-practice-sync";
 import { wireClientPlantsGardenSync } from "./client-plants-garden-sync";
+import { wireClientMemoriesGrowthSync } from "./client-memories-growth-sync";
 import type { CookbookUseCases } from "../application/cookbooks/cookbook-use-cases";
 import { runSyncEngines, type PausableSyncEngine } from "./sync-run";
 import type { FitnessScheduleUseCases } from "../application/fitness/schedule";
@@ -32,7 +33,10 @@ import type { CultureUseCases } from "../application/plants-garden/culture-use-c
 import type { CareProfileUseCases } from "../application/plants-garden/care-profile";
 import type { BookQuoteUseCases } from "../application/books/book-quotes";
 import type { MovieQuoteUseCases } from "../application/movies/movie-quotes";
-import { createReadingSettings, type ReadingSettingsUseCases } from "../application/books/reading-settings";
+import {
+  createReadingSettings,
+  type ReadingSettingsUseCases,
+} from "../application/books/reading-settings";
 import { createItemUseCases, type ItemUseCases } from "../application/items";
 import { createIndexedDbReadingGoalRepository } from "../adapters/indexeddb/reading-goal-repository";
 import { createSearchUseCase, type SearchUseCase } from "../application/search";
@@ -89,6 +93,7 @@ let fitnessSyncEngine: PausableSyncEngine | undefined;
 let cookbookSyncEngine: PausableSyncEngine | undefined;
 let musicPracticeSyncEngine: PausableSyncEngine | undefined;
 let plantsGardenSyncEngine: PausableSyncEngine | undefined;
+let memoriesGrowthSyncEngine: PausableSyncEngine | undefined;
 let syncStarted = false;
 
 function publishSyncStatus(next: SyncStatusState): void {
@@ -198,6 +203,13 @@ function buildClientContext(): Promise<ClientContext> {
     });
     plantsGardenSyncEngine = plantsGardenSync.plantsGardenEngine;
 
+    const memoriesGrowthSync = wireClientMemoriesGrowthSync({
+      db,
+      items: repository,
+      pullLimit: SYNC_PULL_LIMIT,
+    });
+    memoriesGrowthSyncEngine = memoriesGrowthSync.memoriesGrowthEngine;
+
     async function runSync(): Promise<void> {
       const cookbookEngine = cookbookSyncEngine;
       const engine = syncEngine;
@@ -206,6 +218,7 @@ function buildClientContext(): Promise<ClientContext> {
       const fitnessEngine = fitnessSyncEngine;
       const musicPracticeEngine = musicPracticeSyncEngine;
       const plantsEngine = plantsGardenSyncEngine;
+      const memoriesEngine = memoriesGrowthSyncEngine;
       if (
         cookbookEngine === undefined ||
         engine === undefined ||
@@ -213,7 +226,8 @@ function buildClientContext(): Promise<ClientContext> {
         movieQuoteEngine === undefined ||
         fitnessEngine === undefined ||
         musicPracticeEngine === undefined ||
-        plantsEngine === undefined
+        plantsEngine === undefined ||
+        memoriesEngine === undefined
       ) {
         return;
       }
@@ -226,6 +240,7 @@ function buildClientContext(): Promise<ClientContext> {
           fitnessEngine,
           musicPracticeEngine,
           plantsEngine,
+          memoriesEngine,
         ],
         connectivity,
         onStatus: publishSyncStatus,
@@ -467,6 +482,7 @@ export function startClientSync(): Promise<void> {
     fitnessSyncEngine?.resume();
     musicPracticeSyncEngine?.resume();
     plantsGardenSyncEngine?.resume();
+    memoriesGrowthSyncEngine?.resume();
     syncScheduler?.resume();
     if (!syncStarted) {
       syncStarted = true;
@@ -492,7 +508,6 @@ export function stopClientSync(): void {
   if (!syncStarted) return;
   syncStarted = false;
   syncScheduler?.stop();
-  const online =
-    typeof navigator !== "undefined" ? navigator.onLine : true;
+  const online = typeof navigator !== "undefined" ? navigator.onLine : true;
   publishSyncStatus(online ? "idle" : "offline");
 }

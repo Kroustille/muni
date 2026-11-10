@@ -28,6 +28,24 @@ export type Numeric = ColumnType<string, number | string, number | string>;
 
 export type Timestamp = ColumnType<Date, Date | string, Date | string>;
 
+export interface Achievement {
+  body: string | null;
+  celebrated_at: Timestamp | null;
+  created_at: Timestamp;
+  deleted_at: Timestamp | null;
+  earned_on: Timestamp;
+  fields_updated_at: Json;
+  id: string;
+  links: Json;
+  origin: string;
+  rule_id: string | null;
+  rule_version: number | null;
+  server_updated_at: Timestamp;
+  threshold: number | null;
+  title: string;
+  user_id: string;
+}
+
 export interface BookQuotes {
   book_item_id: string;
   created_at: Timestamp;
@@ -141,6 +159,37 @@ export interface FitnessWorkoutLog {
   started_at: Timestamp;
   status: string;
   title: string;
+  user_id: string;
+}
+
+export interface Goal {
+  created_at: Timestamp;
+  deleted_at: Timestamp | null;
+  end_date: Timestamp;
+  fields_updated_at: Json;
+  id: string;
+  metric: string | null;
+  period_kind: string;
+  reflection: string | null;
+  reflection_prompt_dismissed_at: Timestamp | null;
+  server_updated_at: Timestamp;
+  start_date: Timestamp;
+  status: string;
+  target_count: number | null;
+  target_kind: string;
+  title: string;
+  user_id: string;
+}
+
+export interface GoalCheckin {
+  created_at: Timestamp;
+  deleted_at: Timestamp | null;
+  fields_updated_at: Json;
+  goal_id: string;
+  id: string;
+  note: string | null;
+  occurred_on: Timestamp;
+  server_updated_at: Timestamp;
   user_id: string;
 }
 
@@ -357,6 +406,22 @@ export interface Sessions {
   user_id: string;
 }
 
+export interface Souvenir {
+  body: string | null;
+  created_at: Timestamp;
+  deleted_at: Timestamp | null;
+  favourite: boolean;
+  fields_updated_at: Json;
+  id: string;
+  links: Json;
+  mood: string | null;
+  occurred_on: Timestamp;
+  place: string | null;
+  server_updated_at: Timestamp;
+  title: string;
+  user_id: string;
+}
+
 export interface Users {
   created_at: Generated<Timestamp>;
   email: string;
@@ -398,6 +463,7 @@ export interface WatchGoals {
 }
 
 export interface DB {
+  achievement: Achievement;
   book_quotes: BookQuotes;
   catalog_cache: CatalogCache;
   cookbooks: Cookbooks;
@@ -407,6 +473,8 @@ export interface DB {
   fitness_skip_record: FitnessSkipRecord;
   fitness_user_settings: FitnessUserSettings;
   fitness_workout_log: FitnessWorkoutLog;
+  goal: Goal;
+  goal_checkin: GoalCheckin;
   items: Items;
   learning_piece: LearningPiece;
   magic_link_tokens: MagicLinkTokens;
@@ -421,6 +489,7 @@ export interface DB {
   practice_plan: PracticePlan;
   reading_goals: ReadingGoals;
   sessions: Sessions;
+  souvenir: Souvenir;
   users: Users;
   vegetable_culture: VegetableCulture;
   vegetable_milestone: VegetableMilestone;

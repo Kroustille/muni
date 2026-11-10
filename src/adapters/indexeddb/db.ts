@@ -16,6 +16,9 @@ import type {
   FitnessUserSettings,
   FitnessWorkoutLog,
 } from "../../domain/fitness/workout-log";
+import type { Achievement } from "../../domain/achievement";
+import type { Goal, GoalCheckin } from "../../domain/goal";
+import type { Souvenir } from "../../domain/souvenir";
 import type { Plant } from "../../domain/plant";
 import type { PlantCareEvent } from "../../domain/plant-care-event";
 import type { PlantCareProfile } from "../../domain/plant-care-profile";
@@ -125,11 +128,23 @@ export interface MuniDbSchema extends DBSchema {
   plantCareProfileOutbox: { key: string; value: { id: string } };
   vegetableCultureOutbox: { key: string; value: { id: string } };
   vegetableMilestoneOutbox: { key: string; value: { id: string } };
+  souvenirs: { key: string; value: Souvenir };
+  goals: { key: string; value: Goal };
+  goalCheckins: { key: string; value: GoalCheckin; indexes: { goalId: string } };
+  achievements: { key: string; value: Achievement };
+  souvenirOutbox: { key: string; value: { id: string } };
+  goalOutbox: { key: string; value: { id: string } };
+  goalCheckinOutbox: { key: string; value: { id: string } };
+  achievementOutbox: { key: string; value: { id: string } };
+  /** Device-local (not synced): Ce jour-là dismissal per calendar day (015 R8). */
+  onThisDayDismissal: { key: string; value: { calendarDay: string; dismissedAt: string } };
+  /** Device-local (not synced): small preference documents keyed by name. */
+  memoriesPrefs: { key: string; value: unknown };
 }
 
 export type MuniDb = IDBPDatabase<MuniDbSchema>;
 
-const DB_VERSION = 9;
+const DB_VERSION = 10;
 
 export function openMuniDb(name: string): Promise<MuniDb> {
   return openDB<MuniDbSchema>(name, DB_VERSION, {
@@ -226,6 +241,19 @@ export function openMuniDb(name: string): Promise<MuniDb> {
         db.createObjectStore("fitnessScheduledSessionOutbox", { keyPath: "id" });
         db.createObjectStore("fitnessWorkoutOutbox", { keyPath: "id" });
         db.createObjectStore("fitnessSkipOutbox", { keyPath: "id" });
+      }
+      if (oldVersion < 10) {
+        db.createObjectStore("souvenirs", { keyPath: "id" });
+        db.createObjectStore("goals", { keyPath: "id" });
+        const checkins = db.createObjectStore("goalCheckins", { keyPath: "id" });
+        checkins.createIndex("goalId", "goalId");
+        db.createObjectStore("achievements", { keyPath: "id" });
+        db.createObjectStore("souvenirOutbox", { keyPath: "id" });
+        db.createObjectStore("goalOutbox", { keyPath: "id" });
+        db.createObjectStore("goalCheckinOutbox", { keyPath: "id" });
+        db.createObjectStore("achievementOutbox", { keyPath: "id" });
+        db.createObjectStore("onThisDayDismissal", { keyPath: "calendarDay" });
+        db.createObjectStore("memoriesPrefs");
       }
     },
   });

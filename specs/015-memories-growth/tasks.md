@@ -12,29 +12,29 @@
 
 ## Phase 1: Setup
 
-- [ ] T1501 [P] Add `memories.*` and `progression.*` i18n keys (nav, tabs, forms, empty states, celebration, Ce jour-là, Moments forts, goal result lines) in `src/i18n/fr.json` per [contracts/ui-routes.md](contracts/ui-routes.md)
-- [ ] T1502 [P] Unit test tone deny-list over `memories.*`/`progression.*` keys (`retard`, `échec`, `raté`, `perdu`, `série perdue`, `classement`) in `tests/unit/memories-growth/tone.test.ts` (research R13)
-- [ ] T1503 [P] Create `tests/unit/memories-growth/` fixture builders (souvenir, goal, check-in, achievement, récap achievement)
+- [ ] T1501 [P] (foundation keys added 2026-11-11; story keys land with each phase) Add `memories.*` and `progression.*` i18n keys (nav, tabs, forms, empty states, celebration, Ce jour-là, Moments forts, goal result lines) in `src/i18n/fr.json` per [contracts/ui-routes.md](contracts/ui-routes.md)
+- [x] T1502 [P] Unit test tone deny-list over `memories.*`/`progression.*` keys (`retard`, `échec`, `raté`, `perdu`, `série perdue`, `classement`) in `tests/unit/memories-growth/tone.test.ts` (research R13)
+- [x] T1503 [P] Create `tests/unit/memories-growth/` fixture builders (souvenir, goal, check-in, achievement, récap achievement)
 
 ---
 
 ## Phase 2: Foundational (blocks all stories)
 
-- [ ] T1504 [P] Unit tests UUIDv5 against RFC 4122 vectors in `tests/unit/memories-growth/deterministic-uuid.test.ts`
-- [ ] T1505 Implement `src/domain/deterministic-uuid.ts` (WebCrypto SHA-1) (depends on T1504)
-- [ ] T1506 [P] Unit tests souvenir validation (title 1–200, `occurredOn` ≤ today, links ≤ 10 and kinds, body/place limits) in `tests/unit/memories-growth/souvenir-domain.test.ts`
-- [ ] T1507 [P] Unit tests goal validation + period presets (week/month/quarter/year/custom → start/end, span ≤ 3 y, metric/target consistency) in `tests/unit/memories-growth/goal-domain.test.ts`
-- [ ] T1508 [P] Unit tests achievement validation (auto ⇒ ruleId+threshold) in `tests/unit/memories-growth/achievement-domain.test.ts`
-- [ ] T1509 Implement `src/domain/souvenir.ts`, `src/domain/goal.ts`, `src/domain/achievement.ts` (zod schemas + types) (depends on T1506–T1508)
-- [ ] T1510 Migration `db/migrations/0021_memories_growth_tables.ts` (four tables per [data-model.md](data-model.md)) + register in `db/migrations/index.ts`; regenerate `src/adapters/postgres/db-types.ts` with `yarn db:codegen`
-- [ ] T1511 [P] Ports `src/application/ports/memories-growth-repositories.ts` (souvenir, goal, check-in, achievement; `list`, `get`, `upsert`, `pullSince`, `subscribe`)
-- [ ] T1512 Postgres adapters `src/adapters/postgres/memories-growth-repositories.ts` (user scoping, pullSince, LWW merge via `src/domain/merge.ts`)
-- [ ] T1513 IndexedDB adapters `src/adapters/indexeddb/memories-growth-repositories.ts` + version bump in `src/adapters/indexeddb/db.ts` (4 synced stores + 3 local-only stores + outbox tags)
-- [ ] T1514 Integration tests in `tests/integration/memories-growth-sync.test.ts`: round trip per entity, two-user isolation, `goal_checkin.goal_id` ownership, tombstone wins, **same deterministic achievement id pushed twice → one row**
-- [ ] T1515 Server sync service `src/application/server/memories-growth-sync-service.ts` + routes `src/app/api/sync/memories-growth/push/route.ts` (session + same-origin) and `pull/route.ts` (session only, **no Origin check on GET**) per [contracts/memories-growth-sync-api.md](contracts/memories-growth-sync-api.md) (depends on T1514)
-- [ ] T1516 Client engine `src/application/sync/memories-growth-sync-engine.ts`, remote store `src/adapters/http/memories-growth-remote-store.ts`, wiring `src/composition/client-memories-growth-sync.ts` and registration in the `runSync` engine list in `src/composition/client.ts`
-- [ ] T1517 Server container wiring in `src/app/api/_lib/server-container.ts`
-- [ ] T1518 [P] Add **Souvenirs** (`/souvenirs`, `BookHeart`) and **Progression** (`/progression`, `Sprout`) to `FEATURE_NAV` in `src/components/nav-config.ts`; hub shells with tabs and empty states in `src/app/(app)/souvenirs/page.tsx` and `src/app/(app)/progression/page.tsx`
+- [x] T1504 [P] Unit tests UUIDv5 against RFC 4122 vectors in `tests/unit/memories-growth/deterministic-uuid.test.ts`
+- [x] T1505 Implement `src/domain/deterministic-uuid.ts` (WebCrypto SHA-1) (depends on T1504)
+- [x] T1506 [P] Unit tests souvenir validation (title 1–200, `occurredOn` ≤ today, links ≤ 10 and kinds, body/place limits) in `tests/unit/memories-growth/souvenir-domain.test.ts`
+- [x] T1507 [P] Unit tests goal validation + period presets (week/month/quarter/year/custom → start/end, span ≤ 3 y, metric/target consistency) in `tests/unit/memories-growth/goal-domain.test.ts`
+- [x] T1508 [P] Unit tests achievement validation (auto ⇒ ruleId+threshold) in `tests/unit/memories-growth/achievement-domain.test.ts`
+- [x] T1509 Implement `src/domain/souvenir.ts`, `src/domain/goal.ts`, `src/domain/achievement.ts` (zod schemas + types) (depends on T1506–T1508)
+- [x] T1510 Migration `db/migrations/0021_memories_growth_tables.ts` (four tables per [data-model.md](data-model.md)) + register in `db/migrations/index.ts`; regenerate `src/adapters/postgres/db-types.ts` with `yarn db:codegen`
+- [x] T1511 [P] Ports `src/application/ports/memories-growth-repositories.ts` (souvenir, goal, check-in, achievement; `list`, `get`, `upsert`, `pullSince`, `subscribe`)
+- [x] T1512 Postgres adapters `src/adapters/postgres/memories-growth-repositories.ts` (user scoping, pullSince, LWW merge via `src/domain/merge.ts`)
+- [x] T1513 IndexedDB adapters `src/adapters/indexeddb/memories-growth-repositories.ts` + version bump in `src/adapters/indexeddb/db.ts` (4 synced stores + 3 local-only stores + outbox tags)
+- [x] T1514 Integration tests in `tests/integration/memories-growth-sync.test.ts`: round trip per entity, two-user isolation, `goal_checkin.goal_id` ownership, tombstone wins, **same deterministic achievement id pushed twice → one row**
+- [x] T1515 Server sync service `src/application/server/memories-growth-sync-service.ts` + routes `src/app/api/sync/memories-growth/push/route.ts` (session + same-origin) and `pull/route.ts` (session only, **no Origin check on GET**) per [contracts/memories-growth-sync-api.md](contracts/memories-growth-sync-api.md) (depends on T1514)
+- [x] T1516 Client engine `src/application/sync/memories-growth-sync-engine.ts`, remote store `src/adapters/http/memories-growth-remote-store.ts`, wiring `src/composition/client-memories-growth-sync.ts` and registration in the `runSync` engine list in `src/composition/client.ts`
+- [x] T1517 Server container wiring in `src/app/api/_lib/server-container.ts`
+- [x] T1518 [P] Add **Souvenirs** (`/souvenirs`, `BookHeart`) and **Progression** (`/progression`, `Sprout`) to `FEATURE_NAV` in `src/components/nav-config.ts`; hub shells with path tabs (`/souvenirs`, `/souvenirs/liste`, `/progression`, `/progression/realisations`) and empty states
 
 **Checkpoint**: migration applies, sync integration tests green, both hubs reachable with empty states.
 
