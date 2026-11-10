@@ -83,11 +83,11 @@ export interface FitnessScheduledSession {
   deleted_at: Timestamp | null;
   fields_updated_at: Json;
   id: string;
+  server_updated_at: Timestamp;
   session_template_id: string;
   sort_order: number;
-  title_snapshot: string | null;
   template_exercises_snapshot: Json | null;
-  server_updated_at: Timestamp;
+  title_snapshot: string | null;
   user_id: string;
 }
 
@@ -109,9 +109,9 @@ export interface FitnessSkipRecord {
   id: string;
   note: string | null;
   scheduled_session_id: string;
+  server_updated_at: Timestamp;
   session_template_id: string | null;
   title_snapshot: string | null;
-  server_updated_at: Timestamp;
   user_id: string;
 }
 
@@ -134,10 +134,10 @@ export interface FitnessWorkoutLog {
   fields_updated_at: Json;
   id: string;
   logged_exercises: Json;
-  scheduled_session_id: string | null;
-  session_template_id: string | null;
   recovery: Json | null;
+  scheduled_session_id: string | null;
   server_updated_at: Timestamp;
+  session_template_id: string | null;
   started_at: Timestamp;
   status: string;
   title: string;

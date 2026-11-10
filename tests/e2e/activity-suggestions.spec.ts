@@ -1,19 +1,15 @@
 import { expect, test, type Page } from "@playwright/test";
 import fr from "../../src/i18n/fr.json";
-import { signIn, t } from "./list-helpers";
+import { addItem, signIn } from "./list-helpers";
 
 const suggestionsTitle = fr["suggestions.title"];
 
 async function seedStaleBookAndRecipe(page: Page): Promise<void> {
   await page.goto("/lists/books");
-  await page.getByRole("button", { name: t("action.add") }).click();
-  await page.getByLabel(t("field.title")).fill("Livre stale");
-  await page.getByRole("button", { name: t("action.save") }).click();
+  await addItem(page, "book", "Livre stale");
 
   await page.goto("/lists/recipes");
-  await page.getByRole("button", { name: t("action.add") }).click();
-  await page.getByLabel(t("field.title")).fill("Recette stale");
-  await page.getByRole("button", { name: t("action.save") }).click();
+  await addItem(page, "recipe", "Recette stale");
 
   await page.evaluate(async () => {
     const openReq = indexedDB.open("muni");
@@ -58,11 +54,6 @@ async function seedStaleBookAndRecipe(page: Page): Promise<void> {
   });
 }
 
-test.beforeEach(async ({ request }) => {
-  const mailpit = process.env.MAILPIT_URL ?? "http://localhost:8025";
-  await request.delete(`${mailpit}/api/v1/messages`).catch(() => undefined);
-});
-
 test("shows two suggestions on Accueil when pool allows", async ({ page }) => {
   await signIn(page);
   await seedStaleBookAndRecipe(page);
@@ -79,10 +70,16 @@ test("keeps the same snapshot when revisiting Accueil same day", async ({ page }
   await seedStaleBookAndRecipe(page);
   await page.goto("/");
   await expect(page.getByTestId("activity-suggestions-card")).toBeVisible({ timeout: 15_000 });
-  const firstTitles = await page.getByTestId("activity-suggestions-card").locator("li p").allTextContents();
+  const firstTitles = await page
+    .getByTestId("activity-suggestions-card")
+    .locator("li p")
+    .allTextContents();
   await page.goto("/lists/books");
   await page.goto("/");
-  const secondTitles = await page.getByTestId("activity-suggestions-card").locator("li p").allTextContents();
+  const secondTitles = await page
+    .getByTestId("activity-suggestions-card")
+    .locator("li p")
+    .allTextContents();
   expect(secondTitles).toEqual(firstTitles);
 });
 

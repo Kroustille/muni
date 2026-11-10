@@ -1,6 +1,13 @@
 import { expect, test } from "@playwright/test";
 import fr from "../../src/i18n/fr.json";
-import { locators, openQuickAddType, selectors, signIn, titleFieldLabel } from "./list-helpers";
+import {
+  locators,
+  openItem,
+  openQuickAddType,
+  selectors,
+  signIn,
+  titleFieldLabel,
+} from "./list-helpers";
 
 const t = (key: keyof typeof fr): string => fr[key];
 
@@ -12,11 +19,14 @@ test.describe("movies tags and franchise filters", () => {
     const title = `Tag Franchise ${Date.now()}`;
 
     await openQuickAddType(page, "movie");
-    await page.getByRole("dialog").getByLabel(titleFieldLabel("movie")).fill(title);
+    await page
+      .getByRole("dialog")
+      .getByLabel(titleFieldLabel("movie"), { exact: true })
+      .fill(title);
     await locators.quickAddSubmit(page).click();
     await expect(locators.itemLink(page, title)).toBeVisible({ timeout: 15_000 });
 
-    await locators.itemLink(page, title).click();
+    await openItem(page, title);
     await page.getByLabel(t("books.tags.add")).fill("ciné-tag");
     await page.getByRole("button", { name: t("books.tags.add") }).click();
     await page.getByLabel(t("movies.franchise.name")).fill("Ma saga");

@@ -21,14 +21,18 @@ test.describe("movies catalog empty search", () => {
     await page.getByRole("button", { name: t("movies.catalog.search") }).click();
     const catalogDialog = page.getByRole("dialog", { name: t("movies.catalog.search") });
     await catalogDialog.getByLabel(t("movies.catalog.search.placeholder")).fill(title);
-    await catalogDialog.getByRole("button", { name: t("books.lookup.search") }).click();
+    await catalogDialog
+      .getByRole("button", { name: t("books.lookup.search"), exact: true })
+      .click();
     await expect(catalogDialog.getByText(t("movies.catalog.empty"))).toBeVisible({
       timeout: 10_000,
     });
     await catalogDialog.getByRole("button", { name: t("books.addManually") }).click();
 
     const quickAddDialog = page.getByRole("dialog", { name: t("type.movie") });
-    await expect(quickAddDialog.getByLabel(titleFieldLabel("movie"))).toHaveValue(title);
+    await expect(quickAddDialog.getByLabel(titleFieldLabel("movie"), { exact: true })).toHaveValue(
+      title,
+    );
     await locators.quickAddSubmit(page).click();
     await expect(locators.itemLink(page, title)).toBeVisible({ timeout: 15_000 });
   });

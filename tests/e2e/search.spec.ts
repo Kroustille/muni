@@ -2,6 +2,7 @@ import { expect, test } from "@playwright/test";
 import {
   addItem,
   locators,
+  openItem,
   mailpitUrl,
   openList,
   selectors,
@@ -9,12 +10,7 @@ import {
   t,
   type ItemKind,
 } from "./list-helpers";
-import {
-  openSearch,
-  searchFor,
-  searchLocators,
-  searchTypeLabel,
-} from "./search-helpers";
+import { openSearch, searchFor, searchLocators, searchTypeLabel } from "./search-helpers";
 
 test.beforeEach(async ({ request }) => {
   await request.delete(`${mailpitUrl}/api/v1/messages`).catch(() => undefined);
@@ -78,7 +74,7 @@ test("does not match notes, only title or name", async ({ page, context }) => {
   const title = "Titre discret";
   await addItem(page, "book", title);
   await openList(page, "books");
-  await locators.itemLink(page, title).click();
+  await openItem(page, title);
   await page.getByLabel(t("field.notes")).fill("motsecretintrouvable");
   await page.getByRole("button", { name: selectors.actionSave }).click();
 

@@ -40,7 +40,7 @@ test.describe("movies catalog search", () => {
     await page.goto("/lists/movies");
     await page.getByRole("button", { name: "Rechercher dans le catalogue" }).click();
     await page.getByLabel("Titre du film ou de la série").fill("Amélie");
-    await page.getByRole("button", { name: "Rechercher" }).click();
+    await page.getByRole("button", { name: "Rechercher", exact: true }).click();
     await page.getByRole("button", { name: "Amélie" }).click();
     await expect(page.getByText("Amélie est une serveuse discrète.")).toBeVisible({
       timeout: 10_000,

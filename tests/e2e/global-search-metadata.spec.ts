@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { addItem, locators, openList, selectors, signIn, t } from "./list-helpers";
+import { addItem, locators, openItem, openList, selectors, signIn, t } from "./list-helpers";
 import { openSearch, searchFor, searchLocators } from "./search-helpers";
 
 test("global search matches book author metadata", async ({ page, context }) => {
@@ -7,7 +7,7 @@ test("global search matches book author metadata", async ({ page, context }) => 
   const title = "Roman discret";
   await addItem(page, "book", title);
   await openList(page, "books");
-  await locators.itemLink(page, title).click();
+  await openItem(page, title);
   await page.getByLabel(t("field.author")).fill("AuteurUnique");
   await page.getByRole("button", { name: selectors.actionSave }).click();
 

@@ -3,6 +3,7 @@ import {
   addItem,
   listPath,
   locators,
+  openItem,
   mailpitUrl,
   openList,
   selectors,
@@ -90,12 +91,14 @@ test("edits a recipe and persists ingredients and steps after reload", async ({ 
   const title = "Crêpes";
   await addItem(page, "recipe", title);
   await openList(page, "recipes");
-  await locators.itemLink(page, title).click();
+  await openItem(page, title);
   await expect(page).toHaveURL(/\/items\/[^/]+$/);
 
   await page.getByLabel(selectors.fieldNotes).fill("Pour le goûter");
   await page.getByRole("button", { name: selectors.addIngredient }).click();
-  const ingredientRows = page.getByRole("group", { name: selectors.fieldIngredients }).getByRole("listitem");
+  const ingredientRows = page
+    .getByRole("group", { name: selectors.fieldIngredients })
+    .getByRole("listitem");
   await ingredientRows.nth(0).getByLabel(t("field.quantity")).fill("250 g");
   await ingredientRows.nth(0).getByLabel(t("field.name")).fill("farine");
 
@@ -119,7 +122,7 @@ test("deletes an item and restores it with Undo", async ({ page }) => {
   const title = "Amélie";
   await addItem(page, "movie", title);
   await openList(page, "movies");
-  await locators.itemLink(page, title).click();
+  await openItem(page, title);
 
   await page.getByRole("button", { name: selectors.actionDelete }).click();
   await expect(page.getByText(selectors.itemDeleted)).toBeVisible();

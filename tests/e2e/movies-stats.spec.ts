@@ -2,13 +2,14 @@ import { expect, test } from "@playwright/test";
 
 import { addItem, signIn, t } from "./list-helpers";
 
-test.describe("book stats page", () => {
+test.describe("movie stats page", () => {
   test("smoke: insights stats section renders", async ({ page }) => {
     await signIn(page);
-    await addItem(page, "book", "Statistiques Test");
-    await page.goto("/books/insights");
-    await expect(page.getByRole("heading", { name: t("books.insights.stats") })).toBeVisible();
-    await expect(page.getByTestId("book-stats")).toBeVisible();
-    await expect(page.getByText("Par mois")).toBeVisible();
+    await addItem(page, "movie", "Statistiques Film Test");
+    await page.goto("/movies/insights");
+    const stats = page.getByTestId("movie-stats");
+    await expect(stats).toBeVisible();
+    await expect(stats.getByRole("heading", { name: t("movies.insights.stats") })).toBeVisible();
+    await expect(page.getByTestId("watch-heatmap")).toBeVisible();
   });
 });

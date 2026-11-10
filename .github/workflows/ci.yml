@@ -196,6 +196,14 @@ jobs:
       - name: End-to-end tests (shard)
         run: yarn playwright test --shard=${{ matrix.shard }}/${{ matrix.total }}
 
+      - name: Upload Playwright traces
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results-${{ matrix.shard }}
+          path: test-results/
+          retention-days: 7
+
   docker:
     needs: [checks, build, unit, e2e]
     runs-on: ubuntu-latest

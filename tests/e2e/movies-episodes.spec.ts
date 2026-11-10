@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import fr from "../../src/i18n/fr.json";
-import { listPath, locators, signIn } from "./list-helpers";
+import { listPath, locators, openItem, signIn } from "./list-helpers";
 
 const t = (key: keyof typeof fr): string => fr[key];
 
@@ -46,10 +46,10 @@ test.describe("movie episode progress smoke", () => {
     await page.goto(listPath("movies"));
     await page.getByRole("button", { name: "Rechercher dans le catalogue" }).click();
     await page.getByLabel("Titre du film ou de la série").fill("Série");
-    await page.getByRole("button", { name: "Rechercher" }).click();
+    await page.getByRole("button", { name: "Rechercher", exact: true }).click();
     await page.getByRole("button", { name: "Série Fixture" }).click();
     await page.getByRole("button", { name: "Enregistrer" }).click();
-    await locators.itemLink(page, "Série Fixture").click();
+    await openItem(page, "Série Fixture");
 
     await expect(page.getByRole("heading", { name: t("movies.episodes.title") })).toBeVisible();
     await page.getByRole("button", { name: "S1E1" }).click();

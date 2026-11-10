@@ -1,14 +1,7 @@
 import { expect, test } from "@playwright/test";
 
 import fr from "../../src/i18n/fr.json";
-import {
-  addItem,
-  locators,
-  openList,
-  selectors,
-  signIn,
-  t,
-} from "./list-helpers";
+import { addItem, locators, openItem, openList, selectors, signIn, t } from "./list-helpers";
 
 test.describe("book pause and lending", () => {
   test("pause with pages read, lend, and return", async ({ page }) => {
@@ -16,7 +9,7 @@ test.describe("book pause and lending", () => {
     const title = "Le Comte de Monte-Cristo";
     await addItem(page, "book", title);
     await openList(page, "books");
-    await locators.itemLink(page, title).click();
+    await openItem(page, title);
 
     await page.getByLabel(t("field.status")).selectOption({ label: t("status.paused") });
     await page.getByLabel(t("books.pagesRead")).fill("120");

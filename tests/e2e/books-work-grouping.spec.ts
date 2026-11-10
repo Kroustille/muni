@@ -13,22 +13,21 @@ test.describe("books work grouping", () => {
     await page.route("**/api/books/search*", async (route) => {
       const url = new URL(route.request().url());
       const q = (url.searchParams.get("q") ?? "").toLowerCase();
-      const results =
-        q.includes("folio")
-          ? [
-              {
-                isbn: ISBN_B,
-                title: "L'Étranger (folio)",
-                author: "Camus",
-              },
-            ]
-          : [
-              {
-                isbn: ISBN_A,
-                title: "L'Étranger",
-                author: "Camus",
-              },
-            ];
+      const results = q.includes("folio")
+        ? [
+            {
+              isbn: ISBN_B,
+              title: "L'Étranger (folio)",
+              author: "Camus",
+            },
+          ]
+        : [
+            {
+              isbn: ISBN_A,
+              title: "L'Étranger",
+              author: "Camus",
+            },
+          ];
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -57,14 +56,14 @@ test.describe("books work grouping", () => {
 
     await page.getByRole("button", { name: t("books.catalog.search") }).click();
     await page.getByLabel(t("books.catalog.search.placeholder")).fill("étranger");
-    await page.getByRole("button", { name: t("books.lookup.search") }).click();
+    await page.getByRole("button", { name: t("books.lookup.search"), exact: true }).click();
     await page.getByRole("button", { name: "L'Étranger" }).click();
     await page.getByRole("button", { name: t("action.save") }).click();
     await expect(page.getByRole("link", { name: "L'Étranger" })).toBeVisible({ timeout: 15_000 });
 
     await page.getByRole("button", { name: t("books.catalog.search") }).click();
     await page.getByLabel(t("books.catalog.search.placeholder")).fill("étranger folio");
-    await page.getByRole("button", { name: t("books.lookup.search") }).click();
+    await page.getByRole("button", { name: t("books.lookup.search"), exact: true }).click();
     await page.getByRole("button", { name: "L'Étranger (folio)" }).click();
     await page.getByRole("button", { name: t("action.save") }).click();
     await expect(page.getByRole("link", { name: "L'Étranger (folio)" })).toBeVisible({

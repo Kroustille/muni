@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-import { addItem, locators, openList, selectors, signIn, t } from "./list-helpers";
+import { addItem, locators, openItem, openList, selectors, signIn, t } from "./list-helpers";
 
 test.describe("book reading heatmap", () => {
   test("lights activity after pages read update", async ({ page }) => {
@@ -8,7 +8,7 @@ test.describe("book reading heatmap", () => {
     const title = "Les Misérables";
     await addItem(page, "book", title);
     await openList(page, "books");
-    await locators.itemLink(page, title).click();
+    await openItem(page, title);
 
     await page.getByLabel(t("field.status")).selectOption({ label: t("status.reading") });
     await page.getByLabel(t("books.pagesRead")).fill("15");

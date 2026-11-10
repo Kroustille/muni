@@ -20,18 +20,17 @@ test.describe("books catalog empty search", () => {
     await openList(page, "books");
     await page.getByRole("button", { name: t("books.catalog.search") }).click();
     await page.getByLabel(t("books.catalog.search.placeholder")).fill("L'Étranger");
-    await page.waitForResponse(
-      (res) => res.url().includes("/api/books/search") && res.ok(),
-      { timeout: 15_000 },
-    );
+    await page.waitForResponse((res) => res.url().includes("/api/books/search") && res.ok(), {
+      timeout: 15_000,
+    });
 
     await expect(page.getByText(t("books.catalog.empty"))).toBeVisible({ timeout: 10_000 });
     await expect(page.getByRole("button", { name: t("books.addManually") })).toBeVisible();
     expect(await page.evaluate(() => document.querySelectorAll("form form").length)).toBe(0);
 
     await page.getByRole("button", { name: t("books.addManually") }).click();
-    await expect(page.getByLabel(t("field.title"))).toHaveValue("L'Étranger");
-    await page.getByLabel(t("field.title")).fill("L'Étranger");
+    await expect(page.getByLabel(t("field.title"), { exact: true })).toHaveValue("L'Étranger");
+    await page.getByLabel(t("field.title"), { exact: true }).fill("L'Étranger");
     await page.getByRole("button", { name: t("action.save") }).click();
     await expect(page.getByRole("link", { name: "L'Étranger" })).toBeVisible({ timeout: 10_000 });
   });

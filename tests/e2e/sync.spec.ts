@@ -1,18 +1,5 @@
-import {
-  expect,
-  test,
-  type Browser,
-  type BrowserContext,
-  type Page,
-} from "@playwright/test";
-import {
-  addItem,
-  locators,
-  openList,
-  selectors,
-  signIn,
-  t,
-} from "./list-helpers";
+import { expect, test, type Browser, type BrowserContext, type Page } from "@playwright/test";
+import { addItem, locators, openItem, openList, selectors, signIn, t } from "./list-helpers";
 
 const mailpit = process.env.MAILPIT_URL ?? "http://localhost:8025";
 
@@ -109,12 +96,12 @@ test("same-field conflict resolves to the latest edit on both devices", async ({
   const laterNote = "Dernière version";
 
   await openList(pageA, "books");
-  await locators.itemLink(pageA, title).click();
+  await openItem(pageA, title);
   await pageA.getByLabel(selectors.fieldNotes).fill(earlierNote);
   await pageA.getByRole("button", { name: selectors.actionSave }).click();
 
   await openList(pageB, "books");
-  await locators.itemLink(pageB, title).click();
+  await openItem(pageB, title);
   await pageB.getByLabel(selectors.fieldNotes).fill(laterNote);
   await pageB.getByRole("button", { name: selectors.actionSave }).click();
 
@@ -124,7 +111,7 @@ test("same-field conflict resolves to the latest edit on both devices", async ({
   for (const page of [pageA, pageB]) {
     await eventuallyWithinSync(async () => {
       await openList(page, "books");
-      await locators.itemLink(page, title).click();
+      await openItem(page, title);
       await expect(page.getByLabel(selectors.fieldNotes)).toHaveValue(laterNote);
     });
   }
@@ -145,7 +132,7 @@ test("delete on one device removes the item on the other after sync", async ({ b
   });
 
   await openList(pageA, "movies");
-  await locators.itemLink(pageA, title).click();
+  await openItem(pageA, title);
   await pageA.getByRole("button", { name: selectors.actionDelete }).click();
   await expect(pageA.getByText(selectors.itemDeleted)).toBeVisible();
   await expect(pageA.getByText(selectors.itemDeleted)).toBeHidden({

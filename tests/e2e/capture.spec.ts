@@ -1,5 +1,6 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 import fr from "../../src/i18n/fr.json";
+import { openItem, openQuickAddType } from "./list-helpers";
 
 /** i18n keys the capture UI must add alongside existing catalog entries (T064–T066). */
 export type PendingCaptureKey = "field.recommendedBy" | "validation.titleRequired";
@@ -53,7 +54,8 @@ export const locators = {
   quickAddButton: (page: Page) => page.locator("[data-testid=nav-quick-add]:visible"),
   typeButton: (page: Page, kind: ItemKind) =>
     page.getByRole("dialog").getByRole("button", { name: quickAddTypeLabel(kind) }),
-  titleField: (page: Page, kind: ItemKind) => page.getByLabel(titleFieldLabel(kind)),
+  titleField: (page: Page, kind: ItemKind) =>
+    page.getByLabel(titleFieldLabel(kind), { exact: true }),
   authorField: (page: Page) => page.getByLabel(selectors.fieldAuthor),
   quantityField: (page: Page) => page.getByLabel(selectors.fieldQuantity),
   recommendedByField: (page: Page) => page.getByLabel(selectors.fieldRecommendedBy),
@@ -100,8 +102,7 @@ export async function signIn(page: Page): Promise<void> {
 }
 
 export async function openQuickAdd(page: Page, kind: ItemKind): Promise<void> {
-  await locators.quickAddButton(page).click();
-  await locators.typeButton(page, kind).click();
+  await openQuickAddType(page, kind);
 }
 
 export async function openList(page: Page, type: ListRoute): Promise<void> {
@@ -117,7 +118,11 @@ export type QuickAddFields = {
   notes?: string;
 };
 
-export async function fillQuickAdd(page: Page, kind: ItemKind, fields: QuickAddFields): Promise<void> {
+export async function fillQuickAdd(
+  page: Page,
+  kind: ItemKind,
+  fields: QuickAddFields,
+): Promise<void> {
   await locators.titleField(page, kind).fill(fields.title);
   if (fields.author !== undefined) {
     await locators.authorField(page).fill(fields.author);
@@ -201,7 +206,7 @@ test("title-only quick add leaves optional text fields empty on the detail scree
   await fillQuickAdd(page, "book", { title });
   await submitQuickAdd(page);
   await openList(page, "books");
-  await locators.itemLink(page, title).click();
+  await openItem(page, title);
   await expect(page).toHaveURL(/\/items\/[^/]+$/);
 
   await expect(locators.authorField(page)).toHaveValue("");
@@ -216,7 +221,7 @@ test("rejects a whitespace-only title with a validation message", async ({ page 
   await submitQuickAdd(page);
   await expect(locators.validationError(page)).toBeVisible();
   await openList(page, "books");
-  await expect(page.getByText(t("list.empty"))).toBeVisible();
+  await expect(page.getByText(t("list.empty.book"))).toBeVisible();
 });
 
 test('suggests past "recommended by" names while typing', async ({ page }) => {
